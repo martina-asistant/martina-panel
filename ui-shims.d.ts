@@ -6,6 +6,10 @@ declare module '@/components/ui/input' {
   export const Input: any;
 }
 
+declare module '@/components/ui/textarea' {
+  export const Textarea: any;
+}
+
 declare module '@/components/ui/label' {
   export const Label: any;
 }
