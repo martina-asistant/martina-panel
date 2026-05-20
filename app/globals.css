@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@layer base {
+  :root {
+    --background: 60 17% 98%;
+    --foreground: 0 0% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 12%;
+    --primary: 0 0% 12%;
+    --primary-foreground: 60 17% 98%;
+    --secondary: 36 32% 89%;
+    --secondary-foreground: 0 0% 12%;
+    --muted: 36 20% 95%;
+    --muted-foreground: 0 0% 40%;
+    --accent: 36 32% 89%;
+    --accent-foreground: 0 0% 12%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 91%;
+    --input: 0 0% 91%;
+    --ring: 36 32% 70%;
+    --radius: 0.625rem;
+  }
+  body {
+    @apply bg-martina-bg text-martina-text font-sans antialiased;
+  }
+}
+
+/* Scrollbar minimalista */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #E8E8E8; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #C9B79C; }
