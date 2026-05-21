@@ -54,40 +54,60 @@ const Metric = ({
       className="
         group
         relative
-        min-h-[170px]
         overflow-hidden
-        rounded-[26px]
+        rounded-3xl
         border
-        border-cyan-400/35
-        bg-[linear-gradient(145deg,rgba(4,24,31,.92),rgba(1,11,16,.96))]
+        border-cyan-400/25
+        bg-[linear-gradient(145deg,rgba(6,32,39,.90),rgba(2,17,24,.96))]
         p-5
+        min-h-[150px]
         cursor-pointer
         transition-all
         duration-500
         hover:-translate-y-1
-        hover:border-cyan-300/80
-        hover:shadow-[0_0_38px_rgba(34,211,238,.38)]
+        hover:scale-[1.012]
+        hover:border-cyan-300/70
+        hover:shadow-[0_0_38px_rgba(34,211,238,.32)]
       "
     >
-      <div className="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_50%_100%,rgba(34,211,238,.22),transparent_36%)]" />
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[linear-gradient(120deg,transparent,rgba(34,211,238,.16),transparent)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,.18),transparent_35%)] opacity-70" />
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 bg-[linear-gradient(120deg,transparent,rgba(34,211,238,.16),transparent)]" />
 
-      <div className="absolute left-1/2 bottom-3 h-[34px] w-[120px] -translate-x-1/2 rounded-full border border-cyan-300/50 shadow-[0_0_22px_rgba(34,211,238,.55)] opacity-70" />
-      <div className="absolute left-1/2 bottom-6 h-[12px] w-[70px] -translate-x-1/2 rounded-full bg-cyan-300/30 blur-md opacity-80" />
+      <div className="absolute left-1/2 bottom-3 h-[26px] w-[125px] -translate-x-1/2 rounded-full border border-cyan-300/35 bg-cyan-300/5 shadow-[0_0_22px_rgba(34,211,238,.35)] transition-all duration-500 group-hover:border-cyan-200/70 group-hover:shadow-[0_0_34px_rgba(34,211,238,.65)]" />
+      <div className="absolute left-1/2 bottom-6 h-[8px] w-[78px] -translate-x-1/2 rounded-full bg-cyan-300/25 blur-md transition-all duration-500 group-hover:bg-cyan-200/45" />
 
-      <div className="relative z-10 flex h-full flex-col justify-between">
-        <div className="flex items-start justify-between gap-4">
-          <div className="text-xs uppercase tracking-[0.24em] text-cyan-300">
+      <div className="relative z-10 flex h-full min-h-[110px] justify-between">
+        <div className="flex flex-col justify-between">
+          <div className="text-xs uppercase tracking-[0.24em] text-cyan-300/80">
             {label}
           </div>
 
-          <div className="flex h-14 w-14 items-center justify-center rounded-full border border-cyan-300/40 bg-cyan-400/10 shadow-[0_0_24px_rgba(34,211,238,.25)] transition-all duration-500 group-hover:scale-110 group-hover:shadow-[0_0_32px_rgba(34,211,238,.55)]">
-            <Icon className="h-7 w-7 text-cyan-200" />
+          <div className="text-5xl font-bold text-white drop-shadow-[0_0_14px_rgba(255,255,255,.12)]">
+            {value}
           </div>
         </div>
 
-        <div className="text-5xl font-bold text-white drop-shadow-[0_0_16px_rgba(255,255,255,.18)]">
-          {value}
+        <div
+          className="
+            w-14
+            h-14
+            rounded-2xl
+            bg-cyan-500/10
+            border
+            border-cyan-300/20
+            flex
+            items-center
+            justify-center
+            shadow-[0_0_20px_rgba(34,211,238,.18)]
+            transition-all
+            duration-500
+            group-hover:scale-110
+            group-hover:bg-cyan-400/15
+            group-hover:border-cyan-200/45
+            group-hover:shadow-[0_0_28px_rgba(34,211,238,.45)]
+          "
+        >
+          <Icon className="w-7 h-7 text-cyan-300" />
         </div>
       </div>
     </Card>
@@ -178,8 +198,8 @@ const DashboardClient = ({
   const recCancel = recs.filter(r => r.estado === 'cancelada_recado').length;
 
   return (
-    <div className="min-h-full bg-[#02141B] p-8 text-white">
-      <div className="mb-10">
+    <div className="min-h-full bg-[radial-gradient(circle_at_top,rgba(10,80,92,.35),#02141B_62%)] p-8 text-white">
+      <div className="mb-8">
         <h1 className="mb-4 flex items-center gap-3 bg-gradient-to-r from-white to-cyan-300 bg-clip-text text-5xl font-bold text-transparent">
           ¡Hola Sheila!
           <span className="text-cyan-300 drop-shadow-[0_0_12px_rgba(34,211,238,.8)]">
@@ -193,9 +213,9 @@ const DashboardClient = ({
         </div>
       </div>
 
-      <div className="space-y-10">
+      <div className="space-y-8">
         <section>
-          <h2 className="mb-4 uppercase tracking-[0.22em] text-cyan-300">
+          <h2 className="mb-4 uppercase tracking-[0.24em] text-cyan-300">
             Conversaciones
           </h2>
 
@@ -209,7 +229,7 @@ const DashboardClient = ({
         </section>
 
         <section>
-          <h2 className="mb-4 uppercase tracking-[0.22em] text-cyan-300">
+          <h2 className="mb-4 uppercase tracking-[0.24em] text-cyan-300">
             Actividad de hoy
           </h2>
 
@@ -222,7 +242,7 @@ const DashboardClient = ({
         </section>
 
         <section>
-          <h2 className="mb-4 uppercase tracking-[0.22em] text-cyan-300">
+          <h2 className="mb-4 uppercase tracking-[0.24em] text-cyan-300">
             Estado recordatorios
           </h2>
 
