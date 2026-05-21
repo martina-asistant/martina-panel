@@ -20,10 +20,10 @@ const Sidebar = () => {
       <div className="px-4 pt-5 pb-4">
         <div className="rounded-3xl border border-cyan-400/20 bg-cyan-500/10 p-4 flex items-center gap-3">
           <img
-            src="/martina-circle.png"
-            alt="Martina"
-            className="w-14 h-14 rounded-2xl object-cover shadow-[0_0_25px_rgba(34,211,238,.25)]"
-          />
+  src="/martina-circle.png"
+  alt="Martina"
+  className="w-14 h-14 rounded-2xl object-cover shadow-[0_0_25px_rgba(34,211,238,.25)]"
+/>
 
           <div>
             <div className="text-[11px] tracking-[0.35em] text-cyan-300 font-semibold">
