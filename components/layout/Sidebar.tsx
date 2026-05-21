@@ -22,7 +22,7 @@ const Sidebar = () => {
   const pathname = usePathname();
 
   return (
-    <header className="w-full bg-[#03111A] border-b border-cyan-500/10 px-8 py-4">
+    <header className="w-[135%] h-[135%] object-contain object-center translate-y-[2px]"
       <div className="max-w-[1500px] mx-auto flex items-center justify-between gap-8">
 
         <div className="rounded-3xl border border-cyan-400/25 bg-cyan-500/10 px-5 py-3 flex items-center gap-4 shadow-[0_0_30px_rgba(34,211,238,.10)]">
