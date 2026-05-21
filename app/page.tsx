@@ -6,48 +6,33 @@ const Home = () => {
   const router = useRouter();
 
   return (
-    <main className="fixed inset-0 overflow-hidden bg-[#03151B]">
+    <main className="fixed inset-0 bg-[#020f14] overflow-hidden flex items-center justify-center">
+      <div className="relative w-screen h-screen flex items-center justify-center">
 
-      <img
-        src="/martina-hero-v2.png"
-        alt="Martina"
-        className="
-          absolute
-          inset-0
-          w-full
-          h-full
-          object-cover
-          object-top
-        "
-      />
+        <img
+          src="/martina-hero-v2.png"
+          alt="Martina"
+          className="w-full h-full object-contain"
+        />
 
-      {/* zona clicable INVISIBLE encima del botón que YA existe */}
-      <button
-        onClick={() => router.push('/dashboard')}
-        aria-label="Acceder"
-        className="
-          absolute
-          left-1/2
-          top-[67.2%]
-          w-[24%]
-          h-[7%]
-          -translate-x-1/2
-          bg-transparent
-          rounded-full
-          transition-all
-          duration-300
-          hover:scale-105
-        "
-      />
+        {/* Botón invisible sobre ACCEDER */}
+        <button
+          onClick={() => router.push('/dashboard')}
+          aria-label="Acceder"
+          className="
+            absolute
+            left-1/2
+            top-[62%]
+            w-[26%]
+            h-[8%]
+            -translate-x-1/2
+            rounded-full
+            bg-transparent
+            cursor-pointer
+          "
+        />
 
-      <style jsx>{`
-      
-      button:hover{
-        filter: drop-shadow(0 0 30px rgba(34,211,238,1));
-      }
-
-      `}</style>
-
+      </div>
     </main>
   );
 };
