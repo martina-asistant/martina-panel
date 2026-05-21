@@ -54,53 +54,40 @@ const Metric = ({
       className="
         group
         relative
+        min-h-[170px]
         overflow-hidden
-        rounded-3xl
+        rounded-[26px]
         border
-        border-cyan-500/20
-        bg-[rgba(5,18,24,.78)]
-        backdrop-blur-xl
+        border-cyan-400/35
+        bg-[linear-gradient(145deg,rgba(4,24,31,.92),rgba(1,11,16,.96))]
         p-5
         cursor-pointer
         transition-all
         duration-500
         hover:-translate-y-1
-        hover:scale-[1.015]
-        hover:border-cyan-300/60
-        hover:shadow-[0_0_35px_rgba(34,211,238,.32)]
+        hover:border-cyan-300/80
+        hover:shadow-[0_0_38px_rgba(34,211,238,.38)]
       "
     >
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-cyan-400/15 via-transparent to-transparent" />
-      <div className="absolute -bottom-10 left-1/2 h-20 w-32 -translate-x-1/2 rounded-full bg-cyan-400/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_50%_100%,rgba(34,211,238,.22),transparent_36%)]" />
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[linear-gradient(120deg,transparent,rgba(34,211,238,.16),transparent)]" />
 
-      <div className="relative flex justify-between items-center">
-        <div>
-          <div className="text-xs uppercase tracking-[0.22em] text-cyan-300/70 mb-3">
+      <div className="absolute left-1/2 bottom-3 h-[34px] w-[120px] -translate-x-1/2 rounded-full border border-cyan-300/50 shadow-[0_0_22px_rgba(34,211,238,.55)] opacity-70" />
+      <div className="absolute left-1/2 bottom-6 h-[12px] w-[70px] -translate-x-1/2 rounded-full bg-cyan-300/30 blur-md opacity-80" />
+
+      <div className="relative z-10 flex h-full flex-col justify-between">
+        <div className="flex items-start justify-between gap-4">
+          <div className="text-xs uppercase tracking-[0.24em] text-cyan-300">
             {label}
           </div>
 
-          <div className="text-5xl font-bold text-white">
-            {value}
+          <div className="flex h-14 w-14 items-center justify-center rounded-full border border-cyan-300/40 bg-cyan-400/10 shadow-[0_0_24px_rgba(34,211,238,.25)] transition-all duration-500 group-hover:scale-110 group-hover:shadow-[0_0_32px_rgba(34,211,238,.55)]">
+            <Icon className="h-7 w-7 text-cyan-200" />
           </div>
         </div>
 
-        <div
-          className="
-            w-14
-            h-14
-            rounded-2xl
-            bg-cyan-500/10
-            flex
-            items-center
-            justify-center
-            shadow-[0_0_20px_rgba(34,211,238,.18)]
-            transition-all
-            duration-500
-            group-hover:bg-cyan-400/15
-            group-hover:shadow-[0_0_26px_rgba(34,211,238,.35)]
-          "
-        >
-          <Icon className="w-7 h-7 text-cyan-300" />
+        <div className="text-5xl font-bold text-white drop-shadow-[0_0_16px_rgba(255,255,255,.18)]">
+          {value}
         </div>
       </div>
     </Card>
@@ -191,69 +178,28 @@ const DashboardClient = ({
   const recCancel = recs.filter(r => r.estado === 'cancelada_recado').length;
 
   return (
-    <div className="min-h-full p-8 bg-[#02141B] text-white">
+    <div className="min-h-full bg-[#02141B] p-8 text-white">
       <div className="mb-10">
-        <h1
-          className="
-            flex
-            items-center
-            gap-3
-            text-5xl
-            font-bold
-            bg-gradient-to-r
-            from-white
-            to-cyan-300
-            bg-clip-text
-            text-transparent
-            mb-4
-          "
-        >
+        <h1 className="mb-4 flex items-center gap-3 bg-gradient-to-r from-white to-cyan-300 bg-clip-text text-5xl font-bold text-transparent">
           ¡Hola Sheila!
-
           <span className="text-cyan-300 drop-shadow-[0_0_12px_rgba(34,211,238,.8)]">
             ✦
           </span>
         </h1>
 
-        <div
-          className="
-            inline-flex
-            items-center
-            gap-3
-            rounded-full
-            border
-            border-cyan-400/20
-            bg-cyan-500/10
-            px-5
-            py-2.5
-            text-cyan-100
-            text-sm
-            font-medium
-            shadow-[0_0_20px_rgba(34,211,238,.08)]
-          "
-        >
-          <span
-            className="
-              w-2
-              h-2
-              rounded-full
-              bg-cyan-300
-              animate-pulse
-              shadow-[0_0_12px_rgba(34,211,238,.95)]
-            "
-          />
-
+        <div className="inline-flex items-center gap-3 rounded-full border border-cyan-400/20 bg-cyan-500/10 px-5 py-2.5 text-sm font-medium text-cyan-100 shadow-[0_0_20px_rgba(34,211,238,.08)]">
+          <span className="h-2 w-2 animate-pulse rounded-full bg-cyan-300 shadow-[0_0_12px_rgba(34,211,238,.95)]" />
           Martina activa
         </div>
       </div>
 
       <div className="space-y-10">
         <section>
-          <h2 className="mb-4 uppercase tracking-[0.22em] text-cyan-300/70">
+          <h2 className="mb-4 uppercase tracking-[0.22em] text-cyan-300">
             Conversaciones
           </h2>
 
-          <div className="grid lg:grid-cols-5 gap-4">
+          <div className="grid gap-4 lg:grid-cols-5">
             <Metric icon={MessageCircle} label="Nuevas" value={nuevas} href="/conversaciones" />
             <Metric icon={LoaderCircle} label="En curso" value={enCurso} href="/conversaciones" />
             <Metric icon={Building2} label="Recepción" value={recepcion} href="/conversaciones" />
@@ -263,11 +209,11 @@ const DashboardClient = ({
         </section>
 
         <section>
-          <h2 className="mb-4 uppercase tracking-[0.22em] text-cyan-300/70">
+          <h2 className="mb-4 uppercase tracking-[0.22em] text-cyan-300">
             Actividad de hoy
           </h2>
 
-          <div className="grid lg:grid-cols-4 gap-4">
+          <div className="grid gap-4 lg:grid-cols-4">
             <Metric icon={CalendarDays} label="Citas creadas" value={citasHoy} href="/conversaciones" />
             <Metric icon={Bell} label="Recordatorios" value={recordatoriosHoy} href="/recordatorios" />
             <Metric icon={PhoneOutgoing} label="Recalls enviados" value={recallsEnviadosHoy} href="/recalls" />
@@ -276,11 +222,11 @@ const DashboardClient = ({
         </section>
 
         <section>
-          <h2 className="mb-4 uppercase tracking-[0.22em] text-cyan-300/70">
+          <h2 className="mb-4 uppercase tracking-[0.22em] text-cyan-300">
             Estado recordatorios
           </h2>
 
-          <div className="grid lg:grid-cols-5 gap-4">
+          <div className="grid gap-4 lg:grid-cols-5">
             <Metric icon={CircleDot} label="Pendiente" value={recPendiente} href="/recordatorios" />
             <Metric icon={CircleCheck} label="Confirmadas" value={recConf} href="/recordatorios" />
             <Metric icon={CircleX} label="No podrá asistir" value={recNo} href="/recordatorios" />
