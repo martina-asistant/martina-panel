@@ -22,44 +22,51 @@ const Sidebar = () => {
   const pathname = usePathname();
 
   return (
-    <aside className="
+    <aside
+      className="
       w-64
+      bg-[#03111A]
       border-r
       border-cyan-500/10
-      bg-[#03111A]
       text-white
       flex
       flex-col
       overflow-hidden
-    ">
+    "
+    >
 
       {/* CABECERA */}
-      <div className="px-4 pt-5 pb-4">
 
-        <div className="
-          rounded-3xl
+      <div className="px-4 pt-5 pb-5">
+
+        <div
+          className="
+          rounded-[28px]
           border
-          border-cyan-400/20
+          border-cyan-400/25
           bg-cyan-500/10
-          p-4
+          px-5
+          py-5
           flex
           items-center
           gap-4
-        ">
+          shadow-[0_0_30px_rgba(34,211,238,.08)]
+        "
+        >
 
-          {/* MARTINA */}
-
-          <div className="
-            w-16
-            h-16
+          <div
+            className="
+            w-20
+            h-20
             rounded-2xl
             overflow-hidden
             bg-[#061923]
-            ring-1
-            ring-cyan-400/40
-            shadow-[0_0_25px_rgba(34,211,238,.35)]
+            ring-2
+            ring-cyan-400/50
+            shadow-[0_0_28px_rgba(34,211,238,.35)]
             flex-shrink-0
-          ">
+          "
+          >
 
             <img
               src="/martina-sidebar.png"
@@ -69,29 +76,34 @@ const Sidebar = () => {
                 h-full
                 object-cover
                 object-center
-                scale-[1.35]
+                scale-[1.18]
               "
             />
 
           </div>
 
-          <div>
+          <div className="min-w-0">
 
-            <div className="
-              text-[11px]
-              tracking-[0.35em]
+            <div
+              className="
+              text-[12px]
+              tracking-[0.38em]
               text-cyan-300
               font-semibold
-            ">
+            "
+            >
               MARTINA
             </div>
 
-            <div className="
-              text-sm
+            <div
+              className="
+              text-base
               font-semibold
               text-white
               leading-tight
-            ">
+              mt-1
+            "
+            >
               Panel clínico IA
             </div>
 
@@ -103,7 +115,7 @@ const Sidebar = () => {
 
       {/* MENÚ */}
 
-      <nav className="px-4 pt-4 space-y-2">
+      <nav className="px-4 pt-3 space-y-2">
 
         {nav.map(({ href, label, icon: Icon }) => {
 
@@ -129,9 +141,9 @@ const Sidebar = () => {
                 active
                   ? `
                   bg-cyan-500/15
-                  text-cyan-300
                   border
                   border-cyan-400/20
+                  text-cyan-300
                   `
                   : `
                   text-gray-400
@@ -153,9 +165,10 @@ const Sidebar = () => {
 
       </nav>
 
-      {/* PIE */}
+      {/* FOOTER */}
 
-      <div className="
+      <div
+        className="
         mt-auto
         px-5
         py-4
@@ -163,7 +176,8 @@ const Sidebar = () => {
         border-cyan-500/10
         text-xs
         text-gray-500
-      ">
+      "
+      >
 
         Martina IA · v1.0
 
