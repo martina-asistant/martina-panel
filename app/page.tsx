@@ -7,12 +7,12 @@ const Home = () => {
 
   return (
     <main className="fixed inset-0 bg-[#020f14] overflow-hidden flex items-center justify-center">
-      <div className="relative w-screen h-screen flex items-center justify-center">
+      <div className="relative w-screen h-screen flex items-center justify-center overflow-hidden">
 
         <img
           src="/martina-hero-v2.png"
           alt="Martina"
-          className="w-full h-full object-contain"
+          className="w-full h-full object-contain scale-[1.14]"className="w-full h-full object-contain scale-[1.14]"
         />
 
         {/* Botón invisible sobre ACCEDER */}
