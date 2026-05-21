@@ -315,7 +315,7 @@ const ConversacionesView = () => {
                   size="sm"
                   variant="outline"
                   onClick={doTomar}
-                  className="border-cyan-300/35 bg-cyan-50 text-cyan-700 hover:bg-cyan-100"
+                  className="bg-cyan-50 border-cyan-300/35 text-cyan-700 hover:bg-cyan-100"
                 >
                   Tomar conversación
                 </Button>
@@ -324,7 +324,7 @@ const ConversacionesView = () => {
                   size="sm"
                   variant="outline"
                   onClick={doDevolver}
-                  className="border-cyan-300/35 bg-cyan-50 text-cyan-700 hover:bg-cyan-100"
+                  className="bg-cyan-50 border-cyan-300/35 text-cyan-700 hover:bg-cyan-100"
                 >
                   Devolver a Martina
                 </Button>
@@ -395,7 +395,7 @@ const ConversacionesView = () => {
                   Envío gestionado por Martina desde n8n
                 </div>
 
-                <button className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] hover:from-[#25D6E6] hover:to-[#118FA0] text-white flex items-center justify-center shadow-[0_0_24px_rgba(23,199,214,.35)]">
+                <button className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] hover:from-[#25D6E6] hover:to-[#118FA0] shadow-[0_0_24px_rgba(23,199,214,.35)] text-white flex items-center justify-center">
                   <Send className="w-4 h-4" />
                 </button>
               </div>
