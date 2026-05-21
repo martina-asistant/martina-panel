@@ -30,38 +30,20 @@ const Sidebar = () => {
 
         <div className="rounded-3xl border border-cyan-400/25 bg-cyan-500/10 px-5 py-3 flex items-center gap-4 shadow-[0_0_30px_rgba(34,211,238,.10)]">
 
-          {/* LOGO */}
+          {/* HALO AGUAMARINA CON FONDO BLANCO */}
 
           <div
             className="
             w-16
             h-16
-            rounded-2xl
-            overflow-hidden
-            bg-[#061923]
+            rounded-full
+            bg-white
             ring-2
-            ring-cyan-400/50
-            shadow-[0_0_28px_rgba(34,211,238,.35)]
+            ring-cyan-400
+            shadow-[0_0_25px_rgba(34,211,238,.5)]
             flex-shrink-0
-            flex
-            items-center
-            justify-center
-          "
-          >
-
-            <img
-              src="/martina-logo.png?v=3"
-              alt="Martina"
-              className="
-              w-[135%]
-              h-[135%]
-              object-contain
-              object-center
-              translate-y-[2px]
-              "
-            />
-
-          </div>
+            "
+          />
 
           {/* TEXTO */}
 
@@ -87,7 +69,7 @@ const Sidebar = () => {
               mt-1
             "
             >
-              Panel clínico IA
+              Rambla Vilar Dental
             </div>
 
           </div>
@@ -116,7 +98,6 @@ const Sidebar = () => {
               >
 
                 <Icon className="w-4 h-4" />
-
                 <span>{label}</span>
 
               </Link>
