@@ -62,7 +62,7 @@ const Sidebar = () => {
           ">
 
             <img
-              src="/martina-circle.png"
+              src="/martina-sidebar.png"
               alt="Martina"
               className="
                 w-full
