@@ -28,7 +28,7 @@ const Sidebar = () => {
         <div className="rounded-3xl border border-cyan-400/25 bg-cyan-500/10 px-5 py-3 flex items-center gap-4 shadow-[0_0_30px_rgba(34,211,238,.10)]">
           <div className="w-16 h-16 rounded-2xl overflow-hidden bg-[#061923] ring-2 ring-cyan-400/50 shadow-[0_0_28px_rgba(34,211,238,.35)] flex-shrink-0">
             <img
-              src="/martina-sidebar.png"
+              src="/martina-logo.png"
               alt="Martina"
               className="w-full h-full object-cover object-center"
             />
