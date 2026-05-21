@@ -14,8 +14,8 @@ import { cn } from '@/lib/utils/cn';
 const nav = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/conversaciones', label: 'Conversaciones', icon: MessageSquare },
-  { href: '/recalls', label: 'Recalls', icon: PhoneCall },
   { href: '/recordatorios', label: 'Recordatorios', icon: BellRing },
+  { href: '/recalls', label: 'Recalls', icon: PhoneCall },
 ];
 
 const Sidebar = () => {
