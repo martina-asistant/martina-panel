@@ -300,7 +300,7 @@ const ConversacionesView = () => {
           </div>
         ) : (
           <>
-            <div className="h-16 border-b border-cyan-300/25 bg-[#FAFCFC] px-6 flex items-center justify-between shadow-[0_0_18px_rgba(34,211,238,.10)]">
+            <div className="h-16 border-b border-[#7ADBE6] bg-[linear-gradient(90deg,#D8F3F5_0%,#ECFAFB_50%,#D8F3F5_100%)] px-6 flex items-center justify-between shadow-[0_0_30px_rgba(14,124,139,.28)]">
               <div>
                 <div className="font-semibold text-[#06111A]">
                   {selected.nombre_paciente || formatTelefono(selected.telefono_e164)}
@@ -386,7 +386,7 @@ const ConversacionesView = () => {
             </div>
 
             <div className="px-6 py-4 border-t border-cyan-500/15 bg-white shadow-[0_-8px_28px_rgba(34,211,238,.08)]">
-              <div className="flex items-center gap-3 rounded-2xl border border-cyan-300/35 bg-[#F3FBFC] p-3 shadow-[0_0_22px_rgba(34,211,238,.14)]">
+              <div className="flex items-center gap-3 rounded-2xl border border-[#7ADBE6] bg-[linear-gradient(90deg,#D8F3F5_0%,#ECFAFB_50%,#D8F3F5_100%)] p-3 shadow-[0_0_30px_rgba(14,124,139,.28)]">
                 <button className="w-10 h-10 rounded-xl bg-white border border-cyan-200 flex items-center justify-center text-cyan-700">
                   <Paperclip className="w-4 h-4" />
                 </button>
@@ -395,7 +395,7 @@ const ConversacionesView = () => {
                   Envío gestionado por Martina desde n8n
                 </div>
 
-                <button className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] hover:from-[#25D6E6] hover:to-[#118FA0] shadow-[0_0_24px_rgba(23,199,214,.35)] text-white flex items-center justify-center">
+                <button className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] hover:from-[#25D6E6] hover:to-[#118FA0] shadow-[0_0_24px_rgba(14,124,139,.45)] text-white flex items-center justify-center">
                   <Send className="w-4 h-4" />
                 </button>
               </div>
