@@ -41,6 +41,19 @@ const filtros: { key: Filtro; label: string }[] = [
   { key: 'gestionada', label: 'Gestionadas' },
 ];
 
+const formatTelefono = (telefono?: string | null) => {
+  if (!telefono) return '';
+
+  const clean = telefono.replace(/\D/g, '');
+
+  const sinPrefijo =
+    clean.startsWith('34') && clean.length >= 11
+      ? clean.slice(2)
+      : clean;
+
+  return sinPrefijo.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
+};
+
 const ConversacionesView = () => {
   const [convs, setConvs] = useState<ConversacionWhatsapp[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -253,12 +266,12 @@ const ConversacionesView = () => {
                     <div className="flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full bg-cyan-300 shadow-[0_0_12px_rgba(34,211,238,.9)]" />
                       <span className="text-sm font-semibold truncate text-white">
-                        {c.nombre_paciente || c.telefono_e164 || 'Sin nombre'}
+                        {c.nombre_paciente || formatTelefono(c.telefono_e164) || 'Sin nombre'}
                       </span>
                     </div>
 
                     <div className="text-xs text-cyan-100/60 truncate mt-1 ml-4">
-                      {c.motivo || c.telefono_e164}
+                      {c.motivo || formatTelefono(c.telefono_e164)}
                     </div>
                   </div>
 
@@ -287,13 +300,13 @@ const ConversacionesView = () => {
           </div>
         ) : (
           <>
-            <div className="h-16 border-b border-cyan-500/15 bg-white/95 px-6 flex items-center justify-between shadow-[0_8px_28px_rgba(34,211,238,.08)]">
+            <div className="h-16 border-b border-cyan-300/25 bg-[#FAFCFC] px-6 flex items-center justify-between shadow-[0_0_18px_rgba(34,211,238,.10)]">
               <div>
                 <div className="font-semibold text-[#06111A]">
-                  {selected.nombre_paciente || selected.telefono_e164}
+                  {selected.nombre_paciente || formatTelefono(selected.telefono_e164)}
                 </div>
                 <div className="text-xs text-slate-500">
-                  {selected.telefono_e164} · {selected.motivo || 'Sin motivo'}
+                  {formatTelefono(selected.telefono_e164)} · {selected.motivo || 'Sin motivo'}
                 </div>
               </div>
 
@@ -302,7 +315,7 @@ const ConversacionesView = () => {
                   size="sm"
                   variant="outline"
                   onClick={doTomar}
-                  className="border-cyan-400/50 text-cyan-700 hover:bg-cyan-50"
+                  className="border-cyan-300/35 bg-cyan-50 text-cyan-700 hover:bg-cyan-100"
                 >
                   Tomar conversación
                 </Button>
@@ -311,7 +324,7 @@ const ConversacionesView = () => {
                   size="sm"
                   variant="outline"
                   onClick={doDevolver}
-                  className="border-cyan-400/50 text-cyan-700 hover:bg-cyan-50"
+                  className="border-cyan-300/35 bg-cyan-50 text-cyan-700 hover:bg-cyan-100"
                 >
                   Devolver a Martina
                 </Button>
@@ -319,7 +332,7 @@ const ConversacionesView = () => {
                 <Button
                   size="sm"
                   onClick={doCerrar}
-                  className="bg-[#06111A] hover:bg-black text-white shadow-[0_0_20px_rgba(34,211,238,.18)]"
+                  className="bg-[#03111A] hover:bg-[#062535] text-white shadow-[0_0_16px_rgba(34,211,238,.18)]"
                 >
                   Cerrar gestión
                 </Button>
@@ -373,7 +386,7 @@ const ConversacionesView = () => {
             </div>
 
             <div className="px-6 py-4 border-t border-cyan-500/15 bg-white shadow-[0_-8px_28px_rgba(34,211,238,.08)]">
-              <div className="flex items-center gap-3 rounded-2xl border border-cyan-300/35 bg-cyan-50/80 p-3 shadow-[0_0_22px_rgba(34,211,238,.12)]">
+              <div className="flex items-center gap-3 rounded-2xl border border-cyan-300/35 bg-[#F3FBFC] p-3 shadow-[0_0_22px_rgba(34,211,238,.14)]">
                 <button className="w-10 h-10 rounded-xl bg-white border border-cyan-200 flex items-center justify-center text-cyan-700">
                   <Paperclip className="w-4 h-4" />
                 </button>
@@ -382,7 +395,7 @@ const ConversacionesView = () => {
                   Envío gestionado por Martina desde n8n
                 </div>
 
-                <button className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-teal-500 text-white flex items-center justify-center shadow-[0_0_18px_rgba(34,211,238,.35)]">
+                <button className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] hover:from-[#25D6E6] hover:to-[#118FA0] text-white flex items-center justify-center shadow-[0_0_24px_rgba(23,199,214,.35)]">
                   <Send className="w-4 h-4" />
                 </button>
               </div>
@@ -412,7 +425,7 @@ const ConversacionesView = () => {
                   {paciente.nombre_completo}
                 </div>
                 <div className="text-xs text-cyan-100/60">
-                  {paciente.telefono}
+                  {formatTelefono(paciente.telefono)}
                 </div>
               </div>
             </div>
