@@ -11,7 +11,14 @@ const Home = () => {
         <img
           src="/martina-hero-v2.png"
           alt="Martina"
-          className="w-full h-full object-contain"
+          className="
+            w-full 
+            h-full 
+            object-contain
+            scale-[1.08]
+            md:scale-[1.03]
+            lg:scale-100
+          "
         />
 
         <button
@@ -27,6 +34,12 @@ const Home = () => {
             rounded-full
             bg-transparent
             cursor-pointer
+            transition-all
+            duration-300
+            ease-out
+            hover:-translate-y-1
+            hover:scale-[1.03]
+            hover:shadow-[0_0_30px_rgba(34,211,238,.45)]
           "
         />
       </div>
