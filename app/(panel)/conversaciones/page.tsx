@@ -293,19 +293,19 @@ const ConversacionesView = () => {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col min-w-0 bg-white text-[#06111A] shadow-[0_0_35px_rgba(34,211,238,.18)]">
+      <div className="flex-1 flex flex-col min-w-0 bg-[#F8FBFC] text-[#06111A] shadow-[0_0_25px_rgba(14,124,139,.08)]">
         {!selected ? (
           <div className="flex-1 flex items-center justify-center text-slate-400 text-sm">
             Selecciona una conversación
           </div>
         ) : (
           <>
-            <div className="h-16 border-b border-[#7ADBE6] bg-[linear-gradient(90deg,#D8F3F5_0%,#ECFAFB_50%,#D8F3F5_100%)] px-6 flex items-center justify-between shadow-[0_0_30px_rgba(14,124,139,.28)]">
+            <div className="h-16 border-b border-[#6FD7E2]/35 bg-[linear-gradient(180deg,#0E2730_0%,#143640_100%)] px-6 flex items-center justify-between shadow-[0_0_24px_rgba(34,211,238,.18)]">
               <div>
-                <div className="font-semibold text-[#06111A]">
+                <div className="font-semibold text-white">
                   {selected.nombre_paciente || formatTelefono(selected.telefono_e164)}
                 </div>
-                <div className="text-xs text-slate-500">
+                <div className="text-xs text-cyan-100/70">
                   {formatTelefono(selected.telefono_e164)} · {selected.motivo || 'Sin motivo'}
                 </div>
               </div>
@@ -339,7 +339,7 @@ const ConversacionesView = () => {
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-8 py-7 space-y-4 bg-[radial-gradient(circle_at_top,rgba(34,211,238,.08),#ffffff_42%)]">
+            <div className="flex-1 overflow-y-auto px-8 py-7 space-y-4 bg-[radial-gradient(circle_at_top,rgba(34,211,238,.04),#F8FBFC_45%)]">
               {mensajes.map(m => {
                 const isPaciente = m.rol === 'paciente';
 
@@ -353,7 +353,7 @@ const ConversacionesView = () => {
                         'max-w-[72%] rounded-2xl px-5 py-3 text-sm shadow-sm',
                         isPaciente
                           ? 'bg-white border border-slate-200 text-[#06111A] rounded-bl-sm'
-                          : 'bg-gradient-to-br from-[#D9FAFF] to-[#AEEFF4] border border-cyan-200 text-[#05323A] rounded-br-sm shadow-[0_0_18px_rgba(34,211,238,.16)]'
+                          : 'bg-[#D9F7FA] border border-[#B6EAEF] text-[#184B53] rounded-br-sm shadow-[0_0_12px_rgba(34,211,238,.08)]'
                       )}
                     >
                       <div className="whitespace-pre-wrap break-words leading-relaxed">
@@ -385,9 +385,9 @@ const ConversacionesView = () => {
               )}
             </div>
 
-            <div className="px-6 py-4 border-t border-cyan-500/15 bg-white shadow-[0_-8px_28px_rgba(34,211,238,.08)]">
-              <div className="flex items-center gap-3 rounded-2xl border border-[#7ADBE6] bg-[linear-gradient(90deg,#D8F3F5_0%,#ECFAFB_50%,#D8F3F5_100%)] p-3 shadow-[0_0_30px_rgba(14,124,139,.28)]">
-                <button className="w-10 h-10 rounded-xl bg-white border border-cyan-200 flex items-center justify-center text-cyan-700">
+            <div className="px-6 py-4 border-t border-[#6FD7E2]/20 bg-[#F8FBFC] shadow-[0_-6px_20px_rgba(14,124,139,.08)]">
+              <div className="flex items-center gap-3 rounded-2xl border border-[#6FD7E2]/35 bg-[linear-gradient(180deg,#0F2C35_0%,#163C46_100%)] p-3 shadow-[0_0_22px_rgba(14,124,139,.15)]">
+                <button className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] hover:scale-[1.03] shadow-[0_0_20px_rgba(14,124,139,.35)] text-white flex items-center justify-center transition-all"
                   <Paperclip className="w-4 h-4" />
                 </button>
 
