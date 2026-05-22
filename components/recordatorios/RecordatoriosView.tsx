@@ -63,7 +63,7 @@ const RecordatoriosView = () => {
     <div className="min-h-full overflow-y-auto p-8 bg-[#02141B] text-white">
       <div className="mb-8">
         <h1 className="inline-block text-2xl font-semibold tracking-[-0.015em] bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent mb-1">
-        Recalls
+        Recordatorios
         </h1>
 
         <p className="text-sm text-cyan-100/55">
