@@ -9,71 +9,135 @@ import { cn } from '@/lib/utils/cn';
 import { createClient } from '@/lib/supabase/client';
 
 type Filtro = 'todos' | EstadoRecordatorio;
-const filtros: { key: Filtro; label: string; emoji: string }[] = [
-  { key: 'todos',            label: 'Todos',            emoji: '📂' },
-  { key: 'sin_respuesta',    label: 'Sin respuesta',    emoji: '⚪' },
-  { key: 'confirmada',       label: 'Confirmadas',      emoji: '🟢' },
-  { key: 'no_podra_asistir', label: 'No podrá asistir', emoji: '❌' },
-  { key: 'cita_modificada',  label: 'Modificadas',      emoji: '✔️' },
-  { key: 'cancelada_recado', label: 'Cancelada + recado', emoji: '🔴' },
+
+const filtros: { key: Filtro; label: string; icon: string; color: string }[] = [
+  { key: 'todos', label: 'Todos', icon: 'folder', color: 'bg-amber-400' },
+  { key: 'sin_respuesta', label: 'Pendiente', icon: 'dot', color: 'bg-violet-300' },
+  { key: 'confirmada', label: 'Confirmadas', icon: 'dot', color: 'bg-green-400' },
+  { key: 'no_podra_asistir', label: 'No podrá asistir', icon: 'close', color: 'bg-pink-400' },
+  { key: 'cita_modificada', label: 'Modificadas', icon: 'check', color: 'bg-indigo-400' },
+  { key: 'cancelada_recado', label: 'Canceladas', icon: 'dot', color: 'bg-red-400' },
 ];
+
+const formatTelefono = (telefono?: string | null) => {
+  if (!telefono) return '—';
+
+  const clean = telefono.replace(/\D/g, '');
+  const sinPrefijo = clean.startsWith('34') && clean.length >= 11 ? clean.slice(2) : clean;
+
+  return sinPrefijo.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
+};
 
 const RecordatoriosView = () => {
   const [items, setItems] = useState<RecordatorioCita[]>([]);
   const [filter, setFilter] = useState<Filtro>('todos');
 
-  useEffect(() => { listRecordatorios().then(setItems); }, []);
+  useEffect(() => {
+    listRecordatorios().then(setItems);
+  }, []);
+
   useEffect(() => {
     const supa = createClient();
     if (!supa) return;
-    const ch = supa.channel('rec-rt').on('postgres_changes', { event: '*', schema: 'public', table: 'recordatorios_cita' }, async () => setItems(await listRecordatorios())).subscribe();
-    return () => { supa.removeChannel(ch); };
+
+    const ch = supa
+      .channel('rec-rt')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'recordatorios_cita' },
+        async () => setItems(await listRecordatorios())
+      )
+      .subscribe();
+
+    return () => {
+      supa.removeChannel(ch);
+    };
   }, []);
 
-  const filtered = useMemo(() => filter === 'todos' ? items : items.filter(i => i.estado === filter), [items, filter]);
+  const filtered = useMemo(
+    () => filter === 'todos' ? items : items.filter(i => i.estado === filter),
+    [items, filter]
+  );
 
   return (
-    <div className="h-full overflow-y-auto p-6">
-      <h1 className="text-2xl font-semibold tracking-tight mb-1">Recordatorios</h1>
-      <p className="text-sm text-martina-muted mb-5">Recordatorios de cita enviados por Martina</p>
+    <div className="min-h-full overflow-y-auto p-8 bg-[#02141B] text-white">
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-cyan-300 bg-clip-text text-transparent mb-2">
+          Recordatorios
+        </h1>
 
-      <div className="flex flex-wrap gap-1 mb-4">
+        <p className="text-sm text-cyan-100/55">
+          Recordatorios de cita enviados por Martina
+        </p>
+      </div>
+
+      <div className="flex flex-wrap gap-2 mb-6">
         {filtros.map(f => (
-          <button key={f.key} onClick={() => setFilter(f.key)}
-            className={cn('text-xs px-3 py-1.5 rounded-full border transition-colors',
-              filter === f.key ? 'bg-martina-text text-white border-martina-text' : 'bg-white text-martina-muted border-martina-border hover:bg-martina-bg')}>
-            <span className="mr-1">{f.emoji}</span>{f.label}
+          <button
+            key={f.key}
+            onClick={() => setFilter(f.key)}
+            className={cn(
+              'text-sm px-4 py-2 rounded-full border transition-all',
+              filter === f.key
+                ? 'bg-cyan-500/20 text-cyan-100 border-cyan-300/50 shadow-[0_0_18px_rgba(34,211,238,.22)]'
+                : 'bg-white/5 text-cyan-100/65 border-cyan-500/20 hover:bg-cyan-500/10 hover:text-white'
+            )}
+          >
+            <span className="mr-2">{f.emoji}</span>
+            {f.label}
           </button>
         ))}
       </div>
 
-      <div className="bg-white border border-martina-border rounded-lg overflow-hidden">
+      <div className="rounded-3xl border border-cyan-500/20 bg-[rgba(5,18,24,.78)] backdrop-blur-xl overflow-hidden shadow-[0_0_35px_rgba(34,211,238,.10)]">
         <table className="w-full text-sm">
-          <thead className="bg-martina-bg text-martina-muted text-xs uppercase tracking-wide">
+          <thead className="bg-cyan-500/10 text-cyan-300/75 text-xs uppercase tracking-[0.18em]">
             <tr>
-              <th className="text-left px-4 py-3 font-medium">Paciente</th>
-              <th className="text-left px-4 py-3 font-medium">Teléfono</th>
-              <th className="text-left px-4 py-3 font-medium">Fecha cita</th>
-              <th className="text-left px-4 py-3 font-medium">Estado</th>
+              <th className="text-left px-6 py-4 font-medium">Paciente</th>
+              <th className="text-left px-6 py-4 font-medium">Teléfono</th>
+              <th className="text-left px-6 py-4 font-medium">Fecha cita</th>
+              <th className="text-left px-6 py-4 font-medium">Estado</th>
             </tr>
           </thead>
+
           <tbody>
             {filtered.map(r => {
               const lbl = recordatorioLabel[r.estado] || recordatorioLabel.sin_respuesta;
+
               return (
-                <tr key={r.id} className="border-t border-martina-border hover:bg-martina-bg/50">
-                  <td className="px-4 py-3">{r.nombre_completo || '—'}</td>
-                  <td className="px-4 py-3 text-martina-muted">{r.telefono}</td>
-                  <td className="px-4 py-3">{formatDate(r.fecha_cita)}</td>
-                  <td className="px-4 py-3">
-                    <span className={cn('inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full', lbl.color)}>
-                      <span>{lbl.emoji}</span>{lbl.label}
+                <tr
+                  key={r.id}
+                  className="border-t border-cyan-500/10 hover:bg-cyan-500/5 transition-colors"
+                >
+                  <td className="px-6 py-4 font-medium text-white">
+                    {r.nombre_completo || '—'}
+                  </td>
+
+                  <td className="px-6 py-4 text-cyan-100/65">
+                    {formatTelefono(r.telefono)}
+                  </td>
+
+                  <td className="px-6 py-4 text-cyan-100/80">
+                    {formatDate(r.fecha_cita)}
+                  </td>
+
+                  <td className="px-6 py-4">
+                    <span className={cn('inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full', lbl.color)}>
+                      <span>{lbl.emoji}</span>
+                      {lbl.label}
                     </span>
                   </td>
                 </tr>
               );
             })}
-            {filtered.length === 0 && (<tr><td colSpan={4} className="px-4 py-8 text-center text-martina-muted">Sin resultados</td></tr>)}
+
+            {filtered.length === 0 && (
+              <tr>
+                <td colSpan={4} className="px-6 py-10 text-center text-cyan-100/45">
+                  Sin resultados
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
