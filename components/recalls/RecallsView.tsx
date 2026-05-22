@@ -12,10 +12,9 @@ type Filtro = 'todos' | EstadoRecall;
 
 const filtros: { key: Filtro; label: string; color: string }[] = [
   { key: 'todos', label: 'Todos', color: 'bg-cyan-300' },
-  { key: 'enviado', label: 'Enviados', color: 'bg-violet-300' },
-  { key: 'quiere_cita', label: 'Quiere cita', color: 'bg-green-400' },
-  { key: 'cita_agendada', label: 'Cita agendada', color: 'bg-cyan-400' },
-  { key: 'pospuesto', label: 'Más adelante', color: 'bg-red-400' },
+  { key: 'enviado', label: 'Pendientes', color: 'bg-violet-300' },
+  { key: 'cita_agendada', label: 'Confirmadas', color: 'bg-green-400' },
+  { key: 'pospuesto', label: 'Pospuestas', color: 'bg-red-400' },
 ];
 
 const formatTelefono = (telefono?: string | null) => {
@@ -28,6 +27,34 @@ const formatTelefono = (telefono?: string | null) => {
       : clean;
 
   return sinPrefijo.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
+};
+
+const recallEstadoVisual = (estado: EstadoRecall) => {
+  if (estado === 'enviado') {
+    return {
+      label: 'Pendiente contestar',
+      color: 'bg-violet-300'
+    };
+  }
+
+  if (estado === 'cita_agendada') {
+    return {
+      label: 'Cita agendada',
+      color: 'bg-green-400'
+    };
+  }
+
+  if (estado === 'pospuesto') {
+    return {
+      label: 'Llamará más adelante',
+      color: 'bg-red-400'
+    };
+  }
+
+  return {
+    label: 'Pendiente contestar',
+    color: 'bg-violet-300'
+  };
 };
 
 const RecallsView = () => {
