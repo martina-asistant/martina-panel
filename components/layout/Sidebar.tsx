@@ -25,83 +25,48 @@ const Sidebar = () => {
 
   return (
     <header className="w-full bg-[#03111A] border-b border-cyan-500/10 px-8 py-4">
-
       <div className="max-w-[1500px] mx-auto flex items-center justify-between gap-8">
-
-        {/* TARJETA MARTINA */}
-
         <div className="rounded-3xl border border-cyan-400/25 bg-cyan-500/10 px-9 py-3 flex items-center gap-8 shadow-[0_0_30px_rgba(34,211,238,.10)]">
-
-          {/* HALO AGUAMARINA CON FONDO BLANCO */}
-
-         <div
-  className="
-  key={avatarKey}
-  className="
-    w-[108px]
-    h-[108px]
-    rounded-full
-    bg-white
-    ring-2
-    ring-cyan-400
-    shadow-[0_0_25px_rgba(34,211,238,.5)]
-    overflow-hidden
-    flex-shrink-0
-    animate-martina-spin
-  "
->
-  <Image
-    src="/martina-logo.png"
-    alt="Martina"
-    width={90}
-    height={90}
-    className="w-full h-full object-cover object-center scale-[1.50] translate-x-[4px] translate-y-[6px]"
-  />
-</div>
-          {/* TEXTO */}
+          <div
+            key={avatarKey}
+            className="
+              w-[108px]
+              h-[108px]
+              rounded-full
+              bg-white
+              ring-2
+              ring-cyan-400
+              shadow-[0_0_25px_rgba(34,211,238,.5)]
+              overflow-hidden
+              flex-shrink-0
+              animate-martina-spin
+            "
+          >
+            <Image
+              src="/martina-logo.png"
+              alt="Martina"
+              width={90}
+              height={90}
+              className="w-full h-full object-cover object-center scale-[1.50] translate-x-[4px] translate-y-[6px]"
+            />
+          </div>
 
           <div>
-
-            <div
-              className="
-              text-[12px]
-              tracking-[0.38em]
-              text-cyan-300
-              font-semibold
-            "
-            >
+            <div className="text-[12px] tracking-[0.38em] text-cyan-300 font-semibold">
               MARTINA
             </div>
 
-            <div
-              className="
-              text-[19px]
-              font-semibold
-              scale-y-[1.08]
-              scale-x-[0.96]
-              translate-x-[-5px]
-              text-white
-              leading-tight
-              mt-1
-            "
-            >
+            <div className="text-[19px] font-semibold scale-y-[1.08] scale-x-[0.96] translate-x-[-5px] text-white leading-tight mt-1">
               Rambla Vilar Dental
             </div>
-
           </div>
-
         </div>
 
-        {/* MENÚ */}
-
         <nav className="flex items-center gap-3">
-
           {nav.map(({ href, label, icon: Icon }) => {
-
             const active = pathname?.startsWith(href);
 
             return (
-
               <Link
                 key={href}
                 href={href}
@@ -112,20 +77,13 @@ const Sidebar = () => {
                     : 'border-transparent text-gray-400 hover:bg-white/5 hover:text-white'
                 )}
               >
-
                 <Icon className="w-4 h-4" />
                 <span>{label}</span>
-
               </Link>
-
             );
-
           })}
-
         </nav>
-
       </div>
-
     </header>
   );
 };
