@@ -300,44 +300,46 @@ const ConversacionesView = () => {
           </div>
         ) : (
           <>
-           <div className="relative z-10 bg-[#F8FBFC] px-8 py-5 border-b border-cyan-100 shadow-[0_12px_30px_rgba(14,124,139,.08)]">
-  <div className="w-full flex items-center justify-between gap-6 rounded-3xl border border-[#6FD7E2]/35 bg-[linear-gradient(180deg,#0F2C35_0%,#163C46_100%)] px-8 py-4 shadow-[0_0_34px_rgba(34,211,238,.18),0_16px_32px_rgba(14,124,139,.14),inset_0_1px_0_rgba(255,255,255,.06)]">
-    <div className="w-[45%] min-w-[320px]">
-      <div className="font-semibold text-white truncate">
-        {selected.nombre_paciente || formatTelefono(selected.telefono_e164)}
+          <div className="relative z-10 bg-[#F8FBFC] px-8 py-5 border-b border-cyan-100 shadow-[0_12px_30px_rgba(14,124,139,.08)]">
+  <div className="w-full rounded-3xl border border-[#6FD7E2]/35 bg-[linear-gradient(180deg,#0F2C35_0%,#163C46_100%)] px-8 py-4 shadow-[0_0_34px_rgba(34,211,238,.18),0_16px_32px_rgba(14,124,139,.14),inset_0_1px_0_rgba(255,255,255,.06)]">
+    <div className="flex items-center justify-between gap-6">
+      <div className="min-w-0">
+        <div className="font-semibold text-white">
+          {selected.nombre_paciente || formatTelefono(selected.telefono_e164)}
+        </div>
+
+        <div className="text-xs text-cyan-100/75">
+          {formatTelefono(selected.telefono_e164)} · {selected.motivo || 'Sin motivo'}
+        </div>
       </div>
 
-      <div className="text-xs text-cyan-100/75 truncate">
-        {formatTelefono(selected.telefono_e164)} · {selected.motivo || 'Sin motivo'}
+      <div className="flex items-center gap-3 shrink-0">
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={doTomar}
+          className="bg-cyan-50 border-cyan-300/35 text-cyan-700 hover:bg-cyan-100"
+        >
+          Tomar conversación
+        </Button>
+
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={doDevolver}
+          className="bg-cyan-50 border-cyan-300/35 text-cyan-700 hover:bg-cyan-100"
+        >
+          Devolver a Martina
+        </Button>
+
+        <Button
+          size="sm"
+          onClick={doCerrar}
+          className="bg-[#03111A] hover:bg-[#062535] text-white shadow-[0_0_16px_rgba(34,211,238,.18)]"
+        >
+          Cerrar gestión
+        </Button>
       </div>
-    </div>
-
-    <div className="flex items-center gap-3 shrink-0">
-      <Button
-        size="sm"
-        variant="outline"
-        onClick={doTomar}
-        className="bg-cyan-50 border-cyan-300/35 text-cyan-700 hover:bg-cyan-100"
-      >
-        Tomar conversación
-      </Button>
-
-      <Button
-        size="sm"
-        variant="outline"
-        onClick={doDevolver}
-        className="bg-cyan-50 border-cyan-300/35 text-cyan-700 hover:bg-cyan-100"
-      >
-        Devolver a Martina
-      </Button>
-
-      <Button
-        size="sm"
-        onClick={doCerrar}
-        className="bg-[#03111A] hover:bg-[#062535] text-white shadow-[0_0_16px_rgba(34,211,238,.18)]"
-      >
-        Cerrar gestión
-      </Button>
     </div>
   </div>
 </div>
