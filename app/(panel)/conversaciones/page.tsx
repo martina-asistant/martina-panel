@@ -304,9 +304,9 @@ const ConversacionesView = () => {
 
   <button
     onClick={doCerrar}
-    className="absolute top-7 right-5 w-6 h-6 rounded-full flex items-center justify-center text-black bg-transparent hover:scale-110 transition-all z-20"
+    className="absolute -top-2 right-4 w-12 h-12 rounded-full flex items-center justify-center text-white bg-[linear-gradient(180deg,#163C46_0%,#0F2C35_100%)] border border-cyan-300/20 shadow-[0_0_0_4px_rgba(34,211,238,.12),0_0_28px_rgba(34,211,238,.35),0_8px_18px_rgba(0,0,0,.18)] hover:scale-105 transition-all z-20"
   >
-    ×
+    <span className="text-[30px] leading-none">×</span>
   </button>
   <div className="w-full rounded-3xl border border-[#6FD7E2]/35 bg-[linear-gradient(180deg,#0F2C35_0%,#163C46_100%)] px-8 py-4 shadow-[0_0_34px_rgba(34,211,238,.18),0_16px_32px_rgba(14,124,139,.14),inset_0_1px_0_rgba(255,255,255,.06)]">
     <div className="flex items-center justify-between gap-6">
