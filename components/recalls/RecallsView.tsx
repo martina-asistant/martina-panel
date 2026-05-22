@@ -9,72 +9,161 @@ import { cn } from '@/lib/utils/cn';
 import { createClient } from '@/lib/supabase/client';
 
 type Filtro = 'todos' | EstadoRecall;
-const filtros: { key: Filtro; label: string; emoji: string }[] = [
-  { key: 'todos',         label: 'Todos',          emoji: '📂' },
-  { key: 'enviado',       label: 'Enviados',       emoji: '⚪' },
-  { key: 'quiere_cita',   label: 'Quiere cita',    emoji: '🟢' },
-  { key: 'cita_agendada', label: 'Cita agendada',  emoji: '✅' },
-  { key: 'pospuesto',     label: 'Más adelante',   emoji: '🔴' },
+
+const filtros: { key: Filtro; label: string; color: string }[] = [
+  { key: 'todos', label: 'Todos', color: 'bg-cyan-300' },
+  { key: 'enviado', label: 'Enviados', color: 'bg-violet-300' },
+  { key: 'quiere_cita', label: 'Quiere cita', color: 'bg-green-400' },
+  { key: 'cita_agendada', label: 'Cita agendada', color: 'bg-cyan-400' },
+  { key: 'pospuesto', label: 'Más adelante', color: 'bg-red-400' },
 ];
+
+const formatTelefono = (telefono?: string | null) => {
+  if (!telefono) return '—';
+
+  const clean = telefono.replace(/\D/g, '');
+  const sinPrefijo =
+    clean.startsWith('34') && clean.length >= 11
+      ? clean.slice(2)
+      : clean;
+
+  return sinPrefijo.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
+};
 
 const RecallsView = () => {
   const [items, setItems] = useState<Recall[]>([]);
   const [filter, setFilter] = useState<Filtro>('todos');
 
-  useEffect(() => { listRecalls().then(setItems); }, []);
+  useEffect(() => {
+    listRecalls().then(setItems);
+  }, []);
+
   useEffect(() => {
     const supa = createClient();
     if (!supa) return;
-    const ch = supa.channel('recalls-rt').on('postgres_changes', { event: '*', schema: 'public', table: 'recalls' }, async () => setItems(await listRecalls())).subscribe();
-    return () => { supa.removeChannel(ch); };
+
+    const ch = supa
+      .channel('recalls-rt')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'recalls' },
+        async () => setItems(await listRecalls())
+      )
+      .subscribe();
+
+    return () => {
+      supa.removeChannel(ch);
+    };
   }, []);
 
-  const filtered = useMemo(() => filter === 'todos' ? items : items.filter(i => i.estado === filter), [items, filter]);
+  const filtered = useMemo(
+    () => filter === 'todos' ? items : items.filter(i => i.estado === filter),
+    [items, filter]
+  );
 
   return (
-    <div className="h-full overflow-y-auto p-6">
-      <h1 className="text-2xl font-semibold tracking-tight mb-1">Recalls</h1>
-      <p className="text-sm text-martina-muted mb-5">Reactivación de pacientes · gestionada por Martina</p>
+    <div className="min-h-full overflow-y-auto p-8 bg-[#02141B] text-white">
+      <div className="mb-8">
+        <h1 className="text-2xl font-semibold tracking-[-0.015em] scale-x-[0.97] origin-left bg-gradient-to-r from-white to-cyan-300 bg-clip-text text-transparent mb-1">
+          Recalls
+        </h1>
 
-      <div className="flex flex-wrap gap-1 mb-4">
+        <p className="text-sm text-cyan-100/55">
+          Reactivación de pacientes
+        </p>
+      </div>
+
+      <div className="flex flex-wrap gap-2 mb-6">
         {filtros.map(f => (
-          <button key={f.key} onClick={() => setFilter(f.key)}
-            className={cn('text-xs px-3 py-1.5 rounded-full border transition-colors',
-              filter === f.key ? 'bg-martina-text text-white border-martina-text' : 'bg-white text-martina-muted border-martina-border hover:bg-martina-bg')}>
-            <span className="mr-1">{f.emoji}</span>{f.label}
+          <button
+            key={f.key}
+            onClick={() => setFilter(f.key)}
+            className={cn(
+              'text-[12px] px-3 py-[6px] rounded-full border transition-all whitespace-nowrap',
+              filter === f.key
+                ? 'bg-cyan-500/20 text-cyan-100 border-cyan-300/50 shadow-[0_0_18px_rgba(34,211,238,.22)]'
+                : 'bg-white/5 text-cyan-100/65 border-cyan-500/20 hover:bg-cyan-500/10 hover:text-white'
+            )}
+          >
+            <div className="flex items-center gap-2">
+              <span
+                className={cn(
+                  'w-2.5 h-2.5 rounded-full shadow-[0_0_10px_currentColor]',
+                  f.color
+                )}
+              />
+
+              <span className={f.key === 'todos' ? 'font-bold uppercase' : ''}>
+                {f.label}
+              </span>
+            </div>
           </button>
         ))}
       </div>
 
-      <div className="bg-white border border-martina-border rounded-lg overflow-hidden">
+      <div className="rounded-3xl border border-cyan-500/20 bg-[rgba(5,18,24,.78)] backdrop-blur-xl overflow-hidden shadow-[0_0_35px_rgba(34,211,238,.10)]">
         <table className="w-full text-sm">
-          <thead className="bg-martina-bg text-martina-muted text-xs uppercase tracking-wide">
+          <thead className="bg-cyan-500/10 text-cyan-300/75 text-xs uppercase tracking-[0.18em]">
             <tr>
-              <th className="text-left px-4 py-3 font-medium">Paciente</th>
-              <th className="text-left px-4 py-3 font-medium">Teléfono</th>
-              <th className="text-left px-4 py-3 font-medium">Tipo</th>
-              <th className="text-left px-4 py-3 font-medium">Fecha envío</th>
-              <th className="text-left px-4 py-3 font-medium">Estado</th>
+              <th className="text-left px-6 py-4 font-medium">Paciente</th>
+              <th className="text-left px-6 py-4 font-medium">Teléfono</th>
+              <th className="text-left px-6 py-4 font-medium">Tipo</th>
+              <th className="text-left px-6 py-4 font-medium">Fecha envío</th>
+              <th className="text-left px-6 py-4 font-medium">Estado</th>
             </tr>
           </thead>
+
           <tbody>
             {filtered.map(r => {
               const lbl = recallLabel[r.estado] || recallLabel.enviado;
+
               return (
-                <tr key={r.id} className="border-t border-martina-border hover:bg-martina-bg/50">
-                  <td className="px-4 py-3">{r.nombre_completo || '—'}</td>
-                  <td className="px-4 py-3 text-martina-muted">{r.telefono}</td>
-                  <td className="px-4 py-3">{r.tipo || '—'}</td>
-                  <td className="px-4 py-3 text-martina-muted">{formatDate(r.fecha_envio)}</td>
-                  <td className="px-4 py-3">
-                    <span className={cn('inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full', lbl.color)}>
-                      <span>{lbl.emoji}</span>{lbl.label}
+                <tr
+                  key={r.id}
+                  className="border-t border-cyan-500/10 hover:bg-cyan-500/5 transition-colors"
+                >
+                  <td className="px-6 py-4 font-medium text-white">
+                    {r.nombre_completo || '—'}
+                  </td>
+
+                  <td className="px-6 py-4 text-cyan-100/65">
+                    {formatTelefono(r.telefono)}
+                  </td>
+
+                  <td className="px-6 py-4 text-cyan-100/80">
+                    {r.tipo || '—'}
+                  </td>
+
+                  <td className="px-6 py-4 text-cyan-100/65">
+                    {formatDate(r.fecha_envio)}
+                  </td>
+
+                  <td className="px-6 py-4">
+                    <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-cyan-500/20 bg-cyan-500/5 text-cyan-100 shadow-[0_0_12px_rgba(34,211,238,.10)]">
+                      <span
+                        className={cn(
+                          'w-2.5 h-2.5 rounded-full shadow-[0_0_10px_currentColor]',
+                          r.estado === 'enviado' && 'bg-violet-300',
+                          r.estado === 'quiere_cita' && 'bg-green-400',
+                          r.estado === 'cita_agendada' && 'bg-cyan-400',
+                          r.estado === 'pospuesto' && 'bg-red-400'
+                        )}
+                      />
+
+                      {lbl.label}
                     </span>
                   </td>
                 </tr>
               );
             })}
-            {filtered.length === 0 && (<tr><td colSpan={5} className="px-4 py-8 text-center text-martina-muted">Sin resultados</td></tr>)}
+
+            {filtered.length === 0 && (
+              <tr>
+                <td colSpan={5} className="px-6 py-10 text-center text-cyan-100/45">
+                  Sin resultados
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
