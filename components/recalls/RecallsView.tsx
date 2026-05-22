@@ -142,7 +142,7 @@ const RecallsView = () => {
 
           <tbody>
             {filtered.map(r => {
-              const lbl = recallLabel[r.estado] || recallLabel.enviado;
+              const lbl = recallEstadoVisual(r.estado);
 
               return (
                 <tr
@@ -168,16 +168,9 @@ const RecallsView = () => {
                   <td className="px-6 py-4">
                     <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-cyan-500/20 bg-cyan-500/5 text-cyan-100 shadow-[0_0_12px_rgba(34,211,238,.10)]">
                       <span
-                        className={cn(
-                          'w-2.5 h-2.5 rounded-full shadow-[0_0_10px_currentColor]',
-                          r.estado === 'enviado' && 'bg-violet-300',
-                          r.estado === 'quiere_cita' && 'bg-green-400',
-                          r.estado === 'cita_agendada' && 'bg-cyan-400',
-                          r.estado === 'pospuesto' && 'bg-red-400'
-                        )}
-                      />
+                       className={cn( 'w-2.5 h-2.5 rounded-full shadow-[0_0_10px_currentColor]', lbl.color )}/>
 
-                      {lbl.label}
+                    {lbl.label}
                     </span>
                   </td>
                 </tr>
