@@ -6,12 +6,12 @@ const Home = () => {
   const router = useRouter();
 
   return (
-    <main className="fixed inset-0 bg-[#020f14] overflow-hidden flex items-center justify-center">
-      <div className="relative w-[min(100vw,150vh)] h-[min(100vh,66.666vw)]">
+    <main className="min-h-screen bg-[#020f14] overflow-y-auto">
+      <div className="relative w-full">
         <img
           src="/martina-hero-v2.png"
           alt="Martina"
-          className="absolute inset-0 w-full h-full object-contain"
+          className="block w-full h-auto"
         />
 
         <button
