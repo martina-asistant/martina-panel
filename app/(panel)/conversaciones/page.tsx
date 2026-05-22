@@ -221,7 +221,7 @@ const ConversacionesView = () => {
       <div className="w-[340px] border-r border-cyan-500/15 bg-[#03111A] flex flex-col">
 
   <div className="px-6 pt-6 pb-4">
-   <h1 className="text-3xl font-semibold tracking-[-0.01em] scale-x-[1.01] origin-left bg-gradient-to-r from-white to-cyan-300 bg-clip-text text-transparent mb-1">
+   <h1 className="text-3xl font-semibold tracking-[-0.015em] scale-x-[0.97] origin-left bg-gradient-to-r from-white to-cyan-300 bg-clip-text text-transparent mb-1">
     Conversaciones
     </h1>
 
