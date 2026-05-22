@@ -75,7 +75,7 @@ const Sidebar = () => {
               font-semibold
               scale-y-[1.08]
               scale-x-[0.96]
-              translate-x-[-6px]
+              translate-x-[-5px]
               text-white
               leading-tight
               mt-1
