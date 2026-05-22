@@ -51,7 +51,7 @@ const Sidebar = () => {
 
             <div
               className="
-              text-[11px]
+              text-[12px]
               tracking-[0.38em]
               text-cyan-300
               font-semibold
@@ -62,7 +62,7 @@ const Sidebar = () => {
 
             <div
               className="
-              text-base
+              text-[14px]
               font-semibold
               text-white
               leading-tight
