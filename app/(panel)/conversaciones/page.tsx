@@ -189,9 +189,20 @@ const ConversacionesView = () => {
   const doCerrar = async () => {
     if (!selected) return;
     await cerrarGestion(selected.id);
-    setConvs(await listConversaciones());
-    toast.success('Gestión cerrada');
-  };
+     const updated = await listConversaciones();
+
+  // quitar la conversación cerrada de la vista actual
+  const visibles = updated.filter(
+    c => c.estado_visual !== 'gestionada'
+  );
+
+  setConvs(visibles);
+
+  // volver a estado base
+  setSelectedId(visibles[0]?.id || null);
+
+  toast.success('Conversación cerrada');
+};
 
   const saveNotasConv = async () => {
     if (!selected) return;
