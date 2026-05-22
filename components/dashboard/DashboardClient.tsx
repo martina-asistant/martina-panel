@@ -161,6 +161,27 @@ const DashboardClient = ({
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+  
+  const DEMO_MODE = true;
+
+const demo = {
+  nuevas: 12,
+  enCurso: 4,
+  recepcion: 3,
+  gestion: 28,
+  recados: 7,
+
+  citasHoy: 9,
+  recordatoriosHoy: 14,
+  recallsEnviadosHoy: 23,
+  recallsAceptadosHoy: 8,
+
+  recPendiente: 5,
+  recConf: 18,
+  recNo: 2,
+  recMod: 6,
+  recCancel: 1
+};
 
   const isToday = (iso: string | null) => iso ? new Date(iso) >= today : false;
 
