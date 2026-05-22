@@ -21,6 +21,7 @@ const nav = [
 
 const Sidebar = () => {
   const pathname = usePathname();
+  const avatarKey = pathname;
 
   return (
     <header className="w-full bg-[#03111A] border-b border-cyan-500/10 px-8 py-4">
@@ -35,6 +36,8 @@ const Sidebar = () => {
 
          <div
   className="
+  key={avatarKey}
+  className="
     w-[108px]
     h-[108px]
     rounded-full
@@ -44,6 +47,7 @@ const Sidebar = () => {
     shadow-[0_0_25px_rgba(34,211,238,.5)]
     overflow-hidden
     flex-shrink-0
+    animate-martina-spin
   "
 >
   <Image
