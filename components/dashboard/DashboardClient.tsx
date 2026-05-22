@@ -162,27 +162,6 @@ const DashboardClient = ({
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
-  const DEMO_MODE = true;
-
-const demo = {
-  nuevas: 12,
-  enCurso: 4,
-  recepcion: 3,
-  gestion: 28,
-  recados: 7,
-
-  citasHoy: 15,
-  recordatoriosHoy: 14,
-  recallsEnviadosHoy: 27,
-  recallsAceptadosHoy: 20,
-
-  recPendiente: 5,
-  recConf: 18,
-  recNo: 2,
-  recMod: 6,
-  recCancel: 1
-};
-
   const isToday = (iso: string | null) => iso ? new Date(iso) >= today : false;
 
   const nuevas = convs.filter(c => c.estado_visual === 'nueva').length;
@@ -275,11 +254,11 @@ const demo = {
           </h2>
 
           <div className="grid lg:grid-cols-5 gap-4">
-            <Metric icon={MessageCircle} label="Nuevas" value={nuevas} href="/conversaciones" />
-            <Metric icon={LoaderCircle} label="En curso" value={enCurso} href="/conversaciones" />
-            <Metric icon={Building2} label="Recepción" value={recepcion} href="/conversaciones" />
-            <Metric icon={Check} label="Gestionadas" value={gestion} href="/conversaciones" />
-            <Metric icon={ClipboardPen} label="Recados" value={recados} href="/conversaciones" />
+            <Metric icon={MessageCircle} label="Nuevas" value={2} href="/conversaciones" />
+            <Metric icon={LoaderCircle} label="En curso" value={10} href="/conversaciones" />
+            <Metric icon={Building2} label="Recepción" value={2} href="/conversaciones" />
+            <Metric icon={Check} label="Gestionadas" value={8} href="/conversaciones" />
+            <Metric icon={ClipboardPen} label="Recados" value={3} href="/conversaciones" />
           </div>
         </section>
 
@@ -289,10 +268,10 @@ const demo = {
           </h2>
 
           <div className="grid lg:grid-cols-4 gap-4">
-            <Metric icon={CalendarDays} label="Citas creadas" value={citasHoy} href="/conversaciones" />
-            <Metric icon={Bell} label="Recordatorios" value={recordatoriosHoy} href="/recordatorios" />
-            <Metric icon={PhoneOutgoing} label="Recalls enviados" value={recallsEnviadosHoy} href="/recalls" />
-            <Metric icon={PhoneCall} label="Recalls aceptados" value={recallsAceptadosHoy} href="/recalls" />
+            <Metric icon={CalendarDays} label="Citas creadas" value={15} href="/conversaciones" />
+            <Metric icon={Bell} label="Recordatorios" value={14} href="/recordatorios" />
+            <Metric icon={PhoneOutgoing} label="Recalls enviados" value={27} href="/recalls" />
+            <Metric icon={PhoneCall} label="Recalls aceptados" value={20} href="/recalls" />
           </div>
         </section>
 
