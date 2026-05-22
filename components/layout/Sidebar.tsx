@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
@@ -32,26 +33,27 @@ const Sidebar = () => {
 
           {/* HALO AGUAMARINA CON FONDO BLANCO */}
 
-          <div
-            className="
-            w-[90px]
-            h-[90px]
-            rounded-full
-            bg-white
-            ring-2
-            ring-cyan-400
-            shadow-[0_0_25px_rgba(34,211,238,.5)]
-            flex-shrink-0
-            "
-          />
-          <Image
-          src="/martina-logo.png"
-          alt="Martina"
-          width={90}
-          height={90}
-          className="w-full h-full object-cover object-center scale-[1.15]"
-          />
-          </div>
+         <div
+  className="
+    w-[90px]
+    h-[90px]
+    rounded-full
+    bg-white
+    ring-2
+    ring-cyan-400
+    shadow-[0_0_25px_rgba(34,211,238,.5)]
+    overflow-hidden
+    flex-shrink-0
+  "
+>
+  <Image
+    src="/martina-logo.png"
+    alt="Martina"
+    width={90}
+    height={90}
+    className="w-full h-full object-cover object-center scale-[1.15]"
+  />
+</div>
           {/* TEXTO */}
 
           <div>
