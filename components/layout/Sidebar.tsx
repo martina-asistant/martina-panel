@@ -51,7 +51,7 @@ const Sidebar = () => {
     alt="Martina"
     width={90}
     height={90}
-    className="w-full h-full object-cover object-center scale-[1.25] translate-x-[8px] translate-y-[8px]"
+    className="w-full h-full object-cover object-center scale-[1.25] translate-x-[4px] translate-y-[4px]"
   />
 </div>
           {/* TEXTO */}
