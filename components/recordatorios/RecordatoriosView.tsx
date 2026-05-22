@@ -71,23 +71,30 @@ const RecordatoriosView = () => {
         </p>
       </div>
 
-      <div className="flex flex-wrap gap-2 mb-6">
-        {filtros.map(f => (
-          <button
-            key={f.key}
-            onClick={() => setFilter(f.key)}
-            className={cn(
-              'text-sm px-4 py-2 rounded-full border transition-all',
-              filter === f.key
-                ? 'bg-cyan-500/20 text-cyan-100 border-cyan-300/50 shadow-[0_0_18px_rgba(34,211,238,.22)]'
-                : 'bg-white/5 text-cyan-100/65 border-cyan-500/20 hover:bg-cyan-500/10 hover:text-white'
-            )}
-          >
-            <span className="mr-2">{f.emoji}</span>
-            {f.label}
-          </button>
-        ))}
+<div className="flex flex-wrap gap-2 mb-6">
+  {filtros.map(f => (
+    <button
+      key={f.key}
+      onClick={() => setFilter(f.key)}
+      className={cn(
+        'text-sm px-4 py-2 rounded-full border transition-all',
+        filter === f.key
+          ? 'bg-cyan-500/20 text-cyan-100 border-cyan-300/50 shadow-[0_0_18px_rgba(34,211,238,.22)]'
+          : 'bg-white/5 text-cyan-100/65 border-cyan-500/20 hover:bg-cyan-500/10 hover:text-white'
+      )}
+    >
+      <div className="flex items-center gap-2">
+        <span
+          className={cn(
+            'w-2.5 h-2.5 rounded-full shadow-[0_0_10px_currentColor]',
+            f.color
+          )}
+        />
+        {f.label}
       </div>
+    </button>
+  ))}
+</div>
 
       <div className="rounded-3xl border border-cyan-500/20 bg-[rgba(5,18,24,.78)] backdrop-blur-xl overflow-hidden shadow-[0_0_35px_rgba(34,211,238,.10)]">
         <table className="w-full text-sm">
