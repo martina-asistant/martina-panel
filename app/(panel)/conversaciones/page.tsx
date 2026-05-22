@@ -219,10 +219,22 @@ const ConversacionesView = () => {
   return (
     <div className="h-full flex bg-[#02141B] text-white">
       <div className="w-[340px] border-r border-cyan-500/15 bg-[#03111A] flex flex-col">
-        <div className="p-4 border-b border-cyan-500/15 space-y-3">
-          <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-cyan-300/70" />
-            <Input
+
+  <div className="px-6 pt-6 pb-4">
+    <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-cyan-300 bg-clip-text text-transparent mb-1">
+      Conversaciones
+    </h1>
+
+    <p className="text-sm text-cyan-100/55">
+      WhatsApp
+    </p>
+  </div>
+
+  <div className="p-4 border-b border-cyan-500/15 space-y-3">
+
+    <div className="relative">
+      <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-cyan-300/70" />
+      <Input
               placeholder="Buscar paciente, teléfono..."
               value={search}
               onChange={e => setSearch(e.target.value)}
