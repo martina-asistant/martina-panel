@@ -11,7 +11,7 @@ import { createClient } from '@/lib/supabase/client';
 type Filtro = 'todos' | EstadoRecall;
 
 const filtros: { key: Filtro; label: string; color: string }[] = [
-  { key: 'todos', label: 'Todos', color: 'bg-cyan-300' },
+  { key: 'todos', label: 'Todos', color: 'bg-amber-400' },
   { key: 'enviado', label: 'Pendientes', color: 'bg-violet-300' },
   { key: 'cita_agendada', label: 'Confirmadas', color: 'bg-green-400' },
   { key: 'pospuesto', label: 'Pospuestas', color: 'bg-red-400' },
