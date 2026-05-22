@@ -171,10 +171,10 @@ const demo = {
   gestion: 28,
   recados: 7,
 
-  citasHoy: 9,
+  citasHoy: 15,
   recordatoriosHoy: 14,
-  recallsEnviadosHoy: 23,
-  recallsAceptadosHoy: 8,
+  recallsEnviadosHoy: 27,
+  recallsAceptadosHoy: 20,
 
   recPendiente: 5,
   recConf: 18,
