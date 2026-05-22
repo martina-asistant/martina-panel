@@ -165,7 +165,7 @@ const DashboardClient = ({
   const isToday = (iso: string | null) => iso ? new Date(iso) >= today : false;
 
   const nuevas = convs.filter(c => c.estado_visual === 'nueva').length;
-  const enCurso = convs.filter(c => c.estado_visual === 'en_curso').length;
+  const enCurso = convs.filter(c => c.estado_visual === 'martina').length;
   const recepcion = convs.filter(c => c.estado_visual === 'recepcion').length;
   const gestion = convs.filter(c => c.estado_visual === 'gestionada').length;
   const recados = convs.filter(c => (c.notas_internas || '').trim().length > 0).length;
@@ -255,7 +255,7 @@ const DashboardClient = ({
 
           <div className="grid lg:grid-cols-5 gap-4">
             <Metric icon={MessageCircle} label="Nuevas" value={2} href="/conversaciones" />
-            <Metric icon={LoaderCircle} label="En curso" value={10} href="/conversaciones" />
+            <Metric icon={LoaderCircle} label="Martina" value={10} href="/conversaciones" />
             <Metric icon={Building2} label="Recepción" value={2} href="/conversaciones" />
             <Metric icon={Check} label="Gestionadas" value={8} href="/conversaciones" />
             <Metric icon={ClipboardPen} label="Recados" value={3} href="/conversaciones" />
