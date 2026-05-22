@@ -62,8 +62,8 @@ const RecordatoriosView = () => {
   return (
     <div className="min-h-full overflow-y-auto p-8 bg-[#02141B] text-white">
       <div className="mb-8">
-        <h1 className="text-2xl font-semibold tracking-[-0.015em] scale-x-[0.97] origin-left bg-gradient-to-r from-white to-cyan-300 bg-clip-text text-transparent mb-1">
-          Recordatorios
+        <h1 className="inline-block text-2xl font-semibold tracking-[-0.015em] bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent mb-1">
+        Recalls
         </h1>
 
         <p className="text-sm text-cyan-100/55">
@@ -90,7 +90,9 @@ const RecordatoriosView = () => {
             f.color
           )}
         />
-        {f.label}
+        <span className={f.key === 'todos' ? 'font-bold uppercase' : ''}>
+  {f.label}
+</span>
       </div>
     </button>
   ))}
@@ -100,7 +102,7 @@ const RecordatoriosView = () => {
         <table className="w-full text-sm">
           <thead className="bg-cyan-500/10 text-cyan-300/75 text-xs uppercase tracking-[0.18em]">
             <tr>
-              <th className="text-left px-6 py-4 font-medium">Paciente</th>
+              <th className="text-left pl-6 pr-2 py-4 font-medium">Paciente</th>
               <th className="text-left px-6 py-4 font-medium">Teléfono</th>
               <th className="text-left px-6 py-4 font-medium">Fecha cita</th>
               <th className="text-left px-6 py-4 font-medium">Estado</th>
