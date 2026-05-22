@@ -280,6 +280,8 @@ const ConversacionesView = () => {
     ))}
 </div>
 
+</div>
+
         <div className="flex-1 overflow-y-auto">
           {filtered.length === 0 && (
             <div className="p-6 text-center text-sm text-cyan-100/50">
