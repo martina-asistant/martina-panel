@@ -38,7 +38,7 @@ export function tomarConversacion(id: string, email: string) {
   return updateConv(id, { modo_atencion: 'recepcion' as ModoAtencion, estado_visual: 'recepcion' as EstadoVisualConv, asignado_a: email });
 }
 export function devolverAMartina(id: string) {
-  return updateConv(id, { modo_atencion: 'martina' as ModoAtencion, estado_visual: 'en_curso' as EstadoVisualConv, asignado_a: null });
+  return updateConv(id, { modo_atencion: 'martina' as ModoAtencion, estado_visual: 'nueva' as EstadoVisualConv, asignado_a: null });
 }
 export function cerrarGestion(id: string) {
   return updateConv(id, { modo_atencion: 'martina' as ModoAtencion, estado_visual: 'gestionada' as EstadoVisualConv, asignado_a: null });
