@@ -300,45 +300,45 @@ const ConversacionesView = () => {
           </div>
         ) : (
           <>
-            <div className="h-16 border-b border-[#6FD7E2]/35 bg-[linear-gradient(180deg,#0E2730_0%,#143640_100%)] px-6 flex items-center justify-between shadow-[0_-10px_40px_rgba(34,211,238,.16),0_12px_30px_rgba(34,211,238,.12),inset_0_1px_0_rgba(255,255,255,.05)]">
-              <div className="px-5 py-2 rounded-2xl bg-[linear-gradient(90deg,rgba(34,211,238,.12),rgba(34,211,238,.03))] border border-cyan-300/10 shadow-[0_0_28px_rgba(34,211,238,.12)]">
-                <div className="font-semibold text-white">
-                  {selected.nombre_paciente || formatTelefono(selected.telefono_e164)}
-                </div>
+           <div className="relative z-10 h-24 border-b border-[#6FD7E2]/40 bg-[linear-gradient(180deg,#0E2730_0%,#143640_100%)] px-8 flex items-center justify-between shadow-[0_0_35px_rgba(34,211,238,.22),0_18px_35px_rgba(34,211,238,.16),inset_0_1px_0_rgba(255,255,255,.06)]">
+  <div className="min-w-[260px] px-5 py-3 rounded-2xl bg-[linear-gradient(90deg,rgba(34,211,238,.16),rgba(34,211,238,.04))] border border-cyan-300/20 shadow-[0_0_30px_rgba(34,211,238,.20)]">
+    <div className="font-semibold text-white truncate">
+      {selected.nombre_paciente || formatTelefono(selected.telefono_e164)}
+    </div>
 
-                <div className="text-xs text-cyan-100/70">
-                  {formatTelefono(selected.telefono_e164)} · {selected.motivo || 'Sin motivo'}
-                </div>
-              </div>
+    <div className="text-xs text-cyan-100/75 truncate">
+      {formatTelefono(selected.telefono_e164)} · {selected.motivo || 'Sin motivo'}
+    </div>
+  </div>
 
-              <div className="flex items-center gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={doTomar}
-                  className="bg-cyan-50 border-cyan-300/35 text-cyan-700 hover:bg-cyan-100"
-                >
-                  Tomar conversación
-                </Button>
+  <div className="flex items-center gap-3">
+    <Button
+      size="sm"
+      variant="outline"
+      onClick={doTomar}
+      className="bg-cyan-50 border-cyan-300/35 text-cyan-700 hover:bg-cyan-100"
+    >
+      Tomar conversación
+    </Button>
 
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={doDevolver}
-                  className="bg-cyan-50 border-cyan-300/35 text-cyan-700 hover:bg-cyan-100"
-                >
-                  Devolver a Martina
-                </Button>
+    <Button
+      size="sm"
+      variant="outline"
+      onClick={doDevolver}
+      className="bg-cyan-50 border-cyan-300/35 text-cyan-700 hover:bg-cyan-100"
+    >
+      Devolver a Martina
+    </Button>
 
-                <Button
-                  size="sm"
-                  onClick={doCerrar}
-                  className="bg-[#03111A] hover:bg-[#062535] text-white shadow-[0_0_16px_rgba(34,211,238,.18)]"
-                >
-                  Cerrar gestión
-                </Button>
-              </div>
-            </div>
+    <Button
+      size="sm"
+      onClick={doCerrar}
+      className="bg-[#03111A] hover:bg-[#062535] text-white shadow-[0_0_16px_rgba(34,211,238,.18)]"
+    >
+      Cerrar gestión
+    </Button>
+  </div>
+</div>
 
             <div className="flex-1 overflow-y-auto px-8 py-7 space-y-4 bg-[radial-gradient(circle_at_top,rgba(34,211,238,.04),#F8FBFC_45%)]">
               {mensajes.map(m => {
