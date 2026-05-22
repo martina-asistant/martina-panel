@@ -29,7 +29,7 @@ const Sidebar = () => {
 
         {/* TARJETA MARTINA */}
 
-        <div className="rounded-3xl border border-cyan-400/25 bg-cyan-500/10 px-9 py-3 flex items-center gap-8 shadow-[0_0_30px_rgba(34,211,238,.10)]">
+        <div className="rounded-3xl border border-cyan-400/25 bg-cyan-500/10 px-9 py-4 flex items-center gap-8 shadow-[0_0_30px_rgba(34,211,238,.10)]">
 
           {/* HALO AGUAMARINA CON FONDO BLANCO */}
 
