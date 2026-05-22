@@ -17,11 +17,11 @@ import { toast } from 'sonner';
 
 type Filtro = 'todas' | EstadoVisualConv;
 
-const filtros: { key: Filtro; label: string; emoji: string }[] = [
-  { key: 'todas',      label: 'Todas',      emoji: '📂' },
-  { key: 'nueva',      label: 'Martina',    emoji: '🤖' },
-  { key: 'recepcion',  label: 'Recepción',  emoji: '👩🏽‍⚕️' },
-  { key: 'gestionada', label: 'Gestionadas',emoji: '✅' },
+const filtros: { key: Filtro; label: string }[] = [
+  { key: 'todas',      label: 'Todas', },
+  { key: 'nueva',      label: 'Martina', },
+  { key: 'recepcion',  label: 'Recepción', },
+  { key: 'gestionada', label: 'Gestionadas', },
 ];
 
 const ConversacionesView = () => {
@@ -117,7 +117,7 @@ const ConversacionesView = () => {
               <button key={f.key} onClick={() => setFilter(f.key)}
                 className={cn('text-xs px-2.5 py-1 rounded-full border transition-colors',
                   filter === f.key ? 'bg-martina-text text-white border-martina-text' : 'bg-white text-martina-muted border-martina-border hover:bg-martina-bg')}>
-                <span className="mr-1">{f.emoji}</span>{f.label}
+                {f.label}
               </button>
             ))}
           </div>
