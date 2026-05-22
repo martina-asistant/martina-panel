@@ -115,7 +115,7 @@ const RecallsView = () => {
             <div className="flex items-center gap-2">
               <span
                 className={cn(
-                  'w-3 h-3 rounded-full shadow-[0_0_12px_currentColor]',
+                  'w-2.5 h-2.5 rounded-full shadow-[0_0_12px_currentColor]',
                   f.color
                 )}
               />
