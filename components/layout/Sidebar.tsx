@@ -62,7 +62,7 @@ const Sidebar = () => {
 
             <div
               className="
-              text-[14px]
+              text-[17px]
               font-semibold
               text-white
               leading-tight
