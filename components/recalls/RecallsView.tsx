@@ -79,7 +79,7 @@ const RecallsView = () => {
             key={f.key}
             onClick={() => setFilter(f.key)}
             className={cn(
-              'text-[12px] px-3 py-[6px] rounded-full border transition-all whitespace-nowrap',
+              'text-[13px] px-4 py-[9px] rounded-full border transition-all whitespace-nowrap',
               filter === f.key
                 ? 'bg-cyan-500/20 text-cyan-100 border-cyan-300/50 shadow-[0_0_18px_rgba(34,211,238,.22)]'
                 : 'bg-white/5 text-cyan-100/65 border-cyan-500/20 hover:bg-cyan-500/10 hover:text-white'
@@ -88,12 +88,12 @@ const RecallsView = () => {
             <div className="flex items-center gap-2">
               <span
                 className={cn(
-                  'w-2.5 h-2.5 rounded-full shadow-[0_0_10px_currentColor]',
+                  'w-3 h-3 rounded-full shadow-[0_0_12px_currentColor]',
                   f.color
                 )}
               />
 
-              <span className={f.key === 'todos' ? 'font-bold uppercase' : ''}>
+             <span className={cn( 'font-medium tracking-[-0.01em]', f.key === 'todos' && 'font-bold uppercase' )}>
                 {f.label}
               </span>
             </div>
