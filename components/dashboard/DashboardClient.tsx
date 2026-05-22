@@ -198,7 +198,7 @@ const DashboardClient = ({
             flex
             items-center
             gap-3
-            text-5xl
+            text-4xl
             font-bold
             bg-gradient-to-r
             from-white
@@ -210,7 +210,7 @@ const DashboardClient = ({
         >
           ¡Hola Sheila!
 
-          <span className="text-cyan-300 drop-shadow-[0_0_12px_rgba(34,211,238,.8)]">
+          <span className="text-cyan-300 text-3xl drop-shadow-[0_0_12px_rgba(34,211,238,.8)]">
             ✦
           </span>
         </h1>
