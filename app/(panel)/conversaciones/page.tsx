@@ -35,7 +35,7 @@ type Filtro = 'todas' | EstadoVisualConv;
 
 const filtros: { key: Filtro; label: string }[] = [
   { key: 'todas', label: 'Todas' },
-  { key: 'nueva', label: 'Martina' },
+  { key: 'nueva', label: 'Martina activa' },
   { key: 'en_curso', label: 'En curso' },
   { key: 'recepcion', label: 'Recepción' },
   { key: 'gestionada', label: 'Gestionadas' },
