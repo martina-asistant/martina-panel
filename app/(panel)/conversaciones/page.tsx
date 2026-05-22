@@ -222,7 +222,7 @@ const ConversacionesView = () => {
 
   <div className="px-6 pt-6 pb-4">
    <h1 className="text-2xl font-semibold tracking-[-0.015em] scale-x-[0.97] origin-left bg-gradient-to-r from-white to-cyan-300 bg-clip-text text-transparent mb-1">
-    Conversaciones
+    CONVERSACIONES
     </h1>
 
     <p className="text-sm text-cyan-100/55">
