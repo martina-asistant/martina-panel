@@ -93,7 +93,7 @@ const RecallsView = () => {
                 )}
               />
 
-             <span className={cn( 'font-medium tracking-[-0.01em]', f.key === 'todos' && 'font-bold uppercase' )}>
+            <span className={cn( f.key === 'todos' ? 'font-bold uppercase' : 'font-normal text-[14px] tracking-[-0.01em]' )} >
                 {f.label}
               </span>
             </div>
