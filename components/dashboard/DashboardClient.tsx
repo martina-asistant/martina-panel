@@ -165,7 +165,7 @@ const DashboardClient = ({
   const isToday = (iso: string | null) => iso ? new Date(iso) >= today : false;
 
   const nuevas = convs.filter(c => c.estado_visual === 'nueva').length;
-  const enCurso = convs.filter(c => c.estado_visual === 'martina').length;
+  const enCurso = convs.filter(c => c.estado_visual === 'en_curso').length;
   const recepcion = convs.filter(c => c.estado_visual === 'recepcion').length;
   const gestion = convs.filter(c => c.estado_visual === 'gestionada').length;
   const recados = convs.filter(c => (c.notas_internas || '').trim().length > 0).length;
