@@ -51,7 +51,7 @@ const Sidebar = () => {
           height={90}
           className="w-full h-full object-cover object-center scale-[1.15]"
           />
-
+          </div>
           {/* TEXTO */}
 
           <div>
