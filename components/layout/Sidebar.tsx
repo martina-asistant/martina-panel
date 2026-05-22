@@ -34,8 +34,8 @@ const Sidebar = () => {
 
           <div
             className="
-            w-18
-            h-18
+            w-16
+            h-16
             rounded-full
             bg-white
             ring-2
@@ -51,7 +51,7 @@ const Sidebar = () => {
 
             <div
               className="
-              text-[13px]
+              text-[11px]
               tracking-[0.38em]
               text-cyan-300
               font-semibold
@@ -62,7 +62,7 @@ const Sidebar = () => {
 
             <div
               className="
-              text-[17px]
+              text-base
               font-semibold
               text-white
               leading-tight
