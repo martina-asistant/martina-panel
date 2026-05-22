@@ -301,9 +301,9 @@ const ConversacionesView = () => {
         ) : (
           <>
            <div className="relative z-10 bg-[#F8FBFC] px-8 py-5 border-b border-cyan-100 shadow-[0_12px_30px_rgba(14,124,139,.08)]">
-  <div className="flex items-center justify-between gap-5 rounded-3xl border border-[#6FD7E2]/35 bg-[linear-gradient(180deg,#0F2C35_0%,#163C46_100%)] px-6 py-4 shadow-[0_0_34px_rgba(34,211,238,.18),0_16px_32px_rgba(14,124,139,.14),inset_0_1px_0_rgba(255,255,255,.06)]">
-    <div className="min-w-0">
-      <div className="font-semibold text-white truncate">
+  <div className="w-full flex items-center justify-between gap-6 rounded-3xl border border-[#6FD7E2]/35 bg-[linear-gradient(180deg,#0F2C35_0%,#163C46_100%)] px-8 py-4 shadow-[0_0_34px_rgba(34,211,238,.18),0_16px_32px_rgba(14,124,139,.14),inset_0_1px_0_rgba(255,255,255,.06)]">
+    <div className="flex-1 min-w-0">
+      <div className="font-semibold text-white text-[18px] truncate">
         {selected.nombre_paciente || formatTelefono(selected.telefono_e164)}
       </div>
 
