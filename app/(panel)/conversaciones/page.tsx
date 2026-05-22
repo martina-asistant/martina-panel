@@ -300,19 +300,16 @@ const ConversacionesView = () => {
           </div>
         ) : (
           <>
-           <div className="h-16 border-b border-[#6FD7E2]/35 bg-[linear-gradient(180deg,#0E2730_0%,#143640_100%)] px-6 flex items-center justify-between shadow-[0_-10px_40px_rgba(34,211,238,.16),0_12px_30px_rgba(34,211,238,.12),inset_0_1px_0_rgba(255,255,255,.05)]">
+            <div className="h-16 border-b border-[#6FD7E2]/35 bg-[linear-gradient(180deg,#0E2730_0%,#143640_100%)] px-6 flex items-center justify-between shadow-[0_-10px_40px_rgba(34,211,238,.16),0_12px_30px_rgba(34,211,238,.12),inset_0_1px_0_rgba(255,255,255,.05)]">
+              <div className="px-5 py-2 rounded-2xl bg-[linear-gradient(90deg,rgba(34,211,238,.12),rgba(34,211,238,.03))] border border-cyan-300/10 shadow-[0_0_28px_rgba(34,211,238,.12)]">
+                <div className="font-semibold text-white">
+                  {selected.nombre_paciente || formatTelefono(selected.telefono_e164)}
+                </div>
 
-  <div className="px-5 py-2 rounded-2xl bg-[linear-gradient(90deg,rgba(34,211,238,.12),rgba(34,211,238,.03))] border border-cyan-300/10 shadow-[0_0_28px_rgba(34,211,238,.12)]">
-    <div className="font-semibold text-white">
-      {selected.nombre_paciente || formatTelefono(selected.telefono_e164)}
-    </div>
-
-    <div className="text-xs text-cyan-100/70">
-      {formatTelefono(selected.telefono_e164)} · {selected.motivo || 'Sin motivo'}
-    </div>
-  </div>
-
-  <div className="flex items-center gap-2">
+                <div className="text-xs text-cyan-100/70">
+                  {formatTelefono(selected.telefono_e164)} · {selected.motivo || 'Sin motivo'}
+                </div>
+              </div>
 
               <div className="flex items-center gap-2">
                 <Button
@@ -391,8 +388,9 @@ const ConversacionesView = () => {
 
             <div className="px-6 py-4 border-t border-[#6FD7E2]/20 bg-[#F8FBFC] shadow-[0_-6px_20px_rgba(14,124,139,.08)]">
               <div className="flex items-center gap-3 rounded-2xl border border-[#6FD7E2]/35 bg-[linear-gradient(180deg,#0F2C35_0%,#163C46_100%)] p-3 shadow-[0_-10px_35px_rgba(34,211,238,.14),0_14px_30px_rgba(34,211,238,.10),inset_0_1px_0_rgba(255,255,255,.05)]">
-                <button className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] hover:scale-[1.03] shadow-[0_0_20px_rgba(14,124,139,.35)] text-white flex items-center justify-center transition-all"
->
+                <button
+                  className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] hover:scale-[1.03] shadow-[0_0_20px_rgba(14,124,139,.35)] text-white flex items-center justify-center transition-all"
+                >
                   <Paperclip className="w-4 h-4" />
                 </button>
 
