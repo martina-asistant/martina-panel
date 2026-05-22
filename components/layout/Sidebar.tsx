@@ -44,6 +44,13 @@ const Sidebar = () => {
             flex-shrink-0
             "
           />
+          <Image
+          src="/martina-logo.png"
+          alt="Martina"
+          width={90}
+          height={90}
+          className="w-full h-full object-cover object-center scale-[1.15]"
+          />
 
           {/* TEXTO */}
 
