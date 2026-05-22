@@ -77,7 +77,7 @@ const RecordatoriosView = () => {
       key={f.key}
       onClick={() => setFilter(f.key)}
       className={cn(
-        'text-sm px-4 py-2 rounded-full border transition-all',
+        'text-sm px-3 py-2 rounded-full border transition-all',
         filter === f.key
           ? 'bg-cyan-500/20 text-cyan-100 border-cyan-300/50 shadow-[0_0_18px_rgba(34,211,238,.22)]'
           : 'bg-white/5 text-cyan-100/65 border-cyan-500/20 hover:bg-cyan-500/10 hover:text-white'
