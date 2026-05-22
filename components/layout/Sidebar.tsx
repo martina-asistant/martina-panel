@@ -34,8 +34,8 @@ const Sidebar = () => {
 
           <div
             className="
-            w-[84px]
-            h-[84px]
+            w-[88px]
+            h-[88px]
             rounded-full
             bg-white
             ring-2
