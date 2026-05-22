@@ -67,7 +67,7 @@ const RecordatoriosView = () => {
         </h1>
 
         <p className="text-sm text-cyan-100/55">
-          Enviados por Martina
+          Próximas citas
         </p>
       </div>
 
