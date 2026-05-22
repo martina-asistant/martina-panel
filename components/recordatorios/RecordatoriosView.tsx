@@ -62,12 +62,12 @@ const RecordatoriosView = () => {
   return (
     <div className="min-h-full overflow-y-auto p-8 bg-[#02141B] text-white">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-cyan-300 bg-clip-text text-transparent mb-2">
+        <h1 className="text-2xl font-semibold tracking-[-0.015em] scale-x-[0.97] origin-left bg-gradient-to-r from-white to-cyan-300 bg-clip-text text-transparent mb-1">
           Recordatorios
         </h1>
 
         <p className="text-sm text-cyan-100/55">
-          Recordatorios de cita enviados por Martina
+          Enviados por Martina
         </p>
       </div>
 
