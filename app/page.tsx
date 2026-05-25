@@ -13,19 +13,7 @@ const Home = () => {
           alt="Martina"
           className="block w-full h-auto"
           />
-          <div
-  className="
-    absolute
-    left-1/2
-    top-[9.3%]
-    w-[24.2%]
-    h-[24.2%]
-    -translate-x-1/2
-    rounded-full
-    pointer-events-none
-    martina-halo
-  "
-/>
+          <div className="martina-halo" />
 
      <button
    onClick={() => router.push('/dashboard')}
