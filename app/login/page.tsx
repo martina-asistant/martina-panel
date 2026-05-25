@@ -21,7 +21,7 @@ const LoginPage = () => {
     const supabase = createClient();
 
     if (!supabase) {
-      setError('Supabase no está configurado.');
+      setError('Por favor, contacta con el administrador');
       setLoading(false);
       return;
     }
