@@ -16,7 +16,7 @@ const Home = () => {
           <div className="martina-halo" />
         
      <button
-   onClick={() => router.push('/dashboard')}
+   onClick={() => router.push('/login')}
   aria-label="Acceder"
   className="
     absolute
