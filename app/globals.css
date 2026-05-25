@@ -93,18 +93,19 @@
 .martina-halo {
   position: absolute;
   left: 50%;
-  top: 8.9%;
-  width: 25%;
+  top: 11.2%;
+  width: 17.2%;
   aspect-ratio: 1 / 1;
+
   border-radius: 9999px;
   background: transparent !important;
   pointer-events: none;
   z-index: 2;
 
   box-shadow:
-    0 0 10px rgba(36, 244, 234, 0.45),
-    0 0 22px rgba(36, 244, 234, 0.32),
-    0 0 42px rgba(36, 244, 234, 0.18);
+    0 0 8px rgba(36,244,234,.40),
+    0 0 18px rgba(36,244,234,.25),
+    0 0 35px rgba(36,244,234,.12);
 
   animation: haloPulse 4.2s ease-in-out infinite;
 }
