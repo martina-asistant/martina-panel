@@ -156,7 +156,7 @@ const LoginPage = () => {
     disabled:opacity-60
   "
 >
-  {loading ? 'ENTRANDO...' : 'ENTRAR'}
+  {loading ? 'ACCEDIENDO...' : 'ENTRAR'}
 </button>
         </div>
       </form>
