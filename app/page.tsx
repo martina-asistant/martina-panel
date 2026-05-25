@@ -14,33 +14,6 @@ const Home = () => {
           className="block w-full h-auto"
           />
           <div className="martina-halo" />
-
-{/* Destellos tipo estrella mejorados */}
-
-<div className="absolute top-[31%] left-[32%] text-[#8EFDF4] text-[12px] opacity-90 animate-pulse
-drop-shadow-[0_0_3px_rgba(36,244,234,0.95)]
-[filter:drop-shadow(0_0_8px_rgba(36,244,234,0.75))_drop-shadow(0_0_18px_rgba(36,244,234,0.35))]
-select-none">✦</div>
-
-<div className="absolute top-[34%] left-[40%] text-[#8EFDF4] text-[10px] opacity-80 animate-pulse
-drop-shadow-[0_0_2px_rgba(36,244,234,0.9)]
-[filter:drop-shadow(0_0_6px_rgba(36,244,234,0.65))_drop-shadow(0_0_14px_rgba(36,244,234,0.25))]
-select-none">✦</div>
-
-<div className="absolute top-[36%] left-[66%] text-[#8EFDF4] text-[14px] opacity-100 animate-pulse
-drop-shadow-[0_0_4px_rgba(36,244,234,1)]
-[filter:drop-shadow(0_0_10px_rgba(36,244,234,0.8))_drop-shadow(0_0_22px_rgba(36,244,234,0.4))]
-select-none">✦</div>
-
-<div className="absolute top-[43%] left-[24%] text-[#8EFDF4] text-[10px] opacity-75 animate-pulse
-drop-shadow-[0_0_2px_rgba(36,244,234,0.9)]
-[filter:drop-shadow(0_0_6px_rgba(36,244,234,0.65))_drop-shadow(0_0_14px_rgba(36,244,234,0.25))]
-select-none">✦</div>
-
-<div className="absolute top-[44%] left-[74%] text-[#8EFDF4] text-[12px] opacity-90 animate-pulse
-drop-shadow-[0_0_3px_rgba(36,244,234,0.95)]
-[filter:drop-shadow(0_0_8px_rgba(36,244,234,0.75))_drop-shadow(0_0_18px_rgba(36,244,234,0.35))]
-select-none">✦</div>
         
      <button
    onClick={() => router.push('/dashboard')}
