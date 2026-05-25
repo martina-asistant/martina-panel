@@ -25,15 +25,17 @@ const Home = () => {
     h-[7%]
     -translate-x-1/2
     rounded-full
+    bg-transparent
     cursor-pointer
-    bg-cyan-300/0
-    transition-all
-    duration-300
+
+    transition-transform
+    duration-200
     ease-out
-    hover:bg-cyan-300/10
-    hover:shadow-[0_0_35px_rgba(36,244,234,0.9)]
-    hover:scale-[1.025]
-    active:scale-[0.96]
+
+    hover:scale-[1.018]
+    hover:shadow-[0_0_28px_rgba(36,244,234,0.85)]
+
+    active:scale-[0.965]
     active:translate-y-[2px]
   "
 />
