@@ -72,39 +72,3 @@
     drop-shadow(0 0 25px rgba(36, 244, 234, .55));
 }
 
-.sparkle-dot {
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  border-radius: 9999px;
-  background: #24f4ea;
-  box-shadow:
-    0 0 8px rgba(36,244,234,.9),
-    0 0 18px rgba(36,244,234,.55);
-  pointer-events: none;
-  opacity: .75;
-  animation: sparkleMove 4s ease-in-out infinite;
-}
-
-.sparkle-1 { left: 32%; top: 30%; animation-delay: 0s; }
-.sparkle-2 { left: 67%; top: 27%; animation-delay: .7s; }
-.sparkle-3 { left: 23%; top: 43%; animation-delay: 1.2s; }
-.sparkle-4 { left: 78%; top: 45%; animation-delay: 1.8s; }
-.sparkle-5 { left: 50%; top: 20%; animation-delay: 2.4s; }
-
-@keyframes sparkleMove {
-  0% {
-    transform: translateY(0) scale(1);
-    opacity: .35;
-  }
-
-  50% {
-    transform: translateY(-10px) scale(1.35);
-    opacity: 1;
-  }
-
-  100% {
-    transform: translateY(0) scale(1);
-    opacity: .35;
-  }
-}
