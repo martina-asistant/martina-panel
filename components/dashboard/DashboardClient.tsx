@@ -93,7 +93,7 @@ const DashboardClient = ({
   const [convs, setConvs] = useState<ConversacionWhatsapp[]>(initialConvs);
   const [recs, setRecs] = useState<RecordatorioCita[]>(initialRecs);
   const [recalls, setRecalls] = useState<Recall[]>(initialRecalls);
-  const [nombreUsuario, setNombreUsuario] = useState('Usuario');
+  const [nombreUsuario, setNombreUsuario] = useState('');
 
   useEffect(() => {
     (async () => {
@@ -203,7 +203,7 @@ const DashboardClient = ({
             bg-clip-text text-transparent mb-4
           "
         >
-          ¡Hola {nombreUsuario}!
+          ¡Hola {nombreUsuario || '...'}!
 
           <span className="text-cyan-300 text-3xl drop-shadow-[0_0_12px_rgba(34,211,238,.8)]">
             ✦
