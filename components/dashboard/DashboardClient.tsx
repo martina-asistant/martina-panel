@@ -208,7 +208,7 @@ const DashboardClient = ({
             mb-4
           "
         >
-          ¡Hola Sheila!
+          ¡Hola {user?.email?.split('@')[0] || 'Usuario'}!
 
           <span className="text-cyan-300 text-3xl drop-shadow-[0_0_12px_rgba(34,211,238,.8)]">
             ✦
