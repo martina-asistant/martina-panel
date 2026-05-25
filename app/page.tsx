@@ -15,6 +15,7 @@ const Home = () => {
           />
           <div className="martina-halo" />
         <span className="sparkle-dot sparkle-1" />
+<span className="sparkle-dot sparkle-1" />
 <span className="sparkle-dot sparkle-2" />
 <span className="sparkle-dot sparkle-3" />
 <span className="sparkle-dot sparkle-4" />
