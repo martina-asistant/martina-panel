@@ -120,26 +120,27 @@
 
 @keyframes haloPulse {
   0% {
-    opacity: .5;
+    opacity: .55;
     transform: translateX(-50%) scale(1);
   }
 
   50% {
     opacity: 1;
-    transform: translateX(-50%) scale(1.035);
+    transform: translateX(-50%) scale(1.025);
   }
 
   100% {
-    opacity: .5;
+    opacity: .55;
     transform: translateX(-50%) scale(1);
   }
 }
 
 .martina-halo {
   box-shadow:
-    0 0 18px rgba(36,244,234,.45),
-    0 0 45px rgba(36,244,234,.35),
-    0 0 85px rgba(36,244,234,.18);
+    0 0 16px rgba(36,244,234,.45),
+    0 0 42px rgba(36,244,234,.38),
+    0 0 85px rgba(36,244,234,.22),
+    inset 0 0 35px rgba(36,244,234,.18);
 
-  animation: haloPulse 4s ease-in-out infinite;
+  animation: haloPulse 4.2s ease-in-out infinite;
 }
