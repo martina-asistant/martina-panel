@@ -15,7 +15,7 @@ const Home = () => {
         />
 
      <button
-  onClick={() => router.push('/dashboard')}
+   onClick={() => router.push('/dashboard')}
   aria-label="Acceder"
   className="
     absolute
@@ -25,18 +25,17 @@ const Home = () => {
     h-[5.8%]
     -translate-x-1/2
     rounded-full
+    bg-transparent
     cursor-pointer
 
-    bg-transparent
-
-    transition-all
-    duration-300
+    transition-transform
+    duration-200
     ease-out
 
-    hover:scale-[1.025]
-    hover:drop-shadow-[0_0_18px_rgba(36,244,234,0.75)]
+    hover:scale-[1.018]
+    hover:shadow-[0_0_28px_rgba(36,244,234,0.85)]
 
-    active:scale-[0.96]
+    active:scale-[0.965]
     active:translate-y-[2px]
   "
 />
