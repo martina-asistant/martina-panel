@@ -117,3 +117,29 @@
 .sparkle {
   animation: sparkleFloat 3s ease-in-out infinite;
 }
+
+@keyframes haloPulse {
+  0% {
+    opacity: .5;
+    transform: translateX(-50%) scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.035);
+  }
+
+  100% {
+    opacity: .5;
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+.martina-halo {
+  box-shadow:
+    0 0 18px rgba(36,244,234,.45),
+    0 0 45px rgba(36,244,234,.35),
+    0 0 85px rgba(36,244,234,.18);
+
+  animation: haloPulse 4s ease-in-out infinite;
+}
