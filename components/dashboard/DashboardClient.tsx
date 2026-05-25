@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { LogOut } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import {
   MessageCircle,
@@ -53,22 +52,10 @@ const Metric = ({
   <Link href={href} className="block">
     <Card
       className="
-        group
-        relative
-        overflow-hidden
-        rounded-3xl
-        border
-        border-cyan-500/20
-        bg-[rgba(5,18,24,.78)]
-        backdrop-blur-xl
-        p-5
-        cursor-pointer
-        transition-all
-        duration-500
-        hover:-translate-y-1
-        hover:scale-[1.015]
-        hover:border-cyan-300/60
-        hover:shadow-[0_0_35px_rgba(34,211,238,.32)]
+        group relative overflow-hidden rounded-3xl border border-cyan-500/20
+        bg-[rgba(5,18,24,.78)] backdrop-blur-xl p-5 cursor-pointer
+        transition-all duration-500 hover:-translate-y-1 hover:scale-[1.015]
+        hover:border-cyan-300/60 hover:shadow-[0_0_35px_rgba(34,211,238,.32)]
       "
     >
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-cyan-400/15 via-transparent to-transparent" />
@@ -80,24 +67,14 @@ const Metric = ({
             {label}
           </div>
 
-          <div className="text-5xl font-bold text-white">
-            {value}
-          </div>
+          <div className="text-5xl font-bold text-white">{value}</div>
         </div>
 
         <div
           className="
-            w-14
-            h-14
-            rounded-2xl
-            bg-cyan-500/10
-            flex
-            items-center
-            justify-center
+            w-14 h-14 rounded-2xl bg-cyan-500/10 flex items-center justify-center
             shadow-[0_0_20px_rgba(34,211,238,.18)]
-            transition-all
-            duration-500
-            group-hover:bg-cyan-400/15
+            transition-all duration-500 group-hover:bg-cyan-400/15
             group-hover:shadow-[0_0_26px_rgba(34,211,238,.35)]
           "
         >
@@ -117,15 +94,6 @@ const DashboardClient = ({
   const [recs, setRecs] = useState<RecordatorioCita[]>(initialRecs);
   const [recalls, setRecalls] = useState<Recall[]>(initialRecalls);
   const [nombreUsuario, setNombreUsuario] = useState('Usuario');
-  const cerrarSesion = async () => {
-  const supa = createClient();
-
-  if (!supa) return;
-
-  await supa.auth.signOut();
-
-  window.location.href = '/login';
-};
 
   useEffect(() => {
     (async () => {
@@ -142,29 +110,29 @@ const DashboardClient = ({
   }, []);
 
   useEffect(() => {
-  (async () => {
-    const supa = createClient();
+    (async () => {
+      const supa = createClient();
 
-    if (!supa) return;
+      if (!supa) return;
 
-    const {
-      data: { user }
-    } = await supa.auth.getUser();
+      const {
+        data: { user }
+      } = await supa.auth.getUser();
 
-    if (!user?.email) return;
+      if (!user?.email) return;
 
-    const { data } = await supa
-      .from('usuarios_panel')
-      .select('nombre')
-      .eq('email', user.email)
-      .single();
+      const { data } = await supa
+        .from('usuarios_panel')
+        .select('nombre')
+        .eq('email', user.email)
+        .single();
 
-    if (data?.nombre) {
-      setNombreUsuario(data.nombre);
-    }
-  })();
-}, []);
-  
+      if (data?.nombre) {
+        setNombreUsuario(data.nombre);
+      }
+    })();
+  }, []);
+
   useEffect(() => {
     const supa = createClient();
 
@@ -196,8 +164,8 @@ const DashboardClient = ({
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  
-  const isToday = (iso: string | null) => iso ? new Date(iso) >= today : false;
+
+  const isToday = (iso: string | null) => (iso ? new Date(iso) >= today : false);
 
   const nuevas = convs.filter(c => c.estado_visual === 'nueva').length;
   const enCurso = convs.filter(c => c.estado_visual === 'en_curso').length;
@@ -225,103 +193,86 @@ const DashboardClient = ({
   const recMod = recs.filter(r => r.estado === 'cita_modificada').length;
   const recCancel = recs.filter(r => r.estado === 'cancelada_recado').length;
 
-return (
-  <div className="min-h-full p-8 bg-[#02141B] text-white">
-    <div className="mb-10">
-      <div className="flex justify-end mb-10 -mt-4">
-        <button
-          onClick={cerrarSesion}
+  return (
+    <div className="min-h-full p-8 bg-[#02141B] text-white">
+      <div className="mb-10">
+        <h1
           className="
-            flex items-center gap-2 px-5 py-3 rounded-2xl
-            border border-cyan-500/20
-            bg-[rgba(5,18,24,.78)]
-            hover:border-cyan-300/60
-            hover:shadow-[0_0_25px_rgba(34,211,238,.25)]
-            transition-all
+            flex items-center gap-3 text-4xl font-bold
+            bg-gradient-to-r from-white to-cyan-300
+            bg-clip-text text-transparent mb-4
           "
         >
-          <LogOut className="w-4 h-4 text-cyan-300" />
-          <span>Cerrar sesión</span>
-        </button>
-      </div>
+          ¡Hola {nombreUsuario}!
 
-      <h1
-        className="
-          flex items-center gap-3 text-4xl font-bold
-          bg-gradient-to-r from-white to-cyan-300
-          bg-clip-text text-transparent mb-4
-        "
-      >
-        ¡Hola {nombreUsuario}!
+          <span className="text-cyan-300 text-3xl drop-shadow-[0_0_12px_rgba(34,211,238,.8)]">
+            ✦
+          </span>
+        </h1>
 
-        <span className="text-cyan-300 text-3xl drop-shadow-[0_0_12px_rgba(34,211,238,.8)]">
-          ✦
-        </span>
-      </h1>
-
-      <div
-        className="
-          inline-flex items-center gap-3 rounded-full
-          border border-cyan-400/20 bg-cyan-500/10
-          px-5 py-2.5 text-cyan-100 text-sm font-medium
-          shadow-[0_0_20px_rgba(34,211,238,.08)]
-        "
-      >
-        <span
+        <div
           className="
-            w-2 h-2 rounded-full bg-cyan-300 animate-pulse
-            shadow-[0_0_12px_rgba(34,211,238,.95)]
+            inline-flex items-center gap-3 rounded-full
+            border border-cyan-400/20 bg-cyan-500/10
+            px-5 py-2.5 text-cyan-100 text-sm font-medium
+            shadow-[0_0_20px_rgba(34,211,238,.08)]
           "
-        />
+        >
+          <span
+            className="
+              w-2 h-2 rounded-full bg-cyan-300 animate-pulse
+              shadow-[0_0_12px_rgba(34,211,238,.95)]
+            "
+          />
 
-        Martina activa
+          Martina activa
+        </div>
+      </div>
+
+      <div className="space-y-10">
+        <section>
+          <h2 className="mb-4 uppercase tracking-[0.22em] text-cyan-300/70">
+            Conversaciones
+          </h2>
+
+          <div className="grid lg:grid-cols-5 gap-4">
+            <Metric icon={MessageCircle} label="Nuevas" value={2} href="/conversaciones" />
+            <Metric icon={LoaderCircle} label="Martina" value={10} href="/conversaciones" />
+            <Metric icon={Building2} label="Recepción" value={2} href="/conversaciones" />
+            <Metric icon={Check} label="Gestionadas" value={8} href="/conversaciones" />
+            <Metric icon={ClipboardPen} label="Recados" value={3} href="/conversaciones" />
+          </div>
+        </section>
+
+        <section>
+          <h2 className="mb-4 uppercase tracking-[0.22em] text-cyan-300/70">
+            Actividad de hoy
+          </h2>
+
+          <div className="grid lg:grid-cols-4 gap-4">
+            <Metric icon={CalendarDays} label="Citas creadas" value={15} href="/conversaciones" />
+            <Metric icon={Bell} label="Recordatorios" value={14} href="/recordatorios" />
+            <Metric icon={PhoneOutgoing} label="Recalls enviados" value={27} href="/recalls" />
+            <Metric icon={PhoneCall} label="Recalls aceptados" value={20} href="/recalls" />
+          </div>
+        </section>
+
+        <section>
+          <h2 className="mb-4 uppercase tracking-[0.22em] text-cyan-300/70">
+            Estado recordatorios
+          </h2>
+
+          <div className="grid lg:grid-cols-5 gap-4">
+            <Metric icon={CircleDot} label="Pendiente" value={2} href="/recordatorios" />
+            <Metric icon={CircleCheck} label="Confirmadas" value={10} href="/recordatorios" />
+            <Metric icon={CircleX} label="No podrá asistir" value={1} href="/recordatorios" />
+            <Metric icon={RefreshCcw} label="Modificadas" value={1} href="/recordatorios" />
+            <Metric icon={Ban} label="Canceladas" value={1} href="/recordatorios" />
+          </div>
+        </section>
       </div>
     </div>
-
-    <div className="space-y-10">
-      <section>
-        <h2 className="mb-4 uppercase tracking-[0.22em] text-cyan-300/70">
-          Conversaciones
-        </h2>
-
-        <div className="grid lg:grid-cols-5 gap-4">
-          <Metric icon={MessageCircle} label="Nuevas" value={2} href="/conversaciones" />
-          <Metric icon={LoaderCircle} label="Martina" value={10} href="/conversaciones" />
-          <Metric icon={Building2} label="Recepción" value={2} href="/conversaciones" />
-          <Metric icon={Check} label="Gestionadas" value={8} href="/conversaciones" />
-          <Metric icon={ClipboardPen} label="Recados" value={3} href="/conversaciones" />
-        </div>
-      </section>
-
-      <section>
-        <h2 className="mb-4 uppercase tracking-[0.22em] text-cyan-300/70">
-          Actividad de hoy
-        </h2>
-
-        <div className="grid lg:grid-cols-4 gap-4">
-          <Metric icon={CalendarDays} label="Citas creadas" value={15} href="/conversaciones" />
-          <Metric icon={Bell} label="Recordatorios" value={14} href="/recordatorios" />
-          <Metric icon={PhoneOutgoing} label="Recalls enviados" value={27} href="/recalls" />
-          <Metric icon={PhoneCall} label="Recalls aceptados" value={20} href="/recalls" />
-        </div>
-      </section>
-
-      <section>
-        <h2 className="mb-4 uppercase tracking-[0.22em] text-cyan-300/70">
-          Estado recordatorios
-        </h2>
-
-        <div className="grid lg:grid-cols-5 gap-4">
-          <Metric icon={CircleDot} label="Pendiente" value={2} href="/recordatorios" />
-          <Metric icon={CircleCheck} label="Confirmadas" value={10} href="/recordatorios" />
-          <Metric icon={CircleX} label="No podrá asistir" value={1} href="/recordatorios" />
-          <Metric icon={RefreshCcw} label="Modificadas" value={1} href="/recordatorios" />
-          <Metric icon={Ban} label="Canceladas" value={1} href="/recordatorios" />
-        </div>
-      </section>
-    </div>
-  </div>
-);
+  );
 };
 
 export default DashboardClient;
