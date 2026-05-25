@@ -115,6 +115,7 @@ const DashboardClient = ({
   const [convs, setConvs] = useState<ConversacionWhatsapp[]>(initialConvs);
   const [recs, setRecs] = useState<RecordatorioCita[]>(initialRecs);
   const [recalls, setRecalls] = useState<Recall[]>(initialRecalls);
+  const [nombreUsuario, setNombreUsuario] = useState('Usuario');
 
   useEffect(() => {
     (async () => {
@@ -130,6 +131,30 @@ const DashboardClient = ({
     })();
   }, []);
 
+  useEffect(() => {
+  (async () => {
+    const supa = createClient();
+
+    if (!supa) return;
+
+    const {
+      data: { user }
+    } = await supa.auth.getUser();
+
+    if (!user?.email) return;
+
+    const { data } = await supa
+      .from('usuarios_panel')
+      .select('nombre')
+      .eq('email', user.email)
+      .single();
+
+    if (data?.nombre) {
+      setNombreUsuario(data.nombre);
+    }
+  })();
+}, []);
+  
   useEffect(() => {
     const supa = createClient();
 
@@ -208,7 +233,7 @@ const DashboardClient = ({
             mb-4
           "
         >
-          ¡Hola {user?.email?.split('@')[0] || 'Usuario'}!
+          ¡Hola {nombreUsuario}!
 
           <span className="text-cyan-300 text-3xl drop-shadow-[0_0_12px_rgba(34,211,238,.8)]">
             ✦
