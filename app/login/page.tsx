@@ -57,14 +57,24 @@ const LoginPage = () => {
         "
       >
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-cyan-300 bg-clip-text text-transparent">
-            Acceso Martina
-          </h1>
 
-          <p className="mt-3 text-sm text-cyan-100/70">
-            Inicia sesión para acceder al panel.
-          </p>
-        </div>
+  <h1 className="
+    text-3xl
+    font-bold
+    bg-gradient-to-r
+    from-white
+    to-cyan-300
+    bg-clip-text
+    text-transparent
+  ">
+    Martina Assistant ✦
+  </h1>
+
+  <p className="mt-3 text-sm text-cyan-100/70">
+    Inicia sesión para acceder al panel
+  </p>
+
+</div>
 
         <div className="space-y-5">
           <div>
