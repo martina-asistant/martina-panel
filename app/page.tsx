@@ -15,7 +15,6 @@ const Home = () => {
           />
           <div
   className="
-     className="
     absolute
     left-1/2
     top-[9.3%]
