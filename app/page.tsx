@@ -29,7 +29,7 @@ const Home = () => {
     cursor-pointer
 
     transition-transform
-    duration-200
+    duration-300
     ease-out
 
     hover:scale-[1.018]
