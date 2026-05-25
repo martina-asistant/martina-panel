@@ -15,11 +15,12 @@ const Home = () => {
           />
           <div
   className="
+     className="
     absolute
     left-1/2
-    top-[8.7%]
-    w-[28.5%]
-    h-[34%]
+    top-[9.3%]
+    w-[24.2%]
+    h-[24.2%]
     -translate-x-1/2
     rounded-full
     pointer-events-none
