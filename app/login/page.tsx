@@ -134,25 +134,30 @@ const LoginPage = () => {
           )}
 
           <button
-            type="submit"
-            disabled={loading}
-            className="
-              w-full
-              rounded-2xl
-              bg-cyan-300
-              py-3
-              font-semibold
-              text-[#03111A]
-              transition-all
-              duration-300
-              hover:shadow-[0_0_25px_rgba(36,244,234,.65)]
-              hover:scale-[1.015]
-              active:scale-[0.97]
-              disabled:opacity-60
-            "
-          >
-            {loading ? 'Entrando...' : 'Entrar'}
-          </button>
+  type="submit"
+  disabled={loading}
+  className="
+    w-full
+    rounded-[999px]
+    bg-[#F7F9FA]
+    border-2
+    border-cyan-300/80
+    py-4
+    font-semibold
+    tracking-[0.25em]
+    text-[#03111A]
+    transition-all
+    duration-500
+    shadow-[0_0_18px_rgba(36,244,234,.55)]
+    hover:scale-[1.02]
+    hover:shadow-[0_0_30px_rgba(36,244,234,.85)]
+    active:translate-y-[2px]
+    active:scale-[0.98]
+    disabled:opacity-60
+  "
+>
+  {loading ? 'ENTRANDO...' : 'ENTRAR'}
+</button>
         </div>
       </form>
     </main>
