@@ -14,28 +14,29 @@ const Home = () => {
           className="block w-full h-auto"
         />
 
-      <button
+     <button
   onClick={() => router.push('/dashboard')}
   aria-label="Acceder"
   className="
     absolute
     left-1/2
-    top-[61.7%]
-    w-[28%]
-    h-[7%]
+    top-[63.2%]
+    w-[26.5%]
+    h-[5.8%]
     -translate-x-1/2
     rounded-full
-    bg-transparent
     cursor-pointer
 
-    transition-transform
-    duration-200
+    bg-transparent
+
+    transition-all
+    duration-300
     ease-out
 
-    hover:scale-[1.018]
-    hover:shadow-[0_0_28px_rgba(36,244,234,0.85)]
+    hover:scale-[1.025]
+    hover:drop-shadow-[0_0_18px_rgba(36,244,234,0.75)]
 
-    active:scale-[0.965]
+    active:scale-[0.96]
     active:translate-y-[2px]
   "
 />
