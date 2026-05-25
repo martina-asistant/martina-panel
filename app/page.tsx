@@ -17,9 +17,9 @@ const Home = () => {
   className="
     absolute
     left-1/2
-    top-[18.2%]
-    w-[24%]
-    h-[24%]
+    top-[8.7%]
+    w-[28.5%]
+    h-[34%]
     -translate-x-1/2
     rounded-full
     pointer-events-none
@@ -42,7 +42,7 @@ const Home = () => {
     cursor-pointer
 
     transition-transform
-    duration-300
+    duration-500
     ease-out
 
     hover:scale-[1.018]
