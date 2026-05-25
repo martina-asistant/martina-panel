@@ -12,7 +12,20 @@ const Home = () => {
           src="/martina-hero-v2.png"
           alt="Martina"
           className="block w-full h-auto"
-        />
+          />
+          <div
+  className="
+    absolute
+    left-1/2
+    top-[18.2%]
+    w-[24%]
+    h-[24%]
+    -translate-x-1/2
+    rounded-full
+    pointer-events-none
+    martina-halo
+  "
+/>
 
      <button
    onClick={() => router.push('/dashboard')}
