@@ -87,40 +87,42 @@ const ConversacionesView = () => {
   }, []);
 
   useEffect(() => {
-    if (!selectedId) {
-      setMensajes([]);
-      setPaciente(null);
-      return;
-    }
+  if (!selectedId) {
+    setMensajes([]);
+    setPaciente(null);
+    return;
+  }
 
-    (async () => {
-      const ms = await listMensajesByConversation(selectedId);
-      setMensajes(ms);
-    })();
+  (async () => {
+    const ms = await listMensajesByConversation(selectedId);
+    setMensajes(ms);
+  })();
 
-    const conv = convs.find(c => c.id === selectedId);
+  const conv = convs.find(c => c.id === selectedId);
 
-setNotasConv(conv?.notas_internas || '');
+  setNotasConv(conv?.notas_internas || '');
 
-if (conv?.paciente_id) {
-  getPatientById(conv.paciente_id).then(p => {
-    setPaciente(p);
-    setNotasPaciente(p?.notas_internas || '');
-  });
+  if (conv?.paciente_id) {
+    getPatientById(conv.paciente_id).then(p => {
+      setPaciente(p);
+      setNotasPaciente(p?.notas_internas || '');
+    });
 
-} else if (conv?.telefono_e164) {
+  } else if (conv?.telefono_e164) {
 
-  getPatientByTelefono(conv.telefono_e164).then(p => {
-    setPaciente(p);
-    setNotasPaciente(p?.notas_internas || '');
-  });
+    getPatientByTelefono(conv.telefono_e164).then(p => {
+      setPaciente(p);
+      setNotasPaciente(p?.notas_internas || '');
+    });
 
-} else {
+  } else {
 
-  setPaciente(null);
-  setNotasPaciente('');
+    setPaciente(null);
+    setNotasPaciente('');
 
-}[selectedId, convs]);
+  }
+
+}, [selectedId, convs]);
 
   useEffect(() => {
     const supa = createClient();
