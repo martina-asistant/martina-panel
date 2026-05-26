@@ -13,7 +13,7 @@ import {
   actualizarNotasConversacion
 } from '@/lib/repos/conversaciones.repo';
 import { listMensajesByConversation } from '@/lib/repos/mensajes.repo';
-import { getPatientById, updatePatientNotas } from '@/lib/repos/patients.repo';
+import { getPatientById, getPatientByTelefono, updatePatientNotas } from '@/lib/repos/patients.repo';
 import type {
   ConversacionWhatsapp,
   MensajeWhatsapp,
