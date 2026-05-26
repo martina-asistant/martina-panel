@@ -80,7 +80,7 @@ export interface MensajeWhatsapp {
 export interface Recall {
   id: string;
   created_at: string;
-  patient_id: string | null;
+  paciente_id: string | null;
   telefono: string | null;
   nombre_completo: string | null;
   tipo: string | null;
@@ -91,7 +91,6 @@ export interface Recall {
 export interface RecordatorioCita {
   id: string;
   created_at: string;
-  patient_id?: string | null;
   paciente_id?: string | null;
   nombre_completo?: string | null;
   telefono?: string | null;
