@@ -389,42 +389,50 @@ const ConversacionesView = () => {
 
             <div className="flex-1 overflow-y-auto px-8 py-7 space-y-4 bg-[radial-gradient(circle_at_top,rgba(34,211,238,.04),#F8FBFC_45%)]">
               {mensajes.map(m => {
-                const isPaciente = m.rol === 'paciente';
+  const isPaciente =
+    m.tipo_emisor === 'paciente' ||
+    m.direccion === 'entrante';
 
-                return (
-                  <div
-                    key={m.id}
-                    className={cn('flex', isPaciente ? 'justify-start' : 'justify-end')}
-                  >
-                    <div
-                      className={cn(
-                        'max-w-[72%] rounded-2xl px-5 py-3 text-sm shadow-sm',
-                        isPaciente
-                          ? 'bg-white border border-slate-200 text-[#06111A] rounded-bl-sm'
-                          : 'bg-[#D9F7FA] border border-[#B6EAEF] text-[#184B53] rounded-br-sm shadow-[0_0_12px_rgba(34,211,238,.08)]'
-                      )}
-                    >
-                      <div className="whitespace-pre-wrap break-words leading-relaxed">
-                        {m.contenido}
-                      </div>
+  return (
+    <div
+      key={m.id}
+      className={cn(
+        'flex',
+        isPaciente ? 'justify-start' : 'justify-end'
+      )}
+    >
+      <div
+        className={cn(
+          'max-w-[72%] rounded-2xl px-5 py-3 text-sm shadow-sm',
+          isPaciente
+            ? 'bg-white border border-slate-200 text-[#06111A] rounded-bl-sm'
+            : 'bg-[#D9F7FA] border border-[#B6EAEF] text-[#184B53] rounded-br-sm shadow-[0_0_12px_rgba(34,211,238,.08)]'
+        )}
+      >
+        <div className="whitespace-pre-wrap break-words leading-relaxed">
+          {m.contenido_texto || ''}
+        </div>
 
-                      <div
-                        className={cn(
-                          'text-[10px] mt-2 text-right',
-                          isPaciente ? 'text-slate-400' : 'text-cyan-900/60'
-                        )}
-                      >
-                        {m.rol !== 'paciente' && (
-                          <span className="mr-2 uppercase tracking-wide">
-                            {m.rol}
-                          </span>
-                        )}
-                        {formatTime(m.created_at)}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+        <div
+          className={cn(
+            'text-[10px] mt-2 text-right',
+            isPaciente
+              ? 'text-slate-400'
+              : 'text-cyan-900/60'
+          )}
+        >
+          {!isPaciente && m.tipo_emisor && (
+            <span className="mr-2 uppercase tracking-wide">
+              {m.tipo_emisor}
+            </span>
+          )}
+
+          {formatTime(m.created_at)}
+        </div>
+      </div>
+    </div>
+  );
+})}
 
               {mensajes.length === 0 && (
                 <div className="text-center text-sm text-slate-400 py-8">
