@@ -7,10 +7,10 @@ export const metadata: Metadata = {
 
   manifest: '/manifest.json',
 
-  icons: {
-    icon: '/martina-hero-halo.png',
-    shortcut: '/martina-hero-halo.png',
-    apple: '/martina-hero-halo.png',
+    icons: {
+  icon: '/favicon.ico',
+  shortcut: '/favicon.ico',
+  apple: '/favicon.ico',
   },
 };
 
