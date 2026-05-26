@@ -173,15 +173,35 @@ const ConversacionesView = () => {
             </div>
             <div className="flex-1 overflow-y-auto px-6 py-5 space-y-2">
               {mensajes.map(m => {
-              const isPaciente = m.rol === 'paciente';
-                return (
-                <div key={m.id} className={cn('flex', isPaciente ? 'justify-start' : 'justify-end')}>
-                <div className={cn('max-w-[70%] rounded-2xl px-4 py-2 text-sm shadow-sm',
-                isPaciente ? 'bg-white border border-martina-border text-martina-text rounded-bl-sm' : 'bg-martina-beige text-martina-text rounded-br-sm')}>
-                <div className="whitespace-pre-wrap break-words">{m.contenido}</div>
-                <div className="text-[10px] text-martina-muted mt-1 text-right">
-                {m.rol !== 'paciente' && <span className="mr-2 uppercase tracking-wide">{m.rol}</span>}
-                  {formatTime(m.created_at)}
+  const isPaciente =
+    m.tipo_emisor === 'paciente' ||
+    m.direccion === 'entrante';
+
+  const contenido =
+    m.contenido_texto ||
+    m.contenido ||
+    '';
+
+  const emisor =
+    m.tipo_emisor ||
+    m.rol ||
+    '';
+
+  return (
+    <div key={m.id} className={cn('flex', isPaciente ? 'justify-start' : 'justify-end')}>
+      <div className={cn(
+        'max-w-[70%] rounded-2xl px-4 py-2 text-sm shadow-sm',
+        isPaciente
+          ? 'bg-white border border-martina-border text-martina-text rounded-bl-sm'
+          : 'bg-martina-beige text-martina-text rounded-br-sm'
+      )}>
+        <div className="whitespace-pre-wrap break-words">{contenido}</div>
+
+        <div className="text-[10px] text-martina-muted mt-1 text-right">
+          {!isPaciente && emisor && (
+            <span className="mr-2 uppercase tracking-wide">{emisor}</span>
+          )}
+          {formatTime(m.created_at)}
                       </div>
                     </div>
                   </div>
