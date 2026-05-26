@@ -99,22 +99,28 @@ const ConversacionesView = () => {
     })();
 
     const conv = convs.find(c => c.id === selectedId);
-    setNotasConv(conv?.notas_internas || '');
 
-    if (conv?.paciente_id) {
+setNotasConv(conv?.notas_internas || '');
+
+if (conv?.paciente_id) {
   getPatientById(conv.paciente_id).then(p => {
     setPaciente(p);
     setNotasPaciente(p?.notas_internas || '');
   });
+
 } else if (conv?.telefono_e164) {
+
   getPatientByTelefono(conv.telefono_e164).then(p => {
     setPaciente(p);
     setNotasPaciente(p?.notas_internas || '');
   });
+
 } else {
+
   setPaciente(null);
   setNotasPaciente('');
-}
+
+}[selectedId, convs]);
 
   useEffect(() => {
     const supa = createClient();
