@@ -64,9 +64,10 @@ export interface MensajeWhatsapp {
   created_at: string;
   conversation_id: string;
   telefono: string | null;
-  rol: RolMensaje | string;
-  contenido: string;
-  fecha: string | null;
+  tipo_emisor: 'paciente' | 'bot' | 'recepcion' | 'sistema' | null;
+  direccion: 'entrante' | 'saliente' | null;
+  tipo_mensaje: string | null;
+  contenido_texto: string | null;
 }
 
 export interface Recall {
