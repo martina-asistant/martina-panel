@@ -263,11 +263,11 @@ const DashboardClient = ({
           </h2>
 
           <div className="grid lg:grid-cols-5 gap-4">
-            <Metric icon={CircleDot} label="Pendiente" value={pendientes} href="/recordatorios" />
-            <Metric icon={CircleCheck} label="Confirmadas" value={confirmadas} href="/recordatorios" />
-            <Metric icon={CircleX} label="No podrá asistir" value={noAsistira} href="/recordatorios" />
-            <Metric icon={RefreshCcw} label="Modificadas" value={modificadas} href="/recordatorios" />
-            <Metric icon={Ban} label="Canceladas" value={canceladas} href="/recordatorios" />
+            <Metric icon={CircleDot} label="Pendiente" value={recPendiente} href="/recordatorios" />
+            <Metric icon={CircleCheck} label="Confirmadas" value={recConf} href="/recordatorios" />
+            <Metric icon={CircleX} label="No podrá asistir" value={recNo} href="/recordatorios" />
+            <Metric icon={RefreshCcw} label="Modificadas" value={recMod} href="/recordatorios" />
+            <Metric icon={Ban} label="Canceladas" value={recCancel} href="/recordatorios" />
           </div>
         </section>
       </div>
