@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   description: 'Asistente inteligente para Rambla Vilar Dental',
 
   manifest: '/manifest.json',
+  icons: {
+  icon: '/m-icon.png',
+},
 };
 
 const RootLayout = ({
