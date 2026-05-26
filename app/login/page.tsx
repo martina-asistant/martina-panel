@@ -70,8 +70,9 @@ const LoginPage = () => {
         <span>Volver</span>
       </button>
 
-      <form
-        onSubmit={handleLogin}
+     <form
+  onSubmit={handleLogin}
+  autoComplete="off"
         className="
           w-full
           max-w-md
@@ -110,23 +111,25 @@ const LoginPage = () => {
             </label>
 
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="
-                w-full
-                rounded-2xl
-                border
-                border-cyan-400/20
-                bg-white/5
-                px-4
-                py-3
-                text-white
-                outline-none
-                focus:border-cyan-300/60
+            type="text"
+            name="martina-user-field"
+            autoComplete="new-password"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="
+              w-full
+              rounded-2xl
+              border
+              border-cyan-400/20
+              bg-white/5
+              px-4
+              py-3
+              text-white
+              outline-none
+              focus:border-cyan-300/60
               "
-            />
+              />
           </div>
 
           <div>
