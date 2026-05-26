@@ -138,23 +138,25 @@ const LoginPage = () => {
             </label>
 
             <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="
-                w-full
-                rounded-2xl
-                border
-                border-cyan-400/20
-                bg-white/5
-                px-4
-                py-3
-                text-white
-                outline-none
-                focus:border-cyan-300/60
+            type="password"
+            name="martina-access-field"
+            autoComplete="new-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="
+              w-full
+              rounded-2xl
+              border
+              border-cyan-400/20
+              bg-white/5
+              px-4
+              py-3
+              text-white
+              outline-none
+              focus:border-cyan-300/60
               "
-            />
+              />
           </div>
 
           {error && (
