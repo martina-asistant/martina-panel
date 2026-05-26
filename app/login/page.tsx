@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { ArrowLeft } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
 const LoginPage = () => {
@@ -42,7 +43,33 @@ const LoginPage = () => {
   };
 
   return (
-    <main className="min-h-screen bg-[#020f14] flex items-center justify-center px-6">
+    <main className="relative min-h-screen bg-[#020f14] flex items-center justify-center px-6">
+      <button
+        type="button"
+        onClick={() => router.push('/')}
+        className="
+          absolute
+          top-8
+          left-8
+          flex
+          items-center
+          gap-2
+          px-5
+          py-3
+          rounded-2xl
+          border
+          border-cyan-500/20
+          bg-[rgba(5,18,24,.78)]
+          text-cyan-100
+          hover:border-cyan-300/60
+          hover:shadow-[0_0_25px_rgba(34,211,238,.25)]
+          transition-all
+        "
+      >
+        <ArrowLeft className="w-4 h-4 text-cyan-300" />
+        <span>Volver</span>
+      </button>
+
       <form
         onSubmit={handleLogin}
         className="
@@ -57,24 +84,24 @@ const LoginPage = () => {
         "
       >
         <div className="mb-8 text-center">
+          <h1
+            className="
+              text-3xl
+              font-bold
+              bg-gradient-to-r
+              from-white
+              to-cyan-300
+              bg-clip-text
+              text-transparent
+            "
+          >
+            Martina Assistant ✦
+          </h1>
 
-  <h1 className="
-    text-3xl
-    font-bold
-    bg-gradient-to-r
-    from-white
-    to-cyan-300
-    bg-clip-text
-    text-transparent
-  ">
-    Martina Assistant ✦
-  </h1>
-
-  <p className="mt-3 text-sm text-cyan-100/70">
-    Inicia sesión para acceder al panel
-  </p>
-
-</div>
+          <p className="mt-3 text-sm text-cyan-100/70">
+            Inicia sesión para acceder al panel
+          </p>
+        </div>
 
         <div className="space-y-5">
           <div>
@@ -134,30 +161,30 @@ const LoginPage = () => {
           )}
 
           <button
-  type="submit"
-  disabled={loading}
-  className="
-    w-full
-    rounded-[999px]
-    bg-[#F7F9FA]
-    border-2
-    border-cyan-300/80
-    py-4
-    font-semibold
-    tracking-[0.25em]
-    text-[#03111A]
-    transition-all
-    duration-500
-    shadow-[0_0_18px_rgba(36,244,234,.55)]
-    hover:scale-[1.02]
-    hover:shadow-[0_0_30px_rgba(36,244,234,.85)]
-    active:translate-y-[2px]
-    active:scale-[0.98]
-    disabled:opacity-60
-  "
->
-  {loading ? 'ACCEDIENDO...' : 'ENTRAR'}
-</button>
+            type="submit"
+            disabled={loading}
+            className="
+              w-full
+              rounded-[999px]
+              bg-[#F7F9FA]
+              border-2
+              border-cyan-300/80
+              py-4
+              font-semibold
+              tracking-[0.25em]
+              text-[#03111A]
+              transition-all
+              duration-500
+              shadow-[0_0_18px_rgba(36,244,234,.55)]
+              hover:scale-[1.02]
+              hover:shadow-[0_0_30px_rgba(36,244,234,.85)]
+              active:translate-y-[2px]
+              active:scale-[0.98]
+              disabled:opacity-60
+            "
+          >
+            {loading ? 'ACCEDIENDO...' : 'ENTRAR'}
+          </button>
         </div>
       </form>
     </main>
