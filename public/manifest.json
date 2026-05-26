@@ -1,0 +1,19 @@
+{
+  "name": "Martina Assistant",
+  "short_name": "Martina",
+  "description": "Asistente inteligente para Rambla Vilar Dental",
+  "start_url": "/login",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#02141B",
+  "theme_color": "#22D3EE",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/martina-hero-halo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
