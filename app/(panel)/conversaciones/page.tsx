@@ -457,7 +457,7 @@ const ConversacionesView = () => {
         )}
       </div>
 
-      <div className="w-[320px] border-l border-cyan-500/15 bg-[#03111A] overflow-y-auto shrink-0">
+      <div className="w-[24%] min-w-[280px] max-w-[340px] border-l border-cyan-500/15 bg-[#03111A] overflow-y-auto shrink-0">
         {!selected ? null : !paciente ? (
           <div className="p-5 text-sm text-cyan-100/50">
             Sin paciente vinculado.
