@@ -376,7 +376,7 @@ const ConversacionesView = () => {
         )}
       </div>
 
-      <div className="hidden 2xl:block w-[320px] border-l border-martina-border bg-white overflow-y-auto shrink-0">
+      <div className="hidden min-[1600px]:block w-[320px] border-l border-martina-border bg-white overflow-y-auto shrink-0">
         {!selected ? null : !paciente ? (
           <div className="p-5 text-sm text-martina-muted">
             Sin paciente vinculado.
