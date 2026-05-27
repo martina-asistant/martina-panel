@@ -458,30 +458,27 @@ const ConversacionesView = () => {
       </div>
 
       <div className="w-[24%] min-w-[280px] max-w-[340px] border-l border-cyan-500/15 bg-[#03111A] overflow-y-auto shrink-0">
-        {!selected ? null : !paciente ? (
-          <div className="p-5 text-sm text-cyan-100/50">
-            Sin paciente vinculado.
-          </div>
-        ) : (
-          <div className="p-5 space-y-5">
-            <div className="flex items-center gap-3">
-              <div className="w-14 h-14 rounded-full border border-cyan-300/60 bg-cyan-500/10 flex items-center justify-center text-base font-semibold text-cyan-100 shadow-[0_0_20px_rgba(34,211,238,.22)]">
-                {(paciente.nombre_completo || '?')
-                  .split(' ')
-                  .map(s => s[0])
-                  .slice(0, 2)
-                  .join('')}
-              </div>
+{!selected ? null : (
+  <div className="p-5 space-y-5">
+    <div className="flex items-center gap-3">
+      <div className="w-14 h-14 rounded-full border border-cyan-300/60 bg-cyan-500/10 flex items-center justify-center text-base font-semibold text-cyan-100 shadow-[0_0_20px_rgba(34,211,238,.22)]">
+        {(paciente?.nombre_completo || selected.nombre_paciente || '?')
+          .split(' ')
+          .map(s => s[0])
+          .slice(0, 2)
+          .join('')}
+      </div>
 
-              <div className="min-w-0">
-                <div className="font-semibold truncate text-white">
-                  {paciente.nombre_completo}
-                </div>
-                <div className="text-xs text-cyan-100/60">
-                  {formatTelefono(paciente.telefono)}
-                </div>
-              </div>
-            </div>
+      <div className="min-w-0">
+        <div className="font-semibold truncate text-white">
+          {paciente?.nombre_completo || selected.nombre_paciente || 'Sin nombre registrado'}
+        </div>
+
+        <div className="text-xs text-cyan-100/60">
+          {formatTelefono(paciente?.telefono || selected.telefono_e164) || 'Sin teléfono registrado'}
+        </div>
+      </div>
+    </div>
 
             {paciente.alerta_urgencia && (
               <div className="text-xs px-3 py-2 rounded-xl bg-red-500/10 text-red-100 border border-red-400/25">
