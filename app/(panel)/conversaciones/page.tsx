@@ -461,7 +461,7 @@ const ConversacionesView = () => {
 {!selected ? null : (
   <div className="p-5 space-y-5">
     <div className="flex items-center gap-3">
-      <div className="w-14 h-14 rounded-full border border-cyan-300/60 bg-cyan-500/10 flex items-center justify-center text-base font-semibold text-cyan-100 shadow-[0_0_20px_rgba(34,211,238,.22)]">
+      <div className="w-16 h-16 rounded-full bg-[radial-gradient(circle_at_35%_30%,#8FFBFF_0%,#25D6E6_35%,#0E7C8B_100%)] border-2 border-cyan-100/90 flex items-center justify-center text-lg font-semibold text-white shadow-[0_0_18px_rgba(34,211,238,.75),0_0_42px_rgba(34,211,238,.45),inset_0_0_18px_rgba(255,255,255,.35)]">
         {(paciente?.nombre_completo || selected.nombre_paciente || '?')
           .split(' ')
           .map(s => s[0])
