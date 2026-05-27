@@ -45,17 +45,17 @@ export const mockMensajes: MensajeWhatsapp[] = [
 ];
 
 export const mockRecalls: Recall[] = [
-  { id: 'r1', created_at: daysAgo(2),  patient_id: 'p1', telefono: '+34611111111', nombre_completo: 'María García López', tipo: 'Revisión anual',     fecha_envio: daysAgo(2),  estado: 'enviado' },
-  { id: 'r2', created_at: daysAgo(5),  patient_id: 'p3', telefono: '+34633333333', nombre_completo: 'Lucía Fernández',    tipo: 'Limpieza',           fecha_envio: daysAgo(5),  estado: 'quiere_cita' },
-  { id: 'r3', created_at: daysAgo(7),  patient_id: 'p5', telefono: '+34655555555', nombre_completo: 'Carmen Vidal',       tipo: 'Revisión implantes', fecha_envio: daysAgo(7),  estado: 'cita_agendada' },
-  { id: 'r4', created_at: daysAgo(10), patient_id: 'p4', telefono: '+34644444444', nombre_completo: 'Pedro Sánchez Moreno',tipo: 'Revisión anual',    fecha_envio: daysAgo(10), estado: 'pospuesto' },
-  { id: 'r5', created_at: daysAgo(1),  patient_id: 'p2', telefono: '+34622222222', nombre_completo: 'Javier Ruiz Pérez',  tipo: 'Endodoncia',         fecha_envio: daysAgo(1),  estado: 'enviado' },
+  { id: 'r1', created_at: daysAgo(2),  paciente_id: 'p1', telefono: '+34611111111', nombre_completo: 'María García López', tipo: 'Revisión anual',     fecha_envio: daysAgo(2),  estado: 'enviado' },
+  { id: 'r2', created_at: daysAgo(5),  paciente_id: 'p3', telefono: '+34633333333', nombre_completo: 'Lucía Fernández',    tipo: 'Limpieza',           fecha_envio: daysAgo(5),  estado: 'quiere_cita' },
+  { id: 'r3', created_at: daysAgo(7),  paciente_id: 'p5', telefono: '+34655555555', nombre_completo: 'Carmen Vidal',       tipo: 'Revisión implantes', fecha_envio: daysAgo(7),  estado: 'cita_agendada' },
+  { id: 'r4', created_at: daysAgo(10), paciente_id: 'p4', telefono: '+34644444444', nombre_completo: 'Pedro Sánchez Moreno',tipo: 'Revisión anual',    fecha_envio: daysAgo(10), estado: 'pospuesto' },
+  { id: 'r5', created_at: daysAgo(1),  paciente_id: 'p2', telefono: '+34622222222', nombre_completo: 'Javier Ruiz Pérez',  tipo: 'Endodoncia',         fecha_envio: daysAgo(1),  estado: 'enviado' },
 ];
 
 export const mockRecordatorios: RecordatorioCita[] = [
-  { id: 'rec1', created_at: daysAgo(1), patient_id: 'p1', nombre_completo: 'María García López',    telefono: '+34611111111', fecha_cita: daysAhead(7), estado: 'confirmada' },
-  { id: 'rec2', created_at: daysAgo(1), patient_id: 'p5', nombre_completo: 'Carmen Vidal',          telefono: '+34655555555', fecha_cita: daysAhead(2), estado: 'sin_respuesta' },
-  { id: 'rec3', created_at: daysAgo(2), patient_id: 'p4', nombre_completo: 'Pedro Sánchez Moreno', telefono: '+34644444444', fecha_cita: daysAhead(3), estado: 'no_podra_asistir' },
-  { id: 'rec4', created_at: daysAgo(2), patient_id: 'p3', nombre_completo: 'Lucía Fernández',      telefono: '+34633333333', fecha_cita: daysAhead(5), estado: 'cita_modificada' },
-  { id: 'rec5', created_at: daysAgo(3), patient_id: 'p2', nombre_completo: 'Javier Ruiz Pérez',    telefono: '+34622222222', fecha_cita: daysAhead(1), estado: 'cancelada_recado' },
+  { id: 'rec1', created_at: daysAgo(1), paciente_id: 'p1', nombre_completo: 'María García López',    telefono: '+34611111111', fecha_cita: daysAhead(7), estado: 'confirmada' },
+  { id: 'rec2', created_at: daysAgo(1), paciente_id: 'p5', nombre_completo: 'Carmen Vidal',          telefono: '+34655555555', fecha_cita: daysAhead(2), estado: 'sin_respuesta' },
+  { id: 'rec3', created_at: daysAgo(2), paciente_id: 'p4', nombre_completo: 'Pedro Sánchez Moreno', telefono: '+34644444444', fecha_cita: daysAhead(3), estado: 'no_podra_asistir' },
+  { id: 'rec4', created_at: daysAgo(2), paciente_id: 'p3', nombre_completo: 'Lucía Fernández',      telefono: '+34633333333', fecha_cita: daysAhead(5), estado: 'cita_modificada' },
+  { id: 'rec5', created_at: daysAgo(3), paciente_id: 'p2', nombre_completo: 'Javier Ruiz Pérez',    telefono: '+34622222222', fecha_cita: daysAhead(1), estado: 'cancelada_recado' },
 ];
