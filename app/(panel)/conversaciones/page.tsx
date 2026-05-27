@@ -217,7 +217,8 @@ const ConversacionesView = () => {
   };
 
   return (
-    <div className="h-full flex bg-[#02141B] text-white">
+    <div className="h-full w-full overflow-x-auto overflow-y-hidden bg-[#02141B] text-white">
+  <div className="flex min-w-[1180px] h-full">
       <div className="w-[28%] min-w-[280px] max-w-[340px] border-r border-cyan-500/15 bg-[#03111A] flex flex-col shrink-0">
 
   <div className="px-6 pt-6 pb-4">
@@ -337,7 +338,7 @@ const ConversacionesView = () => {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col min-w-0 bg-[#F8FBFC] text-[#06111A] shadow-[0_0_25px_rgba(14,124,139,.08)]">
+      <div className="flex-[1_1_700px] min-w-[700px] flex flex-col bg-[#F8FBFC] text-[#06111A] shadow-[0_0_25px_rgba(14,124,139,.08)]">
         {!selected ? (
           <div className="flex-1 flex items-center justify-center text-slate-400 text-sm">
             Selecciona una conversación
@@ -462,7 +463,7 @@ const ConversacionesView = () => {
         )}
       </div>
 
-      <div className="w-[24%] min-w-[280px] max-w-[340px] border-l border-cyan-500/15 bg-[#03111A] overflow-y-auto shrink-0">
+      <div className="hidden min-[1600px]:block w-[320px] border-l border-cyan-500/15 bg-[#03111A] overflow-y-auto shrink-0">
         {!selected ? null : !paciente ? (
           <div className="p-5 text-sm text-cyan-100/50">
             Sin paciente vinculado.
