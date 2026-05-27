@@ -87,42 +87,36 @@ const ConversacionesView = () => {
   }, []);
 
   useEffect(() => {
-  if (!selectedId) {
-    setMensajes([]);
-    setPaciente(null);
-    return;
-  }
+    if (!selectedId) {
+      setMensajes([]);
+      setPaciente(null);
+      return;
+    }
 
-  (async () => {
-    const ms = await listMensajesByConversation(selectedId);
-    setMensajes(ms);
-  })();
+    (async () => {
+      const ms = await listMensajesByConversation(selectedId);
+      setMensajes(ms);
+    })();
 
-  const conv = convs.find(c => c.id === selectedId);
+    const conv = convs.find(c => c.id === selectedId);
 
-  setNotasConv(conv?.notas_internas || '');
+    setNotasConv(conv?.notas_internas || '');
 
-  if (conv?.paciente_id) {
-    getPatientById(conv.paciente_id).then(p => {
-      setPaciente(p);
-      setNotasPaciente(p?.notas_internas || '');
-    });
-
-  } else if (conv?.telefono_e164) {
-
-    getPatientByTelefono(conv.telefono_e164).then(p => {
-      setPaciente(p);
-      setNotasPaciente(p?.notas_internas || '');
-    });
-
-  } else {
-
-    setPaciente(null);
-    setNotasPaciente('');
-
-  }
-
-}, [selectedId, convs]);
+    if (conv?.paciente_id) {
+      getPatientById(conv.paciente_id).then(p => {
+        setPaciente(p);
+        setNotasPaciente(p?.notas_internas || '');
+      });
+    } else if (conv?.telefono_e164) {
+      getPatientByTelefono(conv.telefono_e164).then(p => {
+        setPaciente(p);
+        setNotasPaciente(p?.notas_internas || '');
+      });
+    } else {
+      setPaciente(null);
+      setNotasPaciente('');
+    }
+  }, [selectedId, convs]);
 
   useEffect(() => {
     const supa = createClient();
@@ -200,267 +194,271 @@ const ConversacionesView = () => {
   };
 
   return (
-    <div className="h-full w-full min-w-0 overflow-hidden flex">
-      <div className="w-[320px] border-r border-martina-border bg-white flex flex-col">
-        <div className="p-3 border-b border-martina-border space-y-3">
-          <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-martina-muted" />
-            <Input
-              placeholder="Buscar paciente, teléfono…"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="pl-9 h-9 bg-martina-bg border-martina-border"
-            />
-          </div>
+    <div className="h-full w-full overflow-x-auto overflow-y-hidden">
+      <div className="flex min-w-[1180px] h-full">
 
-          <div className="flex flex-wrap gap-1">
-            {filtros.map(f => (
-              <button
-                key={f.key}
-                onClick={() => setFilter(f.key)}
-                className={cn(
-                  'text-xs px-2.5 py-1 rounded-full border transition-colors',
-                  filter === f.key
-                    ? 'bg-martina-text text-white border-martina-text'
-                    : 'bg-white text-martina-muted border-martina-border hover:bg-martina-bg'
-                )}
-              >
-                {f.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex-1 overflow-y-auto">
-          {filtered.length === 0 && (
-            <div className="p-6 text-center text-sm text-martina-muted">
-              Sin conversaciones
+        <div className="w-[320px] shrink-0 border-r border-martina-border bg-white flex flex-col">
+          <div className="p-3 border-b border-martina-border space-y-3">
+            <div className="relative">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-martina-muted" />
+              <Input
+                placeholder="Buscar paciente, teléfono…"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="pl-9 h-9 bg-martina-bg border-martina-border"
+              />
             </div>
-          )}
 
-          {filtered.map(c => {
-            const lbl = c.estado_visual ? conversacionLabel[c.estado_visual] : null;
-            const last = lastActivity(c);
-            const isSel = c.id === selectedId;
+            <div className="flex flex-wrap gap-1">
+              {filtros.map(f => (
+                <button
+                  key={f.key}
+                  onClick={() => setFilter(f.key)}
+                  className={cn(
+                    'text-xs px-2.5 py-1 rounded-full border transition-colors',
+                    filter === f.key
+                      ? 'bg-martina-text text-white border-martina-text'
+                      : 'bg-white text-martina-muted border-martina-border hover:bg-martina-bg'
+                  )}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
-            return (
-              <button
-                key={c.id}
-                onClick={() => setSelectedId(c.id)}
-                className={cn(
-                  'w-full text-left px-4 py-3 border-b border-martina-border hover:bg-martina-bg transition-colors',
-                  isSel && 'bg-martina-beige hover:bg-martina-beige'
-                )}
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-sm font-medium truncate">
-                        {c.nombre_paciente || c.telefono_e164 || 'Sin nombre'}
+          <div className="flex-1 overflow-y-auto">
+            {filtered.length === 0 && (
+              <div className="p-6 text-center text-sm text-martina-muted">
+                Sin conversaciones
+              </div>
+            )}
+
+            {filtered.map(c => {
+              const lbl = c.estado_visual ? conversacionLabel[c.estado_visual] : null;
+              const last = lastActivity(c);
+              const isSel = c.id === selectedId;
+
+              return (
+                <button
+                  key={c.id}
+                  onClick={() => setSelectedId(c.id)}
+                  className={cn(
+                    'w-full text-left px-4 py-3 border-b border-martina-border hover:bg-martina-bg transition-colors',
+                    isSel && 'bg-martina-beige hover:bg-martina-beige'
+                  )}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm font-medium truncate">
+                          {c.nombre_paciente || c.telefono_e164 || 'Sin nombre'}
+                        </span>
+                      </div>
+
+                      <div className="text-xs text-martina-muted truncate mt-0.5">
+                        {c.motivo || c.telefono_e164}
+                      </div>
+                    </div>
+
+                    <div className="text-[10px] text-martina-muted shrink-0">
+                      {formatRelativeOrTime(last)}
+                    </div>
+                  </div>
+
+                  {lbl && (
+                    <div className="mt-1.5">
+                      <span className={cn('inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full', lbl.color)}>
+                        <span>{lbl.emoji}</span>
+                        {lbl.label}
                       </span>
                     </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
-                    <div className="text-xs text-martina-muted truncate mt-0.5">
-                      {c.motivo || c.telefono_e164}
-                    </div>
+        <div className="flex-[1_1_700px] min-w-[700px] flex flex-col bg-martina-bg">
+          {!selected ? (
+            <div className="flex-1 flex items-center justify-center text-martina-muted text-sm">
+              Selecciona una conversación
+            </div>
+          ) : (
+            <>
+              <div className="h-16 shrink-0 border-b border-martina-border bg-white px-5 flex items-center justify-between gap-4">
+                <div className="min-w-0">
+                  <div className="font-medium truncate">
+                    {selected.nombre_paciente || selected.telefono_e164}
                   </div>
-
-                  <div className="text-[10px] text-martina-muted shrink-0">
-                    {formatRelativeOrTime(last)}
+                  <div className="text-xs text-martina-muted truncate">
+                    {selected.telefono_e164} · {selected.motivo || 'Sin motivo'}
                   </div>
                 </div>
 
-                {lbl && (
-                  <div className="mt-1.5">
-                    <span className={cn('inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full', lbl.color)}>
-                      <span>{lbl.emoji}</span>
-                      {lbl.label}
-                    </span>
+                <div className="flex items-center gap-2 shrink-0">
+                  <Button size="sm" variant="outline" onClick={doTomar} className="border-martina-border">
+                    Tomar conversación
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={doDevolver} className="border-martina-border">
+                    Devolver a Martina
+                  </Button>
+                  <Button size="sm" onClick={doCerrar} className="bg-martina-text hover:bg-black text-white">
+                    Cerrar gestión
+                  </Button>
+                </div>
+              </div>
+
+              <div className="flex-1 overflow-y-auto px-6 py-5 space-y-2">
+                {mensajes.map(m => {
+                  const msg = m as any;
+
+                  const isPaciente =
+                    msg.tipo_emisor === 'paciente' ||
+                    msg.direccion === 'entrante' ||
+                    msg.rol === 'paciente';
+
+                  const contenido =
+                    msg.contenido_texto ||
+                    msg.contenido ||
+                    '';
+
+                  const emisor =
+                    msg.tipo_emisor ||
+                    msg.rol ||
+                    '';
+
+                  return (
+                    <div key={msg.id} className={cn('flex', isPaciente ? 'justify-start' : 'justify-end')}>
+                      <div
+                        className={cn(
+                          'max-w-[70%] rounded-2xl px-4 py-2 text-sm shadow-sm',
+                          isPaciente
+                            ? 'bg-white border border-martina-border text-martina-text rounded-bl-sm'
+                            : 'bg-martina-beige text-martina-text rounded-br-sm'
+                        )}
+                      >
+                        <div className="whitespace-pre-wrap break-words">
+                          {contenido}
+                        </div>
+
+                        <div className="text-[10px] text-martina-muted mt-1 text-right">
+                          {!isPaciente && emisor && (
+                            <span className="mr-2 uppercase tracking-wide">
+                              {emisor}
+                            </span>
+                          )}
+                          {formatTime(msg.created_at)}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {mensajes.length === 0 && (
+                  <div className="text-center text-sm text-martina-muted py-8">
+                    Sin mensajes
                   </div>
                 )}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+              </div>
 
-      <div className="flex-1 flex flex-col min-w-0 bg-martina-bg">
-        {!selected ? (
-          <div className="flex-1 flex items-center justify-center text-martina-muted text-sm">
-            Selecciona una conversación
-          </div>
-        ) : (
-          <>
-            <div className="h-16 border-b border-martina-border bg-white px-5 flex items-center justify-between">
-              <div>
-                <div className="font-medium">
-                  {selected.nombre_paciente || selected.telefono_e164}
-                </div>
+              <div className="px-6 py-3 shrink-0 border-t border-martina-border bg-white">
                 <div className="text-xs text-martina-muted">
-                  {selected.telefono_e164} · {selected.motivo || 'Sin motivo'}
+                  🔒 Envío de mensajes gestionado por Martina (n8n). Este panel es de supervisión.
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+
+        <div className="hidden min-[1600px]:block w-[320px] border-l border-martina-border bg-white overflow-y-auto shrink-0">
+          {!selected ? null : !paciente ? (
+            <div className="p-5 text-sm text-martina-muted">
+              Sin paciente vinculado.
+            </div>
+          ) : (
+            <div className="p-5 space-y-5">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-martina-beige flex items-center justify-center text-base font-medium">
+                  {(paciente.nombre_completo || '?').split(' ').map(s => s[0]).slice(0, 2).join('')}
+                </div>
+
+                <div className="min-w-0">
+                  <div className="font-medium truncate">{paciente.nombre_completo}</div>
+                  <div className="text-xs text-martina-muted">{paciente.telefono}</div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
-                <Button size="sm" variant="outline" onClick={doTomar} className="border-martina-border">
-                  Tomar conversación
-                </Button>
-                <Button size="sm" variant="outline" onClick={doDevolver} className="border-martina-border">
-                  Devolver a Martina
-                </Button>
-                <Button size="sm" onClick={doCerrar} className="bg-martina-text hover:bg-black text-white">
-                  Cerrar gestión
-                </Button>
-              </div>
-            </div>
-
-            <div className="flex-1 overflow-y-auto px-6 py-5 space-y-2">
-              {mensajes.map(m => {
-                const msg = m as any;
-
-                const isPaciente =
-                  msg.tipo_emisor === 'paciente' ||
-                  msg.direccion === 'entrante' ||
-                  msg.rol === 'paciente';
-
-                const contenido =
-                  msg.contenido_texto ||
-                  msg.contenido ||
-                  '';
-
-                const emisor =
-                  msg.tipo_emisor ||
-                  msg.rol ||
-                  '';
-
-                return (
-                  <div key={msg.id} className={cn('flex', isPaciente ? 'justify-start' : 'justify-end')}>
-                    <div
-                      className={cn(
-                        'max-w-[70%] rounded-2xl px-4 py-2 text-sm shadow-sm',
-                        isPaciente
-                          ? 'bg-white border border-martina-border text-martina-text rounded-bl-sm'
-                          : 'bg-martina-beige text-martina-text rounded-br-sm'
-                      )}
-                    >
-                      <div className="whitespace-pre-wrap break-words">
-                        {contenido}
-                      </div>
-
-                      <div className="text-[10px] text-martina-muted mt-1 text-right">
-                        {!isPaciente && emisor && (
-                          <span className="mr-2 uppercase tracking-wide">
-                            {emisor}
-                          </span>
-                        )}
-                        {formatTime(msg.created_at)}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-
-              {mensajes.length === 0 && (
-                <div className="text-center text-sm text-martina-muted py-8">
-                  Sin mensajes
+              {paciente.alerta_urgencia && (
+                <div className="text-xs px-3 py-2 rounded-lg bg-red-50 text-red-800 border border-red-100">
+                  🚨 Posible urgencia
                 </div>
               )}
-            </div>
 
-            <div className="px-6 py-3 border-t border-martina-border bg-white">
-              <div className="text-xs text-martina-muted">
-                🔒 Envío de mensajes gestionado por Martina (n8n). Este panel es de supervisión.
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <div className="text-martina-muted">Última cita</div>
+                  <div className="font-medium">{formatDate(paciente.ultima_cita_fecha)}</div>
+                  <div className="text-martina-muted">{paciente.ultima_cita_motivo || '—'}</div>
+                </div>
+
+                <div>
+                  <div className="text-martina-muted">Próxima cita</div>
+                  <div className="font-medium">{formatDate(paciente.proxima_cita_fecha)}</div>
+                  <div className="text-martina-muted">{paciente.proxima_cita_motivo || '—'}</div>
+                </div>
+              </div>
+
+              {paciente.etiquetas && paciente.etiquetas.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {paciente.etiquetas.map(t => (
+                    <span key={t} className="text-[10px] px-2 py-0.5 rounded-full bg-martina-beige text-martina-text">
+                      ⚠️ {t}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <div className="text-xs font-medium text-martina-muted uppercase tracking-wide">
+                  Notas del paciente
+                </div>
+
+                <Textarea
+                  value={notasPaciente}
+                  onChange={e => setNotasPaciente(e.target.value)}
+                  rows={4}
+                  className="text-sm bg-martina-bg border-martina-border"
+                  placeholder="Añade notas…"
+                />
+
+                <Button size="sm" onClick={saveNotasPaciente} className="w-full bg-martina-text hover:bg-black text-white">
+                  Guardar notas
+                </Button>
+              </div>
+
+              <div className="space-y-2 pt-2 border-t border-martina-border">
+                <div className="text-xs font-medium text-martina-muted uppercase tracking-wide">
+                  Notas de esta conversación
+                </div>
+
+                <Textarea
+                  value={notasConv}
+                  onChange={e => setNotasConv(e.target.value)}
+                  rows={3}
+                  className="text-sm bg-martina-bg border-martina-border"
+                  placeholder="Recado, contexto…"
+                />
+
+                <Button size="sm" variant="outline" onClick={saveNotasConv} className="w-full border-martina-border">
+                  Guardar recado
+                </Button>
               </div>
             </div>
-          </>
-        )}
-      </div>
+          )}
+        </div>
 
-      <div className="hidden min-[1600px]:block w-[320px] border-l border-martina-border bg-white overflow-y-auto shrink-0">
-        {!selected ? null : !paciente ? (
-          <div className="p-5 text-sm text-martina-muted">
-            Sin paciente vinculado.
-          </div>
-        ) : (
-          <div className="p-5 space-y-5">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-martina-beige flex items-center justify-center text-base font-medium">
-                {(paciente.nombre_completo || '?').split(' ').map(s => s[0]).slice(0, 2).join('')}
-              </div>
-
-              <div className="min-w-0">
-                <div className="font-medium truncate">{paciente.nombre_completo}</div>
-                <div className="text-xs text-martina-muted">{paciente.telefono}</div>
-              </div>
-            </div>
-
-            {paciente.alerta_urgencia && (
-              <div className="text-xs px-3 py-2 rounded-lg bg-red-50 text-red-800 border border-red-100">
-                🚨 Posible urgencia
-              </div>
-            )}
-
-            <div className="grid grid-cols-2 gap-3 text-xs">
-              <div>
-                <div className="text-martina-muted">Última cita</div>
-                <div className="font-medium">{formatDate(paciente.ultima_cita_fecha)}</div>
-                <div className="text-martina-muted">{paciente.ultima_cita_motivo || '—'}</div>
-              </div>
-
-              <div>
-                <div className="text-martina-muted">Próxima cita</div>
-                <div className="font-medium">{formatDate(paciente.proxima_cita_fecha)}</div>
-                <div className="text-martina-muted">{paciente.proxima_cita_motivo || '—'}</div>
-              </div>
-            </div>
-
-            {paciente.etiquetas && paciente.etiquetas.length > 0 && (
-              <div className="flex flex-wrap gap-1.5">
-                {paciente.etiquetas.map(t => (
-                  <span key={t} className="text-[10px] px-2 py-0.5 rounded-full bg-martina-beige text-martina-text">
-                    ⚠️ {t}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            <div className="space-y-2">
-              <div className="text-xs font-medium text-martina-muted uppercase tracking-wide">
-                Notas del paciente
-              </div>
-
-              <Textarea
-                value={notasPaciente}
-                onChange={e => setNotasPaciente(e.target.value)}
-                rows={4}
-                className="text-sm bg-martina-bg border-martina-border"
-                placeholder="Añade notas…"
-              />
-
-              <Button size="sm" onClick={saveNotasPaciente} className="w-full bg-martina-text hover:bg-black text-white">
-                Guardar notas
-              </Button>
-            </div>
-
-            <div className="space-y-2 pt-2 border-t border-martina-border">
-              <div className="text-xs font-medium text-martina-muted uppercase tracking-wide">
-                Notas de esta conversación
-              </div>
-
-              <Textarea
-                value={notasConv}
-                onChange={e => setNotasConv(e.target.value)}
-                rows={3}
-                className="text-sm bg-martina-bg border-martina-border"
-                placeholder="Recado, contexto…"
-              />
-
-              <Button size="sm" variant="outline" onClick={saveNotasConv} className="w-full border-martina-border">
-                Guardar recado
-              </Button>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
