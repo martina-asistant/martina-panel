@@ -332,7 +332,7 @@ const ConversacionesView = () => {
         </div>
       </div>
 
-      <div className="w-[780px] shrink-0 flex flex-col bg-[#F8FBFC] text-[#06111A] shadow-[0_0_25px_rgba(14,124,139,.08)]">
+      <div className="flex-1 flex flex-col min-w-0 bg-[#F8FBFC] text-[#06111A] shadow-[0_0_25px_rgba(14,124,139,.08)]">
         {!selected ? (
           <div className="flex-1 flex items-center justify-center text-slate-400 text-sm">
             Selecciona una conversación
