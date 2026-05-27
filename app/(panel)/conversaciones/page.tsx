@@ -215,7 +215,7 @@ const ConversacionesView = () => {
   };
 
   return (
-    <div className="h-full flex min-w-[1120px] overflow-x-auto overflow-y-hidden bg-[#02141B] text-white">
+    <div className="h-full flex bg-[#02141B] text-white">
       <div className="w-[28%] min-w-[280px] max-w-[340px] border-r border-cyan-500/15 bg-[#03111A] flex flex-col shrink-0">
         <div className="px-6 pt-6 pb-4">
           <h1 className="text-2xl font-semibold tracking-[-0.015em] scale-x-[0.97] origin-left bg-gradient-to-r from-white to-cyan-300 bg-clip-text text-transparent mb-1">
