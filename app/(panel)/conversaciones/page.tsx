@@ -353,7 +353,7 @@ const ConversacionesView = () => {
    <span className="text-[12px] leading-[1] flex items-center justify-center translate-y-[-1px]">✕</span>
   </button>
   <div className="w-full rounded-3xl border border-[#6FD7E2]/35 bg-[linear-gradient(180deg,#0F2C35_0%,#163C46_100%)] px-8 py-4 shadow-[0_0_34px_rgba(34,211,238,.18),0_16px_32px_rgba(14,124,139,.14),inset_0_1px_0_rgba(255,255,255,.06)]">
-    <div className="flex items-center justify-between gap-6">
+    <div className="flex flex-wrap items-start justify-between gap-4">
       <div className="min-w-0">
         <div className="font-semibold text-white">
           {selected.nombre_paciente || formatTelefono(selected.telefono_e164)}
@@ -364,12 +364,12 @@ const ConversacionesView = () => {
         </div>
       </div>
 
-      <div className="flex items-center gap-3 shrink-0">
+      <div className="flex flex-wrap items-center gap-3">
         <Button
           size="sm"
           variant="outline"
           onClick={doTomar}
-          className="bg-cyan-50 border-cyan-300/35 text-cyan-700 hover:bg-cyan-100"
+          className="bg-cyan-50 border-cyan-300/35 text-cyan-700 hover:bg-cyan-100 whitespace-nowrap"
         >
           Tomar conversación
         </Button>
@@ -378,7 +378,7 @@ const ConversacionesView = () => {
           size="sm"
           variant="outline"
           onClick={doDevolver}
-          className="bg-cyan-50 border-cyan-300/35 text-cyan-700 hover:bg-cyan-100"
+          className="bg-cyan-50 border-cyan-300/35 text-cyan-700 hover:bg-cyan-100 whitespace-nowrap"
         >
           Devolver a Martina
         </Button>
