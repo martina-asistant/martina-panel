@@ -200,7 +200,7 @@ const ConversacionesView = () => {
   };
 
   return (
-    <div className="h-full flex">
+    <div className="h-full w-full min-w-0 overflow-hidden flex">
       <div className="w-[320px] border-r border-martina-border bg-white flex flex-col">
         <div className="p-3 border-b border-martina-border space-y-3">
           <div className="relative">
@@ -376,7 +376,7 @@ const ConversacionesView = () => {
         )}
       </div>
 
-      <div className="w-[320px] border-l border-martina-border bg-white overflow-y-auto">
+      <div className="hidden 2xl:block w-[320px] border-l border-martina-border bg-white overflow-y-auto shrink-0">
         {!selected ? null : !paciente ? (
           <div className="p-5 text-sm text-martina-muted">
             Sin paciente vinculado.
