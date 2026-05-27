@@ -510,7 +510,7 @@ const ConversacionesView = () => {
 
             {paciente.etiquetas && paciente.etiquetas.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
-                {paciente.etiquetas.map(t => (
+                {paciente?.etiquetas.map(t => (
                   <span
                     key={t}
                     className="text-[10px] px-2.5 py-1 rounded-full bg-cyan-500/10 text-cyan-100 border border-cyan-400/20"
