@@ -144,20 +144,25 @@ const ConversacionesView = () => {
   }, [selectedId]);
 
   const filtered = convs.filter(c => {
-    if (filter !== 'todas' && c.estado_visual !== filter) return false;
 
-    if (search.trim()) {
-      const q = search.toLowerCase();
+  if (filter === 'gestionada') {
+    if (c.estado_cita !== 'gestionada') return false;
+  } else if (filter !== 'todas') {
+    if (c.estado_visual !== filter) return false;
+  }
 
-      return (
-        (c.nombre_paciente || '').toLowerCase().includes(q) ||
-        (c.telefono_e164 || '').includes(q) ||
-        (c.motivo || '').toLowerCase().includes(q)
-      );
-    }
+  if (search.trim()) {
+    const q = search.toLowerCase();
 
-    return true;
-  });
+    return (
+      (c.nombre_paciente || '').toLowerCase().includes(q) ||
+      (c.telefono_e164 || '').includes(q) ||
+      (c.motivo || '').toLowerCase().includes(q)
+    );
+  }
+
+  return true;
+});
 
   const doTomar = async () => {
     if (!selected) return;
