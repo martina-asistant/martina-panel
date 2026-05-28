@@ -397,18 +397,26 @@ const ConversacionesView = () => {
               )}
 
               <div className="grid grid-cols-2 gap-3 text-xs">
-                <div>
-                  <div className="text-martina-muted">Última cita</div>
-                  <div className="font-medium">{formatDate(paciente.ultima_cita_fecha)}</div>
-                  <div className="text-martina-muted">{paciente.ultima_cita_motivo || '—'}</div>
-                </div>
+  <div>
+    <div className="text-martina-muted">Última cita</div>
+    <div className="font-medium">
+      {formatDate((selected as any)?.ultima_cita_fecha)}
+    </div>
+    <div className="text-martina-muted">
+      {(selected as any)?.ultima_cita_motivo || '—'}
+    </div>
+  </div>
 
-                <div>
-                  <div className="text-martina-muted">Próxima cita</div>
-                  <div className="font-medium">{formatDate(paciente.proxima_cita_fecha)}</div>
-                  <div className="text-martina-muted">{paciente.proxima_cita_motivo || '—'}</div>
-                </div>
-              </div>
+  <div>
+    <div className="text-martina-muted">Próxima cita</div>
+    <div className="font-medium">
+      {formatDate((selected as any)?.proxima_cita_fecha)}
+    </div>
+    <div className="text-martina-muted">
+      {(selected as any)?.proxima_cita_motivo || '—'}
+    </div>
+  </div>
+</div>
 
               {paciente.etiquetas && paciente.etiquetas.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
