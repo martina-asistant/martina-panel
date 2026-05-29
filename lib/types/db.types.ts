@@ -97,13 +97,3 @@ export interface RecordatorioCita {
   fecha_cita: string | null;
   estado: EstadoRecordatorio;
 }
-
-export type CanalMartina = 'whatsapp' | 'llamadas';
-
-export interface ConfiguracionMartina {
-  id: string;
-  canal: CanalMartina;
-  activo: boolean;
-  updated_at: string;
-  updated_by: string | null;
-}
