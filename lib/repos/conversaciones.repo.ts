@@ -34,15 +34,11 @@ async function updateConv(id: string, patch: Partial<ConversacionWhatsapp>): Pro
   return data as ConversacionWhatsapp;
 }
 
-export function tomarConversacion(id: string, email: string) {
-  return updateConv(id, { modo_atencion: 'recepcion' as ModoAtencion, estado_visual: 'recepcion' as EstadoVisualConv, asignado_a: email });
-}
-export function devolverAMartina(id: string) {
-  return updateConv(id, { modo_atencion: 'martina' as ModoAtencion, estado_visual: 'nueva' as EstadoVisualConv, asignado_a: null });
-}
-export function cerrarGestion(id: string) {
-  return updateConv(id, { modo_atencion: 'martina' as ModoAtencion, estado_visual: 'gestionada' as EstadoVisualConv, estado_cita: 'gestionada', asignado_a: null });
-}
+export function tomarConversacion(id: string, email: string) { return updateConv(id, { modo_atencion: 'recepcion' as ModoAtencion, estado_visual: 'recepcion' as EstadoVisualConv, asignado_a: email }); }
+
+export function devolverAMartina(id: string) { return updateConv(id, { modo_atencion: 'ia' as ModoAtencion, estado_visual: 'nueva' as EstadoVisualConv, asignado_a: null }); }
+
+export function cerrarGestion(id: string) { return updateConv(id, { modo_atencion: 'ia' as ModoAtencion, estado_cita: 'gestionada', asignado_a: null }); }
 
 export function actualizarNotasConversacion(id: string, notas: string) {
   return updateConv(id, { notas_internas: notas });
