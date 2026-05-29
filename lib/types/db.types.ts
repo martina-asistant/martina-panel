@@ -1,11 +1,21 @@
 // Tipos exactos de las tablas existentes en Supabase.
 // NO modificar nombres ni añadir columnas sin acuerdo previo.
 
-export type ModoAtencion = 'martina' | 'recepcion';
+export type ModoAtencion = 'ia' | 'recepcion';
 export type EstadoVisualConv = 'nueva' | 'en_curso' | 'recepcion' | 'gestionada';
 export type EstadoRecordatorio = 'sin_respuesta' | 'confirmada' | 'no_podra_asistir' | 'cita_modificada' | 'cancelada_recado';
 export type EstadoRecall = 'enviado' | 'quiere_cita' | 'cita_agendada' | 'pospuesto' | 'sin_respuesta';
 export type RolMensaje = 'paciente' | 'martina' | 'recepcion' | 'sistema';
+
+export type CanalMartina = 'whatsapp' | 'llamadas';
+
+export interface ConfiguracionMartina {
+  id: string;
+  canal: CanalMartina;
+  activo: boolean;
+  updated_at: string;
+  updated_by: string | null;
+}
 
 export interface Patient {
   id: string;
@@ -63,9 +73,7 @@ export interface MensajeWhatsapp {
   id: string;
   created_at: string;
   conversation_id: string;
-
   telefono: string | null;
-
   tipo_emisor?: 'paciente' | 'bot' | 'recepcion' | 'sistema' | null;
   direccion?: 'entrante' | 'saliente' | null;
   tipo_mensaje?: string | null;
