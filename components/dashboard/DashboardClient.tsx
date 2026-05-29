@@ -169,10 +169,6 @@ const isToday = (iso: string | null) => (iso ? new Date(iso) >= today : false);
 
 const nuevas = convs.filter(
   c =>
-    (
-      c.modo_atencion === 'ia' ||
-      c.modo_atencion === 'recepcion'
-    ) &&
     c.estado_cita !== 'gestionada' &&
     !(c.estado_cita || '').toLowerCase().includes('recado')
 ).length;
