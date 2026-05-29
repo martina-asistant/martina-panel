@@ -285,7 +285,7 @@ const ConversacionesView = () => {
           </div>
         </div>
 
-        <div className="flex-[1_1_700px] min-w-[700px] flex flex-col bg-martina-bg">
+        <div className="flex-[1_1_700px] min-w-[700px] flex flex-col bg-martina-bg min-h-0">
           {!selected ? (
             <div className="flex-1 flex items-center justify-center text-martina-muted text-sm">
               Selecciona una conversación
@@ -315,7 +315,7 @@ const ConversacionesView = () => {
                 </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto px-6 py-5 space-y-2">
+              <div className="flex-1 min-h-0 overflow-y-auto px-6 py-5 space-y-2">
                 {mensajes.map(m => {
                   const msg = m as any;
 
