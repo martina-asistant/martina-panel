@@ -12,7 +12,10 @@ import {
   cerrarGestion,
   actualizarNotasConversacion
 } from '@/lib/repos/conversaciones.repo';
-import { listMensajesByConversation } from '@/lib/repos/mensajes.repo';
+import {
+  listMensajesByConversation,
+  crearMensajeSaliente
+} from '@/lib/repos/mensajes.repo';
 import { getPatientById, getPatientByTelefono, updatePatientNotas } from '@/lib/repos/patients.repo';
 import type {
   ConversacionWhatsapp,
@@ -44,6 +47,7 @@ const ConversacionesView = () => {
   const [search, setSearch] = useState('');
   const [notasPaciente, setNotasPaciente] = useState('');
   const [notasConv, setNotasConv] = useState('');
+  const [nuevoMensaje, setNuevoMensaje] = useState('');
   const [userEmail, setUserEmail] = useState<string>('demo@martina.local');
 
   const selected = useMemo(
@@ -145,24 +149,24 @@ const ConversacionesView = () => {
 
   const filtered = convs.filter(c => {
 
-  if (filter === 'gestionada') {
-    if (c.estado_cita !== 'gestionada') return false;
-  } else if (filter !== 'todas') {
-    if (c.estado_visual !== filter) return false;
-  }
+    if (filter === 'gestionada') {
+      if (c.estado_cita !== 'gestionada') return false;
+    } else if (filter !== 'todas') {
+      if (c.estado_visual !== filter) return false;
+    }
 
-  if (search.trim()) {
-    const q = search.toLowerCase();
+    if (search.trim()) {
+      const q = search.toLowerCase();
 
-    return (
-      (c.nombre_paciente || '').toLowerCase().includes(q) ||
-      (c.telefono_e164 || '').includes(q) ||
-      (c.motivo || '').toLowerCase().includes(q)
-    );
-  }
+      return (
+        (c.nombre_paciente || '').toLowerCase().includes(q) ||
+        (c.telefono_e164 || '').includes(q) ||
+        (c.motivo || '').toLowerCase().includes(q)
+      );
+    }
 
-  return true;
-});
+    return true;
+  });
 
   const doTomar = async () => {
     if (!selected) return;
@@ -196,6 +200,24 @@ const ConversacionesView = () => {
     if (!paciente) return;
     await updatePatientNotas(paciente.id, notasPaciente);
     toast.success('Notas del paciente guardadas');
+  };
+
+  const enviarMensaje = async () => {
+    if (!selected || !nuevoMensaje.trim()) return;
+
+    const creado = await crearMensajeSaliente(
+      selected.id,
+      nuevoMensaje.trim()
+    );
+
+    if (!creado) {
+      toast.error('No se ha podido guardar el mensaje');
+      return;
+    }
+
+    setNuevoMensaje('');
+    setMensajes(await listMensajesByConversation(selected.id));
+    toast.success('Mensaje guardado');
   };
 
   return (
@@ -338,7 +360,7 @@ const ConversacionesView = () => {
                     <div key={msg.id} className={cn('flex', isPaciente ? 'justify-start' : 'justify-end')}>
                       <div
                         className={cn(
-                          'max-w-[70%] rounded-2xl px-4 py-2 text-sm shadow-sm',
+                          'max-w-[70%] rounded-2xl px-4 py-1.5 text-sm shadow-sm',
                           isPaciente
                             ? 'bg-white border border-martina-border text-martina-text rounded-bl-sm'
                             : 'bg-martina-beige text-martina-text rounded-br-sm'
@@ -369,8 +391,31 @@ const ConversacionesView = () => {
               </div>
 
               <div className="px-6 py-3 shrink-0 border-t border-martina-border bg-white">
-                <div className="text-xs text-martina-muted">
-                  🔒 Envío de mensajes gestionado por Martina (n8n). Este panel es de supervisión.
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Escribe un mensaje..."
+                    value={nuevoMensaje}
+                    onChange={(e) => setNuevoMensaje(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        enviarMensaje();
+                      }
+                    }}
+                    className="flex-1 h-10 bg-martina-bg border-martina-border"
+                  />
+
+                  <Button
+                    onClick={enviarMensaje}
+                    disabled={!nuevoMensaje.trim()}
+                    className="bg-martina-text hover:bg-black text-white"
+                  >
+                    Enviar
+                  </Button>
+                </div>
+
+                <div className="text-[11px] text-martina-muted mt-2">
+                  El mensaje se guarda en el historial. Pendiente conectar envío real por WhatsApp.
                 </div>
               </div>
             </>
@@ -402,26 +447,26 @@ const ConversacionesView = () => {
               )}
 
               <div className="grid grid-cols-2 gap-3 text-xs">
-  <div>
-    <div className="text-martina-muted">Última cita</div>
-    <div className="font-medium">
-      {formatDate((selected as any)?.ultima_cita_fecha)}
-    </div>
-    <div className="text-martina-muted">
-      {(selected as any)?.ultima_cita_motivo || '—'}
-    </div>
-  </div>
+                <div>
+                  <div className="text-martina-muted">Última cita</div>
+                  <div className="font-medium">
+                    {formatDate((selected as any)?.ultima_cita_fecha)}
+                  </div>
+                  <div className="text-martina-muted">
+                    {(selected as any)?.ultima_cita_motivo || '—'}
+                  </div>
+                </div>
 
-  <div>
-    <div className="text-martina-muted">Próxima cita</div>
-    <div className="font-medium">
-      {formatDate((selected as any)?.proxima_cita_fecha)}
-    </div>
-    <div className="text-martina-muted">
-      {(selected as any)?.proxima_cita_motivo || '—'}
-    </div>
-  </div>
-</div>
+                <div>
+                  <div className="text-martina-muted">Próxima cita</div>
+                  <div className="font-medium">
+                    {formatDate((selected as any)?.proxima_cita_fecha)}
+                  </div>
+                  <div className="text-martina-muted">
+                    {(selected as any)?.proxima_cita_motivo || '—'}
+                  </div>
+                </div>
+              </div>
 
               {paciente.etiquetas && paciente.etiquetas.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
