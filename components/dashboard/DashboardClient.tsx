@@ -167,26 +167,17 @@ const DashboardClient = ({
 
 const isToday = (iso: string | null) => (iso ? new Date(iso) >= today : false);
 
-const nuevas = convs.filter(c => c.estado_cita !== 'gestionada').length;
+const nuevas = convs.filter(c => c.estado_visual === 'nueva' && c.estado_cita !== 'gestionada' && !(c.estado_cita || '').toLowerCase().includes('recado')
+).length;
 const enCurso = convs.filter(c => (c.modo_atencion as string) === 'ia' && c.estado_cita !== 'gestionada').length;
-const recepcion = convs.filter(c =>
-    c.modo_atencion === 'recepcion' &&
-    c.estado_cita !== 'gestionada' &&
-    !(c.estado_cita || '').toLowerCase().includes('recado')
+const recepcion = convs.filter(c => c.modo_atencion === 'recepcion' && c.estado_cita !== 'gestionada' && !(c.estado_cita || '').toLowerCase().includes('recado')
 ).length;
 const gestion = convs.filter(c => c.estado_cita === 'gestionada').length;
-const recados = convs.filter(
-  c =>
-    c.estado_cita !== 'gestionada' &&
-    (c.estado_cita || '').toLowerCase().includes('recado')
-).length;
+const recados = convs.filter(c => c.estado_cita !== 'gestionada' && (c.estado_cita || '').toLowerCase().includes('recado')).length;
 
 const citasHoy = convs.filter(c => c.estado_cita === 'gestionada' && isToday(c.updated_at)).length;
-
 const recordatoriosHoy = recs.filter(r => isToday(r.created_at)).length;
-
 const recallsEnviadosHoy = recalls.filter(r => r.estado === 'enviado' && isToday(r.fecha_envio)).length;
-
 const recallsAceptadosHoy = recalls.filter(r => r.estado === 'cita_agendada' && isToday(r.fecha_envio)).length;
 
   const recPendiente = recs.filter(r => r.estado === 'sin_respuesta').length;
