@@ -165,27 +165,21 @@ const DashboardClient = ({
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const isToday = (iso: string | null) => (iso ? new Date(iso) >= today : false);
+const isToday = (iso: string | null) => (iso ? new Date(iso) >= today : false);
 
-  const nuevas = convs.filter(c => c.estado_visual === 'nueva').length;
-  const enCurso = convs.filter(c => c.estado_visual === 'en_curso').length;
-  const recepcion = convs.filter(c => c.estado_visual === 'recepcion').length;
-  const gestion = convs.filter( c => c.estado_cita === 'gestionada').length;
-  const recados = convs.filter(c => (c.notas_internas || '').trim().length > 0).length;
+const nuevas = convs.filter(c => c.estado_visual === 'nueva' && c.estado_cita !== 'gestionada').length;
+const enCurso = convs.filter(c => c.modo_atencion === 'ia' && c.estado_cita !== 'gestionada').length;
+const recepcion = convs.filter(c => c.modo_atencion === 'recepcion' && c.estado_cita !== 'gestionada').length;
+const gestion = convs.filter(c => c.estado_cita === 'gestionada').length;
+const recados = convs.filter(c => (c.notas_internas || '').trim().length > 0).length;
 
- const citasHoy = convs.filter(
-  c => c.estado_cita === 'gestionada' && isToday(c.updated_at)
-).length;
+const citasHoy = convs.filter(c => c.estado_cita === 'gestionada' && isToday(c.updated_at)).length;
 
-  const recordatoriosHoy = recs.filter(r => isToday(r.created_at)).length;
+const recordatoriosHoy = recs.filter(r => isToday(r.created_at)).length;
 
-  const recallsEnviadosHoy = recalls.filter(
-    r => r.estado === 'enviado' && isToday(r.fecha_envio)
-  ).length;
+const recallsEnviadosHoy = recalls.filter(r => r.estado === 'enviado' && isToday(r.fecha_envio)).length;
 
-  const recallsAceptadosHoy = recalls.filter(
-    r => r.estado === 'cita_agendada' && isToday(r.fecha_envio)
-  ).length;
+const recallsAceptadosHoy = recalls.filter(r => r.estado === 'cita_agendada' && isToday(r.fecha_envio)).length;
 
   const recPendiente = recs.filter(r => r.estado === 'sin_respuesta').length;
   const recConf = recs.filter(r => r.estado === 'confirmada').length;
