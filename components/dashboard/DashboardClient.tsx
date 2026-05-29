@@ -170,12 +170,12 @@ const DashboardClient = ({
   const nuevas = convs.filter(c => c.estado_visual === 'nueva').length;
   const enCurso = convs.filter(c => c.estado_visual === 'en_curso').length;
   const recepcion = convs.filter(c => c.estado_visual === 'recepcion').length;
-  const gestion = convs.filter(c => c.estado_visual === 'gestionada').length;
+  const gestion = convs.filter( c => c.estado_cita === 'gestionada').length;
   const recados = convs.filter(c => (c.notas_internas || '').trim().length > 0).length;
 
-  const citasHoy = convs.filter(
-    c => c.estado_cita === 'creada' && isToday(c.updated_at)
-  ).length;
+ const citasHoy = convs.filter(
+  c => c.estado_cita === 'gestionada' && isToday(c.updated_at)
+).length;
 
   const recordatoriosHoy = recs.filter(r => isToday(r.created_at)).length;
 
