@@ -12,7 +12,10 @@ import {
   cerrarGestion,
   actualizarNotasConversacion
 } from '@/lib/repos/conversaciones.repo';
-import { listMensajesByConversation } from '@/lib/repos/mensajes.repo';
+import {
+  listMensajesByConversation,
+  crearMensajeSaliente
+} from '@/lib/repos/mensajes.repo';
 import { getPatientById, updatePatientNotas } from '@/lib/repos/patients.repo';
 import type {
   ConversacionWhatsapp,
@@ -62,6 +65,7 @@ const ConversacionesView = () => {
   const [search, setSearch] = useState('');
   const [notasPaciente, setNotasPaciente] = useState('');
   const [notasConv, setNotasConv] = useState('');
+  const [nuevoMensaje, setNuevoMensaje] = useState('');
   const [userEmail, setUserEmail] = useState<string>('demo@martina.local');
 
   const selected = useMemo(
@@ -214,9 +218,27 @@ const ConversacionesView = () => {
     toast.success('Notas del paciente guardadas');
   };
 
+  const enviarMensaje = async () => {
+    if (!selected || !nuevoMensaje.trim()) return;
+
+    const creado = await crearMensajeSaliente(
+      selected.id,
+      nuevoMensaje.trim()
+    );
+
+    if (!creado) {
+      toast.error('No se ha podido guardar el mensaje');
+      return;
+    }
+
+    setNuevoMensaje('');
+    setMensajes(await listMensajesByConversation(selected.id));
+    toast.success('Mensaje guardado');
+  };
+
   return (
-    <div className="h-full flex bg-[#02141B] text-white">
-      <div className="w-[28%] min-w-[280px] max-w-[340px] border-r border-cyan-500/15 bg-[#03111A] flex flex-col shrink-0">
+    <div className="h-full flex bg-[#02141B] text-white overflow-hidden">
+      <div className="w-[28%] min-w-[280px] max-w-[340px] border-r border-cyan-500/15 bg-[#03111A] flex flex-col shrink-0 min-h-0">
         <div className="px-6 pt-6 pb-4">
           <h1 className="text-2xl font-semibold tracking-[-0.015em] scale-x-[0.97] origin-left bg-gradient-to-r from-white to-cyan-300 bg-clip-text text-transparent mb-1">
             Conversaciones
@@ -277,7 +299,7 @@ const ConversacionesView = () => {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 min-h-0 overflow-y-auto">
           {filtered.length === 0 && (
             <div className="p-6 text-center text-sm text-cyan-100/50">
               Sin conversaciones
@@ -332,14 +354,14 @@ const ConversacionesView = () => {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col min-w-0 bg-[#F8FBFC] text-[#06111A] shadow-[0_0_25px_rgba(14,124,139,.08)]">
+      <div className="flex-1 flex flex-col min-w-0 min-h-0 bg-[#F8FBFC] text-[#06111A] shadow-[0_0_25px_rgba(14,124,139,.08)]">
         {!selected ? (
           <div className="flex-1 flex items-center justify-center text-slate-400 text-sm">
             Selecciona una conversación
           </div>
         ) : (
           <>
-            <div className="relative z-10 bg-[#F8FBFC] px-8 py-5 border-b border-cyan-100 shadow-[0_12px_30px_rgba(14,124,139,.08)]">
+            <div className="relative z-10 bg-[#F8FBFC] px-8 py-5 border-b border-cyan-100 shadow-[0_12px_30px_rgba(14,124,139,.08)] shrink-0">
               <button
                 onClick={doCerrar}
                 className="absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center text-white bg-[linear-gradient(180deg,#214955_0%,#163C46_100%)] border border-cyan-300/15 shadow-[0_0_0_3px_rgba(34,211,238,.10),0_0_18px_rgba(34,211,238,.25)] hover:scale-105 transition-all z-20"
@@ -382,7 +404,7 @@ const ConversacionesView = () => {
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-8 py-7 space-y-4 bg-[radial-gradient(circle_at_top,rgba(34,211,238,.04),#F8FBFC_45%)]">
+            <div className="flex-1 min-h-0 overflow-y-auto px-8 py-7 space-y-4 bg-[radial-gradient(circle_at_top,rgba(34,211,238,.04),#F8FBFC_45%)]">
               {mensajes.map(m => {
                 const isPaciente =
                   m.tipo_emisor === 'paciente' ||
@@ -436,19 +458,34 @@ const ConversacionesView = () => {
               )}
             </div>
 
-            <div className="px-6 py-4 border-t border-[#6FD7E2]/20 bg-[#F8FBFC] shadow-[0_-6px_20px_rgba(14,124,139,.08)]">
+            <div className="px-6 py-4 border-t border-[#6FD7E2]/20 bg-[#F8FBFC] shadow-[0_-6px_20px_rgba(14,124,139,.08)] shrink-0">
               <div className="flex items-center gap-3 rounded-2xl border border-[#6FD7E2]/35 bg-[linear-gradient(180deg,#0F2C35_0%,#163C46_100%)] p-3 shadow-[0_-10px_35px_rgba(34,211,238,.14),0_14px_30px_rgba(34,211,238,.10),inset_0_1px_0_rgba(255,255,255,.05)]">
                 <button
+                  type="button"
                   className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] hover:scale-[1.03] shadow-[0_0_20px_rgba(14,124,139,.35)] text-white flex items-center justify-center transition-all"
                 >
                   <Paperclip className="w-4 h-4" />
                 </button>
 
-                <div className="flex-1 rounded-xl bg-white border border-cyan-100 px-4 py-2 text-sm text-slate-400">
-                  Envío gestionado por Martina desde n8n
-                </div>
+                <Input
+                  placeholder="Escribe un mensaje..."
+                  value={nuevoMensaje}
+                  onChange={(e) => setNuevoMensaje(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      enviarMensaje();
+                    }
+                  }}
+                  className="flex-1 h-10 rounded-xl bg-white border border-cyan-100 px-4 text-sm text-slate-700 placeholder:text-slate-400 focus-visible:ring-cyan-400"
+                />
 
-                <button className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] hover:from-[#25D6E6] hover:to-[#118FA0] shadow-[0_0_24px_rgba(14,124,139,.45)] text-white flex items-center justify-center">
+                <button
+                  type="button"
+                  onClick={enviarMensaje}
+                  disabled={!nuevoMensaje.trim()}
+                  className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] hover:from-[#25D6E6] hover:to-[#118FA0] disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_24px_rgba(14,124,139,.45)] text-white flex items-center justify-center"
+                >
                   <Send className="w-4 h-4" />
                 </button>
               </div>
@@ -457,28 +494,28 @@ const ConversacionesView = () => {
         )}
       </div>
 
-      <div className="w-[24%] min-w-[280px] max-w-[340px] border-l border-cyan-500/15 bg-[#03111A] overflow-y-auto shrink-0">
-{!selected ? null : (
-  <div className="p-5 space-y-5">
-    <div className="flex items-center gap-3">
-      <div className="w-16 h-16 rounded-full bg-[radial-gradient(circle_at_35%_30%,#1A6C78_0%,#0D4450_45%,#072B34_100%)] border-2 border-cyan-200/80 flex items-center justify-center text-lg font-semibold text-white shadow-[0_0_12px_rgba(34,211,238,.65),0_0_28px_rgba(34,211,238,.30),inset_0_0_12px_rgba(255,255,255,.18)]">
-        {(paciente?.nombre_completo || selected.nombre_paciente || '?')
-          .split(' ')
-          .map(s => s[0])
-          .slice(0, 2)
-          .join('')}
-      </div>
+      <div className="w-[24%] min-w-[280px] max-w-[340px] border-l border-cyan-500/15 bg-[#03111A] overflow-y-auto shrink-0 min-h-0">
+        {!selected ? null : (
+          <div className="p-5 space-y-5">
+            <div className="flex items-center gap-3">
+              <div className="w-16 h-16 rounded-full bg-[radial-gradient(circle_at_35%_30%,#1A6C78_0%,#0D4450_45%,#072B34_100%)] border-2 border-cyan-200/80 flex items-center justify-center text-lg font-semibold text-white shadow-[0_0_12px_rgba(34,211,238,.65),0_0_28px_rgba(34,211,238,.30),inset_0_0_12px_rgba(255,255,255,.18)]">
+                {(paciente?.nombre_completo || selected.nombre_paciente || '?')
+                  .split(' ')
+                  .map(s => s[0])
+                  .slice(0, 2)
+                  .join('')}
+              </div>
 
-      <div className="min-w-0">
-        <div className="font-semibold truncate text-white">
-          {paciente?.nombre_completo || selected.nombre_paciente || 'Sin nombre registrado'}
-        </div>
+              <div className="min-w-0">
+                <div className="font-semibold truncate text-white">
+                  {paciente?.nombre_completo || selected.nombre_paciente || 'Sin nombre registrado'}
+                </div>
 
-        <div className="text-xs text-cyan-100/60">
-          {formatTelefono(paciente?.telefono || selected.telefono_e164) || 'Sin teléfono registrado'}
-        </div>
-      </div>
-    </div>
+                <div className="text-xs text-cyan-100/60">
+                  {formatTelefono(paciente?.telefono || selected.telefono_e164) || 'Sin teléfono registrado'}
+                </div>
+              </div>
+            </div>
 
             {paciente?.alerta_urgencia && (
               <div className="text-xs px-3 py-2 rounded-xl bg-red-500/10 text-red-100 border border-red-400/25">
