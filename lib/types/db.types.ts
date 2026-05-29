@@ -1,7 +1,7 @@
 // Tipos exactos de las tablas existentes en Supabase.
 // NO modificar nombres ni añadir columnas sin acuerdo previo.
 
-export type ModoAtencion = 'ia' | 'recepcion';
+export type ModoAtencion = 'ia' | 'martina' | 'recepcion';
 export type EstadoVisualConv = 'nueva' | 'en_curso' | 'recepcion' | 'gestionada';
 export type EstadoRecordatorio = 'sin_respuesta' | 'confirmada' | 'no_podra_asistir' | 'cita_modificada' | 'cancelada_recado';
 export type EstadoRecall = 'enviado' | 'quiere_cita' | 'cita_agendada' | 'pospuesto' | 'sin_respuesta';
