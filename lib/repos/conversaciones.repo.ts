@@ -81,7 +81,7 @@ export function tomarConversacion(id: string, email: string) {
 
 export function devolverAMartina(id: string) {
   return updateConv(id, {
-    modo_atencion: 'martina' as ModoAtencion,
+    modo_atencion: 'ia' as ModoAtencion,
     estado_visual: 'nueva' as EstadoVisualConv,
     asignado_a: null
   });
@@ -89,7 +89,7 @@ export function devolverAMartina(id: string) {
 
 export function cerrarGestion(id: string) {
   return updateConv(id, {
-    modo_atencion: 'martina' as ModoAtencion,
+    modo_atencion: 'ia' as ModoAtencion,
     estado_cita: 'gestionada',
     asignado_a: null
   });
