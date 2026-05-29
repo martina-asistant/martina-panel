@@ -171,7 +171,7 @@ const nuevas = convs.filter(c => c.estado_cita !== 'gestionada').length;
 const enCurso = convs.filter(c => (c.modo_atencion as string) === 'ia' && c.estado_cita !== 'gestionada').length;
 const recepcion = convs.filter(c => c.modo_atencion === 'recepcion' && c.estado_cita !== 'gestionada').length;
 const gestion = convs.filter(c => c.estado_cita === 'gestionada').length;
-const recados = convs.filter(c => (c.notas_internas || '').trim().length > 0).length;
+const recados = convs.filter(c => c.modo_atencion === 'recepcion' && c.estado_cita !== 'gestionada' && (c.estado_cita || '').toLowerCase().includes('recado')).length;
 
 const citasHoy = convs.filter(c => c.estado_cita === 'gestionada' && isToday(c.updated_at)).length;
 
