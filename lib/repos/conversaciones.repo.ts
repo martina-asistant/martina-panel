@@ -90,7 +90,6 @@ export function devolverAMartina(id: string) {
 export function cerrarGestion(id: string) {
   return updateConv(id, {
     modo_atencion: 'ia' as ModoAtencion,
-    estado_visual: 'gestionada' as EstadoVisualConv,
     estado_cita: 'gestionada',
     asignado_a: null
   });
