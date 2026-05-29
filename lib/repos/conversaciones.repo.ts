@@ -43,3 +43,92 @@ export function cerrarGestion(id: string) { return updateConv(id, { modo_atencio
 export function actualizarNotasConversacion(id: string, notas: string) {
   return updateConv(id, { notas_internas: notas });
 }
+
+export type CanalMartina = 'whatsapp' | 'llamadas';
+
+export type ConfiguracionMartina = {
+  id: string;
+  canal: CanalMartina;
+  activo: boolean;
+  updated_at: string;
+  updated_by: string | null;
+};
+
+export async function getConfiguracionMartina(): Promise<ConfiguracionMartina[]> {
+  const supa = createBrowserSupa();
+
+  if (!supa) {
+    return [
+      {
+        id: 'mock-whatsapp',
+        canal: 'whatsapp',
+        activo: false,
+        updated_at: new Date().toISOString(),
+        updated_by: null
+      },
+      {
+        id: 'mock-llamadas',
+        canal: 'llamadas',
+        activo: false,
+        updated_at: new Date().toISOString(),
+        updated_by: null
+      }
+    ];
+  }
+
+  const { data, error } = await supa
+    .from('configuracion_martina')
+    .select('*')
+    .order('canal', { ascending: true });
+
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  return (data || []) as ConfiguracionMartina[];
+}
+
+export async function actualizarEstadoCanalMartina(
+  canal: CanalMartina,
+  activo: boolean,
+  email?: string
+): Promise<ConfiguracionMartina | null> {
+  const supa = createBrowserSupa();
+
+  if (!supa) {
+    return {
+      id: `mock-${canal}`,
+      canal,
+      activo,
+      updated_at: new Date().toISOString(),
+      updated_by: email || null
+    };
+  }
+
+  const { data, error } = await supa
+    .from('configuracion_martina')
+    .update({
+      activo,
+      updated_at: new Date().toISOString(),
+      updated_by: email || null
+    })
+    .eq('canal', canal)
+    .select('*')
+    .single();
+
+  if (error) {
+    console.error(error);
+    return null;
+  }
+
+  return data as ConfiguracionMartina;
+}
+
+export function activarCanalMartina(canal: CanalMartina, email?: string) {
+  return actualizarEstadoCanalMartina(canal, true, email);
+}
+
+export function pausarCanalMartina(canal: CanalMartina, email?: string) {
+  return actualizarEstadoCanalMartina(canal, false, email);
+}
