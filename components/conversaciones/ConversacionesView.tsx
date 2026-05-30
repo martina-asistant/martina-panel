@@ -55,6 +55,48 @@ const ConversacionesView = () => {
     [convs, selectedId]
   );
 
+  const citasPaciente = useMemo(() => {
+    if (!selected?.telefono_e164) {
+      return {
+        ultima: null as ConversacionWhatsapp | null,
+        proxima: null as ConversacionWhatsapp | null
+      };
+    }
+
+    const telefono = selected.telefono_e164.replace(/\D/g, '');
+
+    const citas = convs
+      .filter(c => {
+        const t = (c.telefono_e164 || '').replace(/\D/g, '');
+
+        return (
+          t === telefono &&
+          c.estado_cita === 'gestionada' &&
+          !!c.fecha_inicio
+        );
+      })
+      .sort(
+        (a, b) =>
+          new Date(a.fecha_inicio || '').getTime() -
+          new Date(b.fecha_inicio || '').getTime()
+      );
+
+    const ahora = new Date().getTime();
+
+    const pasadas = citas.filter(
+      c => new Date(c.fecha_inicio || '').getTime() < ahora
+    );
+
+    const futuras = citas.filter(
+      c => new Date(c.fecha_inicio || '').getTime() >= ahora
+    );
+
+    return {
+      ultima: pasadas[pasadas.length - 1] || null,
+      proxima: futuras[0] || null
+    };
+  }, [convs, selected]);
+
   useEffect(() => {
     (async () => {
       const list = await listConversaciones();
@@ -147,23 +189,23 @@ const ConversacionesView = () => {
     };
   }, [selectedId]);
 
-const filtered = convs.filter(c => {
+  const filtered = convs.filter(c => {
 
-  if (filter === 'gestionada') {
-    if (c.estado_cita !== 'gestionada') return false;
+    if (filter === 'gestionada') {
+      if (c.estado_cita !== 'gestionada') return false;
 
-  } else if (filter === 'nueva') {
-    if (
-      c.modo_atencion !== 'ia' ||
-      c.estado_cita === 'gestionada'
-    ) return false;
+    } else if (filter === 'nueva') {
+      if (
+        c.modo_atencion !== 'ia' ||
+        c.estado_cita === 'gestionada'
+      ) return false;
 
-  } else if (filter === 'recepcion') {
-    if (
-      c.modo_atencion !== 'recepcion' ||
-      c.estado_cita === 'gestionada'
-    ) return false;
-  }
+    } else if (filter === 'recepcion') {
+      if (
+        c.modo_atencion !== 'recepcion' ||
+        c.estado_cita === 'gestionada'
+      ) return false;
+    }
 
     if (search.trim()) {
       const q = search.toLowerCase();
@@ -433,24 +475,28 @@ const filtered = convs.filter(c => {
         </div>
 
         <div className="hidden min-[1600px]:block w-[320px] border-l border-martina-border bg-white overflow-y-auto shrink-0">
-          {!selected ? null : !paciente ? (
-            <div className="p-5 text-sm text-martina-muted">
-              Sin paciente vinculado.
-            </div>
-          ) : (
+          {!selected ? null : (
             <div className="p-5 space-y-5">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-full bg-martina-beige flex items-center justify-center text-base font-medium">
-                  {(paciente.nombre_completo || '?').split(' ').map(s => s[0]).slice(0, 2).join('')}
+                  {(paciente?.nombre_completo || selected.nombre_paciente || '?')
+                    .split(' ')
+                    .map(s => s[0])
+                    .slice(0, 2)
+                    .join('')}
                 </div>
 
                 <div className="min-w-0">
-                  <div className="font-medium truncate">{paciente.nombre_completo}</div>
-                  <div className="text-xs text-martina-muted">{paciente.telefono}</div>
+                  <div className="font-medium truncate">
+                    {paciente?.nombre_completo || selected.nombre_paciente || 'Sin nombre registrado'}
+                  </div>
+                  <div className="text-xs text-martina-muted">
+                    {paciente?.telefono || selected.telefono_e164 || 'Sin teléfono registrado'}
+                  </div>
                 </div>
               </div>
 
-              {paciente.alerta_urgencia && (
+              {paciente?.alerta_urgencia && (
                 <div className="text-xs px-3 py-2 rounded-lg bg-red-50 text-red-800 border border-red-100">
                   🚨 Posible urgencia
                 </div>
@@ -460,25 +506,25 @@ const filtered = convs.filter(c => {
                 <div>
                   <div className="text-martina-muted">Última cita</div>
                   <div className="font-medium">
-                    {formatDate((selected as any)?.ultima_cita_fecha)}
+                    {formatDate(citasPaciente.ultima?.fecha_inicio)}
                   </div>
                   <div className="text-martina-muted">
-                    {(selected as any)?.ultima_cita_motivo || '—'}
+                    {citasPaciente.ultima?.motivo || '—'}
                   </div>
                 </div>
 
                 <div>
                   <div className="text-martina-muted">Próxima cita</div>
                   <div className="font-medium">
-                    {formatDate((selected as any)?.proxima_cita_fecha)}
+                    {formatDate(citasPaciente.proxima?.fecha_inicio)}
                   </div>
                   <div className="text-martina-muted">
-                    {(selected as any)?.proxima_cita_motivo || '—'}
+                    {citasPaciente.proxima?.motivo || '—'}
                   </div>
                 </div>
               </div>
 
-              {paciente.etiquetas && paciente.etiquetas.length > 0 && (
+              {paciente?.etiquetas && paciente.etiquetas.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
                   {paciente.etiquetas.map(t => (
                     <span key={t} className="text-[10px] px-2 py-0.5 rounded-full bg-martina-beige text-martina-text">
@@ -499,11 +545,23 @@ const filtered = convs.filter(c => {
                   rows={4}
                   className="text-sm bg-martina-bg border-martina-border"
                   placeholder="Añade notas…"
+                  disabled={!paciente}
                 />
 
-                <Button size="sm" onClick={saveNotasPaciente} className="w-full bg-martina-text hover:bg-black text-white">
+                <Button
+                  size="sm"
+                  onClick={saveNotasPaciente}
+                  disabled={!paciente}
+                  className="w-full bg-martina-text hover:bg-black text-white disabled:opacity-40 disabled:cursor-not-allowed"
+                >
                   Guardar notas
                 </Button>
+
+                {!paciente && (
+                  <div className="text-[11px] text-martina-muted">
+                    No hay ficha en patients. Mostrando datos desde conversaciones.
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2 pt-2 border-t border-martina-border">
