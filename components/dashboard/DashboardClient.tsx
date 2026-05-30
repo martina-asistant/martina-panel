@@ -166,12 +166,39 @@ const DashboardClient = ({
   today.setHours(0, 0, 0, 0);
 
 const isToday = (iso: string | null) => (iso ? new Date(iso) >= today : false);
-const nuevas = convs.filter(c => c.estado_cita !== 'gestionada' && !esRecado(c)).length;
-const enCurso = convs.filter(c => (c.modo_atencion as string) === 'ia' && c.estado_cita !== 'gestionada').length;
-const recepcion = convs.filter(c => c.modo_atencion === 'recepcion' && c.estado_cita !== 'gestionada' && !(c.estado_cita || '').toLowerCase().includes('recado')
+
+const esRecado = (c: ConversacionWhatsapp) =>
+  (c.estado_cita || '').toLowerCase().includes('recado');
+
+const nuevas = convs.filter(
+  c =>
+    c.estado_cita !== 'gestionada' &&
+    !esRecado(c)
 ).length;
-const gestion = convs.filter(c => c.estado_cita === 'gestionada').length;
-const recados = convs.filter(c => c.estado_cita !== 'gestionada' && (c.estado_cita || '').toLowerCase().includes('recado')).length;
+
+const enCurso = convs.filter(
+  c =>
+    (c.modo_atencion as string) === 'ia' &&
+    c.estado_cita !== 'gestionada' &&
+    !esRecado(c)
+).length;
+
+const recepcion = convs.filter(
+  c =>
+    c.modo_atencion === 'recepcion' &&
+    c.estado_cita !== 'gestionada' &&
+    !esRecado(c)
+).length;
+
+const gestion = convs.filter(
+  c => c.estado_cita === 'gestionada'
+).length;
+
+const recados = convs.filter(
+  c =>
+    c.estado_cita !== 'gestionada' &&
+    esRecado(c)
+).length;
 
 const citasHoy = convs.filter(c => c.estado_cita === 'gestionada' && isToday(c.updated_at)).length;
 const recordatoriosHoy = recs.filter(r => isToday(r.created_at)).length;
