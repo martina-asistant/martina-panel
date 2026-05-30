@@ -147,13 +147,23 @@ const ConversacionesView = () => {
     };
   }, [selectedId]);
 
-  const filtered = convs.filter(c => {
+const filtered = convs.filter(c => {
 
-    if (filter === 'gestionada') {
-      if (c.estado_cita !== 'gestionada') return false;
-    } else if (filter !== 'todas') {
-      if (c.estado_visual !== filter) return false;
-    }
+  if (filter === 'gestionada') {
+    if (c.estado_cita !== 'gestionada') return false;
+
+  } else if (filter === 'nueva') {
+    if (
+      c.modo_atencion !== 'ia' ||
+      c.estado_cita === 'gestionada'
+    ) return false;
+
+  } else if (filter === 'recepcion') {
+    if (
+      c.modo_atencion !== 'recepcion' ||
+      c.estado_cita === 'gestionada'
+    ) return false;
+  }
 
     if (search.trim()) {
       const q = search.toLowerCase();
