@@ -171,7 +171,6 @@ const nuevas = convs.filter(
     c.estado_cita !== 'gestionada' &&
     !(c.estado_cita || '').toLowerCase().includes('recado')
 ).length;
-const nuevas = enCurso + recepcion;
 const enCurso = convs.filter(c => (c.modo_atencion as string) === 'ia' && c.estado_cita !== 'gestionada').length;
 const recepcion = convs.filter(c => c.modo_atencion === 'recepcion' && c.estado_cita !== 'gestionada' && !(c.estado_cita || '').toLowerCase().includes('recado')
 ).length;
