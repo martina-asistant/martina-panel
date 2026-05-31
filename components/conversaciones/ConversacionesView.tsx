@@ -50,145 +50,153 @@ const ConversacionesView = () => {
   const [nuevoMensaje, setNuevoMensaje] = useState('');
   const [userEmail, setUserEmail] = useState<string>('demo@martina.local');
 
-  const selected = useMemo(
-    () => convs.find(c => c.id === selectedId) || null,
-    [convs, selectedId]
+ const selected = useMemo(
+  () => convs.find(c => c.id === selectedId) || null,
+  [convs, selectedId]
+);
+
+const citasPaciente = useMemo(() => {
+  const telefonoBase = selected?.telefono || selected?.telefono_e164;
+
+  if (!telefonoBase) {
+    return {
+      ultima: null as ConversacionWhatsapp | null,
+      proxima: null as ConversacionWhatsapp | null
+    };
+  }
+
+  const telefono = telefonoBase.replace(/\D/g, '');
+
+  const citas = convs
+    .filter(c => {
+      const t = (c.telefono || c.telefono_e164 || '').replace(/\D/g, '');
+
+      return (
+        t === telefono &&
+        c.estado_cita === 'gestionada' &&
+        !!c.fecha_inicio
+      );
+    })
+    .sort(
+      (a, b) =>
+        new Date(a.fecha_inicio || '').getTime() -
+        new Date(b.fecha_inicio || '').getTime()
+    );
+
+  const ahora = new Date().getTime();
+
+  const pasadas = citas.filter(
+    c => new Date(c.fecha_inicio || '').getTime() < ahora
   );
 
-  const citasPaciente = useMemo(() => {
-    if (!selected?.telefono_e164) {
-      return {
-        ultima: null as ConversacionWhatsapp | null,
-        proxima: null as ConversacionWhatsapp | null
-      };
-    }
+  const futuras = citas.filter(
+    c => new Date(c.fecha_inicio || '').getTime() >= ahora
+  );
 
-    const telefono = selected.telefono_e164.replace(/\D/g, '');
+  return {
+    ultima: pasadas[pasadas.length - 1] || null,
+    proxima: futuras[0] || null
+  };
+}, [convs, selected]);
 
-    const citas = convs
-      .filter(c => {
-        const t = (c.telefono_e164 || '').replace(/\D/g, '');
+useEffect(() => {
+  (async () => {
+    const list = await listConversaciones();
+    setConvs(list);
+    if (list[0]) setSelectedId(list[0].id);
+  })();
 
-        return (
-          t === telefono &&
-          c.estado_cita === 'gestionada' &&
-          !!c.fecha_inicio
-        );
-      })
-      .sort(
-        (a, b) =>
-          new Date(a.fecha_inicio || '').getTime() -
-          new Date(b.fecha_inicio || '').getTime()
-      );
-
-    const ahora = new Date().getTime();
-
-    const pasadas = citas.filter(
-      c => new Date(c.fecha_inicio || '').getTime() < ahora
-    );
-
-    const futuras = citas.filter(
-      c => new Date(c.fecha_inicio || '').getTime() >= ahora
-    );
-
-    return {
-      ultima: pasadas[pasadas.length - 1] || null,
-      proxima: futuras[0] || null
-    };
-  }, [convs, selected]);
-
-  useEffect(() => {
-    (async () => {
-      const list = await listConversaciones();
-      setConvs(list);
-      if (list[0]) setSelectedId(list[0].id);
-    })();
-
-    if (isSupabaseConfigured()) {
-      const supa = createClient();
-      supa.auth.getUser().then(({ data }) => {
-        if (data.user?.email) setUserEmail(data.user.email);
-      });
-    }
-  }, []);
-
-  useEffect(() => {
+  if (isSupabaseConfigured()) {
     const supa = createClient();
-    if (!supa) return;
+    supa.auth.getUser().then(({ data }) => {
+      if (data.user?.email) setUserEmail(data.user.email);
+    });
+  }
+}, []);
 
-    const ch = supa
-      .channel('conv-realtime')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'conversaciones_whatsapp' },
-        async () => {
-          setConvs(await listConversaciones());
-        }
-      )
-      .subscribe();
+useEffect(() => {
+  const supa = createClient();
+  if (!supa) return;
 
-    return () => {
-      supa.removeChannel(ch);
-    };
-  }, []);
+  const ch = supa
+    .channel('conv-realtime')
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'conversaciones_whatsapp' },
+      async () => {
+        setConvs(await listConversaciones());
+      }
+    )
+    .subscribe();
 
-  useEffect(() => {
-    if (!selectedId) {
-      setMensajes([]);
-      setPaciente(null);
-      return;
-    }
+  return () => {
+    supa.removeChannel(ch);
+  };
+}, []);
 
-    (async () => {
-      const ms = await listMensajesByConversation(selectedId);
-      setMensajes(ms);
-    })();
+useEffect(() => {
+  if (!selectedId) {
+    setMensajes([]);
+    setPaciente(null);
+    setNotasPaciente('');
+    return;
+  }
 
-    const conv = convs.find(c => c.id === selectedId);
+  (async () => {
+    const ms = await listMensajesByConversation(selectedId);
+    setMensajes(ms);
+  })();
 
-    setNotasConv(conv?.notas_internas || '');
+  const conv = convs.find(c => c.id === selectedId);
 
-    if (conv?.paciente_id) {
-      getPatientById(conv.paciente_id).then(p => {
-        setPaciente(p);
-        setNotasPaciente(p?.notas_internas || '');
-      });
-    } else if (conv?.telefono_e164) {
-      getPatientByTelefono(conv.telefono_e164).then(p => {
-        setPaciente(p);
-        setNotasPaciente(p?.notas_internas || '');
-      });
-    } else {
-      setPaciente(null);
-      setNotasPaciente('');
-    }
-  }, [selectedId, convs]);
+  setNotasConv(conv?.notas_internas || '');
 
-  useEffect(() => {
-    const supa = createClient();
-    if (!supa || !selectedId) return;
+  if (conv?.paciente_id) {
+    getPatientById(conv.paciente_id).then(p => {
+      setPaciente(p);
+      setNotasPaciente(p?.notas_internas || '');
+    });
+  } else if (conv?.telefono) {
+    getPatientByTelefono(conv.telefono).then(p => {
+      setPaciente(p);
+      setNotasPaciente(p?.notas_internas || '');
+    });
+  } else if (conv?.telefono_e164) {
+    getPatientByTelefono(conv.telefono_e164).then(p => {
+      setPaciente(p);
+      setNotasPaciente(p?.notas_internas || '');
+    });
+  } else {
+    setPaciente(null);
+    setNotasPaciente('');
+  }
+}, [selectedId, convs]);
 
-    const ch = supa
-      .channel(`msg-realtime-${selectedId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'mensajes_whatsapp',
-          filter: `conversation_id=eq.${selectedId}`
-        },
-        payload => {
-          setMensajes(prev => [...prev, payload.new as MensajeWhatsapp]);
-        }
-      )
-      .subscribe();
+useEffect(() => {
+  const supa = createClient();
+  if (!supa || !selectedId) return;
 
-    return () => {
-      supa.removeChannel(ch);
-    };
-  }, [selectedId]);
+  const ch = supa
+    .channel(`msg-realtime-${selectedId}`)
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'mensajes_whatsapp',
+        filter: `conversation_id=eq.${selectedId}`
+      },
+      payload => {
+        setMensajes(prev => [...prev, payload.new as MensajeWhatsapp]);
+      }
+    )
+    .subscribe();
 
+  return () => {
+    supa.removeChannel(ch);
+  };
+}, [selectedId]);
+  
   const filtered = convs.filter(c => {
 
     if (filter === 'gestionada') {
