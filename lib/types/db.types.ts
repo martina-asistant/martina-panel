@@ -39,6 +39,7 @@ export interface ConversacionWhatsapp {
   created_at: string;
   updated_at: string;
   telefono_e164: string | null;
+  telefono: string | null;
   paciente_id: string | null;
   modo_atencion: ModoAtencion | null;
   estado_conversacion: string | null;
