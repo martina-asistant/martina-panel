@@ -55,26 +55,28 @@ const ConversacionesView = () => {
     [convs, selectedId]
   );
 
-  const citasPaciente = useMemo(() => {
-    if (!selected?.telefono_e164) {
-      return {
-        ultima: null as ConversacionWhatsapp | null,
-        proxima: null as ConversacionWhatsapp | null
-      };
-    }
+const citasPaciente = useMemo(() => {
+  const telefonoBase = selected?.telefono || selected?.telefono_e164;
 
-    const telefono = selected.telefono_e164.replace(/\D/g, '');
+  if (!telefonoBase) {
+    return {
+      ultima: null as ConversacionWhatsapp | null,
+      proxima: null as ConversacionWhatsapp | null
+    };
+  }
 
-    const citas = convs
-      .filter(c => {
-        const t = (c.telefono_e164 || '').replace(/\D/g, '');
+  const telefono = telefonoBase.replace(/\D/g, '');
 
-        return (
-          t === telefono &&
-          c.estado_cita === 'gestionada' &&
-          !!c.fecha_inicio
-        );
-      })
+  const citas = convs
+    .filter(c => {
+      const t = (c.telefono || c.telefono_e164 || '').replace(/\D/g, '');
+
+      return (
+        t === telefono &&
+        c.estado_cita === 'gestionada' &&
+        !!c.fecha_inicio
+      );
+    })
       .sort(
         (a, b) =>
           new Date(a.fecha_inicio || '').getTime() -
@@ -132,38 +134,48 @@ const ConversacionesView = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (!selectedId) {
-      setMensajes([]);
+useEffect(() => {
+  if (!selectedId) {
+    setMensajes([]);
+    setPaciente(null);
+    setNotasPaciente('');
+    return;
+  }
+
+  (async () => {
+    const ms = await listMensajesByConversation(selectedId);
+    setMensajes(ms);
+  })();
+
+  const conv = convs.find(c => c.id === selectedId);
+
+  setNotasConv(conv?.notas_internas || '');
+
+  (async () => {
+    if (!conv) {
       setPaciente(null);
       setNotasPaciente('');
       return;
     }
 
-    (async () => {
-      const ms = await listMensajesByConversation(selectedId);
-      setMensajes(ms);
-    })();
+    let p: Patient | null = null;
 
-    const conv = convs.find(c => c.id === selectedId);
-
-    setNotasConv(conv?.notas_internas || '');
-
-    if (conv?.paciente_id) {
-      getPatientById(conv.paciente_id).then(p => {
-        setPaciente(p);
-        setNotasPaciente(p?.notas_internas || '');
-      });
-    } else if (conv?.telefono_e164) {
-      getPatientByTelefono(conv.telefono_e164).then(p => {
-        setPaciente(p);
-        setNotasPaciente(p?.notas_internas || '');
-      });
-    } else {
-      setPaciente(null);
-      setNotasPaciente('');
+    if (conv.paciente_id) {
+      p = await getPatientById(conv.paciente_id);
     }
-  }, [selectedId, convs]);
+
+    if (!p && conv.telefono) {
+      p = await getPatientByTelefono(conv.telefono);
+    }
+
+    if (!p && conv.telefono_e164) {
+      p = await getPatientByTelefono(conv.telefono_e164);
+    }
+
+    setPaciente(p);
+    setNotasPaciente(p?.notas_internas || '');
+  })();
+}, [selectedId, convs]);
 
   useEffect(() => {
     const supa = createClient();
