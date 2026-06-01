@@ -55,6 +55,21 @@ export async function getPatientByTelefono(telefono: string | null | undefined):
     );
   }
 
+
+  const found = (data || []).find(p => {
+    const patientPhone = normalizePhone(p.telefono);
+
+    return (
+      patientPhone === clean ||
+      patientPhone === sinPrefijo ||
+      patientPhone.endsWith(sinPrefijo) ||
+      clean.endsWith(patientPhone)
+    );
+  });
+
+  return (found as Patient) || null;
+}
+
   const { data, error } = await supa
     .from('patients')
     .select('*')
