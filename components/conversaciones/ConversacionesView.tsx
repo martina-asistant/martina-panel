@@ -116,17 +116,17 @@ const ConversacionesView = () => {
 
       let p: Patient | null = null;
 
-      if (conv.paciente_id) {
-        p = await getPatientById(conv.paciente_id);
-      }
+if (conv.telefono) {
+  p = await getPatientByTelefono(conv.telefono);
+}
 
-      if (!p && conv.telefono) {
-        p = await getPatientByTelefono(conv.telefono);
-      }
+if (!p && conv.telefono_e164) {
+  p = await getPatientByTelefono(conv.telefono_e164);
+}
 
-      if (!p && conv.telefono_e164) {
-        p = await getPatientByTelefono(conv.telefono_e164);
-      }
+if (!p && conv.paciente_id) {
+  p = await getPatientById(conv.paciente_id);
+}
 
       setPaciente(p);
       setNotasPaciente(p?.notas_internas || '');
@@ -457,7 +457,7 @@ const ConversacionesView = () => {
                     {paciente?.nombre_completo || selected.nombre_paciente || 'Sin nombre registrado'}
                   </div>
                   <div className="text-xs text-martina-muted">
-                    {paciente?.telefono || selected.telefono_e164 || 'Sin teléfono registrado'}
+                    {paciente?.telefono || selected.telefono || selected.telefono_e164 || 'Sin teléfono registrado'}
                   </div>
                 </div>
               </div>
