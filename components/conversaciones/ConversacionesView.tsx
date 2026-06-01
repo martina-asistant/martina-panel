@@ -55,50 +55,6 @@ const ConversacionesView = () => {
     [convs, selectedId]
   );
 
-const citasPaciente = useMemo(() => {
-  const telefonoBase = selected?.telefono || selected?.telefono_e164;
-
-  if (!telefonoBase) {
-    return {
-      ultima: null as ConversacionWhatsapp | null,
-      proxima: null as ConversacionWhatsapp | null
-    };
-  }
-
-  const telefono = telefonoBase.replace(/\D/g, '');
-
-  const citas = convs
-    .filter(c => {
-      const t = (c.telefono || c.telefono_e164 || '').replace(/\D/g, '');
-
-      return (
-        t === telefono &&
-        c.estado_cita === 'gestionada' &&
-        !!c.fecha_inicio
-      );
-    })
-      .sort(
-        (a, b) =>
-          new Date(a.fecha_inicio || '').getTime() -
-          new Date(b.fecha_inicio || '').getTime()
-      );
-
-    const ahora = new Date().getTime();
-
-    const pasadas = citas.filter(
-      c => new Date(c.fecha_inicio || '').getTime() < ahora
-    );
-
-    const futuras = citas.filter(
-      c => new Date(c.fecha_inicio || '').getTime() >= ahora
-    );
-
-    return {
-      ultima: pasadas[pasadas.length - 1] || null,
-      proxima: futuras[0] || null
-    };
-  }, [convs, selected]);
-
   useEffect(() => {
     (async () => {
       const list = await listConversaciones();
@@ -134,48 +90,48 @@ const citasPaciente = useMemo(() => {
     };
   }, []);
 
-useEffect(() => {
-  if (!selectedId) {
-    setMensajes([]);
-    setPaciente(null);
-    setNotasPaciente('');
-    return;
-  }
-
-  (async () => {
-    const ms = await listMensajesByConversation(selectedId);
-    setMensajes(ms);
-  })();
-
-  const conv = convs.find(c => c.id === selectedId);
-
-  setNotasConv(conv?.notas_internas || '');
-
-  (async () => {
-    if (!conv) {
+  useEffect(() => {
+    if (!selectedId) {
+      setMensajes([]);
       setPaciente(null);
       setNotasPaciente('');
       return;
     }
 
-    let p: Patient | null = null;
+    (async () => {
+      const ms = await listMensajesByConversation(selectedId);
+      setMensajes(ms);
+    })();
 
-    if (conv.paciente_id) {
-      p = await getPatientById(conv.paciente_id);
-    }
+    const conv = convs.find(c => c.id === selectedId);
 
-    if (!p && conv.telefono) {
-      p = await getPatientByTelefono(conv.telefono);
-    }
+    setNotasConv(conv?.notas_internas || '');
 
-    if (!p && conv.telefono_e164) {
-      p = await getPatientByTelefono(conv.telefono_e164);
-    }
+    (async () => {
+      if (!conv) {
+        setPaciente(null);
+        setNotasPaciente('');
+        return;
+      }
 
-    setPaciente(p);
-    setNotasPaciente(p?.notas_internas || '');
-  })();
-}, [selectedId, convs]);
+      let p: Patient | null = null;
+
+      if (conv.paciente_id) {
+        p = await getPatientById(conv.paciente_id);
+      }
+
+      if (!p && conv.telefono) {
+        p = await getPatientByTelefono(conv.telefono);
+      }
+
+      if (!p && conv.telefono_e164) {
+        p = await getPatientByTelefono(conv.telefono_e164);
+      }
+
+      setPaciente(p);
+      setNotasPaciente(p?.notas_internas || '');
+    })();
+  }, [selectedId, convs]);
 
   useEffect(() => {
     const supa = createClient();
@@ -516,23 +472,29 @@ useEffect(() => {
                 <div>
                   <div className="text-martina-muted">Última cita</div>
                   <div className="font-medium">
-                    {formatDate(citasPaciente.ultima?.fecha_inicio)}
+                    {formatDate(paciente?.ultima_cita_fecha)}
                   </div>
                   <div className="text-martina-muted">
-                    {citasPaciente.ultima?.motivo || '—'}
+                    {paciente?.ultima_cita_motivo || '—'}
                   </div>
                 </div>
 
                 <div>
                   <div className="text-martina-muted">Próxima cita</div>
                   <div className="font-medium">
-                    {formatDate(citasPaciente.proxima?.fecha_inicio)}
+                    {formatDate(paciente?.proxima_cita_fecha)}
                   </div>
                   <div className="text-martina-muted">
-                    {citasPaciente.proxima?.motivo || '—'}
+                    {paciente?.proxima_cita_motivo || '—'}
                   </div>
                 </div>
               </div>
+
+              {paciente?.total_citas !== null && paciente?.total_citas !== undefined && (
+                <div className="text-xs text-martina-muted">
+                  Total citas: <span className="font-medium text-martina-text">{paciente.total_citas}</span>
+                </div>
+              )}
 
               {paciente?.etiquetas && paciente.etiquetas.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
