@@ -124,10 +124,6 @@ if (!p && conv.telefono_e164) {
   p = await getPatientByTelefono(conv.telefono_e164);
 }
 
-if (!p && conv.paciente_id) {
-  p = await getPatientById(conv.paciente_id);
-}
-
       setPaciente(p);
       setNotasPaciente(p?.notas_internas || '');
     })();
