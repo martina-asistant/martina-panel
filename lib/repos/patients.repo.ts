@@ -30,7 +30,9 @@ export async function getPatientById(id: string | null | undefined): Promise<Pat
   return data as Patient;
 }
 
-export async function getPatientByTelefono(telefono: string | null | undefined): Promise<Patient | null> {
+export async function getPatientByTelefono(
+  telefono: string | null | undefined
+): Promise<Patient | null> {
   const clean = normalizePhone(telefono);
 
   if (!clean) return null;
@@ -46,15 +48,26 @@ export async function getPatientByTelefono(telefono: string | null | undefined):
     return (
       mockPatients.find(p => {
         const patientPhone = normalizePhone(p.telefono);
+
         return (
           patientPhone === clean ||
           patientPhone === sinPrefijo ||
-          patientPhone.endsWith(sinPrefijo)
+          patientPhone.endsWith(sinPrefijo) ||
+          clean.endsWith(patientPhone)
         );
       }) || null
     );
   }
 
+  const { data, error } = await supa
+    .from('patients')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error(error);
+    return null;
+  }
 
   const found = (data || []).find(p => {
     const patientPhone = normalizePhone(p.telefono);
@@ -70,22 +83,10 @@ export async function getPatientByTelefono(telefono: string | null | undefined):
   return (found as Patient) || null;
 }
 
-  const { data, error } = await supa
-    .from('patients')
-    .select('*')
-    .or(`telefono.eq.${clean},telefono.eq.${sinPrefijo},telefono.ilike.%${sinPrefijo}`)
-    .order('created_at', { ascending: false })
-    .limit(1);
-
-  if (error) {
-    console.error(error);
-    return null;
-  }
-
-  return ((data || [])[0] as Patient) || null;
-}
-
-export async function updatePatientNotas(id: string, notas: string): Promise<Patient | null> {
+export async function updatePatientNotas(
+  id: string,
+  notas: string
+): Promise<Patient | null> {
   const supa = createBrowserSupa();
 
   if (!supa) {
