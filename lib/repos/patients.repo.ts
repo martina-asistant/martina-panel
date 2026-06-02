@@ -2,9 +2,9 @@ import { createClient as createBrowserSupa } from '@/lib/supabase/client';
 import { mockPatients } from '@/lib/mock/data';
 import type { Patient } from '@/lib/types/db.types';
 
-const normalizePhone = (phone?: string | null) => {
-  if (!phone) return '';
-  return phone.replace(/\D/g, '');
+const normalizePhone = (phone?: string | number | null) => {
+  if (phone === null || phone === undefined) return '';
+  return String(phone).replace(/\D/g, '');
 };
 
 export async function getPatientById(id: string | null | undefined): Promise<Patient | null> {
