@@ -453,7 +453,8 @@ setNotasConv(conv?.notas_internas || '');
     {paciente?.telefono || selected.telefono || 'Sin teléfono registrado'}
   </div>
 </div>
-
+</div>
+                
               {paciente?.alerta_urgencia && (
                 <div className="text-xs px-3 py-2 rounded-lg bg-red-50 text-red-800 border border-red-100">
                   🚨 Posible urgencia
