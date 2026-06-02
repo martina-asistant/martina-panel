@@ -114,18 +114,14 @@ setNotasConv(conv?.notas_internas || '');
     return;
   }
 
-  let p: Patient | null = null;
-
-  if (conv.paciente_id) {
-    p = await getPatientById(conv.paciente_id);
+  if (conv.telefono) {
+    const p = await getPatientByTelefono(conv.telefono);
+    setPaciente(p);
+    setNotasPaciente(p?.notas_internas || '');
+  } else {
+    setPaciente(null);
+    setNotasPaciente('');
   }
-
-  if (!p && conv.telefono) {
-    p = await getPatientByTelefono(conv.telefono);
-  }
-
-  setPaciente(p);
-  setNotasPaciente(p?.notas_internas || '');
 })();
 }, [selectedId, convs]);
 
@@ -448,15 +444,15 @@ setNotasConv(conv?.notas_internas || '');
                     .join('')}
                 </div>
 
-                <div className="min-w-0">
-                  <div className="font-medium truncate">
-                    {paciente?.nombre_completo || selected.nombre_paciente || 'Sin nombre registrado'}
-                  </div>
-                  <div className="text-xs text-martina-muted">
-                    {paciente?.telefono || selected.telefono || selected.telefono_e164 || 'Sin teléfono registrado'}
-                  </div>
-                </div>
-              </div>
+               <div className="min-w-0">
+  <div className="font-medium truncate">
+    {paciente?.nombre_completo || selected.nombre_paciente || 'Sin nombre registrado'}
+  </div>
+
+  <div className="text-xs text-martina-muted">
+    {paciente?.telefono || selected.telefono || 'Sin teléfono registrado'}
+  </div>
+</div>
 
               {paciente?.alerta_urgencia && (
                 <div className="text-xs px-3 py-2 rounded-lg bg-red-50 text-red-800 border border-red-100">
