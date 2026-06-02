@@ -116,13 +116,13 @@ setNotasConv(conv?.notas_internas || '');
 
   let p: Patient | null = null;
 
-  if (conv.telefono) {
-    p = await getPatientByTelefono(conv.telefono);
-  }
+if (conv.telefono) {
+  p = await getPatientByTelefono(conv.telefono);
+}
 
-  if (!p && conv.telefono_e164) {
-    p = await getPatientByTelefono(conv.telefono_e164);
-  }
+if (!p && conv.telefono_e164) {
+  p = await getPatientByTelefono(conv.telefono_e164);
+}
 
   setPaciente(p);
   setNotasPaciente(p?.notas_internas || '');
@@ -333,18 +333,8 @@ setNotasConv(conv?.notas_internas || '');
   <div className="font-medium truncate">
     {paciente?.nombre_completo || selected.nombre_paciente || 'Sin nombre registrado'}
   </div>
-
   <div className="text-xs text-martina-muted">
     {paciente?.telefono || selected.telefono || selected.telefono_e164 || 'Sin teléfono registrado'}
-  </div>
-
-  <div className="mt-3 rounded-lg border border-cyan-400/30 bg-cyan-500/10 p-2 text-[10px] text-cyan-900 space-y-1">
-    <div><strong>selected.telefono:</strong> {selected.telefono || 'VACÍO'}</div>
-    <div><strong>selected.telefono_e164:</strong> {selected.telefono_e164 || 'VACÍO'}</div>
-    <div><strong>paciente:</strong> {paciente ? 'ENCONTRADO' : 'NO ENCONTRADO'}</div>
-    <div><strong>paciente.telefono:</strong> {paciente?.telefono || 'VACÍO'}</div>
-    <div><strong>paciente.proxima:</strong> {paciente?.proxima_cita_fecha || 'VACÍO'}</div>
-    <div><strong>paciente.motivo:</strong> {paciente?.proxima_cita_motivo || 'VACÍO'}</div>
   </div>
 </div>
 
