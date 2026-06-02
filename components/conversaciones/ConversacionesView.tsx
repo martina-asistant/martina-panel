@@ -114,18 +114,14 @@ setNotasConv(conv?.notas_internas || '');
     return;
   }
 
-  let p: Patient | null = null;
-
-if (conv.telefono) {
-  p = await getPatientByTelefono(conv.telefono);
-}
-
-if (!p && conv.telefono_e164) {
-  p = await getPatientByTelefono(conv.telefono_e164);
-}
-
-  setPaciente(p);
-  setNotasPaciente(p?.notas_internas || '');
+  if (conv.telefono) {
+    const p = await getPatientByTelefono(conv.telefono);
+    setPaciente(p);
+    setNotasPaciente(p?.notas_internas || '');
+  } else {
+    setPaciente(null);
+    setNotasPaciente('');
+  }
 })();
 }, [selectedId, convs]);
 
