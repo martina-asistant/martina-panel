@@ -10,10 +10,10 @@ const agendas = [
 ];
 
 const acciones = [
-  'Insertar cita',
-  'Modificar cita',
-  'Cancelar cita',
-  'Agregar recall',
+  'INSERTAR CITA',
+  'MODIFICAR CITA',
+  'CANCELAR CITA',
+  'INSERTAR RECALL',
 ];
 
 export default function AgendasView() {
@@ -43,7 +43,11 @@ export default function AgendasView() {
             className="bg-transparent text-white text-sm font-medium outline-none"
           >
             {agendas.map((a) => (
-              <option key={a.key} value={a.key} className="bg-[#03111A] text-white">
+              <option
+                key={a.key}
+                value={a.key}
+                className="bg-[#03111A] text-white"
+              >
                 {a.nombre}
               </option>
             ))}
@@ -57,10 +61,6 @@ export default function AgendasView() {
             <h2 className="text-[12px] tracking-[0.38em] text-cyan-300 font-semibold">
               {agenda?.nombre.toUpperCase()}
             </h2>
-
-            <p className="text-sm text-cyan-100/55 mt-2">
-              Calendario de citas
-            </p>
           </div>
 
           <div className="flex flex-wrap items-center justify-end gap-2">
@@ -69,8 +69,10 @@ export default function AgendasView() {
                 key={accion}
                 className="
                   rounded-2xl border border-cyan-400/30 bg-cyan-500/10
-                  px-4 py-2.5 text-sm text-cyan-100
-                  hover:bg-cyan-500/20 hover:border-cyan-300/50
+                  px-4 py-2.5 text-xs tracking-[0.08em]
+                  text-cyan-100
+                  hover:bg-cyan-500/20
+                  hover:border-cyan-300/50
                   hover:shadow-[0_0_18px_rgba(34,211,238,.18)]
                   transition-all whitespace-nowrap
                 "
@@ -92,13 +94,22 @@ export default function AgendasView() {
               </div>
 
               <div className="space-y-2">
-                {['09:00', '10:00', '11:00', '12:00', '16:00', '17:00', '18:00'].map((hora) => (
+                {[
+                  '09:00',
+                  '10:00',
+                  '11:00',
+                  '12:00',
+                  '16:00',
+                  '17:00',
+                  '18:00',
+                ].map((hora) => (
                   <button
                     key={hora}
                     className="
                       w-full rounded-xl border border-cyan-400/10
                       bg-white/5 px-3 py-2 text-left
-                      hover:bg-cyan-500/10 hover:text-white
+                      hover:bg-cyan-500/10
+                      hover:text-white
                       transition-all
                     "
                   >
