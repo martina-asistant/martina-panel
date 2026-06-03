@@ -234,7 +234,7 @@ setNotasConv(conv?.notas_internas || '');
     <div className="h-[calc(100vh-150px)] w-full overflow-x-auto overflow-y-hidden">
       <div className="flex min-w-[1180px] h-full min-h-0">
 
-        <div className="w-[320px] shrink-0 border-r border-martina-border bg-white flex flex-col">
+        <div className="w-[320px] h-full min-h-0 shrink-0 border-r border-martina-border bg-white flex flex-col">
           <div className="p-3 border-b border-martina-border space-y-3">
             <div className="relative">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-martina-muted" />
@@ -264,7 +264,7 @@ setNotasConv(conv?.notas_internas || '');
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 min-h-0 overflow-y-auto">
             {filtered.length === 0 && (
               <div className="p-6 text-center text-sm text-martina-muted">
                 Sin conversaciones
