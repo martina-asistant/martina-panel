@@ -55,70 +55,72 @@ export default function AgendasView() {
         </div>
       </div>
 
-      <div className="rounded-3xl border border-cyan-500/20 bg-[rgba(5,18,24,.78)] backdrop-blur-xl p-6 min-h-[520px] shadow-[0_0_35px_rgba(34,211,238,.10)]">
-        <div className="flex items-center justify-between gap-6 mb-6">
-          <div>
-            <h2 className="text-[12px] tracking-[0.38em] text-cyan-300 font-semibold">
+      <div className="rounded-3xl border border-cyan-500/20 bg-[rgba(5,18,24,.78)] backdrop-blur-xl overflow-hidden shadow-[0_0_35px_rgba(34,211,238,.10)]">
+        <div className="bg-cyan-500/10 border-b border-cyan-500/10 px-6 py-4">
+          <div className="flex items-center justify-between gap-6">
+            <h2 className="text-[13px] tracking-[0.32em] text-cyan-300 font-semibold">
               {agenda?.nombre.toUpperCase()}
             </h2>
-          </div>
 
-          <div className="flex flex-wrap items-center justify-end gap-2">
-            {acciones.map((accion) => (
-              <button
-                key={accion}
-                className="
-                  rounded-2xl border border-cyan-400/30 bg-cyan-500/10
-                  px-4 py-2.5 text-xs tracking-[0.08em]
-                  text-cyan-100
-                  hover:bg-cyan-500/20
-                  hover:border-cyan-300/50
-                  hover:shadow-[0_0_18px_rgba(34,211,238,.18)]
-                  transition-all whitespace-nowrap
-                "
-              >
-                {accion}
-              </button>
-            ))}
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              {acciones.map((accion) => (
+                <button
+                  key={accion}
+                  className="
+                    rounded-full border border-cyan-400/30 bg-cyan-500/10
+                    px-4 py-2 text-[11px] tracking-[0.12em]
+                    text-cyan-100
+                    hover:bg-cyan-500/20
+                    hover:border-cyan-300/50
+                    hover:shadow-[0_0_18px_rgba(34,211,238,.18)]
+                    transition-all whitespace-nowrap
+                  "
+                >
+                  {accion}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-5 gap-3 text-sm text-cyan-100/60">
-          {['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'].map((dia) => (
-            <div
-              key={dia}
-              className="rounded-2xl border border-cyan-400/10 bg-[#03111A]/70 p-4 min-h-[420px]"
-            >
-              <div className="font-medium text-cyan-200 mb-4">
-                {dia}
-              </div>
+        <div className="p-6 min-h-[520px]">
+          <div className="grid grid-cols-5 gap-3 text-sm text-cyan-100/60">
+            {['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'].map((dia) => (
+              <div
+                key={dia}
+                className="rounded-2xl border border-cyan-400/10 bg-[#03111A]/70 p-4 min-h-[420px]"
+              >
+                <div className="font-medium text-cyan-200 mb-4">
+                  {dia}
+                </div>
 
-              <div className="space-y-2">
-                {[
-                  '09:00',
-                  '10:00',
-                  '11:00',
-                  '12:00',
-                  '16:00',
-                  '17:00',
-                  '18:00',
-                ].map((hora) => (
-                  <button
-                    key={hora}
-                    className="
-                      w-full rounded-xl border border-cyan-400/10
-                      bg-white/5 px-3 py-2 text-left
-                      hover:bg-cyan-500/10
-                      hover:text-white
-                      transition-all
-                    "
-                  >
-                    {hora}
-                  </button>
-                ))}
+                <div className="space-y-2">
+                  {[
+                    '09:00',
+                    '10:00',
+                    '11:00',
+                    '12:00',
+                    '16:00',
+                    '17:00',
+                    '18:00',
+                  ].map((hora) => (
+                    <button
+                      key={hora}
+                      className="
+                        w-full rounded-xl border border-cyan-400/10
+                        bg-white/5 px-3 py-2 text-left
+                        hover:bg-cyan-500/10
+                        hover:text-white
+                        transition-all
+                      "
+                    >
+                      {hora}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </div>
