@@ -20,11 +20,10 @@ export default function AgendasView() {
         <div>
           <h1
             className="
-              text-4xl font-semibold tracking-[-0.015em]
-              scale-x-[0.97] origin-left
-              bg-gradient-to-r from-white to-cyan-300
-              bg-clip-text text-transparent mb-1
-            "
+  inline-block text-2xl font-semibold tracking-[-0.015em]
+  bg-gradient-to-r from-white via-cyan-100 to-cyan-300
+  bg-clip-text text-transparent mb-1
+"
           >
             Agendas
           </h1>
