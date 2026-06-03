@@ -8,7 +8,8 @@ import {
   MessageSquare,
   PhoneCall,
   BellRing,
-  LogOut
+  LogOut,
+  CalendarDays
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils/cn';
@@ -19,6 +20,7 @@ const nav = [
   { href: '/conversaciones', label: 'Conversaciones', icon: MessageSquare },
   { href: '/recordatorios', label: 'Recordatorios', icon: BellRing },
   { href: '/recalls', label: 'Recalls', icon: PhoneCall },
+  { href: '/agendas', label: 'Agendas', icon: CalendarDays },
 ];
 
 const Sidebar = () => {
