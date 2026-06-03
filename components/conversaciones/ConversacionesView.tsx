@@ -230,8 +230,8 @@ setNotasConv(conv?.notas_internas || '');
     toast.success('Mensaje guardado');
   };
 
-  return (
-    <div className="h-[calc(100vh-238px)] w-full overflow-x-auto">
+    return (
+    <div className="h-full min-h-0 w-full overflow-x-auto">
       <div className="flex min-w-[1180px] h-full min-h-0">
 
         <div className="w-[320px] h-full min-h-0 shrink-0 border-r border-martina-border bg-white flex flex-col">
