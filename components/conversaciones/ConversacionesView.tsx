@@ -264,7 +264,7 @@ setNotasConv(conv?.notas_internas || '');
             </div>
           </div>
 
-          <div className="flex-1 min-h-0 overflow-y-auto">
+          <div className="flex-1 min-h-0 overflow-y-scroll">
             {filtered.length === 0 && (
               <div className="p-6 text-center text-sm text-martina-muted">
                 Sin conversaciones
@@ -347,7 +347,7 @@ setNotasConv(conv?.notas_internas || '');
                 </div>
               </div>
 
-              <div className="flex-1 min-h-0 overflow-y-auto px-6 py-5 space-y-2">
+              <div className="flex-1 min-h-0 overflow-y-scroll px-6 py-5 space-y-2">
                 {mensajes.map(m => {
                   const msg = m as any;
 
@@ -432,8 +432,7 @@ setNotasConv(conv?.notas_internas || '');
           )}
         </div>
 
-        <div className="hidden min-[1600px]:block w-[320px] h-full min-h-0 border-l border-martina-border bg-white overflow-y-auto shrink-0">
-          {!selected ? null : (
+        <div className="hidden min-[1600px]:block w-[320px] h-full min-h-0 border-l border-martina-border bg-white overflow-y-scroll shrink-0">          {!selected ? null : (
             <div className="p-5 space-y-5">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-full bg-martina-beige flex items-center justify-center text-base font-medium">
