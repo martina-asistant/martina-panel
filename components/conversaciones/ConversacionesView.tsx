@@ -231,7 +231,7 @@ setNotasConv(conv?.notas_internas || '');
   };
 
   return (
-    <div className="h-[calc(100vh-150px)] w-full overflow-x-auto overflow-y-hidden">
+    <div className="h-[calc(100vh-238px)] w-full overflow-x-auto overflow-y-hidden">
       <div className="flex min-w-[1180px] h-full min-h-0">
 
         <div className="w-[320px] h-full min-h-0 shrink-0 border-r border-martina-border bg-white flex flex-col">
