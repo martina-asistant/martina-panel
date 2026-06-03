@@ -93,7 +93,7 @@ const Sidebar = () => {
             <span>Cerrar sesión</span>
           </button>
 
-          <nav className="flex items-center gap-3 mt-8">
+          <nav className="flex items-center gap-3 mt-10">
             {nav.map(({ href, label, icon: Icon }) => {
               const active = pathname?.startsWith(href);
 
