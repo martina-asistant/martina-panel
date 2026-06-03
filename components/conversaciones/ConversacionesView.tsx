@@ -432,7 +432,7 @@ setNotasConv(conv?.notas_internas || '');
           )}
         </div>
 
-        <div className="hidden min-[1600px]:block w-[320px] border-l border-martina-border bg-white overflow-y-auto shrink-0">
+        <div className="hidden min-[1600px]:block w-[320px] h-full min-h-0 border-l border-martina-border bg-white overflow-y-auto shrink-0">
           {!selected ? null : (
             <div className="p-5 space-y-5">
               <div className="flex items-center gap-3">
