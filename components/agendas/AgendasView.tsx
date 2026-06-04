@@ -121,7 +121,7 @@ export default function AgendasView() {
   }, [agendaActiva, semanaInicio]);
 
   return (
-    <div className="min-h-full overflow-y-auto p-8 bg-[#02141B] text-white">
+    <div className="h-full overflow-y-auto overflow-x-hidden p-8 bg-[#02141B] text-white pb-20">
       <div className="flex items-start justify-between gap-6 mb-8">
         <div>
           <h1 className="inline-block text-2xl font-semibold tracking-[-0.015em] bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent mb-1">
