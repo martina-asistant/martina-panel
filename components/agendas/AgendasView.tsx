@@ -40,7 +40,13 @@ const toISO = (date: Date) => date.toISOString();
 
 const formatSemana = (inicio: Date) => {
   const fin = addDays(inicio, 4);
-  return `${inicio.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })} - ${fin.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}`;
+  return `${inicio.toLocaleDateString('es-ES', {
+    day: 'numeric',
+    month: 'short',
+  })} - ${fin.toLocaleDateString('es-ES', {
+    day: 'numeric',
+    month: 'short',
+  })}`;
 };
 
 const formatMes = (date: Date) =>
@@ -51,12 +57,19 @@ const formatDia = (date: Date) =>
 
 const sameDay = (iso: string, date: Date) => {
   const d = new Date(iso);
-  return d.getFullYear() === date.getFullYear() && d.getMonth() === date.getMonth() && d.getDate() === date.getDate();
+  return (
+    d.getFullYear() === date.getFullYear() &&
+    d.getMonth() === date.getMonth() &&
+    d.getDate() === date.getDate()
+  );
 };
 
 const formatHora = (iso?: string | null) => {
   if (!iso) return '';
-  return new Date(iso).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  return new Date(iso).toLocaleTimeString('es-ES', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 };
 
 const getMinutesFromStart = (iso: string) => {
@@ -173,29 +186,19 @@ export default function AgendasView() {
           </div>
         </div>
 
-        <div className="px-6 pt-5 pb-3 text-center text-white text-sm tracking-[0.28em] font-light">
+        <div className="px-6 pt-5 pb-3 text-left text-white text-sm tracking-[0.28em] font-light">
           {formatMes(semanaInicio)}
         </div>
 
         <div className="px-6 pb-6">
           {loading && <div className="mb-3 text-sm text-cyan-100/55">Cargando agenda...</div>}
 
-          <div className="grid grid-cols-[70px_repeat(5,1fr)] gap-3">
-            <div />
-
+          <div className="grid grid-cols-5 gap-3">
             {diasSemana.map((dia) => (
               <div key={dia.toISOString()} className="text-cyan-200 font-medium capitalize px-2">
                 {formatDia(dia)}
               </div>
             ))}
-
-            <div className="space-y-0">
-              {slots.map((hora) => (
-                <div key={hora} style={{ height: SLOT_HEIGHT }} className="text-[11px] text-cyan-100/35 pr-2 text-right">
-                  {hora.endsWith(':00') ? hora : ''}
-                </div>
-              ))}
-            </div>
 
             {diasSemana.map((dia) => {
               const eventosDia = eventos.filter(e => e.fecha_inicio && sameDay(e.fecha_inicio, dia));
