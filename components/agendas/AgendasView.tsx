@@ -191,7 +191,7 @@ export default function AgendasView() {
         </div>
 
         <div className="px-4 pb-5">
-          {loading && <div className="mb-3 text-sm text-cyan-100/55">Cargando agenda...</div>}
+          
 
           <div className="grid grid-cols-5 gap-2">
             {diasSemana.map((dia) => (
