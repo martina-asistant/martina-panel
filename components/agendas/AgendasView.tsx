@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
+import { CalendarDays, ChevronLeft, ChevronRight, Lock } from 'lucide-react';
 import { getAgendaFede, type EventoAgenda } from '@/lib/repos/agendas.repo';
 
 const agendas = [
@@ -82,6 +82,10 @@ const getDuration = (inicio?: string | null, fin?: string | null) => {
   return Math.max(5, Math.round((+new Date(fin) - +new Date(inicio)) / 60000));
 };
 
+const isHoraComida = (hora: string) => {
+  return hora >= '14:00' && hora < '15:00';
+};
+
 const slots = Array.from({ length: ((END_HOUR - START_HOUR) * 60) / 15 }, (_, i) => {
   const total = START_HOUR * 60 + i * 15;
   const h = String(Math.floor(total / 60)).padStart(2, '0');
@@ -102,6 +106,10 @@ export default function AgendasView() {
     () => [0, 1, 2, 3, 4].map(d => addDays(semanaInicio, d)),
     [semanaInicio]
   );
+
+  const slotSeleccionadoBloqueado = slotSeleccionado
+    ? isHoraComida(slotSeleccionado.split('-').pop() || '')
+    : false;
 
   useEffect(() => {
     const cargarAgenda = async () => {
@@ -182,6 +190,20 @@ export default function AgendasView() {
                   {accion}
                 </button>
               ))}
+
+              <button
+                title={slotSeleccionadoBloqueado ? 'Desbloquear horario' : 'Bloquear horario'}
+                className={`
+                  w-9 h-9 rounded-full border flex items-center justify-center transition-all
+                  ${
+                    slotSeleccionadoBloqueado
+                      ? 'border-cyan-200 bg-cyan-400/20 shadow-[0_0_22px_rgba(103,232,249,.45)]'
+                      : 'border-cyan-400/30 bg-cyan-500/10 hover:bg-cyan-500/20 hover:border-cyan-300/50'
+                  }
+                `}
+              >
+                <Lock className="w-4 h-4 text-cyan-200" />
+              </button>
             </div>
           </div>
         </div>
@@ -191,8 +213,6 @@ export default function AgendasView() {
         </div>
 
         <div className="px-4 pb-5">
-          
-
           <div className="grid grid-cols-5 gap-2">
             {diasSemana.map((dia) => (
               <div key={dia.toISOString()} className="text-cyan-200 font-medium capitalize px-2">
@@ -211,6 +231,8 @@ export default function AgendasView() {
                 >
                   {slots.map((hora) => {
                     const slotKey = `${dia.toISOString()}-${hora}`;
+                    const seleccionado = slotSeleccionado === slotKey;
+                    const bloqueado = isHoraComida(hora);
 
                     return (
                       <button
@@ -218,11 +240,14 @@ export default function AgendasView() {
                         onClick={() => setSlotSeleccionado(slotKey)}
                         style={{ height: SLOT_HEIGHT }}
                         className={`
-                          w-full block border-b border-cyan-400/5 text-left px-2 text-[10px]
-                          ${slotSeleccionado === slotKey ? 'bg-cyan-500/20' : 'hover:bg-cyan-500/10'}
+                          w-full block border-b border-cyan-400/5 text-left px-2 text-[10px] transition-all
+                          ${bloqueado ? 'bg-gray-400/12 hover:bg-gray-400/18' : ''}
+                          ${seleccionado ? 'bg-cyan-500/25' : !bloqueado ? 'hover:bg-cyan-500/10' : ''}
                         `}
                       >
-                        <span className="text-cyan-100/20">{hora}</span>
+                        <span className={bloqueado ? 'text-gray-300/35' : 'text-cyan-100/20'}>
+                          {hora}
+                        </span>
                       </button>
                     );
                   })}
