@@ -12,7 +12,7 @@ const agendas = [
 
 const acciones = ['INSERTAR CITA', 'MODIFICAR CITA', 'CANCELAR CITA', 'INSERTAR RECALL'];
 
-const SLOT_HEIGHT = 28;
+const SLOT_HEIGHT = 16;
 const START_HOUR = 9;
 const END_HOUR = 20;
 
@@ -190,10 +190,10 @@ export default function AgendasView() {
           {formatMes(semanaInicio)}
         </div>
 
-        <div className="px-6 pb-6">
+        <div className="px-4 pb-5">
           {loading && <div className="mb-3 text-sm text-cyan-100/55">Cargando agenda...</div>}
 
-          <div className="grid grid-cols-5 gap-3">
+          <div className="grid grid-cols-5 gap-2">
             {diasSemana.map((dia) => (
               <div key={dia.toISOString()} className="text-cyan-200 font-medium capitalize px-2">
                 {formatDia(dia)}
