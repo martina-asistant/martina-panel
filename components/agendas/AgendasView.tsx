@@ -136,8 +136,6 @@ const [slotFin, setSlotFin] = useState<string | null>(null);
   );
 
   const slotSeleccionadoBloqueado = false;
-  slotInicio &&
-  isHoraComida(slotInicio.split('-').pop() || '');
 
   const manejarSeleccion = (slotKey: string) => {
   if (!slotInicio) {
@@ -287,7 +285,7 @@ const [slotFin, setSlotFin] = useState<string | null>(null);
                         style={{ height: SLOT_HEIGHT }}
                         className={`
                           w-full block border-b border-cyan-400/5 text-left px-2 text-[10px] transition-all
-                          ${bloqueado ? 'bg-cyan-500/25 hover:bg-cyan-500/30'' : ''}
+                          ${bloqueado ? 'bg-cyan-500/25 hover:bg-cyan-500/30' : ''}
                           ${seleccionado ? 'bg-cyan-500/25' : !bloqueado ? 'hover:bg-cyan-500/10' : ''}
                         `}
                       >
