@@ -98,7 +98,8 @@ export default function AgendasView() {
   const [semanaInicio, setSemanaInicio] = useState(() => getMonday(new Date()));
   const [eventos, setEventos] = useState<EventoAgenda[]>([]);
   const [loading, setLoading] = useState(false);
-  const [slotSeleccionado, setSlotSeleccionado] = useState<string | null>(null);
+  const [slotInicio, setSlotInicio] = useState<string | null>(null);
+const [slotFin, setSlotFin] = useState<string | null>(null);
 
   const agenda = agendas.find(a => a.key === agendaActiva);
 
@@ -107,9 +108,25 @@ export default function AgendasView() {
     [semanaInicio]
   );
 
-  const slotSeleccionadoBloqueado = slotSeleccionado
-    ? isHoraComida(slotSeleccionado.split('-').pop() || '')
-    : false;
+  const slotSeleccionadoBloqueado =
+  slotInicio &&
+  isHoraComida(slotInicio.split('-').pop() || '');
+
+  const manejarSeleccion = (slotKey: string) => {
+  if (!slotInicio) {
+    setSlotInicio(slotKey);
+    setSlotFin(null);
+    return;
+  }
+
+  if (!slotFin) {
+    setSlotFin(slotKey);
+    return;
+  }
+
+  setSlotInicio(slotKey);
+  setSlotFin(null);
+};
 
   useEffect(() => {
     const cargarAgenda = async () => {
@@ -231,13 +248,15 @@ export default function AgendasView() {
                 >
                   {slots.map((hora) => {
                     const slotKey = `${dia.toISOString()}-${hora}`;
-                    const seleccionado = slotSeleccionado === slotKey;
+                    const seleccionado =
+  slotKey === slotInicio ||
+  slotKey === slotFin;
                     const bloqueado = isHoraComida(hora);
 
                     return (
                       <button
                         key={slotKey}
-                        onClick={() => setSlotSeleccionado(slotKey)}
+                        onClick={() => manejarSeleccion(slotKey)}
                         style={{ height: SLOT_HEIGHT }}
                         className={`
                           w-full block border-b border-cyan-400/5 text-left px-2 text-[10px] transition-all
