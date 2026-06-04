@@ -14,7 +14,7 @@ const acciones = ['INSERTAR CITA', 'MODIFICAR CITA', 'CANCELAR CITA', 'INSERTAR 
 
 const SLOT_HEIGHT = 16;
 const START_HOUR = 9;
-const END_HOUR = 20;
+const END_HOUR = 19.5;
 
 const getMonday = (date: Date) => {
   const d = new Date(date);
@@ -82,8 +82,35 @@ const getDuration = (inicio?: string | null, fin?: string | null) => {
   return Math.max(5, Math.round((+new Date(fin) - +new Date(inicio)) / 60000));
 };
 
-const isHoraComida = (hora: string) => {
-  return hora >= '14:00' && hora < '15:00';
+const isHoraComida = (hora: string, dia: Date) => {
+  const diaSemana = dia.getDay();
+
+  // Lunes
+  if (diaSemana === 1) {
+    return hora >= '17:00';
+  }
+
+  // Martes
+  if (diaSemana === 2) {
+    return hora >= '14:00' && hora < '15:00';
+  }
+
+  // Miércoles
+  if (diaSemana === 3) {
+    return hora >= '17:00';
+  }
+
+  // Jueves
+  if (diaSemana === 4) {
+    return hora >= '14:00' && hora < '15:00';
+  }
+
+  // Viernes
+  if (diaSemana === 5) {
+    return hora >= '14:00';
+  }
+
+  return false;
 };
 
 const slots = Array.from({ length: ((END_HOUR - START_HOUR) * 60) / 15 }, (_, i) => {
@@ -108,7 +135,7 @@ const [slotFin, setSlotFin] = useState<string | null>(null);
     [semanaInicio]
   );
 
-  const slotSeleccionadoBloqueado =
+  const slotSeleccionadoBloqueado = false;
   slotInicio &&
   isHoraComida(slotInicio.split('-').pop() || '');
 
@@ -251,7 +278,7 @@ const [slotFin, setSlotFin] = useState<string | null>(null);
                     const seleccionado =
   slotKey === slotInicio ||
   slotKey === slotFin;
-                    const bloqueado = isHoraComida(hora);
+                    const bloqueado = isHoraComida(hora, dia);
 
                     return (
                       <button
@@ -260,11 +287,11 @@ const [slotFin, setSlotFin] = useState<string | null>(null);
                         style={{ height: SLOT_HEIGHT }}
                         className={`
                           w-full block border-b border-cyan-400/5 text-left px-2 text-[10px] transition-all
-                          ${bloqueado ? 'bg-gray-400/12 hover:bg-gray-400/18' : ''}
+                          ${bloqueado ? 'bg-cyan-500/25 hover:bg-cyan-500/30'' : ''}
                           ${seleccionado ? 'bg-cyan-500/25' : !bloqueado ? 'hover:bg-cyan-500/10' : ''}
                         `}
                       >
-                        <span className={bloqueado ? 'text-gray-300/35' : 'text-cyan-100/20'}>
+                        <span className={bloqueado ? 'text-cyan-50/75' : 'text-cyan-100/20'}>
                           {hora}
                         </span>
                       </button>
