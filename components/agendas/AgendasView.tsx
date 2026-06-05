@@ -371,16 +371,16 @@ export default function AgendasView() {
                         `}
                       >
                         {!esBloqueo && (
-                          <>
-                            <div className="text-[10px] text-cyan-100">
-                              {formatHora(evento.fecha_inicio)} - {formatHora(evento.fecha_fin)}
-                            </div>
+  <>
+    <div className="text-[10px] text-cyan-100">
+      {formatHora(evento.fecha_inicio)} - {formatHora(evento.fecha_fin)}
+    </div>
 
-                            <div className="text-[11px] text-white truncate">
-                              {evento.titulo || 'Cita sin título'}
-                            </div>
-                          </>
-                        )}
+    <div className="text-[11px] text-white truncate">
+      {evento.titulo || 'Cita sin título'}
+    </div>
+  </>
+)}
                       </button>
                     );
                   })}
