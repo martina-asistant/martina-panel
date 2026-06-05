@@ -38,6 +38,13 @@ const addWeeks = (date: Date, weeks: number) => {
 
 const toISO = (date: Date) => date.toISOString();
 
+const toDateKey = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 const formatSemana = (inicio: Date) => {
   const fin = addDays(inicio, 4);
   return `${inicio.toLocaleDateString('es-ES', {
@@ -85,30 +92,11 @@ const getDuration = (inicio?: string | null, fin?: string | null) => {
 const isHoraComida = (hora: string, dia: Date) => {
   const diaSemana = dia.getDay();
 
-  // Lunes
-  if (diaSemana === 1) {
-    return hora >= '17:00';
-  }
-
-  // Martes
-  if (diaSemana === 2) {
-    return hora >= '14:00' && hora < '15:00';
-  }
-
-  // Miércoles
-  if (diaSemana === 3) {
-    return hora >= '17:00';
-  }
-
-  // Jueves
-  if (diaSemana === 4) {
-    return hora >= '14:00' && hora < '15:00';
-  }
-
-  // Viernes
-  if (diaSemana === 5) {
-    return hora >= '14:00';
-  }
+  if (diaSemana === 1) return hora >= '17:00';
+  if (diaSemana === 2) return hora >= '14:00' && hora < '15:00';
+  if (diaSemana === 3) return hora >= '17:00';
+  if (diaSemana === 4) return hora >= '14:00' && hora < '15:00';
+  if (diaSemana === 5) return hora >= '14:00';
 
   return false;
 };
@@ -126,7 +114,7 @@ export default function AgendasView() {
   const [eventos, setEventos] = useState<EventoAgenda[]>([]);
   const [loading, setLoading] = useState(false);
   const [slotInicio, setSlotInicio] = useState<string | null>(null);
-const [slotFin, setSlotFin] = useState<string | null>(null);
+  const [slotFin, setSlotFin] = useState<string | null>(null);
 
   const agenda = agendas.find(a => a.key === agendaActiva);
 
@@ -138,35 +126,89 @@ const [slotFin, setSlotFin] = useState<string | null>(null);
   const slotSeleccionadoBloqueado = false;
 
   const manejarSeleccion = (slotKey: string) => {
-  if (!slotInicio) {
+    if (!slotInicio) {
+      setSlotInicio(slotKey);
+      setSlotFin(null);
+      return;
+    }
+
+    const diaInicio = slotInicio.split('|')[0];
+    const diaNuevo = slotKey.split('|')[0];
+
+    if (diaInicio !== diaNuevo) {
+      setSlotInicio(slotKey);
+      setSlotFin(null);
+      return;
+    }
+
+    if (!slotFin) {
+      setSlotFin(slotKey);
+      return;
+    }
+
     setSlotInicio(slotKey);
     setSlotFin(null);
-    return;
-  }
+  };
 
-  if (!slotFin) {
-    setSlotFin(slotKey);
-    return;
-  }
+  const crearFechaDesdeSlot = (slotKey: string) => {
+    const [fechaKey, hora] = slotKey.split('|');
+    const [year, month, day] = fechaKey.split('-').map(Number);
+    const [hours, minutes] = hora.split(':').map(Number);
 
-  setSlotInicio(slotKey);
-  setSlotFin(null);
-};
+    return new Date(year, month - 1, day, hours, minutes, 0, 0);
+  };
+
+  const cargarAgenda = async () => {
+    setLoading(true);
+
+    if (agendaActiva === 'fede') {
+      const data = await getAgendaFede(toISO(semanaInicio), toISO(addDays(semanaInicio, 7)));
+      setEventos(data);
+    } else {
+      setEventos([]);
+    }
+
+    setLoading(false);
+  };
+
+  const gestionarBloqueo = async () => {
+    if (!slotInicio || loading) return;
+
+    const inicioKey = slotFin ? [slotInicio, slotFin].sort()[0] : slotInicio;
+    const finKey = slotFin ? [slotInicio, slotFin].sort()[1] : slotInicio;
+
+    const fechaInicio = crearFechaDesdeSlot(inicioKey);
+    const fechaFin = crearFechaDesdeSlot(finKey);
+    fechaFin.setMinutes(fechaFin.getMinutes() + 15);
+
+    const response = await fetch('/agendas/gestionar', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        accion: 'bloquear',
+        agenda: agendaActiva,
+        fecha_inicio: fechaInicio.toISOString(),
+        fecha_fin: fechaFin.toISOString(),
+        usuario: 'Sheila',
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!data?.ok) {
+      console.error('Error gestionando bloqueo:', data);
+      return;
+    }
+
+    setSlotInicio(null);
+    setSlotFin(null);
+
+    await cargarAgenda();
+  };
 
   useEffect(() => {
-    const cargarAgenda = async () => {
-      setLoading(true);
-
-      if (agendaActiva === 'fede') {
-        const data = await getAgendaFede(toISO(semanaInicio), toISO(addDays(semanaInicio, 7)));
-        setEventos(data);
-      } else {
-        setEventos([]);
-      }
-
-      setLoading(false);
-    };
-
     cargarAgenda();
   }, [agendaActiva, semanaInicio]);
 
@@ -234,6 +276,8 @@ const [slotFin, setSlotFin] = useState<string | null>(null);
               ))}
 
               <button
+                onClick={gestionarBloqueo}
+                disabled={!slotInicio || loading}
                 title={slotSeleccionadoBloqueado ? 'Desbloquear horario' : 'Bloquear horario'}
                 className={`
                   w-9 h-9 rounded-full border flex items-center justify-center transition-all
@@ -242,6 +286,7 @@ const [slotFin, setSlotFin] = useState<string | null>(null);
                       ? 'border-cyan-200 bg-cyan-400/20 shadow-[0_0_22px_rgba(103,232,249,.45)]'
                       : 'border-cyan-400/30 bg-cyan-500/10 hover:bg-cyan-500/20 hover:border-cyan-300/50'
                   }
+                  ${!slotInicio || loading ? 'opacity-45 cursor-not-allowed' : ''}
                 `}
               >
                 <Lock className="w-4 h-4 text-cyan-200" />
@@ -272,20 +317,21 @@ const [slotFin, setSlotFin] = useState<string | null>(null);
                   style={{ height: slots.length * SLOT_HEIGHT }}
                 >
                   {slots.map((hora) => {
-                    const slotKey = `${dia.toISOString()}-${hora}`;
+                    const slotKey = `${toDateKey(dia)}|${hora}`;
+
                     const seleccionado = (() => {
-                    if (!slotInicio) return false;
+                      if (!slotInicio) return false;
 
-                    if (!slotFin) {
-                    return slotKey === slotInicio;
-                    }
+                      if (!slotFin) {
+                        return slotKey === slotInicio;
+                      }
 
-                    const inicio = [slotInicio, slotFin].sort()[0];
-                    const fin = [slotInicio, slotFin].sort()[1];
+                      const inicio = [slotInicio, slotFin].sort()[0];
+                      const fin = [slotInicio, slotFin].sort()[1];
 
-                    return slotKey >= inicio && slotKey <= fin;
+                      return slotKey >= inicio && slotKey <= fin;
                     })();
-                  
+
                     const bloqueado = isHoraComida(hora, dia);
 
                     return (
