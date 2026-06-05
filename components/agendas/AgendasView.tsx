@@ -12,7 +12,7 @@ const agendas = [
 
 const acciones = ['INSERTAR CITA', 'MODIFICAR CITA', 'CANCELAR CITA', 'INSERTAR RECALL'];
 
-const SLOT_HEIGHT = 16;
+const SLOT_HEIGHT = 18;
 const START_HOUR = 9;
 const END_HOUR = 19.5;
 
@@ -377,13 +377,14 @@ export default function AgendasView() {
         height,
         borderColor: esBloqueo ? 'transparent' : 'rgba(255,255,255,.75)',
         boxShadow: esBloqueo ? 'none' : `0 0 14px ${colorTratamiento}`,
+backgroundColor: esBloqueo ? undefined : colorTratamiento,
       }}
       className={`
         absolute overflow-hidden text-left transition-all
         ${
           esBloqueo
             ? 'left-0 right-0 rounded-none border-0 bg-cyan-500/25 hover:bg-cyan-500/30'
-            : 'left-0 right-0 rounded-md border bg-transparent hover:bg-white/5'
+            : 'left-0 right-0 rounded-md border hover:opacity-90'
         }
       `}
     >
