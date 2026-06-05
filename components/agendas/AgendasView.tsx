@@ -395,7 +395,6 @@ export default function AgendasView() {
     </button>
   );
 })}
-                  })}
                 </div>
               );
             })}
