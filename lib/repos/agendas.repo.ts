@@ -20,7 +20,7 @@ export async function getAgendaFede(
   fecha_fin: string
 ): Promise<EventoAgenda[]> {
   try {
-    const response = await fetch('/api/agendas/fede', {
+    const response = await fetch('/agendas/fede', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
