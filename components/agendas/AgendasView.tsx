@@ -273,9 +273,19 @@ const [slotFin, setSlotFin] = useState<string | null>(null);
                 >
                   {slots.map((hora) => {
                     const slotKey = `${dia.toISOString()}-${hora}`;
-                    const seleccionado =
-  slotKey === slotInicio ||
-  slotKey === slotFin;
+                    const seleccionado = (() => {
+                    if (!slotInicio) return false;
+
+                    if (!slotFin) {
+                    return slotKey === slotInicio;
+                    }
+
+                    const inicio = [slotInicio, slotFin].sort()[0];
+                    const fin = [slotInicio, slotFin].sort()[1];
+
+                    return slotKey >= inicio && slotKey <= fin;
+                    })();
+                  
                     const bloqueado = isHoraComida(hora, dia);
 
                     return (
