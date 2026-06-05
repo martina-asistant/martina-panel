@@ -12,7 +12,7 @@ const agendas = [
 
 const acciones = ['INSERTAR CITA', 'MODIFICAR CITA', 'CANCELAR CITA', 'INSERTAR RECALL'];
 
-const SLOT_HEIGHT = 18;
+const SLOT_HEIGHT = 20;
 const START_HOUR = 9;
 const END_HOUR = 19.5;
 
@@ -79,17 +79,7 @@ const formatHora = (iso?: string | null) => {
   });
 };
 
-const getMinutesFromStart = (iso: string) => {
-  const d = new Date(iso);
-  return (d.getHours() - START_HOUR) * 60 + d.getMinutes();
-};
-
-const getDuration = (inicio?: string | null, fin?: string | null) => {
-  if (!inicio || !fin) return 15;
-  return Math.max(5, Math.round((+new Date(fin) - +new Date(inicio)) / 60000));
-};
-
-const isHoraComida = (hora: string, dia: Date) => {
+const isHorarioNoDisponible = (hora: string, dia: Date) => {
   const diaSemana = dia.getDay();
 
   if (diaSemana === 1) return hora >= '17:00';
@@ -108,6 +98,20 @@ const slots = Array.from({ length: ((END_HOUR - START_HOUR) * 60) / 15 }, (_, i)
   return `${h}:${m}`;
 });
 
+const getColorTratamiento = (evento: EventoAgenda) => {
+  const texto = `${evento.titulo || ''} ${evento.motivo || ''}`.toLowerCase();
+
+  if (texto.includes('primera visita')) return { bg: 'rgba(34,197,94,.75)', text: 'text-white' };
+  if (texto.includes('endodoncia')) return { bg: 'rgba(244,114,182,.78)', text: 'text-white' };
+  if (texto.includes('obturacion') || texto.includes('obturación')) return { bg: 'rgba(168,85,247,.78)', text: 'text-white' };
+  if (texto.includes('revision') || texto.includes('revisión')) return { bg: 'rgba(34,211,238,.72)', text: 'text-white' };
+  if (texto.includes('protesis') || texto.includes('prótesis')) return { bg: 'rgba(249,115,22,.78)', text: 'text-white' };
+  if (texto.includes('impresiones')) return { bg: 'rgba(249,115,22,.78)', text: 'text-white' };
+  if (texto.includes('cirugia') || texto.includes('cirugía')) return { bg: 'rgba(255,255,255,.88)', text: 'text-[#03111A]' };
+
+  return { bg: 'rgba(34,211,238,.55)', text: 'text-white' };
+};
+
 export default function AgendasView() {
   const [agendaActiva, setAgendaActiva] = useState('fede');
   const [semanaInicio, setSemanaInicio] = useState(() => getMonday(new Date()));
@@ -123,7 +127,45 @@ export default function AgendasView() {
     [semanaInicio]
   );
 
-  const slotSeleccionadoBloqueado = false;
+  const crearFechaDesdeSlot = (slotKey: string) => {
+    const [fechaKey, hora] = slotKey.split('|');
+    const [year, month, day] = fechaKey.split('-').map(Number);
+    const [hours, minutes] = hora.split(':').map(Number);
+
+    return new Date(year, month - 1, day, hours, minutes, 0, 0);
+  };
+
+  const getRangoSeleccionado = () => {
+    if (!slotInicio) return null;
+
+    const inicioKey = slotFin ? [slotInicio, slotFin].sort()[0] : slotInicio;
+    const finKey = slotFin ? [slotInicio, slotFin].sort()[1] : slotInicio;
+
+    const inicio = crearFechaDesdeSlot(inicioKey);
+    const fin = crearFechaDesdeSlot(finKey);
+    fin.setMinutes(fin.getMinutes() + 15);
+
+    return { inicioKey, finKey, inicio, fin };
+  };
+
+  const bloqueoSeleccionado = (() => {
+    const rango = getRangoSeleccionado();
+
+    if (!rango) return null;
+
+    return eventos.find((evento) => {
+      const esBloqueo = evento.titulo?.toUpperCase().includes('BLOQUEO AGENDA');
+
+      if (!esBloqueo) return false;
+
+      const inicioEvento = new Date(evento.fecha_inicio);
+      const finEvento = new Date(evento.fecha_fin);
+
+      return inicioEvento < rango.fin && finEvento > rango.inicio;
+    }) || null;
+  })();
+
+  const slotSeleccionadoBloqueado = Boolean(bloqueoSeleccionado);
 
   const manejarSeleccion = (slotKey: string) => {
     if (!slotInicio) {
@@ -150,14 +192,6 @@ export default function AgendasView() {
     setSlotFin(null);
   };
 
-  const crearFechaDesdeSlot = (slotKey: string) => {
-    const [fechaKey, hora] = slotKey.split('|');
-    const [year, month, day] = fechaKey.split('-').map(Number);
-    const [hours, minutes] = hora.split(':').map(Number);
-
-    return new Date(year, month - 1, day, hours, minutes, 0, 0);
-  };
-
   const cargarAgenda = async () => {
     setLoading(true);
 
@@ -174,12 +208,19 @@ export default function AgendasView() {
   const gestionarBloqueo = async () => {
     if (!slotInicio || loading) return;
 
-    const inicioKey = slotFin ? [slotInicio, slotFin].sort()[0] : slotInicio;
-    const finKey = slotFin ? [slotInicio, slotFin].sort()[1] : slotInicio;
+    const rango = getRangoSeleccionado();
 
-    const fechaInicio = crearFechaDesdeSlot(inicioKey);
-    const fechaFin = crearFechaDesdeSlot(finKey);
-    fechaFin.setMinutes(fechaFin.getMinutes() + 15);
+    if (!rango) return;
+
+    const accion = bloqueoSeleccionado ? 'desbloquear' : 'bloquear';
+
+    const fechaInicio = bloqueoSeleccionado
+      ? new Date(bloqueoSeleccionado.fecha_inicio)
+      : rango.inicio;
+
+    const fechaFin = bloqueoSeleccionado
+      ? new Date(bloqueoSeleccionado.fecha_fin)
+      : rango.fin;
 
     const response = await fetch('/agendas/gestionar', {
       method: 'POST',
@@ -187,7 +228,7 @@ export default function AgendasView() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        accion: 'bloquear',
+        accion,
         agenda: agendaActiva,
         fecha_inicio: fechaInicio.toISOString(),
         fecha_fin: fechaFin.toISOString(),
@@ -224,6 +265,7 @@ export default function AgendasView() {
 
         <div className="flex items-center gap-3 rounded-2xl border border-cyan-400/25 bg-cyan-500/10 px-4 py-3">
           <CalendarDays className="w-5 h-5 text-cyan-300" />
+
           <select
             value={agendaActiva}
             onChange={(e) => setAgendaActiva(e.target.value)}
@@ -313,11 +355,27 @@ export default function AgendasView() {
               return (
                 <div
                   key={dia.toISOString()}
-                  className="relative rounded-2xl border border-cyan-400/10 bg-[#03111A]/70 overflow-hidden"
-                  style={{ height: slots.length * SLOT_HEIGHT }}
+                  className="rounded-2xl border border-cyan-400/10 bg-[#03111A]/70 overflow-hidden"
                 >
                   {slots.map((hora) => {
                     const slotKey = `${toDateKey(dia)}|${hora}`;
+                    const slotInicioDate = crearFechaDesdeSlot(slotKey);
+                    const slotFinDate = new Date(slotInicioDate);
+                    slotFinDate.setMinutes(slotFinDate.getMinutes() + 15);
+
+                    const eventoSlot = eventosDia.find((evento) => {
+                      const inicioEvento = new Date(evento.fecha_inicio);
+                      const finEvento = new Date(evento.fecha_fin);
+
+                      return inicioEvento < slotFinDate && finEvento > slotInicioDate;
+                    });
+
+                    const esBloqueoEvento = eventoSlot?.titulo?.toUpperCase().includes('BLOQUEO AGENDA') || false;
+                    const esInicioEvento = eventoSlot
+                      ? new Date(eventoSlot.fecha_inicio).getTime() === slotInicioDate.getTime()
+                      : false;
+
+                    const color = eventoSlot ? getColorTratamiento(eventoSlot) : null;
 
                     const seleccionado = (() => {
                       if (!slotInicio) return false;
@@ -332,70 +390,40 @@ export default function AgendasView() {
                       return slotKey >= inicio && slotKey <= fin;
                     })();
 
-                    const bloqueado = isHoraComida(hora, dia);
+                    const bloqueadoAutomatico = isHorarioNoDisponible(hora, dia);
+                    const bloqueado = bloqueadoAutomatico || esBloqueoEvento;
 
                     return (
                       <button
                         key={slotKey}
                         onClick={() => manejarSeleccion(slotKey)}
-                        style={{ height: SLOT_HEIGHT }}
+                        style={{
+                          height: SLOT_HEIGHT,
+                          backgroundColor: esBloqueoEvento
+                            ? 'rgba(6,182,212,.25)'
+                            : eventoSlot && !esBloqueoEvento
+                              ? color?.bg
+                              : undefined,
+                        }}
                         className={`
                           w-full block border-b border-cyan-400/5 text-left px-2 text-[10px] transition-all
-                          ${bloqueado ? 'bg-cyan-500/25 hover:bg-cyan-500/30' : ''}
-                          ${seleccionado ? 'bg-cyan-500/25' : !bloqueado ? 'hover:bg-cyan-500/10' : ''}
+                          ${bloqueadoAutomatico ? 'bg-cyan-500/25 hover:bg-cyan-500/30' : ''}
+                          ${seleccionado ? 'ring-1 ring-white/70 bg-cyan-500/30' : ''}
+                          ${!bloqueado && !eventoSlot ? 'hover:bg-cyan-500/10' : ''}
                         `}
                       >
-                        <span className={bloqueado ? 'text-cyan-50/75' : 'text-cyan-100/20'}>
+                        <span className={bloqueado ? 'text-cyan-50/75' : 'text-cyan-100/25'}>
                           {hora}
                         </span>
+
+                        {eventoSlot && !esBloqueoEvento && esInicioEvento && (
+                          <span className={`ml-3 text-[11px] font-semibold truncate ${color?.text}`}>
+                            {eventoSlot.titulo || eventoSlot.nombre_paciente || 'Cita'}
+                          </span>
+                        )}
                       </button>
                     );
                   })}
-
-                                    {eventosDia.map((evento) => {
-  const top = Math.max(0, (getMinutesFromStart(evento.fecha_inicio) / 15) * SLOT_HEIGHT);
-  const height = Math.max(9, (getDuration(evento.fecha_inicio, evento.fecha_fin) / 15) * SLOT_HEIGHT);
-  const esBloqueo = evento.titulo?.toUpperCase().includes('BLOQUEO AGENDA');
-
-  const texto = `${evento.titulo || evento.nombre_paciente || 'Cita'}`.toLowerCase();
-
-  let colorTratamiento = 'rgba(34,211,238,.55)';
-
-  if (texto.includes('primera visita')) colorTratamiento = 'rgba(34,197,94,.70)';
-  if (texto.includes('endodoncia')) colorTratamiento = 'rgba(244,114,182,.75)';
-  if (texto.includes('obturacion') || texto.includes('obturación')) colorTratamiento = 'rgba(168,85,247,.75)';
-  if (texto.includes('revision') || texto.includes('revisión')) colorTratamiento = 'rgba(34,211,238,.75)';
-  if (texto.includes('protesis') || texto.includes('prótesis')) colorTratamiento = 'rgba(249,115,22,.75)';
-  if (texto.includes('impresiones')) colorTratamiento = 'rgba(249,115,22,.75)';
-  if (texto.includes('cirugia') || texto.includes('cirugía')) colorTratamiento = 'rgba(255,255,255,.85)';
-
-  return (
-    <button
-      key={evento.event_id}
-      style={{
-        top,
-        height,
-        borderColor: esBloqueo ? 'transparent' : 'rgba(255,255,255,.75)',
-        boxShadow: esBloqueo ? 'none' : `0 0 14px ${colorTratamiento}`,
-backgroundColor: esBloqueo ? undefined : colorTratamiento,
-      }}
-      className={`
-        absolute overflow-hidden text-left transition-all
-        ${
-          esBloqueo
-            ? 'left-0 right-0 rounded-none border-0 bg-cyan-500/25 hover:bg-cyan-500/30'
-            : 'left-0 right-0 rounded-md border hover:opacity-90'
-        }
-      `}
-    >
-      {!esBloqueo && (
-        <div className="h-full flex items-start px-2 pl-[43px] pt-[2px] text-[11px] leading-none text-white font-medium truncate">
-          {evento.titulo || evento.nombre_paciente || 'Cita'}
-        </div>
-      )}
-    </button>
-  );
-})}
                 </div>
               );
             })}
