@@ -357,32 +357,26 @@ export default function AgendasView() {
                     const height = Math.max(9, (getDuration(evento.fecha_inicio, evento.fecha_fin) / 15) * SLOT_HEIGHT);
                     const esBloqueo = evento.titulo?.toUpperCase().includes('BLOQUEO AGENDA');
 
-                    return (
-                      <button
-                        key={evento.event_id}
-                        style={{ top, height }}
-                        className={`
-                          absolute overflow-hidden text-left transition-all
-                          ${
-                            esBloqueo
-                              ? 'left-0 right-0 rounded-none border-0 bg-cyan-500/25 hover:bg-cyan-500/30 px-2 py-0'
-                              : 'left-2 right-2 rounded-lg border border-cyan-300/30 bg-cyan-500/20 hover:bg-cyan-500/30 px-2 py-1'
-                          }
-                        `}
-                      >
-                        {!esBloqueo && (
-  <>
-    <div className="text-[10px] text-cyan-100">
-      {formatHora(evento.fecha_inicio)} - {formatHora(evento.fecha_fin)}
-    </div>
-
-    <div className="text-[11px] text-white truncate">
-      {evento.titulo || 'Cita sin título'}
-    </div>
-  </>
-)}
-                      </button>
-                    );
+                   return (
+  <button
+    key={evento.event_id}
+    style={{ top, height }}
+    className={`
+      absolute left-0 right-0 overflow-hidden text-left transition-all
+      ${
+        esBloqueo
+          ? 'rounded-none border-0 bg-cyan-500/25 hover:bg-cyan-500/30'
+          : 'rounded-none border-0 bg-cyan-500/35 hover:bg-cyan-500/45'
+      }
+    `}
+  >
+    {!esBloqueo && (
+      <div className="h-full flex items-center px-2 text-[11px] leading-none text-white font-medium truncate">
+        {evento.titulo || evento.nombre_paciente || 'Cita'}
+      </div>
+    )}
+  </button>
+);
                   })}
                 </div>
               );
