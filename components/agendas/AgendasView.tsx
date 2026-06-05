@@ -353,30 +353,48 @@ export default function AgendasView() {
                   })}
 
                                     {eventosDia.map((evento) => {
-                    const top = Math.max(0, (getMinutesFromStart(evento.fecha_inicio) / 15) * SLOT_HEIGHT);
-                    const height = Math.max(9, (getDuration(evento.fecha_inicio, evento.fecha_fin) / 15) * SLOT_HEIGHT);
-                    const esBloqueo = evento.titulo?.toUpperCase().includes('BLOQUEO AGENDA');
+  const top = Math.max(0, (getMinutesFromStart(evento.fecha_inicio) / 15) * SLOT_HEIGHT);
+  const height = Math.max(9, (getDuration(evento.fecha_inicio, evento.fecha_fin) / 15) * SLOT_HEIGHT);
+  const esBloqueo = evento.titulo?.toUpperCase().includes('BLOQUEO AGENDA');
 
-                   return (
-  <button
-    key={evento.event_id}
-    style={{ top, height }}
-    className={`
-      absolute left-0 right-0 overflow-hidden text-left transition-all
-      ${
-        esBloqueo
-          ? 'rounded-none border-0 bg-cyan-500/25 hover:bg-cyan-500/30'
-          : 'rounded-none border-0 bg-cyan-500/35 hover:bg-cyan-500/45'
-      }
-    `}
-  >
-    {!esBloqueo && (
-      <div className="h-full flex items-center px-2 text-[11px] leading-none text-white font-medium truncate">
-        {evento.titulo || evento.nombre_paciente || 'Cita'}
-      </div>
-    )}
-  </button>
-);
+  const texto = `${evento.titulo || evento.nombre_paciente || 'Cita'}`.toLowerCase();
+
+  let colorTratamiento = 'rgba(34,211,238,.55)';
+
+  if (texto.includes('primera visita')) colorTratamiento = 'rgba(34,197,94,.70)';
+  if (texto.includes('endodoncia')) colorTratamiento = 'rgba(244,114,182,.75)';
+  if (texto.includes('obturacion') || texto.includes('obturación')) colorTratamiento = 'rgba(168,85,247,.75)';
+  if (texto.includes('revision') || texto.includes('revisión')) colorTratamiento = 'rgba(34,211,238,.75)';
+  if (texto.includes('protesis') || texto.includes('prótesis')) colorTratamiento = 'rgba(249,115,22,.75)';
+  if (texto.includes('impresiones')) colorTratamiento = 'rgba(249,115,22,.75)';
+  if (texto.includes('cirugia') || texto.includes('cirugía')) colorTratamiento = 'rgba(255,255,255,.85)';
+
+  return (
+    <button
+      key={evento.event_id}
+      style={{
+        top,
+        height,
+        borderColor: esBloqueo ? 'transparent' : 'rgba(255,255,255,.75)',
+        boxShadow: esBloqueo ? 'none' : `0 0 14px ${colorTratamiento}`,
+      }}
+      className={`
+        absolute overflow-hidden text-left transition-all
+        ${
+          esBloqueo
+            ? 'left-0 right-0 rounded-none border-0 bg-cyan-500/25 hover:bg-cyan-500/30'
+            : 'left-0 right-0 rounded-md border bg-transparent hover:bg-white/5'
+        }
+      `}
+    >
+      {!esBloqueo && (
+        <div className="h-full flex items-start px-2 pl-[43px] pt-[2px] text-[11px] leading-none text-white font-medium truncate">
+          {evento.titulo || evento.nombre_paciente || 'Cita'}
+        </div>
+      )}
+    </button>
+  );
+})}
                   })}
                 </div>
               );
