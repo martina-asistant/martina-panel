@@ -97,7 +97,7 @@ const getColorTratamiento = (evento: EventoAgenda) => {
   const texto = `${evento.titulo || ''} ${evento.motivo || ''}`.toLowerCase();
 
   if (texto.includes('primera visita')) {
-    return { bg: 'rgba(34,197,94,.90)', text: 'text-white' };
+    return { bg: 'rgba(250,204,21,.92)', text: 'text-[#02141B]' };
   }
 
   if (texto.includes('endodoncia')) {
