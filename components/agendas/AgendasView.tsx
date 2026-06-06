@@ -97,34 +97,38 @@ const getColorTratamiento = (evento: EventoAgenda) => {
   const texto = `${evento.titulo || ''} ${evento.motivo || ''}`.toLowerCase();
 
   if (texto.includes('primera visita')) {
-    return { bg: 'rgba(34,197,94,.78)', text: 'text-white' };
+    return { bg: 'rgba(34,197,94,.90)', text: 'text-white' };
   }
 
   if (texto.includes('endodoncia')) {
-    return { bg: 'rgba(244,114,182,.80)', text: 'text-white' };
+    return { bg: 'rgba(244,114,182,.92)', text: 'text-white' };
   }
 
   if (texto.includes('obturacion') || texto.includes('obturación')) {
-    return { bg: 'rgba(168,85,247,.82)', text: 'text-white' };
+    return { bg: 'rgba(168,85,247,.92)', text: 'text-white' };
   }
 
+  // Revisión = azul más profesional, distinto del aguamarina de bloqueos
   if (texto.includes('revision') || texto.includes('revisión')) {
-    return { bg: 'rgba(34,211,238,.75)', text: 'text-white' };
+    return { bg: 'rgba(59,130,246,.90)', text: 'text-white' };
   }
 
+  // Prótesis / Impresiones / Prueba-Colocar = naranja
   if (
     texto.includes('protesis') ||
     texto.includes('prótesis') ||
-    texto.includes('impresiones')
+    texto.includes('impresiones') ||
+    texto.includes('prueba-colocar')
   ) {
-    return { bg: 'rgba(249,115,22,.80)', text: 'text-white' };
+    return { bg: 'rgba(249,115,22,.92)', text: 'text-white' };
   }
 
   if (texto.includes('cirugia') || texto.includes('cirugía')) {
-    return { bg: 'rgba(255,255,255,.88)', text: 'text-[#03111A]' };
+    return { bg: 'rgba(255,255,255,.95)', text: 'text-[#03111A]' };
   }
 
-  return { bg: 'rgba(34,211,238,.65)', text: 'text-white' };
+  // Color por defecto
+  return { bg: 'rgba(59,130,246,.85)', text: 'text-white' };
 };
 
 export default function AgendasView() {
@@ -425,7 +429,7 @@ export default function AgendasView() {
                           ${!bloqueado && !eventoSlot ? 'hover:bg-cyan-500/10' : ''}
                         `}
                       >
-                        <span className={bloqueado ? 'text-cyan-50/75' : 'text-cyan-100/30'}>
+                        <span className={bloqueado ? 'text-cyan-50/90' : 'text-white/75'}>
                           {hora}
                         </span>
 
