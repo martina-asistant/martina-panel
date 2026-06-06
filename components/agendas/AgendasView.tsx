@@ -184,30 +184,43 @@ export default function AgendasView() {
 
   const slotSeleccionadoBloqueado = Boolean(bloqueoSeleccionado);
 
-  const manejarSeleccion = (slotKey: string) => {
-    if (!slotInicio) {
-      setSlotInicio(slotKey);
-      setSlotFin(null);
-      return;
-    }
+ const manejarSeleccion = (slotKey: string) => {
+  // Si clicas otra vez exactamente la misma celda, se deselecciona
+  if (slotInicio === slotKey && !slotFin) {
+    setSlotInicio(null);
+    setSlotFin(null);
+    return;
+  }
 
-    const diaInicio = slotInicio.split('|')[0];
-    const diaNuevo = slotKey.split('|')[0];
+  // Si clicas otra vez el final del rango, quitamos el rango y dejamos solo el inicio
+  if (slotFin === slotKey) {
+    setSlotFin(null);
+    return;
+  }
 
-    if (diaInicio !== diaNuevo) {
-      setSlotInicio(slotKey);
-      setSlotFin(null);
-      return;
-    }
-
-    if (!slotFin) {
-      setSlotFin(slotKey);
-      return;
-    }
-
+  if (!slotInicio) {
     setSlotInicio(slotKey);
     setSlotFin(null);
-  };
+    return;
+  }
+
+  const diaInicio = slotInicio.split('|')[0];
+  const diaNuevo = slotKey.split('|')[0];
+
+  if (diaInicio !== diaNuevo) {
+    setSlotInicio(slotKey);
+    setSlotFin(null);
+    return;
+  }
+
+  if (!slotFin) {
+    setSlotFin(slotKey);
+    return;
+  }
+
+  setSlotInicio(slotKey);
+  setSlotFin(null);
+};
 
   const cargarAgenda = async () => {
     setLoading(true);
