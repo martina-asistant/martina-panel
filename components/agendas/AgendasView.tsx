@@ -474,10 +474,15 @@ export default function AgendasView() {
             {eventoSeleccionado && (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
     <div
-      className="w-full max-w-2xl rounded-3xl border border-cyan-400/30
-                 bg-[#03111A]/95 backdrop-blur-xl
-                 shadow-[0_0_40px_rgba(34,211,238,.25)]
-                 overflow-hidden"
+      style={{
+        backgroundColor: `${getColorTratamiento(eventoSeleccionado).bg.replace('.95', '.12').replace('.92', '.12').replace('.90', '.12').replace('.88', '.12').replace('.80', '.12').replace('.78', '.12')}`,
+      }}
+      className="
+        w-full max-w-2xl rounded-3xl border border-cyan-400/30
+        bg-[#03111A]/95 backdrop-blur-xl
+        shadow-[0_0_40px_rgba(34,211,238,.25)]
+        overflow-hidden
+      "
     >
       <div className="px-6 py-5 border-b border-cyan-400/15">
         <div className="flex items-start justify-between gap-4">
@@ -511,40 +516,22 @@ export default function AgendasView() {
       </div>
 
       <div className="p-6 space-y-5">
-        <div className="grid grid-cols-2 gap-5">
-          <div>
-            <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1">
-              Teléfono
-            </div>
-            <div className="text-white">
-              {eventoSeleccionado.telefono || 'No disponible'}
-            </div>
-          </div>
-
-          <div>
-            <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1">
-              Estado
-            </div>
-            <div className="text-white">
-              {eventoSeleccionado.estado || 'Sin estado'}
-            </div>
-          </div>
-
+        <div className="grid grid-cols-2 gap-6">
           <div>
             <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1">
               Motivo
             </div>
-            <div className="text-white">
+            <div className="text-white text-lg font-medium">
               {eventoSeleccionado.motivo || 'No indicado'}
             </div>
           </div>
 
           <div>
             <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1">
-              Cambios
+              Teléfono
             </div>
-            <div className="text-white">
-              {eventoSeleccionado.cambios ?? 0}
+            <div className="text-white text-lg font-medium">
+              {eventoSeleccionado.telefono || 'No disponible'}
             </div>
           </div>
         </div>
@@ -554,18 +541,37 @@ export default function AgendasView() {
             Detalle del motivo
           </div>
 
-          <div className="rounded-2xl border border-cyan-400/10 bg-cyan-500/5 p-4 text-white/90">
+          <div className="rounded-2xl border border-cyan-400/10 bg-black/20 p-4 text-white/90">
             {eventoSeleccionado.detalle_motivo || 'Sin observaciones'}
           </div>
         </div>
 
-        <div>
-          <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1">
-            Origen
+        <div className="grid grid-cols-3 gap-5 pt-2 border-t border-cyan-400/10">
+          <div>
+            <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1">
+              Origen
+            </div>
+            <div className="text-white/90 text-sm">
+              {eventoSeleccionado.origen || 'No indicado'}
+            </div>
           </div>
 
-          <div className="text-white">
-            {eventoSeleccionado.origen || 'No indicado'}
+          <div>
+            <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1">
+              Estado
+            </div>
+            <div className="text-white/90 text-sm">
+              {eventoSeleccionado.estado || 'Sin estado'}
+            </div>
+          </div>
+
+          <div>
+            <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1">
+              Cambios
+            </div>
+            <div className="text-white/90 text-sm">
+              {eventoSeleccionado.cambios ?? 0}
+            </div>
           </div>
         </div>
       </div>
