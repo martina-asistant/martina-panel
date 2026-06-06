@@ -138,6 +138,7 @@ export default function AgendasView() {
   const [loading, setLoading] = useState(false);
   const [slotInicio, setSlotInicio] = useState<string | null>(null);
   const [slotFin, setSlotFin] = useState<string | null>(null);
+  const [eventoSeleccionado, setEventoSeleccionado] = useState<EventoAgenda | null>(null);
 
   const agenda = agendas.find(a => a.key === agendaActiva);
 
@@ -427,6 +428,11 @@ export default function AgendasView() {
                       <button
                         key={slotKey}
                         onClick={() => manejarSeleccion(slotKey)}
+                        onDoubleClick={() => {
+  if (eventoSlot && !esBloqueoEvento) {
+    setEventoSeleccionado(eventoSlot);
+  }
+}}
                         style={{
                           height: SLOT_HEIGHT,
                           backgroundColor: esBloqueoEvento
@@ -465,6 +471,107 @@ export default function AgendasView() {
                 </div>
               );
             })}
+            {eventoSeleccionado && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div
+      className="w-full max-w-2xl rounded-3xl border border-cyan-400/30
+                 bg-[#03111A]/95 backdrop-blur-xl
+                 shadow-[0_0_40px_rgba(34,211,238,.25)]
+                 overflow-hidden"
+    >
+      <div className="px-6 py-5 border-b border-cyan-400/15">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-semibold text-white">
+              {eventoSeleccionado.titulo}
+            </h2>
+
+            <p className="text-cyan-200/70 text-sm mt-1">
+              {new Date(eventoSeleccionado.fecha_inicio).toLocaleDateString('es-ES')}
+              {' · '}
+              {new Date(eventoSeleccionado.fecha_inicio).toLocaleTimeString('es-ES', {
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+              {' - '}
+              {new Date(eventoSeleccionado.fecha_fin).toLocaleTimeString('es-ES', {
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </p>
+          </div>
+
+          <button
+            onClick={() => setEventoSeleccionado(null)}
+            className="text-cyan-200 hover:text-white text-xl"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <div className="p-6 space-y-5">
+        <div className="grid grid-cols-2 gap-5">
+          <div>
+            <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1">
+              Teléfono
+            </div>
+            <div className="text-white">
+              {eventoSeleccionado.telefono || 'No disponible'}
+            </div>
+          </div>
+
+          <div>
+            <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1">
+              Estado
+            </div>
+            <div className="text-white">
+              {eventoSeleccionado.estado || 'Sin estado'}
+            </div>
+          </div>
+
+          <div>
+            <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1">
+              Motivo
+            </div>
+            <div className="text-white">
+              {eventoSeleccionado.motivo || 'No indicado'}
+            </div>
+          </div>
+
+          <div>
+            <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1">
+              Cambios
+            </div>
+            <div className="text-white">
+              {eventoSeleccionado.cambios ?? 0}
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div className="text-cyan-300 text-xs uppercase tracking-wider mb-2">
+            Detalle del motivo
+          </div>
+
+          <div className="rounded-2xl border border-cyan-400/10 bg-cyan-500/5 p-4 text-white/90">
+            {eventoSeleccionado.detalle_motivo || 'Sin observaciones'}
+          </div>
+        </div>
+
+        <div>
+          <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1">
+            Origen
+          </div>
+
+          <div className="text-white">
+            {eventoSeleccionado.origen || 'No indicado'}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
           </div>
         </div>
       </div>
