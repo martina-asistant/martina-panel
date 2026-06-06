@@ -406,12 +406,7 @@ export default function AgendasView() {
                       : false;
 
                     const color = eventoSlot && !esBloqueoEvento ? getColorTratamiento(eventoSlot) : null;
-                  const esCirugia =
-  eventoSlot &&
-  `${eventoSlot.titulo || ''} ${eventoSlot.motivo || ''}`
-    .toLowerCase()
-    .includes('cirugia');
-
+                  
                     const seleccionado = (() => {
                       if (!slotInicio) return false;
 
@@ -449,8 +444,8 @@ export default function AgendasView() {
                       >
                         <span
   className={
-    esCirugia
-      ? 'text-[#02141B] font-semibold'
+    eventoSlot && !esBloqueoEvento
+      ? `${color?.text || 'text-white'} font-semibold`
       : bloqueado
         ? 'text-white/90'
         : 'text-white'
