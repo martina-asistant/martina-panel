@@ -97,20 +97,20 @@ const getColorTratamiento = (evento: EventoAgenda) => {
   const texto = `${evento.titulo || ''} ${evento.motivo || ''}`.toLowerCase();
 
   if (texto.includes('primera visita')) {
-    return { bg: 'rgba(250,204,21,.92)', text: 'text-white' };
+    return { bg: 'rgba(250,204,21,.90)', text: 'text-white' };
   }
 
   if (texto.includes('endodoncia')) {
-    return { bg: 'rgba(244,114,182,.92)', text: 'text-white' };
+    return { bg: 'rgba(244,114,182,.90)', text: 'text-white' };
   }
 
   if (texto.includes('obturacion') || texto.includes('obturación')) {
-    return { bg: 'rgba(168,85,247,.92)', text: 'text-white' };
+    return { bg: 'rgba(168,85,247,.90)', text: 'text-white' };
   }
 
   // Revisión = azul más profesional, distinto del aguamarina de bloqueos
   if (texto.includes('revision') || texto.includes('revisión')) {
-    return { bg: 'rgba(125,211,252,.92)', text: 'text-white' };
+    return { bg: 'rgba(125,211,252,.90)', text: 'text-white' };
   }
 
   // Prótesis / Impresiones / Prueba-Colocar = naranja
@@ -120,7 +120,7 @@ const getColorTratamiento = (evento: EventoAgenda) => {
     texto.includes('impresiones') ||
     texto.includes('prueba-colocar')
   ) {
-    return { bg: 'rgba(249,115,22,.92)', text: 'text-white' };
+    return { bg: 'rgba(249,115,22,.90)', text: 'text-white' };
   }
 
   if (texto.includes('cirugia') || texto.includes('cirugía')) {
