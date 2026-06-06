@@ -110,7 +110,7 @@ const getColorTratamiento = (evento: EventoAgenda) => {
 
   // Revisión = azul más profesional, distinto del aguamarina de bloqueos
   if (texto.includes('revision') || texto.includes('revisión')) {
-    return { bg: 'rgba(59,130,246,.90)', text: 'text-white' };
+    return { bg: 'rgba(125,211,252,.92)', text: 'text-[#02141B]' };
   }
 
   // Prótesis / Impresiones / Prueba-Colocar = naranja
