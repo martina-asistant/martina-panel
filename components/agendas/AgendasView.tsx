@@ -429,7 +429,7 @@ export default function AgendasView() {
                           ${!bloqueado && !eventoSlot ? 'hover:bg-cyan-500/10' : ''}
                         `}
                       >
-                        <span className={bloqueado ? 'text-cyan-50/90' : 'text-white/75'}>
+                        <span className={bloqueado ? 'text-white/90' : 'text-white'}>
                           {hora}
                         </span>
 
