@@ -406,6 +406,11 @@ export default function AgendasView() {
                       : false;
 
                     const color = eventoSlot && !esBloqueoEvento ? getColorTratamiento(eventoSlot) : null;
+                  const esCirugia =
+  eventoSlot &&
+  `${eventoSlot.titulo || ''} ${eventoSlot.motivo || ''}`
+    .toLowerCase()
+    .includes('cirugia');
 
                     const seleccionado = (() => {
                       if (!slotInicio) return false;
@@ -442,9 +447,17 @@ export default function AgendasView() {
                           ${!bloqueado && !eventoSlot ? 'hover:bg-cyan-500/10' : ''}
                         `}
                       >
-                        <span className={bloqueado ? 'text-white/90' : 'text-white'}>
-                          {hora}
-                        </span>
+                        <span
+  className={
+    esCirugia
+      ? 'text-[#02141B] font-semibold'
+      : bloqueado
+        ? 'text-white/90'
+        : 'text-white'
+  }
+>
+  {hora}
+</span>
 
                         {eventoSlot && !esBloqueoEvento && esInicioEvento && (
                           <span className={`ml-3 text-[11px] font-semibold truncate ${color?.text}`}>
