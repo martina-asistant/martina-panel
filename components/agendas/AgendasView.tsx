@@ -97,7 +97,7 @@ const getColorTratamiento = (evento: EventoAgenda) => {
   const texto = `${evento.titulo || ''} ${evento.motivo || ''}`.toLowerCase();
 
   if (texto.includes('primera visita')) {
-    return { bg: 'rgba(250,204,21,.92)', text: 'text-[#02141B]' };
+    return { bg: 'rgba(250,204,21,.92)', text: 'text-white' };
   }
 
   if (texto.includes('endodoncia')) {
@@ -110,7 +110,7 @@ const getColorTratamiento = (evento: EventoAgenda) => {
 
   // Revisión = azul más profesional, distinto del aguamarina de bloqueos
   if (texto.includes('revision') || texto.includes('revisión')) {
-    return { bg: 'rgba(125,211,252,.92)', text: 'text-[#02141B]' };
+    return { bg: 'rgba(125,211,252,.92)', text: 'text-white' };
   }
 
   // Prótesis / Impresiones / Prueba-Colocar = naranja
