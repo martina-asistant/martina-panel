@@ -425,52 +425,49 @@ export default function AgendasView() {
                     const bloqueado = bloqueadoAutomatico || esBloqueoEvento;
 
                     return (
-                      <button
-                        key={slotKey}
-                        onClick={() => manejarSeleccion(slotKey)}
-                        onDoubleClick={() => {
-  if (eventoSlot && !esBloqueoEvento) {
-    setEventoSeleccionado(eventoSlot);
-  }
-}}
-                        style={{
-                          height: SLOT_HEIGHT,
-                          backgroundColor: esBloqueoEvento
-                            ? 'rgba(6,182,212,.25)'
-                            : eventoSlot && !esBloqueoEvento
-                              ? color?.bg
-                              : undefined,
-                        }}
-                        className={`
-                          w-full block border-b border-cyan-400/5 text-left px-2 text-[10px] transition-all
-                          ${bloqueadoAutomatico ? 'bg-cyan-500/25 hover:bg-cyan-500/30' : ''}
-                          ${seleccionado ? 'ring-1 ring-white/70 bg-cyan-500/35' : ''}
-                          ${!bloqueado && !eventoSlot ? 'hover:bg-cyan-500/10' : ''}
-                        `}
-                      >
-                        <span
-  className={
-    eventoSlot && !esBloqueoEvento
-      ? `${color?.text || 'text-white'} font-semibold`
-      : bloqueado
-        ? 'text-white/90'
-        : 'text-white'
-  }
->
-  {hora}
-</span>
+  <button
+    key={slotKey}
+    onClick={() => manejarSeleccion(slotKey)}
+    onDoubleClick={() => {
+      if (eventoSlot && !esBloqueoEvento) {
+        setEventoSeleccionado(eventoSlot);
+      }
+    }}
+    style={{
+      height: SLOT_HEIGHT,
+      backgroundColor: esBloqueoEvento
+        ? 'rgba(6,182,212,.25)'
+        : eventoSlot && !esBloqueoEvento
+          ? color?.bg
+          : undefined,
+    }}
+    className={`
+      w-full block border-b border-cyan-400/5 text-left px-2 text-[10px] transition-all
+      ${bloqueadoAutomatico ? 'bg-cyan-500/25 hover:bg-cyan-500/30' : ''}
+      ${seleccionado ? 'ring-1 ring-white/70 bg-cyan-500/35' : ''}
+      ${!bloqueado && !eventoSlot ? 'hover:bg-cyan-500/10' : ''}
+    `}
+  >
+    <span
+      className={
+        eventoSlot && !esBloqueoEvento
+          ? `${color?.text || 'text-white'} font-semibold`
+          : bloqueado
+            ? 'text-white/90'
+            : 'text-white'
+      }
+    >
+      {hora}
+    </span>
 
-                        {eventoSlot && !esBloqueoEvento && esInicioEvento && (
-                          <span className={`ml-3 text-[11px] font-semibold truncate ${color?.text}`}>
-                            {eventoSlot.titulo || eventoSlot.nombre_paciente || 'Cita'}
-                          </span>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              );
-            })}
+    {eventoSlot && !esBloqueoEvento && esInicioEvento && (
+      <span className={`ml-3 text-[11px] font-semibold truncate ${color?.text || 'text-white'}`}>
+        {eventoSlot.titulo || eventoSlot.nombre_paciente || 'Cita'}
+      </span>
+    )}
+  </button>
+);
+            
             {eventoSeleccionado && (
   <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm pt-[13vh]">
     <div
