@@ -577,7 +577,7 @@ export default function AgendasView() {
       </div>
     </div>
   </div>
-)}}
+)}
           </div>
         </div>
       </div>
