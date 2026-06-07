@@ -475,7 +475,7 @@ export default function AgendasView() {
         <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm pt-[13vh]">
           <div
             style={{
-              backgroundColor: getColorTratamiento(eventoSeleccionado).bg.replace(/\.[0-9]+\)/, '.38)'),
+              backgroundColor: getColorTratamiento(eventoSeleccionado).bg.replace(/\.[0-9]+\)/, '.28)'),
               boxShadow: `
                 0 0 15px rgba(255,255,255,.35),
                 0 0 35px rgba(255,255,255,.25),
@@ -524,7 +524,7 @@ export default function AgendasView() {
             <div className="p-6 space-y-5">
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <div className="text-[#02141B] text-xs uppercase tracking-wider mb-1 font-bold">
+                  <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
                     Motivo
                   </div>
                   <div className="text-white text-lg font-medium">
@@ -533,7 +533,7 @@ export default function AgendasView() {
                 </div>
 
                 <div>
-                  <div className="text-[#02141B] text-xs uppercase tracking-wider mb-1 font-bold">
+                  <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
                     Teléfono
                   </div>
                   <div className="text-white text-lg font-medium">
@@ -543,7 +543,7 @@ export default function AgendasView() {
               </div>
 
               <div>
-                <div className="text-[#02141B] text-xs uppercase tracking-wider mb-2 font-bold">
+                <div className="text-cyan-300 text-xs uppercase tracking-wider mb-2 font-bold">
                   Detalle del motivo
                 </div>
 
@@ -554,7 +554,7 @@ export default function AgendasView() {
 
               <div className="grid grid-cols-3 gap-5 pt-2 border-t border-white/20">
                 <div>
-                  <div className="text-[#02141B] text-[11px] uppercase tracking-wider mb-1 font-bold">
+                  <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">
                     Origen
                   </div>
                   <div className="text-white/95 text-sm">
@@ -563,7 +563,7 @@ export default function AgendasView() {
                 </div>
 
                 <div>
-                  <div className="text-[#02141B] text-[11px] uppercase tracking-wider mb-1 font-bold">
+                  <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">
                     Estado
                   </div>
                   <div className="text-white/95 text-sm">
@@ -572,7 +572,7 @@ export default function AgendasView() {
                 </div>
 
                 <div>
-                  <div className="text-[#02141B] text-[11px] uppercase tracking-wider mb-1 font-bold">
+                  <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">
                     Cambios
                   </div>
                   <div className="text-white/95 text-sm">
