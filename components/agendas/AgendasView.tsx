@@ -497,7 +497,7 @@ export default function AgendasView() {
                     {eventoSeleccionado.titulo}
                   </h2>
 
-                  <p className="text-white/85 text-sm mt-1">
+                  <p className="text-cyan-200 text-sm mt-1">
                     {new Date(eventoSeleccionado.fecha_inicio).toLocaleDateString('es-ES')}
                     {' · '}
                     {new Date(eventoSeleccionado.fecha_inicio).toLocaleTimeString('es-ES', {
