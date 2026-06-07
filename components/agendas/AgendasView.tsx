@@ -108,12 +108,10 @@ const getColorTratamiento = (evento: EventoAgenda) => {
     return { bg: 'rgba(168,85,247,.90)', text: 'text-white' };
   }
 
-  // Revisión = azul más profesional, distinto del aguamarina de bloqueos
   if (texto.includes('revision') || texto.includes('revisión')) {
     return { bg: 'rgba(125,211,252,.90)', text: 'text-white' };
   }
 
-  // Prótesis / Impresiones / Prueba-Colocar = naranja
   if (
     texto.includes('protesis') ||
     texto.includes('prótesis') ||
@@ -127,7 +125,6 @@ const getColorTratamiento = (evento: EventoAgenda) => {
     return { bg: 'rgba(255,255,255,.95)', text: 'text-[#03111A]' };
   }
 
-  // Color por defecto
   return { bg: 'rgba(59,130,246,.85)', text: 'text-white' };
 };
 
@@ -185,43 +182,41 @@ export default function AgendasView() {
 
   const slotSeleccionadoBloqueado = Boolean(bloqueoSeleccionado);
 
- const manejarSeleccion = (slotKey: string) => {
-  // Si clicas otra vez exactamente la misma celda, se deselecciona
-  if (slotInicio === slotKey && !slotFin) {
-    setSlotInicio(null);
-    setSlotFin(null);
-    return;
-  }
+  const manejarSeleccion = (slotKey: string) => {
+    if (slotInicio === slotKey && !slotFin) {
+      setSlotInicio(null);
+      setSlotFin(null);
+      return;
+    }
 
-  // Si clicas otra vez el final del rango, quitamos el rango y dejamos solo el inicio
-  if (slotFin === slotKey) {
-    setSlotFin(null);
-    return;
-  }
+    if (slotFin === slotKey) {
+      setSlotFin(null);
+      return;
+    }
 
-  if (!slotInicio) {
+    if (!slotInicio) {
+      setSlotInicio(slotKey);
+      setSlotFin(null);
+      return;
+    }
+
+    const diaInicio = slotInicio.split('|')[0];
+    const diaNuevo = slotKey.split('|')[0];
+
+    if (diaInicio !== diaNuevo) {
+      setSlotInicio(slotKey);
+      setSlotFin(null);
+      return;
+    }
+
+    if (!slotFin) {
+      setSlotFin(slotKey);
+      return;
+    }
+
     setSlotInicio(slotKey);
     setSlotFin(null);
-    return;
-  }
-
-  const diaInicio = slotInicio.split('|')[0];
-  const diaNuevo = slotKey.split('|')[0];
-
-  if (diaInicio !== diaNuevo) {
-    setSlotInicio(slotKey);
-    setSlotFin(null);
-    return;
-  }
-
-  if (!slotFin) {
-    setSlotFin(slotKey);
-    return;
-  }
-
-  setSlotInicio(slotKey);
-  setSlotFin(null);
-};
+  };
 
   const cargarAgenda = async () => {
     setLoading(true);
@@ -402,12 +397,13 @@ export default function AgendasView() {
                     });
 
                     const esBloqueoEvento = esBloqueoAgenda(eventoSlot);
+
                     const esInicioEvento = eventoSlot
                       ? new Date(eventoSlot.fecha_inicio).getTime() === slotInicioDate.getTime()
                       : false;
 
                     const color = eventoSlot && !esBloqueoEvento ? getColorTratamiento(eventoSlot) : null;
-                  
+
                     const seleccionado = (() => {
                       if (!slotInicio) return false;
 
@@ -425,165 +421,169 @@ export default function AgendasView() {
                     const bloqueado = bloqueadoAutomatico || esBloqueoEvento;
 
                     return (
-  <button
-    key={slotKey}
-    onClick={() => manejarSeleccion(slotKey)}
-    onDoubleClick={() => {
-      if (eventoSlot && !esBloqueoEvento) {
-        setEventoSeleccionado(eventoSlot);
-      }
-    }}
-    style={{
-      height: SLOT_HEIGHT,
-      backgroundColor: esBloqueoEvento
-        ? 'rgba(6,182,212,.25)'
-        : eventoSlot && !esBloqueoEvento
-          ? color?.bg
-          : undefined,
-    }}
-    className={`
-      w-full block border-b border-cyan-400/5 text-left px-2 text-[10px] transition-all
-      ${bloqueadoAutomatico ? 'bg-cyan-500/25 hover:bg-cyan-500/30' : ''}
-      ${seleccionado ? 'ring-1 ring-white/70 bg-cyan-500/35' : ''}
-      ${!bloqueado && !eventoSlot ? 'hover:bg-cyan-500/10' : ''}
-    `}
-  >
-    <span
-      className={
-        eventoSlot && !esBloqueoEvento
-          ? `${color?.text || 'text-white'} font-semibold`
-          : bloqueado
-            ? 'text-white/90'
-            : 'text-white'
-      }
-    >
-      {hora}
-    </span>
+                      <button
+                        key={slotKey}
+                        onClick={() => manejarSeleccion(slotKey)}
+                        onDoubleClick={() => {
+                          if (eventoSlot && !esBloqueoEvento) {
+                            setEventoSeleccionado(eventoSlot);
+                          }
+                        }}
+                        style={{
+                          height: SLOT_HEIGHT,
+                          backgroundColor: esBloqueoEvento
+                            ? 'rgba(6,182,212,.25)'
+                            : eventoSlot && !esBloqueoEvento
+                              ? color?.bg
+                              : undefined,
+                        }}
+                        className={`
+                          w-full block border-b border-cyan-400/5 text-left px-2 text-[10px] transition-all
+                          ${bloqueadoAutomatico ? 'bg-cyan-500/25 hover:bg-cyan-500/30' : ''}
+                          ${seleccionado ? 'ring-1 ring-white/70 bg-cyan-500/35' : ''}
+                          ${!bloqueado && !eventoSlot ? 'hover:bg-cyan-500/10' : ''}
+                        `}
+                      >
+                        <span
+                          className={
+                            eventoSlot && !esBloqueoEvento
+                              ? `${color?.text || 'text-white'} font-semibold`
+                              : bloqueado
+                                ? 'text-white/90'
+                                : 'text-white'
+                          }
+                        >
+                          {hora}
+                        </span>
 
-    {eventoSlot && !esBloqueoEvento && esInicioEvento && (
-      <span className={`ml-3 text-[11px] font-semibold truncate ${color?.text || 'text-white'}`}>
-        {eventoSlot.titulo || eventoSlot.nombre_paciente || 'Cita'}
-      </span>
-    )}
-  </button>
-);
-            
-            {eventoSeleccionado && (
-  <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm pt-[13vh]">
-    <div
-      style={{
-        backgroundColor: getColorTratamiento(eventoSeleccionado).bg.replace(/\.[0-9]+\)/, '.38)')
-        boxShadow: `
-  0 0 15px rgba(255,255,255,.35),
-  0 0 35px rgba(255,255,255,.25),
-  0 0 70px rgba(255,255,255,.15)
-`
-      }}
-    className="
-w-full max-w-2xl rounded-3xl
-border border-white/50
-backdrop-blur-xl
-overflow-hidden
-bg-[#03111A]/70
-"
-    >
-      <div className="px-6 py-5 border-b border-white/20">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h2 className="text-xl font-semibold text-white">
-              {eventoSeleccionado.titulo}
-            </h2>
-
-            <p className="text-white/85 text-sm mt-1">
-              {new Date(eventoSeleccionado.fecha_inicio).toLocaleDateString('es-ES')}
-              {' · '}
-              {new Date(eventoSeleccionado.fecha_inicio).toLocaleTimeString('es-ES', {
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
-              {' - '}
-              {new Date(eventoSeleccionado.fecha_fin).toLocaleTimeString('es-ES', {
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
-            </p>
+                        {eventoSlot && !esBloqueoEvento && esInicioEvento && (
+                          <span className={`ml-3 text-[11px] font-semibold truncate ${color?.text || 'text-white'}`}>
+                            {eventoSlot.titulo || eventoSlot.nombre_paciente || 'Cita'}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              );
+            })}
           </div>
+        </div>
+      </div>
 
-          <button
-            onClick={() => setEventoSeleccionado(null)}
-            className="text-white/80 hover:text-white text-xl"
+      {eventoSeleccionado && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm pt-[13vh]">
+          <div
+            style={{
+              backgroundColor: getColorTratamiento(eventoSeleccionado).bg.replace(/\.[0-9]+\)/, '.38)'),
+              boxShadow: `
+                0 0 15px rgba(255,255,255,.35),
+                0 0 35px rgba(255,255,255,.25),
+                0 0 70px rgba(255,255,255,.15)
+              `,
+            }}
+            className="
+              w-full max-w-2xl rounded-3xl
+              border border-white/50
+              backdrop-blur-xl
+              overflow-hidden
+              bg-[#03111A]/70
+            "
           >
-            ✕
-          </button>
+            <div className="px-6 py-5 border-b border-white/20">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h2 className="text-xl font-semibold text-white">
+                    {eventoSeleccionado.titulo}
+                  </h2>
+
+                  <p className="text-white/85 text-sm mt-1">
+                    {new Date(eventoSeleccionado.fecha_inicio).toLocaleDateString('es-ES')}
+                    {' · '}
+                    {new Date(eventoSeleccionado.fecha_inicio).toLocaleTimeString('es-ES', {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                    {' - '}
+                    {new Date(eventoSeleccionado.fecha_fin).toLocaleTimeString('es-ES', {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => setEventoSeleccionado(null)}
+                  className="text-white/80 hover:text-white text-xl"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-5">
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <div className="text-[#02141B] text-xs uppercase tracking-wider mb-1 font-bold">
+                    Motivo
+                  </div>
+                  <div className="text-white text-lg font-medium">
+                    {eventoSeleccionado.motivo || 'No indicado'}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-[#02141B] text-xs uppercase tracking-wider mb-1 font-bold">
+                    Teléfono
+                  </div>
+                  <div className="text-white text-lg font-medium">
+                    {eventoSeleccionado.telefono || 'No disponible'}
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div className="text-[#02141B] text-xs uppercase tracking-wider mb-2 font-bold">
+                  Detalle del motivo
+                </div>
+
+                <div className="rounded-2xl border border-white/25 bg-black/20 p-4 text-white/95">
+                  {eventoSeleccionado.detalle_motivo || 'Sin observaciones'}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-5 pt-2 border-t border-white/20">
+                <div>
+                  <div className="text-[#02141B] text-[11px] uppercase tracking-wider mb-1 font-bold">
+                    Origen
+                  </div>
+                  <div className="text-white/95 text-sm">
+                    {eventoSeleccionado.origen || 'No indicado'}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-[#02141B] text-[11px] uppercase tracking-wider mb-1 font-bold">
+                    Estado
+                  </div>
+                  <div className="text-white/95 text-sm">
+                    {eventoSeleccionado.estado || 'Sin estado'}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-[#02141B] text-[11px] uppercase tracking-wider mb-1 font-bold">
+                    Cambios
+                  </div>
+                  <div className="text-white/95 text-sm">
+                    {eventoSeleccionado.cambios ?? 0}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-
-      <div className="p-6 space-y-5">
-        <div className="grid grid-cols-2 gap-6">
-          <div>
-            <div className="text-[#02141B] text-xs uppercase tracking-wider mb-1 font-bold">
-              Motivo
-            </div>
-            <div className="text-white text-lg font-medium">
-              {eventoSeleccionado.motivo || 'No indicado'}
-            </div>
-          </div>
-
-          <div>
-            <div className="text-[#02141B] text-xs uppercase tracking-wider mb-1 font-bold">
-              Teléfono
-            </div>
-            <div className="text-white text-lg font-medium">
-              {eventoSeleccionado.telefono || 'No disponible'}
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <div className="text-[#02141B] text-xs uppercase tracking-wider mb-2 font-bold">
-            Detalle del motivo
-          </div>
-
-          <div className="rounded-2xl border border-white/25 bg-black/20 p-4 text-white/95">
-            {eventoSeleccionado.detalle_motivo || 'Sin observaciones'}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-3 gap-5 pt-2 border-t border-white/20">
-          <div>
-            <div className="text-[#02141B] text-[11px] uppercase tracking-wider mb-1 font-bold">
-              Origen
-            </div>
-            <div className="text-white/95 text-sm">
-              {eventoSeleccionado.origen || 'No indicado'}
-            </div>
-          </div>
-
-          <div>
-            <div className="text-[#02141B] text-[11px] uppercase tracking-wider mb-1 font-bold">
-              Estado
-            </div>
-            <div className="text-white/95 text-sm">
-              {eventoSeleccionado.estado || 'Sin estado'}
-            </div>
-          </div>
-
-          <div>
-            <div className="text-[#02141B] text-[11px] uppercase tracking-wider mb-1 font-bold">
-              Cambios
-            </div>
-            <div className="text-white/95 text-sm">
-              {eventoSeleccionado.cambios ?? 0}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-)}
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
