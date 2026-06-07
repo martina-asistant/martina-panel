@@ -472,26 +472,26 @@ export default function AgendasView() {
               );
             })}
             {eventoSeleccionado && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+  <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm pt-[13vh]">
     <div
       style={{
-        backgroundColor: `${getColorTratamiento(eventoSeleccionado).bg.replace('.95', '.12').replace('.92', '.12').replace('.90', '.12').replace('.88', '.12').replace('.80', '.12').replace('.78', '.12')}`,
+        backgroundColor: getColorTratamiento(eventoSeleccionado).bg.replace(/\.[0-9]+\)/, '.90)'),
+        boxShadow: '0 0 45px rgba(255,255,255,.32)',
       }}
       className="
-        w-full max-w-2xl rounded-3xl border border-cyan-400/30
-        bg-[#03111A]/95 backdrop-blur-xl
-        shadow-[0_0_40px_rgba(34,211,238,.25)]
+        w-full max-w-2xl rounded-3xl border border-white/45
+        backdrop-blur-xl
         overflow-hidden
       "
     >
-      <div className="px-6 py-5 border-b border-cyan-400/15">
+      <div className="px-6 py-5 border-b border-white/20">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h2 className="text-xl font-semibold text-white">
               {eventoSeleccionado.titulo}
             </h2>
 
-            <p className="text-cyan-200/70 text-sm mt-1">
+            <p className="text-white/85 text-sm mt-1">
               {new Date(eventoSeleccionado.fecha_inicio).toLocaleDateString('es-ES')}
               {' · '}
               {new Date(eventoSeleccionado.fecha_inicio).toLocaleTimeString('es-ES', {
@@ -508,7 +508,7 @@ export default function AgendasView() {
 
           <button
             onClick={() => setEventoSeleccionado(null)}
-            className="text-cyan-200 hover:text-white text-xl"
+            className="text-white/80 hover:text-white text-xl"
           >
             ✕
           </button>
@@ -518,7 +518,7 @@ export default function AgendasView() {
       <div className="p-6 space-y-5">
         <div className="grid grid-cols-2 gap-6">
           <div>
-            <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1">
+            <div className="text-[#02141B] text-xs uppercase tracking-wider mb-1 font-bold">
               Motivo
             </div>
             <div className="text-white text-lg font-medium">
@@ -527,7 +527,7 @@ export default function AgendasView() {
           </div>
 
           <div>
-            <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1">
+            <div className="text-[#02141B] text-xs uppercase tracking-wider mb-1 font-bold">
               Teléfono
             </div>
             <div className="text-white text-lg font-medium">
@@ -537,39 +537,39 @@ export default function AgendasView() {
         </div>
 
         <div>
-          <div className="text-cyan-300 text-xs uppercase tracking-wider mb-2">
+          <div className="text-[#02141B] text-xs uppercase tracking-wider mb-2 font-bold">
             Detalle del motivo
           </div>
 
-          <div className="rounded-2xl border border-cyan-400/10 bg-black/20 p-4 text-white/90">
+          <div className="rounded-2xl border border-white/25 bg-black/20 p-4 text-white/95">
             {eventoSeleccionado.detalle_motivo || 'Sin observaciones'}
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-5 pt-2 border-t border-cyan-400/10">
+        <div className="grid grid-cols-3 gap-5 pt-2 border-t border-white/20">
           <div>
-            <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1">
+            <div className="text-[#02141B] text-[11px] uppercase tracking-wider mb-1 font-bold">
               Origen
             </div>
-            <div className="text-white/90 text-sm">
+            <div className="text-white/95 text-sm">
               {eventoSeleccionado.origen || 'No indicado'}
             </div>
           </div>
 
           <div>
-            <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1">
+            <div className="text-[#02141B] text-[11px] uppercase tracking-wider mb-1 font-bold">
               Estado
             </div>
-            <div className="text-white/90 text-sm">
+            <div className="text-white/95 text-sm">
               {eventoSeleccionado.estado || 'Sin estado'}
             </div>
           </div>
 
           <div>
-            <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1">
+            <div className="text-[#02141B] text-[11px] uppercase tracking-wider mb-1 font-bold">
               Cambios
             </div>
-            <div className="text-white/90 text-sm">
+            <div className="text-white/95 text-sm">
               {eventoSeleccionado.cambios ?? 0}
             </div>
           </div>
@@ -577,7 +577,7 @@ export default function AgendasView() {
       </div>
     </div>
   </div>
-)}
+)}}
           </div>
         </div>
       </div>
