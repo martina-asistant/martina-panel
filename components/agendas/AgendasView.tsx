@@ -475,14 +475,20 @@ export default function AgendasView() {
   <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm pt-[13vh]">
     <div
       style={{
-        backgroundColor: getColorTratamiento(eventoSeleccionado).bg.replace(/\.[0-9]+\)/, '.90)'),
-        boxShadow: '0 0 45px rgba(255,255,255,.32)',
+        backgroundColor: getColorTratamiento(eventoSeleccionado).bg.replace(/\.[0-9]+\)/, '.38)')
+        boxShadow: `
+  0 0 15px rgba(255,255,255,.35),
+  0 0 35px rgba(255,255,255,.25),
+  0 0 70px rgba(255,255,255,.15)
+`
       }}
-      className="
-        w-full max-w-2xl rounded-3xl border border-white/45
-        backdrop-blur-xl
-        overflow-hidden
-      "
+    className="
+w-full max-w-2xl rounded-3xl
+border border-white/50
+backdrop-blur-xl
+overflow-hidden
+bg-[#03111A]/70
+"
     >
       <div className="px-6 py-5 border-b border-white/20">
         <div className="flex items-start justify-between gap-4">
