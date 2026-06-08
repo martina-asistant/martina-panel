@@ -136,6 +136,7 @@ export default function AgendasView() {
   const [slotInicio, setSlotInicio] = useState<string | null>(null);
   const [slotFin, setSlotFin] = useState<string | null>(null);
   const [eventoSeleccionado, setEventoSeleccionado] = useState<EventoAgenda | null>(null);
+  const [eventoActivo, setEventoActivo] = useState<EventoAgenda | null>(null);
 
   const agenda = agendas.find(a => a.key === agendaActiva);
 
@@ -182,41 +183,47 @@ export default function AgendasView() {
 
   const slotSeleccionadoBloqueado = Boolean(bloqueoSeleccionado);
 
-  const manejarSeleccion = (slotKey: string) => {
-    if (slotInicio === slotKey && !slotFin) {
-      setSlotInicio(null);
-      setSlotFin(null);
-      return;
-    }
+  const manejarSeleccion = (slotKey: string, eventoSlot?: EventoAgenda | null) => {
+  if (slotInicio === slotKey && !slotFin) {
+    setSlotInicio(null);
+    setSlotFin(null);
+    setEventoActivo(null);
+    return;
+  }
 
-    if (slotFin === slotKey) {
-      setSlotFin(null);
-      return;
-    }
+  if (slotFin === slotKey) {
+    setSlotFin(null);
+    setEventoActivo(null);
+    return;
+  }
 
-    if (!slotInicio) {
-      setSlotInicio(slotKey);
-      setSlotFin(null);
-      return;
-    }
-
-    const diaInicio = slotInicio.split('|')[0];
-    const diaNuevo = slotKey.split('|')[0];
-
-    if (diaInicio !== diaNuevo) {
-      setSlotInicio(slotKey);
-      setSlotFin(null);
-      return;
-    }
-
-    if (!slotFin) {
-      setSlotFin(slotKey);
-      return;
-    }
-
+  if (!slotInicio) {
     setSlotInicio(slotKey);
     setSlotFin(null);
-  };
+    setEventoActivo(eventoSlot && !esBloqueoAgenda(eventoSlot) ? eventoSlot : null);
+    return;
+  }
+
+  const diaInicio = slotInicio.split('|')[0];
+  const diaNuevo = slotKey.split('|')[0];
+
+  if (diaInicio !== diaNuevo) {
+    setSlotInicio(slotKey);
+    setSlotFin(null);
+    setEventoActivo(eventoSlot && !esBloqueoAgenda(eventoSlot) ? eventoSlot : null);
+    return;
+  }
+
+  if (!slotFin) {
+    setSlotFin(slotKey);
+    setEventoActivo(eventoSlot && !esBloqueoAgenda(eventoSlot) ? eventoSlot : null);
+    return;
+  }
+
+  setSlotInicio(slotKey);
+  setSlotFin(null);
+  setEventoActivo(eventoSlot && !esBloqueoAgenda(eventoSlot) ? eventoSlot : null);
+};
 
   const cargarAgenda = async () => {
     setLoading(true);
@@ -423,7 +430,7 @@ export default function AgendasView() {
                     return (
                       <button
                         key={slotKey}
-                        onClick={() => manejarSeleccion(slotKey)}
+                        onClick={() => manejarSeleccion(slotKey, eventoSlot)}
                         onDoubleClick={() => {
                           if (eventoSlot && !esBloqueoEvento) {
                             setEventoSeleccionado(eventoSlot);
