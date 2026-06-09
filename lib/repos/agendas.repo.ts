@@ -27,7 +27,6 @@ const getAgenda = async (
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        agenda,
         fecha_inicio,
         fecha_fin,
       }),
