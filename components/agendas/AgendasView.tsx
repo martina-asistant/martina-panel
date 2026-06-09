@@ -400,7 +400,7 @@ const guardarCambiosCita = async () => {
 
     setTimeout(() => {
       cargarAgenda();
-    }, 100);
+    }, 800);
   } catch (error) {
     console.error('Error guardando cambios cita:', error);
   } finally {
