@@ -759,23 +759,32 @@ export default function AgendasView() {
                   </div>
 
                   {modoEdicion ? (
-                    <input
-                      type="text"
-                      value={eventoSeleccionado.motivo || ''}
-                      onChange={(e) =>
-                        setEventoSeleccionado({
-                          ...eventoSeleccionado,
-                          motivo: e.target.value,
-                        })
-                      }
-                      className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
-                    />
-                  ) : (
-                    <div className="text-white text-lg font-medium">
-                      {eventoSeleccionado.motivo || 'No indicado'}
-                    </div>
-                  )}
-                </div>
+  <input
+    type="text"
+    value={eventoSeleccionado.motivo || ''}
+    onChange={(e) => {
+      const nuevoMotivo = e.target.value;
+
+      const duracion = getDuracionPorMotivo(nuevoMotivo);
+
+      const nuevaFechaFin = sumarMinutosISO(
+        eventoSeleccionado.fecha_inicio,
+        duracion
+      );
+
+      setEventoSeleccionado({
+        ...eventoSeleccionado,
+        motivo: nuevoMotivo,
+        fecha_fin: nuevaFechaFin,
+      });
+    }}
+    className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+  />
+) : (
+  <div className="text-white text-lg font-medium">
+    {eventoSeleccionado.motivo || 'No indicado'}
+  </div>
+)}
 
                 <div>
                   <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
