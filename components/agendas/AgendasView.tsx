@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { CalendarDays, ChevronLeft, ChevronRight, Lock } from 'lucide-react';
-import { getAgendaFede, type EventoAgenda } from '@/lib/repos/agendas.repo';
+import { getAgendaFede, getAgendaCelia, etAgendaAna, type EventoAgenda } from '@/lib/repos/agendas.repo';
 
 const agendas = [
   { key: 'fede', nombre: 'Agenda Fede' },
@@ -276,17 +276,25 @@ export default function AgendasView() {
   };
 
   const cargarAgenda = async () => {
-    setLoading(true);
+  setLoading(true);
 
-    if (agendaActiva === 'fede') {
-      const data = await getAgendaFede(toISO(semanaInicio), toISO(addDays(semanaInicio, 7)));
-      setEventos(data);
-    } else {
-      setEventos([]);
-    }
+  let data: EventoAgenda[] = [];
 
-    setLoading(false);
-  };
+  if (agendaActiva === 'fede') {
+    data = await getAgendaFede(toISO(semanaInicio), toISO(addDays(semanaInicio, 7)));
+  }
+
+  if (agendaActiva === 'celia') {
+    data = await getAgendaCelia(toISO(semanaInicio), toISO(addDays(semanaInicio, 7)));
+  }
+
+  if (agendaActiva === 'ana') {
+    data = await getAgendaAna(toISO(semanaInicio), toISO(addDays(semanaInicio, 7)));
+  }
+
+  setEventos(data);
+  setLoading(false);
+};
 
   const gestionarBloqueo = async () => {
     if (!slotInicio || loading) return;
