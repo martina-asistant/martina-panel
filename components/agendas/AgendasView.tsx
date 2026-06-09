@@ -340,12 +340,13 @@ export default function AgendasView() {
   setSlotFin(null);
 };
 
- const guardarCambiosCita = async () => {
+const guardarCambiosCita = async () => {
   if (!eventoSeleccionado || loading) return;
 
-  setLoading(true);
-
   const citaActualizada = eventoSeleccionado;
+
+  cerrarModalCita();
+  setLoading(true);
 
   try {
     const response = await fetch('/agendas/gestionar', {
@@ -390,18 +391,15 @@ export default function AgendasView() {
       )
     );
 
-    cerrarModalCita();
-
-setTimeout(() => {
-  cargarAgenda();
-}, 100);
+    setTimeout(() => {
+      cargarAgenda();
+    }, 100);
   } catch (error) {
     console.error('Error guardando cambios cita:', error);
   } finally {
     setLoading(false);
   }
 };
-
   const cancelarCita = async () => {
     if (!eventoActivo || loading) return;
 
