@@ -349,9 +349,23 @@ const guardarCambiosCita = async () => {
 
   setModalCitaAbierto(false);
   setEventoSeleccionado(null);
+  setEventoActivo(null);
   setModoEdicion(false);
   setSlotInicio(null);
   setSlotFin(null);
+
+  setEventos((prev) =>
+    prev.map((evento) =>
+      evento.event_id === citaActualizada.event_id ||
+      evento.calendar_id === citaActualizada.calendar_id
+        ? {
+            ...evento,
+            ...citaActualizada,
+            cambios: (citaActualizada.cambios || 0) + 1,
+          }
+        : evento
+    )
+  );
 
   setLoading(true);
 
@@ -383,30 +397,14 @@ const guardarCambiosCita = async () => {
 
     if (!data?.ok) {
       console.error('Error modificando cita:', data);
-      return;
     }
-
-    setEventos((prev) =>
-      prev.map((evento) =>
-        evento.event_id === citaActualizada.event_id
-          ? {
-              ...evento,
-              ...citaActualizada,
-              cambios: (citaActualizada.cambios || 0) + 1,
-            }
-          : evento
-      )
-    );
-
-    setTimeout(() => {
-      cargarAgenda();
-    }, 800);
   } catch (error) {
     console.error('Error guardando cambios cita:', error);
   } finally {
     setLoading(false);
   }
 };
+  
   const cancelarCita = async () => {
     if (!eventoActivo || loading) return;
 
