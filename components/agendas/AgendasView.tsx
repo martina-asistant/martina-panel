@@ -542,48 +542,82 @@ export default function AgendasView() {
             </div>
 
             <div className="p-6 space-y-5">
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-  <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
-    Motivo
-  </div>
+  {modoEdicion && (
+    <div className="grid grid-cols-3 gap-4">
+      <input
+        type="date"
+        className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+      />
 
-  {modoEdicion ? (
-    <input
-      type="text"
-      value={eventoSeleccionado.motivo || ''}
-      onChange={(e) =>
-        setEventoSeleccionado({
-          ...eventoSeleccionado,
-          motivo: e.target.value,
-        })
-      }
-      className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
-    />
-  ) : (
-    <div className="text-white text-lg font-medium">
-      {eventoSeleccionado.motivo || 'No indicado'}
+      <input
+        type="time"
+        className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+      />
+
+      <input
+        type="time"
+        className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+      />
     </div>
   )}
-</div>
-                <div>
-                  <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
-                    Teléfono
-                  </div>
-                  <div className="text-white text-lg font-medium">
-                    {eventoSeleccionado.telefono || 'No disponible'}
-                  </div>
-                </div>
-              </div>
+
+  <div className="grid grid-cols-2 gap-6">
+    <div>
+      <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
+        Motivo
+      </div>
+
+      {modoEdicion ? (
+        <input
+          type="text"
+          value={eventoSeleccionado.motivo || ''}
+          onChange={(e) =>
+            setEventoSeleccionado({
+              ...eventoSeleccionado,
+              motivo: e.target.value,
+            })
+          }
+          className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+        />
+      ) : (
+        <div className="text-white text-lg font-medium">
+          {eventoSeleccionado.motivo || 'No indicado'}
+        </div>
+      )}
+    </div>
+
+    <div>
+      <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
+        Teléfono
+      </div>
+      <div className="text-white text-lg font-medium">
+        {eventoSeleccionado.telefono || 'No disponible'}
+      </div>
+    </div>
+  </div>
 
               <div>
                 <div className="text-cyan-300 text-xs uppercase tracking-wider mb-2 font-bold">
                   Detalle del motivo
                 </div>
 
-                <div className="rounded-2xl border border-white/25 bg-black/20 p-4 text-white/95">
-                  {eventoSeleccionado.detalle_motivo || 'Sin observaciones'}
-                </div>
+                {modoEdicion ? (
+  <textarea
+    value={eventoSeleccionado.detalle_motivo || ''}
+    onChange={(e) =>
+      setEventoSeleccionado({
+        ...eventoSeleccionado,
+        detalle_motivo: e.target.value,
+      })
+    }
+    className="w-full rounded-2xl border border-white/25 bg-black/20 p-4 text-white resize-none outline-none"
+    rows={3}
+  />
+) : (
+  <div className="rounded-2xl border border-white/25 bg-black/20 p-4 text-white/95">
+    {eventoSeleccionado.detalle_motivo || 'Sin observaciones'}
+  </div>
+)}
               </div>
 
               <div className="grid grid-cols-3 gap-5 pt-2 border-t border-white/20">
