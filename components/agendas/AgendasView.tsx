@@ -39,14 +39,12 @@ const getDuracionPorMotivo = (motivo: string) => {
 
   if (m.includes('revisión general') || m.includes('revision general')) return 30;
   if (m.includes('revisión') || m.includes('revision')) return 5;
-
   if (m.includes('limpieza')) return 30;
   if (m.includes('obturacion') || m.includes('obturación') || m.includes('caries')) return 30;
   if (m.includes('primera visita')) return 45;
   if (m.includes('endodoncia')) return 45;
   if (m.includes('implante')) return 45;
   if (m.includes('cirugía') || m.includes('cirugia')) return 60;
-
   if (m.includes('prueba-colocar')) return 30;
   if (m.includes('impresiones')) return 30;
   if (m.includes('raspados')) return 45;
@@ -765,7 +763,7 @@ export default function AgendasView() {
   const nuevaFechaInicio = buildISOFromDateTime(fecha, nuevaHoraInicio);
 
   const duracion = getDuracionPorMotivo(
-    eventoSeleccionado.motivo || eventoSeleccionado.title || ''
+    eventoSeleccionado.motivo || eventoSeleccionado.titulo || ''
   );
 
   const nuevaFechaFin = sumarMinutosISO(nuevaFechaInicio, duracion);
