@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { CalendarDays, ChevronLeft, ChevronRight, Lock } from 'lucide-react';
 import { getAgendaFede, getAgendaCelia, getAgendaAna, type EventoAgenda } from '@/lib/repos/agendas.repo';
+import { createClient } from '@/lib/supabase/client';
 
 const agendas = [
   { key: 'fede', nombre: 'Agenda Fede' },
@@ -187,6 +188,7 @@ export default function AgendasView() {
   const [modoEdicion, setModoEdicion] = useState(false);
   const [mostrarCancelar, setMostrarCancelar] = useState(false);
   const [modalCitaAbierto, setModalCitaAbierto] = useState(false);
+  const [usuarioPanel, setUsuarioPanel] = useState('panel');
     
 
   const agenda = agendas.find(a => a.key === agendaActiva);
@@ -325,7 +327,7 @@ export default function AgendasView() {
         calendar_id: eventoActivo?.calendar_id,
         fecha_inicio: fechaInicio.toISOString(),
         fecha_fin: fechaFin.toISOString(),
-        usuario: 'usuarioPanel',
+        usuario: usuarioPanel,
       }),
     });
 
@@ -397,7 +399,7 @@ const guardarCambiosCita = async () => {
         cambios: (citaActualizada.cambios || 0) + 1,
         fecha_inicio: citaActualizada.fecha_inicio,
         fecha_fin: citaActualizada.fecha_fin,
-        usuario: 'usuarioPanel',
+        usuario: usuarioPanel,
       }),
     });
 
@@ -432,7 +434,7 @@ const guardarCambiosCita = async () => {
         fecha_inicio: eventoActivo.fecha_inicio,
         fecha_fin: eventoActivo.fecha_fin,
         motivo: eventoActivo.motivo,
-        usuario: 'usuarioPanel',
+        usuario: usuarioPanel,
       }),
     });
 
