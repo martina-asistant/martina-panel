@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { CalendarDays, ChevronLeft, ChevronRight, Lock } from 'lucide-react';
-import { getAgendaFede, getAgendaCelia, etAgendaAna, type EventoAgenda } from '@/lib/repos/agendas.repo';
+import { getAgendaFede, getAgendaCelia, getAgendaAna, type EventoAgenda } from '@/lib/repos/agendas.repo';
 
 const agendas = [
   { key: 'fede', nombre: 'Agenda Fede' },
