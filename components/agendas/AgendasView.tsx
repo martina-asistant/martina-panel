@@ -186,6 +186,7 @@ export default function AgendasView() {
   const [eventoActivo, setEventoActivo] = useState<EventoAgenda | null>(null);
   const [modoEdicion, setModoEdicion] = useState(false);
   const [mostrarCancelar, setMostrarCancelar] = useState(false);
+  const [modalCitaAbierto, setModalCitaAbierto] = useState(false);
 
   const agenda = agendas.find(a => a.key === agendaActiva);
 
@@ -333,6 +334,7 @@ export default function AgendasView() {
   };
 
   const cerrarModalCita = () => {
+  setModalCitaAbierto(false);
   setEventoSeleccionado(null);
   setEventoActivo(null);
   setModoEdicion(false);
@@ -345,7 +347,12 @@ const guardarCambiosCita = async () => {
 
   const citaActualizada = eventoSeleccionado;
 
-  cerrarModalCita();
+  setModalCitaAbierto(false);
+  setEventoSeleccionado(null);
+  setModoEdicion(false);
+  setSlotInicio(null);
+  setSlotFin(null);
+
   setLoading(true);
 
   try {
@@ -508,6 +515,7 @@ const guardarCambiosCita = async () => {
                     if (accion === 'MODIFICAR CITA' && eventoActivo) {
                       setEventoSeleccionado(eventoActivo);
                       setModoEdicion(true);
+                      setModalCitaAbierto(true);
                     }
 
                     if (accion === 'CANCELAR CITA' && eventoActivo) {
@@ -605,6 +613,7 @@ const guardarCambiosCita = async () => {
                           if (eventoSlot && !esBloqueoEvento) {
                             setEventoSeleccionado(eventoSlot);
                             setModoEdicion(false);
+                            setModalCitaAbierto(true);
                           }
                         }}
                         style={{
@@ -649,7 +658,7 @@ const guardarCambiosCita = async () => {
         </div>
       </div>
 
-      {eventoSeleccionado && (
+      {modalCitaAbierto && eventoSeleccionado && (
         <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm pt-[13vh]">
           <div
             style={{
