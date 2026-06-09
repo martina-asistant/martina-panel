@@ -15,12 +15,13 @@ export interface EventoAgenda {
   color_id?: string | null;
 }
 
-export async function getAgendaFede(
+const getAgenda = async (
+  agenda: 'fede' | 'celia' | 'ana',
   fecha_inicio: string,
   fecha_fin: string
-): Promise<EventoAgenda[]> {
+): Promise<EventoAgenda[]> => {
   try {
-    const response = await fetch('/agendas/fede', {
+    const response = await fetch(`/agendas/${agenda}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -42,4 +43,13 @@ export async function getAgendaFede(
     console.error(error);
     return [];
   }
-}
+};
+
+export const getAgendaFede = (fecha_inicio: string, fecha_fin: string) =>
+  getAgenda('fede', fecha_inicio, fecha_fin);
+
+export const getAgendaCelia = (fecha_inicio: string, fecha_fin: string) =>
+  getAgenda('celia', fecha_inicio, fecha_fin);
+
+export const getAgendaAna = (fecha_inicio: string, fecha_fin: string) =>
+  getAgenda('ana', fecha_inicio, fecha_fin);
