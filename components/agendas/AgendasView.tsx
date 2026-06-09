@@ -187,6 +187,7 @@ export default function AgendasView() {
   const [modoEdicion, setModoEdicion] = useState(false);
   const [mostrarCancelar, setMostrarCancelar] = useState(false);
   const [modalCitaAbierto, setModalCitaAbierto] = useState(false);
+    
 
   const agenda = agendas.find(a => a.key === agendaActiva);
 
@@ -324,7 +325,7 @@ export default function AgendasView() {
         calendar_id: eventoActivo?.calendar_id,
         fecha_inicio: fechaInicio.toISOString(),
         fecha_fin: fechaFin.toISOString(),
-        usuario: 'Sheila',
+        usuario: 'usuarioPanel',
       }),
     });
 
@@ -396,7 +397,7 @@ const guardarCambiosCita = async () => {
         cambios: (citaActualizada.cambios || 0) + 1,
         fecha_inicio: citaActualizada.fecha_inicio,
         fecha_fin: citaActualizada.fecha_fin,
-        usuario: 'Sheila',
+        usuario: 'usuarioPanel',
       }),
     });
 
@@ -431,7 +432,7 @@ const guardarCambiosCita = async () => {
         fecha_inicio: eventoActivo.fecha_inicio,
         fecha_fin: eventoActivo.fecha_fin,
         motivo: eventoActivo.motivo,
-        usuario: 'Sheila',
+        usuario: 'usuarioPanel',
       }),
     });
 
@@ -457,6 +458,30 @@ const guardarCambiosCita = async () => {
   useEffect(() => {
     cargarAgenda();
   }, [agendaActiva, semanaInicio]);
+
+  useEffect(() => {
+  const cargarUsuarioPanel = async () => {
+    const supabase = createClient();
+
+    if (!supabase) return;
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.email) return;
+
+    const { data } = await supabase
+      .from('usuarios_panel')
+      .select('nombre')
+      .eq('email', user.email)
+      .single();
+
+    setUsuarioPanel(data?.nombre || user.email);
+  };
+
+  cargarUsuarioPanel();
+}, []);
 
   return (
     <div className="h-full overflow-y-auto overflow-x-hidden p-8 bg-[#02141B] text-white pb-20">
