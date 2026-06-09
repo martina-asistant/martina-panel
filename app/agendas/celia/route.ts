@@ -4,11 +4,11 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    const url = process.env.N8N_AGENDA_CELIA_URL;
+    const url = process.env.N8N_AGENDAS_URL;
 
     if (!url) {
       return NextResponse.json(
-        { ok: false, error: 'Falta N8N_AGENDA_CELIA_URL' },
+        { ok: false, error: 'Falta N8N_AGENDAS_URL' },
         { status: 500 }
       );
     }
