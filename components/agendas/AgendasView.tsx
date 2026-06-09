@@ -362,20 +362,20 @@ export default function AgendasView() {
 
     const data = await response.json();
 
-    setLoading(false);
+setLoading(false);
 
-    if (!data?.ok) {
-      console.error('Error modificando cita:', data);
-      return;
-    }
+if (!data?.ok) {
+  console.error('Error modificando cita:', data);
+  return;
+}
 
-    setEventoSeleccionado(null);
-    setEventoActivo(null);
-    setModoEdicion(false);
-    setSlotInicio(null);
-    setSlotFin(null);
+await cargarAgenda();
 
-    await cargarAgenda();
+setEventoSeleccionado(null);
+setEventoActivo(null);
+setModoEdicion(false);
+setSlotInicio(null);
+setSlotFin(null);
   };
 
   const cancelarCita = async () => {
