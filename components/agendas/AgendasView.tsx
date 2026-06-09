@@ -16,6 +16,24 @@ const SLOT_HEIGHT = 22;
 const START_HOUR = 9;
 const END_HOUR = 19.5;
 
+const pad = (n: number) => String(n).padStart(2, '0');
+
+const toInputDate = (iso: string) => {
+  const d = new Date(iso);
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+};
+
+const toInputTime = (iso: string) => {
+  const d = new Date(iso);
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
+
+const buildISOFromDateTime = (date: string, time: string) => {
+  const [year, month, day] = date.split('-').map(Number);
+  const [hours, minutes] = time.split(':').map(Number);
+  return new Date(year, month - 1, day, hours, minutes, 0, 0).toISOString();
+};
+
 const getMonday = (date: Date) => {
   const d = new Date(date);
   const day = d.getDay();
@@ -186,46 +204,46 @@ export default function AgendasView() {
   const slotSeleccionadoBloqueado = Boolean(bloqueoSeleccionado);
 
   const manejarSeleccion = (slotKey: string, eventoSlot?: EventoAgenda | null) => {
-  if (slotInicio === slotKey && !slotFin) {
-    setSlotInicio(null);
-    setSlotFin(null);
-    setEventoActivo(null);
-    return;
-  }
+    if (slotInicio === slotKey && !slotFin) {
+      setSlotInicio(null);
+      setSlotFin(null);
+      setEventoActivo(null);
+      return;
+    }
 
-  if (slotFin === slotKey) {
-    setSlotFin(null);
-    setEventoActivo(null);
-    return;
-  }
+    if (slotFin === slotKey) {
+      setSlotFin(null);
+      setEventoActivo(null);
+      return;
+    }
 
-  if (!slotInicio) {
+    if (!slotInicio) {
+      setSlotInicio(slotKey);
+      setSlotFin(null);
+      setEventoActivo(eventoSlot && !esBloqueoAgenda(eventoSlot) ? eventoSlot : null);
+      return;
+    }
+
+    const diaInicio = slotInicio.split('|')[0];
+    const diaNuevo = slotKey.split('|')[0];
+
+    if (diaInicio !== diaNuevo) {
+      setSlotInicio(slotKey);
+      setSlotFin(null);
+      setEventoActivo(eventoSlot && !esBloqueoAgenda(eventoSlot) ? eventoSlot : null);
+      return;
+    }
+
+    if (!slotFin) {
+      setSlotFin(slotKey);
+      setEventoActivo(eventoSlot && !esBloqueoAgenda(eventoSlot) ? eventoSlot : null);
+      return;
+    }
+
     setSlotInicio(slotKey);
     setSlotFin(null);
     setEventoActivo(eventoSlot && !esBloqueoAgenda(eventoSlot) ? eventoSlot : null);
-    return;
-  }
-
-  const diaInicio = slotInicio.split('|')[0];
-  const diaNuevo = slotKey.split('|')[0];
-
-  if (diaInicio !== diaNuevo) {
-    setSlotInicio(slotKey);
-    setSlotFin(null);
-    setEventoActivo(eventoSlot && !esBloqueoAgenda(eventoSlot) ? eventoSlot : null);
-    return;
-  }
-
-  if (!slotFin) {
-    setSlotFin(slotKey);
-    setEventoActivo(eventoSlot && !esBloqueoAgenda(eventoSlot) ? eventoSlot : null);
-    return;
-  }
-
-  setSlotInicio(slotKey);
-  setSlotFin(null);
-  setEventoActivo(eventoSlot && !esBloqueoAgenda(eventoSlot) ? eventoSlot : null);
-};
+  };
 
   const cargarAgenda = async () => {
     setLoading(true);
@@ -265,6 +283,7 @@ export default function AgendasView() {
       body: JSON.stringify({
         accion,
         agenda: agendaActiva,
+        calendar_id: eventoActivo?.calendar_id,
         fecha_inicio: fechaInicio.toISOString(),
         fecha_fin: fechaFin.toISOString(),
         usuario: 'Sheila',
@@ -278,6 +297,94 @@ export default function AgendasView() {
       return;
     }
 
+    setSlotInicio(null);
+    setSlotFin(null);
+
+    await cargarAgenda();
+  };
+
+  const guardarCambiosCita = async () => {
+    if (!eventoSeleccionado || loading) return;
+
+    setLoading(true);
+
+    const response = await fetch('/agendas/gestionar', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        accion: 'modificar_cita',
+        agenda: agendaActiva,
+        calendar_id: eventoSeleccionado.calendar_id,
+        event_id: eventoSeleccionado.event_id,
+        telefono: eventoSeleccionado.telefono,
+        nombre_paciente: eventoSeleccionado.nombre_paciente,
+        motivo: eventoSeleccionado.motivo,
+        detalle_motivo: eventoSeleccionado.detalle_motivo,
+        origen: eventoSeleccionado.origen,
+        estado: eventoSeleccionado.estado,
+        cambios: (eventoSeleccionado.cambios || 0) + 1,
+        fecha_inicio: eventoSeleccionado.fecha_inicio,
+        fecha_fin: eventoSeleccionado.fecha_fin,
+        usuario: 'Sheila',
+      }),
+    });
+
+    const data = await response.json();
+
+    setLoading(false);
+
+    if (!data?.ok) {
+      console.error('Error modificando cita:', data);
+      return;
+    }
+
+    setEventoSeleccionado(null);
+    setEventoActivo(null);
+    setModoEdicion(false);
+    setSlotInicio(null);
+    setSlotFin(null);
+
+    await cargarAgenda();
+  };
+
+  const cancelarCita = async () => {
+    if (!eventoActivo || loading) return;
+
+    setLoading(true);
+
+    const response = await fetch('/agendas/gestionar', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        accion: 'cancelar_cita',
+        agenda: agendaActiva,
+        calendar_id: eventoActivo.calendar_id,
+        event_id: eventoActivo.event_id,
+        telefono: eventoActivo.telefono,
+        fecha_inicio: eventoActivo.fecha_inicio,
+        fecha_fin: eventoActivo.fecha_fin,
+        motivo: eventoActivo.motivo,
+        usuario: 'Sheila',
+      }),
+    });
+
+    const data = await response.json();
+
+    setLoading(false);
+
+    if (!data?.ok) {
+      console.error('Error cancelando cita:', data);
+      return;
+    }
+
+    setMostrarCancelar(false);
+    setEventoSeleccionado(null);
+    setEventoActivo(null);
+    setModoEdicion(false);
     setSlotInicio(null);
     setSlotFin(null);
 
@@ -344,23 +451,23 @@ export default function AgendasView() {
 
             <div className="flex flex-wrap items-center justify-end gap-2">
               {acciones.map((accion) => (
-  <button
-    key={accion}
-    onClick={() => {
-      if (accion === 'MODIFICAR CITA' && eventoActivo) {
-        setEventoSeleccionado(eventoActivo);
-        setModoEdicion(true);
-      }
+                <button
+                  key={accion}
+                  onClick={() => {
+                    if (accion === 'MODIFICAR CITA' && eventoActivo) {
+                      setEventoSeleccionado(eventoActivo);
+                      setModoEdicion(true);
+                    }
 
-      if (accion === 'CANCELAR CITA' && eventoActivo) {
-        setMostrarCancelar(true);
-      }
-    }}
-    className="rounded-full border border-cyan-400/30 bg-cyan-500/10 px-3.5 py-1.5 text-[10px] tracking-[0.12em] text-cyan-100 hover:bg-cyan-500/20 hover:border-cyan-300/50 transition-all whitespace-nowrap"
-  >
-    {accion}
-  </button>
-))}
+                    if (accion === 'CANCELAR CITA' && eventoActivo) {
+                      setMostrarCancelar(true);
+                    }
+                  }}
+                  className="rounded-full border border-cyan-400/30 bg-cyan-500/10 px-3.5 py-1.5 text-[10px] tracking-[0.12em] text-cyan-100 hover:bg-cyan-500/20 hover:border-cyan-300/50 transition-all whitespace-nowrap"
+                >
+                  {accion}
+                </button>
+              ))}
 
               <button
                 onClick={gestionarBloqueo}
@@ -514,7 +621,8 @@ export default function AgendasView() {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <h2 className="text-xl font-semibold text-white">
-                    {eventoSeleccionado.titulo}
+                    {eventoSeleccionado.nombre_paciente || eventoSeleccionado.titulo}
+                    {eventoSeleccionado.motivo ? ` - ${eventoSeleccionado.motivo}` : ''}
                   </h2>
 
                   <p className="text-cyan-200 text-sm mt-1">
@@ -532,69 +640,115 @@ export default function AgendasView() {
                   </p>
                 </div>
 
-                <button
-                  onClick={() => setEventoSeleccionado(null)}
-                  className="text-white/80 hover:text-white text-xl"
-                >
-                  ✕
-                </button>
+                <div className="flex items-center gap-3">
+                  {modoEdicion && (
+                    <button
+                      onClick={guardarCambiosCita}
+                      disabled={loading}
+                      title="Guardar cambios"
+                      className="text-cyan-200 hover:text-white text-2xl disabled:opacity-50"
+                    >
+                      ✓
+                    </button>
+                  )}
+
+                  <button
+                    onClick={() => {
+                      setEventoSeleccionado(null);
+                      setModoEdicion(false);
+                    }}
+                    className="text-white/80 hover:text-white text-xl"
+                  >
+                    ✕
+                  </button>
+                </div>
               </div>
             </div>
 
             <div className="p-6 space-y-5">
-  {modoEdicion && (
-    <div className="grid grid-cols-3 gap-4">
-      <input
-        type="date"
-        className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
-      />
+              {modoEdicion && (
+                <div className="grid grid-cols-3 gap-4">
+                  <input
+                    type="date"
+                    value={toInputDate(eventoSeleccionado.fecha_inicio)}
+                    onChange={(e) => {
+                      const fecha = e.target.value;
+                      const inicio = toInputTime(eventoSeleccionado.fecha_inicio);
+                      const fin = toInputTime(eventoSeleccionado.fecha_fin);
 
-      <input
-        type="time"
-        className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
-      />
+                      setEventoSeleccionado({
+                        ...eventoSeleccionado,
+                        fecha_inicio: buildISOFromDateTime(fecha, inicio),
+                        fecha_fin: buildISOFromDateTime(fecha, fin),
+                      });
+                    }}
+                    className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+                  />
 
-      <input
-        type="time"
-        className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
-      />
-    </div>
-  )}
+                  <input
+                    type="time"
+                    value={toInputTime(eventoSeleccionado.fecha_inicio)}
+                    onChange={(e) => {
+                      const fecha = toInputDate(eventoSeleccionado.fecha_inicio);
 
-  <div className="grid grid-cols-2 gap-6">
-    <div>
-      <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
-        Motivo
-      </div>
+                      setEventoSeleccionado({
+                        ...eventoSeleccionado,
+                        fecha_inicio: buildISOFromDateTime(fecha, e.target.value),
+                      });
+                    }}
+                    className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+                  />
 
-      {modoEdicion ? (
-        <input
-          type="text"
-          value={eventoSeleccionado.motivo || ''}
-          onChange={(e) =>
-            setEventoSeleccionado({
-              ...eventoSeleccionado,
-              motivo: e.target.value,
-            })
-          }
-          className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
-        />
-      ) : (
-        <div className="text-white text-lg font-medium">
-          {eventoSeleccionado.motivo || 'No indicado'}
-        </div>
-      )}
-    </div>
+                  <input
+                    type="time"
+                    value={toInputTime(eventoSeleccionado.fecha_fin)}
+                    onChange={(e) => {
+                      const fecha = toInputDate(eventoSeleccionado.fecha_fin);
 
-    <div>
-      <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
-        Teléfono
-      </div>
-      <div className="text-white text-lg font-medium">
-        {eventoSeleccionado.telefono || 'No disponible'}
-      </div>
-    </div>
-  </div>
+                      setEventoSeleccionado({
+                        ...eventoSeleccionado,
+                        fecha_fin: buildISOFromDateTime(fecha, e.target.value),
+                      });
+                    }}
+                    className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+                  />
+                </div>
+              )}
+
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
+                    Motivo
+                  </div>
+
+                  {modoEdicion ? (
+                    <input
+                      type="text"
+                      value={eventoSeleccionado.motivo || ''}
+                      onChange={(e) =>
+                        setEventoSeleccionado({
+                          ...eventoSeleccionado,
+                          motivo: e.target.value,
+                        })
+                      }
+                      className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+                    />
+                  ) : (
+                    <div className="text-white text-lg font-medium">
+                      {eventoSeleccionado.motivo || 'No indicado'}
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
+                    Teléfono
+                  </div>
+                  <div className="text-white text-lg font-medium">
+                    {eventoSeleccionado.telefono || 'No disponible'}
+                  </div>
+                </div>
+              </div>
 
               <div>
                 <div className="text-cyan-300 text-xs uppercase tracking-wider mb-2 font-bold">
@@ -602,22 +756,22 @@ export default function AgendasView() {
                 </div>
 
                 {modoEdicion ? (
-  <textarea
-    value={eventoSeleccionado.detalle_motivo || ''}
-    onChange={(e) =>
-      setEventoSeleccionado({
-        ...eventoSeleccionado,
-        detalle_motivo: e.target.value,
-      })
-    }
-    className="w-full rounded-2xl border border-white/25 bg-black/20 p-4 text-white resize-none outline-none"
-    rows={3}
-  />
-) : (
-  <div className="rounded-2xl border border-white/25 bg-black/20 p-4 text-white/95">
-    {eventoSeleccionado.detalle_motivo || 'Sin observaciones'}
-  </div>
-)}
+                  <textarea
+                    value={eventoSeleccionado.detalle_motivo || ''}
+                    onChange={(e) =>
+                      setEventoSeleccionado({
+                        ...eventoSeleccionado,
+                        detalle_motivo: e.target.value,
+                      })
+                    }
+                    className="w-full rounded-2xl border border-white/25 bg-black/20 p-4 text-white resize-none outline-none"
+                    rows={3}
+                  />
+                ) : (
+                  <div className="rounded-2xl border border-white/25 bg-black/20 p-4 text-white/95">
+                    {eventoSeleccionado.detalle_motivo || 'Sin observaciones'}
+                  </div>
+                )}
               </div>
 
               <div className="grid grid-cols-3 gap-5 pt-2 border-t border-white/20">
@@ -648,6 +802,37 @@ export default function AgendasView() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {mostrarCancelar && eventoActivo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-3xl border border-white/45 bg-[#03111A]/95 p-6 shadow-[0_0_45px_rgba(255,255,255,.25)]">
+            <h3 className="text-xl font-semibold text-white mb-2">
+              ¿Cancelar esta cita?
+            </h3>
+
+            <p className="text-cyan-100/80 text-sm mb-6">
+              {eventoActivo.titulo || eventoActivo.nombre_paciente}
+            </p>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setMostrarCancelar(false)}
+                className="rounded-full border border-white/20 px-5 py-2 text-white/80 hover:text-white hover:bg-white/10"
+              >
+                No
+              </button>
+
+              <button
+                onClick={cancelarCita}
+                disabled={loading}
+                className="rounded-full border border-red-300/40 bg-red-500/20 px-5 py-2 text-red-100 hover:bg-red-500/30 disabled:opacity-50"
+              >
+                Sí, cancelar
+              </button>
             </div>
           </div>
         </div>
