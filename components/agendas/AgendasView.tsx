@@ -363,17 +363,16 @@ const guardarCambiosCita = async () => {
   setSlotFin(null);
 
   setEventos((prev) =>
-    prev.map((evento) =>
-      evento.event_id === citaActualizada.event_id ||
-      evento.calendar_id === citaActualizada.calendar_id
-        ? {
-            ...evento,
-            ...citaActualizada,
-            cambios: (citaActualizada.cambios || 0) + 1,
-          }
-        : evento
-    )
-  );
+  prev.map((evento) =>
+    evento.event_id === citaActualizada.event_id
+      ? {
+          ...evento,
+          ...citaActualizada,
+          cambios: (citaActualizada.cambios || 0) + 1,
+        }
+      : evento
+  )
+);
 
   setLoading(true);
 
