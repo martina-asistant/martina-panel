@@ -544,14 +544,28 @@ export default function AgendasView() {
             <div className="p-6 space-y-5">
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
-                    Motivo
-                  </div>
-                  <div className="text-white text-lg font-medium">
-                    {eventoSeleccionado.motivo || 'No indicado'}
-                  </div>
-                </div>
+  <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
+    Motivo
+  </div>
 
+  {modoEdicion ? (
+    <input
+      type="text"
+      value={eventoSeleccionado.motivo || ''}
+      onChange={(e) =>
+        setEventoSeleccionado({
+          ...eventoSeleccionado,
+          motivo: e.target.value,
+        })
+      }
+      className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+    />
+  ) : (
+    <div className="text-white text-lg font-medium">
+      {eventoSeleccionado.motivo || 'No indicado'}
+    </div>
+  )}
+</div>
                 <div>
                   <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
                     Teléfono
