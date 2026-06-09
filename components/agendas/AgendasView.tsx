@@ -137,6 +137,8 @@ export default function AgendasView() {
   const [slotFin, setSlotFin] = useState<string | null>(null);
   const [eventoSeleccionado, setEventoSeleccionado] = useState<EventoAgenda | null>(null);
   const [eventoActivo, setEventoActivo] = useState<EventoAgenda | null>(null);
+  const [modoEdicion, setModoEdicion] = useState(false);
+  const [mostrarCancelar, setMostrarCancelar] = useState(false);
 
   const agenda = agendas.find(a => a.key === agendaActiva);
 
@@ -342,13 +344,23 @@ export default function AgendasView() {
 
             <div className="flex flex-wrap items-center justify-end gap-2">
               {acciones.map((accion) => (
-                <button
-                  key={accion}
-                  className="rounded-full border border-cyan-400/30 bg-cyan-500/10 px-3.5 py-1.5 text-[10px] tracking-[0.12em] text-cyan-100 hover:bg-cyan-500/20 hover:border-cyan-300/50 transition-all whitespace-nowrap"
-                >
-                  {accion}
-                </button>
-              ))}
+  <button
+    key={accion}
+    onClick={() => {
+      if (accion === 'MODIFICAR CITA' && eventoActivo) {
+        setEventoSeleccionado(eventoActivo);
+        setModoEdicion(true);
+      }
+
+      if (accion === 'CANCELAR CITA' && eventoActivo) {
+        setMostrarCancelar(true);
+      }
+    }}
+    className="rounded-full border border-cyan-400/30 bg-cyan-500/10 px-3.5 py-1.5 text-[10px] tracking-[0.12em] text-cyan-100 hover:bg-cyan-500/20 hover:border-cyan-300/50 transition-all whitespace-nowrap"
+  >
+    {accion}
+  </button>
+))}
 
               <button
                 onClick={gestionarBloqueo}
@@ -434,6 +446,7 @@ export default function AgendasView() {
                         onDoubleClick={() => {
                           if (eventoSlot && !esBloqueoEvento) {
                             setEventoSeleccionado(eventoSlot);
+                            setModoEdicion(false);
                           }
                         }}
                         style={{
