@@ -54,34 +54,36 @@ const buildISOFromDateTime = (date: string, time: string) => {
 };
 
 const getDuracionPorMotivo = (motivo: string) => {
-  if (motivo === 'Revisión general') return 30;
-  if (motivo === 'Revisión') return 5;
+  const m = motivo.trim().toLowerCase();
 
-  if (motivo === 'Limpieza') return 30;
+  if (m === 'revisión general' || m === 'revision general') return 30;
+  if (m === 'revisión' || m === 'revision') return 5;
 
-  if (motivo === 'Obturación') return 30;
+  if (m === 'limpieza') return 30;
 
-  if (motivo === 'Primera visita') return 45;
+  if (m === 'obturación' || m === 'obturacion') return 30;
 
-  if (motivo === 'Endodoncia') return 45;
+  if (m === 'primera visita') return 45;
 
-  if (motivo === 'Rec+Post') return 45;
+  if (m === 'endodoncia') return 45;
 
-  if (motivo === 'Implante') return 45;
+  if (m === 'rec+post') return 45;
 
-  if (motivo === 'Cirugía') return 60;
+  if (m === 'implante') return 45;
 
-  if (motivo === 'Impresiones') return 30;
+  if (m === 'cirugía' || m === 'cirugia') return 60;
 
-  if (motivo === 'Prueba-colocar') return 30;
+  if (m === 'impresiones') return 30;
 
-  if (motivo === 'Raspados') return 45;
+  if (m === 'prueba-colocar') return 30;
 
-  if (motivo === 'Tallados') return 60;
+  if (m === 'raspados') return 45;
 
-  if (motivo === 'Prótesis') return 30;
+  if (m === 'tallados') return 60;
 
-  if (motivo === 'Férula Michigan') return 30;
+  if (m === 'prótesis' || m === 'protesis') return 30;
+
+  if (m === 'férula michigan' || m === 'ferula michigan') return 30;
 
   return 30;
 };
@@ -179,61 +181,62 @@ const esBloqueoAgenda = (evento?: EventoAgenda | null) =>
   Boolean(evento?.titulo?.toUpperCase().includes('BLOQUEO AGENDA'));
 
 const getColorTratamiento = (evento: EventoAgenda) => {
-  const motivo = evento.motivo || '';
+  const motivo = (evento.motivo || '').trim().toLowerCase();
 
-  if (motivo === 'Primera visita') {
+  if (motivo === 'primera visita') {
     return { bg: 'rgba(250,204,21,.90)', text: 'text-white' };
   }
 
-  if (motivo === 'Férula Michigan') {
+  if (motivo === 'férula michigan' || motivo === 'ferula michigan') {
     return { bg: 'rgba(202,138,4,.90)', text: 'text-white' };
   }
 
-  if (motivo === 'Endodoncia') {
+  if (motivo === 'endodoncia') {
     return { bg: 'rgba(244,114,182,.90)', text: 'text-white' };
   }
 
-  if (motivo === 'Rec+Post') {
+  if (motivo === 'rec+post') {
     return { bg: 'rgba(236,72,153,.90)', text: 'text-white' };
   }
 
-  if (motivo === 'Limpieza') {
+  if (motivo === 'limpieza') {
     return { bg: 'rgba(148,163,184,.90)', text: 'text-white' };
   }
 
-  if (motivo === 'Obturación') {
+  if (motivo === 'obturación' || motivo === 'obturacion') {
     return { bg: 'rgba(168,85,247,.90)', text: 'text-white' };
   }
 
-  if (motivo === 'Revisión') {
+  if (motivo === 'revisión' || motivo === 'revision') {
     return { bg: 'rgba(125,211,252,.90)', text: 'text-white' };
   }
 
-  if (motivo === 'Revisión general') {
+  if (motivo === 'revisión general' || motivo === 'revision general') {
     return { bg: 'rgba(125,211,252,.90)', text: 'text-white' };
   }
 
   if (
-    motivo === 'Prótesis' ||
-    motivo === 'Impresiones' ||
-    motivo === 'Prueba-colocar'
+    motivo === 'prótesis' ||
+    motivo === 'protesis' ||
+    motivo === 'impresiones' ||
+    motivo === 'prueba-colocar'
   ) {
     return { bg: 'rgba(249,115,22,.90)', text: 'text-white' };
   }
 
-  if (motivo === 'Raspados') {
+  if (motivo === 'raspados') {
     return { bg: 'rgba(153,27,27,.85)', text: 'text-white' };
   }
 
-  if (motivo === 'Tallados') {
+  if (motivo === 'tallados') {
     return { bg: 'rgba(220,38,38,.85)', text: 'text-white' };
   }
 
-  if (motivo === 'Implante') {
+  if (motivo === 'implante') {
     return { bg: 'rgba(14,165,233,.90)', text: 'text-white' };
   }
 
-  if (motivo === 'Cirugía') {
+  if (motivo === 'cirugía' || motivo === 'cirugia') {
     return { bg: 'rgba(255,255,255,.95)', text: 'text-[#03111A]' };
   }
 
