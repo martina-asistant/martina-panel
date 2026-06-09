@@ -332,11 +332,14 @@ export default function AgendasView() {
     await cargarAgenda();
   };
 
-  const guardarCambiosCita = async () => {
-    if (!eventoSeleccionado || loading) return;
+ const guardarCambiosCita = async () => {
+  if (!eventoSeleccionado || loading) return;
 
-    setLoading(true);
+  setLoading(true);
 
+  const citaActualizada = eventoSeleccionado;
+
+  try {
     const response = await fetch('/agendas/gestionar', {
       method: 'POST',
       headers: {
@@ -345,38 +348,53 @@ export default function AgendasView() {
       body: JSON.stringify({
         accion: 'modificar_cita',
         agenda: agendaActiva,
-        calendar_id: eventoSeleccionado.calendar_id,
-        event_id: eventoSeleccionado.event_id,
-        telefono: eventoSeleccionado.telefono,
-        nombre_paciente: eventoSeleccionado.nombre_paciente,
-        motivo: eventoSeleccionado.motivo,
-        detalle_motivo: eventoSeleccionado.detalle_motivo,
-        origen: eventoSeleccionado.origen,
-        estado: eventoSeleccionado.estado,
-        cambios: (eventoSeleccionado.cambios || 0) + 1,
-        fecha_inicio: eventoSeleccionado.fecha_inicio,
-        fecha_fin: eventoSeleccionado.fecha_fin,
+        calendar_id: citaActualizada.calendar_id,
+        event_id: citaActualizada.event_id,
+        telefono: citaActualizada.telefono,
+        nombre_paciente: citaActualizada.nombre_paciente,
+        motivo: citaActualizada.motivo,
+        detalle_motivo: citaActualizada.detalle_motivo,
+        origen: citaActualizada.origen,
+        estado: citaActualizada.estado,
+        cambios: (citaActualizada.cambios || 0) + 1,
+        fecha_inicio: citaActualizada.fecha_inicio,
+        fecha_fin: citaActualizada.fecha_fin,
         usuario: 'Sheila',
       }),
     });
 
     const data = await response.json();
 
-setLoading(false);
+    if (!data?.ok) {
+      console.error('Error modificando cita:', data);
+      return;
+    }
 
-if (!data?.ok) {
-  console.error('Error modificando cita:', data);
-  return;
-}
+    setEventos((prev) =>
+      prev.map((evento) =>
+        evento.event_id === citaActualizada.event_id
+          ? {
+              ...evento,
+              ...citaActualizada,
+              cambios: (citaActualizada.cambios || 0) + 1,
+            }
+          : evento
+      )
+    );
 
-await cargarAgenda();
+    setEventoSeleccionado(null);
+    setEventoActivo(null);
+    setModoEdicion(false);
+    setSlotInicio(null);
+    setSlotFin(null);
 
-setEventoSeleccionado(null);
-setEventoActivo(null);
-setModoEdicion(false);
-setSlotInicio(null);
-setSlotFin(null);
-  };
+    await cargarAgenda();
+  } catch (error) {
+    console.error('Error guardando cambios cita:', error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const cancelarCita = async () => {
     if (!eventoActivo || loading) return;
