@@ -332,6 +332,14 @@ export default function AgendasView() {
     await cargarAgenda();
   };
 
+  const cerrarModalCita = () => {
+  setEventoSeleccionado(null);
+  setEventoActivo(null);
+  setModoEdicion(false);
+  setSlotInicio(null);
+  setSlotFin(null);
+};
+
  const guardarCambiosCita = async () => {
   if (!eventoSeleccionado || loading) return;
 
@@ -382,13 +390,11 @@ export default function AgendasView() {
       )
     );
 
-    setEventoSeleccionado(null);
-    setEventoActivo(null);
-    setModoEdicion(false);
-    setSlotInicio(null);
-    setSlotFin(null);
+    cerrarModalCita();
 
-    cargarAgenda();
+setTimeout(() => {
+  cargarAgenda();
+}, 100);
   } catch (error) {
     console.error('Error guardando cambios cita:', error);
   } finally {
@@ -700,10 +706,7 @@ export default function AgendasView() {
                   )}
 
                   <button
-                    onClick={() => {
-                      setEventoSeleccionado(null);
-                      setModoEdicion(false);
-                    }}
+                    onClick={cerrarModalCita}
                     className="text-white/80 hover:text-white text-xl"
                   >
                     ✕
