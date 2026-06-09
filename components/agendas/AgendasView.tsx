@@ -34,6 +34,32 @@ const buildISOFromDateTime = (date: string, time: string) => {
   return new Date(year, month - 1, day, hours, minutes, 0, 0).toISOString();
 };
 
+const getDuracionPorMotivo = (motivo: string) => {
+  const m = motivo.toLowerCase();
+
+  if (m.includes('revisión general') || m.includes('revision general')) return 30;
+  if (m.includes('revisión') || m.includes('revision')) return 5;
+
+  if (m.includes('limpieza')) return 30;
+  if (m.includes('obturacion') || m.includes('obturación') || m.includes('caries')) return 30;
+  if (m.includes('primera visita')) return 45;
+  if (m.includes('endodoncia')) return 45;
+  if (m.includes('implante')) return 45;
+  if (m.includes('cirugía') || m.includes('cirugia')) return 60;
+
+  if (m.includes('prueba-colocar')) return 30;
+  if (m.includes('impresiones')) return 30;
+  if (m.includes('raspados')) return 45;
+
+  return 30;
+};
+
+const sumarMinutosISO = (iso: string, minutos: number) => {
+  const fecha = new Date(iso);
+  fecha.setMinutes(fecha.getMinutes() + minutos);
+  return fecha.toISOString();
+};
+
 const getMonday = (date: Date) => {
   const d = new Date(date);
   const day = d.getDay();
@@ -667,23 +693,66 @@ export default function AgendasView() {
 
             <div className="p-6 space-y-5">
               {modoEdicion && (
-                <div className="grid grid-cols-3 gap-4">
-                  <input
-                    type="date"
-                    value={toInputDate(eventoSeleccionado.fecha_inicio)}
-                    onChange={(e) => {
-                      const fecha = e.target.value;
-                      const inicio = toInputTime(eventoSeleccionado.fecha_inicio);
-                      const fin = toInputTime(eventoSeleccionado.fecha_fin);
+  <div className="grid grid-cols-3 gap-4">
+    <input
+      type="date"
+      value={toInputDate(eventoSeleccionado.fecha_inicio)}
+      onChange={(e) => {
+        const fecha = e.target.value;
+        const inicio = toInputTime(eventoSeleccionado.fecha_inicio);
+        const fin = toInputTime(eventoSeleccionado.fecha_fin);
 
-                      setEventoSeleccionado({
-                        ...eventoSeleccionado,
-                        fecha_inicio: buildISOFromDateTime(fecha, inicio),
-                        fecha_fin: buildISOFromDateTime(fecha, fin),
-                      });
-                    }}
-                    className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
-                  />
+        setEventoSeleccionado({
+          ...eventoSeleccionado,
+          fecha_inicio: buildISOFromDateTime(fecha, inicio),
+          fecha_fin: buildISOFromDateTime(fecha, fin),
+        });
+      }}
+      className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+    />
+
+    <input
+      type="time"
+      step={300}
+      value={toInputTime(eventoSeleccionado.fecha_inicio)}
+      onChange={(e) => {
+        const fecha = toInputDate(eventoSeleccionado.fecha_inicio);
+        const nuevaHoraInicio = e.target.value;
+
+        const nuevaFechaInicio = buildISOFromDateTime(fecha, nuevaHoraInicio);
+
+        const duracion = getDuracionPorMotivo(
+          eventoSeleccionado.motivo || eventoSeleccionado.titulo || ''
+        );
+
+        const nuevaFechaFin = sumarMinutosISO(nuevaFechaInicio, duracion);
+
+        setEventoSeleccionado({
+          ...eventoSeleccionado,
+          fecha_inicio: nuevaFechaInicio,
+          fecha_fin: nuevaFechaFin,
+        });
+      }}
+      className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+    />
+
+    <input
+      type="time"
+      step={300}
+      value={toInputTime(eventoSeleccionado.fecha_fin)}
+      onChange={(e) => {
+        const fecha = toInputDate(eventoSeleccionado.fecha_inicio);
+        const nuevaHoraFin = e.target.value;
+
+        setEventoSeleccionado({
+          ...eventoSeleccionado,
+          fecha_fin: buildISOFromDateTime(fecha, nuevaHoraFin),
+        });
+      }}
+      className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+    />
+  </div>
+)}
 
                   <input
                     type="time"
