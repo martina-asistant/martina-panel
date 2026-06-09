@@ -48,6 +48,7 @@ const getDuracionPorMotivo = (motivo: string) => {
   if (m.includes('prueba-colocar')) return 30;
   if (m.includes('impresiones')) return 30;
   if (m.includes('raspados')) return 45;
+  if (m.includes('rec+post')) return 45;
 
   return 30;
 };
@@ -144,6 +145,10 @@ const getColorTratamiento = (evento: EventoAgenda) => {
 
   if (texto.includes('endodoncia')) {
     return { bg: 'rgba(244,114,182,.90)', text: 'text-white' };
+  }
+
+    if (texto.includes('rec+post')) {
+    return { bg: 'rgba(236,72,153,.90)', text: 'text-white' };
   }
 
   if (texto.includes('obturacion') || texto.includes('obturación')) {
@@ -785,7 +790,7 @@ export default function AgendasView() {
     {eventoSeleccionado.motivo || 'No indicado'}
   </div>
 )}
-
+</div>
                 <div>
                   <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
                     Teléfono
