@@ -13,6 +13,24 @@ const agendas = [
 
 const acciones = ['INSERTAR CITA', 'MODIFICAR CITA', 'CANCELAR CITA', 'INSERTAR RECALL'];
 
+const TRATAMIENTOS = [
+  'Primera visita',
+  'Revisión',
+  'Revisión general',
+  'Limpieza',
+  'Obturación',
+  'Endodoncia',
+  'Rec+Post',
+  'Implante',
+  'Cirugía',
+  'Impresiones',
+  'Prueba-colocar',
+  'Raspados',
+  'Tallados',
+  'Prótesis',
+  'Férula Michigan',
+];
+
 const SLOT_HEIGHT = 22;
 const START_HOUR = 9;
 const END_HOUR = 19.5;
@@ -36,20 +54,34 @@ const buildISOFromDateTime = (date: string, time: string) => {
 };
 
 const getDuracionPorMotivo = (motivo: string) => {
-  const m = motivo.toLowerCase();
+  if (motivo === 'Revisión general') return 30;
+  if (motivo === 'Revisión') return 5;
 
-  if (m.includes('revisión general') || m.includes('revision general')) return 30;
-  if (m.includes('revisión') || m.includes('revision')) return 5;
-  if (m.includes('limpieza')) return 30;
-  if (m.includes('obturacion') || m.includes('obturación') || m.includes('caries')) return 30;
-  if (m.includes('primera visita')) return 45;
-  if (m.includes('endodoncia')) return 45;
-  if (m.includes('implante')) return 45;
-  if (m.includes('cirugía') || m.includes('cirugia')) return 60;
-  if (m.includes('prueba-colocar')) return 30;
-  if (m.includes('impresiones')) return 30;
-  if (m.includes('raspados')) return 45;
-  if (m.includes('rec+post')) return 45;
+  if (motivo === 'Limpieza') return 30;
+
+  if (motivo === 'Obturación') return 30;
+
+  if (motivo === 'Primera visita') return 45;
+
+  if (motivo === 'Endodoncia') return 45;
+
+  if (motivo === 'Rec+Post') return 45;
+
+  if (motivo === 'Implante') return 45;
+
+  if (motivo === 'Cirugía') return 60;
+
+  if (motivo === 'Impresiones') return 30;
+
+  if (motivo === 'Prueba-colocar') return 30;
+
+  if (motivo === 'Raspados') return 45;
+
+  if (motivo === 'Tallados') return 60;
+
+  if (motivo === 'Prótesis') return 30;
+
+  if (motivo === 'Férula Michigan') return 30;
 
   return 30;
 };
@@ -115,8 +147,17 @@ const sameDay = (iso: string, date: Date) => {
   );
 };
 
-const isHorarioNoDisponible = (hora: string, dia: Date) => {
+const isHorarioNoDisponible = (hora: string, dia: Date, agenda: string) => {
   const diaSemana = dia.getDay();
+
+  if (agenda === 'celia') {
+    if (diaSemana !== 3) return true;
+
+    const manana = hora >= '09:30' && hora < '13:30';
+    const tarde = hora >= '15:00' && hora < '19:00';
+
+    return !(manana || tarde);
+  }
 
   if (diaSemana === 1) return hora >= '17:00';
   if (diaSemana === 2) return hora >= '14:00' && hora < '15:00';
@@ -138,38 +179,61 @@ const esBloqueoAgenda = (evento?: EventoAgenda | null) =>
   Boolean(evento?.titulo?.toUpperCase().includes('BLOQUEO AGENDA'));
 
 const getColorTratamiento = (evento: EventoAgenda) => {
-  const texto = `${evento.titulo || ''} ${evento.motivo || ''}`.toLowerCase();
+  const motivo = evento.motivo || '';
 
-  if (texto.includes('primera visita')) {
+  if (motivo === 'Primera visita') {
     return { bg: 'rgba(250,204,21,.90)', text: 'text-white' };
   }
 
-  if (texto.includes('endodoncia')) {
+  if (motivo === 'Férula Michigan') {
+    return { bg: 'rgba(202,138,4,.90)', text: 'text-white' };
+  }
+
+  if (motivo === 'Endodoncia') {
     return { bg: 'rgba(244,114,182,.90)', text: 'text-white' };
   }
 
-    if (texto.includes('rec+post')) {
+  if (motivo === 'Rec+Post') {
     return { bg: 'rgba(236,72,153,.90)', text: 'text-white' };
   }
 
-  if (texto.includes('obturacion') || texto.includes('obturación')) {
+  if (motivo === 'Limpieza') {
+    return { bg: 'rgba(148,163,184,.90)', text: 'text-white' };
+  }
+
+  if (motivo === 'Obturación') {
     return { bg: 'rgba(168,85,247,.90)', text: 'text-white' };
   }
 
-  if (texto.includes('revision') || texto.includes('revisión')) {
+  if (motivo === 'Revisión') {
+    return { bg: 'rgba(125,211,252,.90)', text: 'text-white' };
+  }
+
+  if (motivo === 'Revisión general') {
     return { bg: 'rgba(125,211,252,.90)', text: 'text-white' };
   }
 
   if (
-    texto.includes('protesis') ||
-    texto.includes('prótesis') ||
-    texto.includes('impresiones') ||
-    texto.includes('prueba-colocar')
+    motivo === 'Prótesis' ||
+    motivo === 'Impresiones' ||
+    motivo === 'Prueba-colocar'
   ) {
     return { bg: 'rgba(249,115,22,.90)', text: 'text-white' };
   }
 
-  if (texto.includes('cirugia') || texto.includes('cirugía')) {
+  if (motivo === 'Raspados') {
+    return { bg: 'rgba(153,27,27,.85)', text: 'text-white' };
+  }
+
+  if (motivo === 'Tallados') {
+    return { bg: 'rgba(220,38,38,.85)', text: 'text-white' };
+  }
+
+  if (motivo === 'Implante') {
+    return { bg: 'rgba(14,165,233,.90)', text: 'text-white' };
+  }
+
+  if (motivo === 'Cirugía') {
     return { bg: 'rgba(255,255,255,.95)', text: 'text-[#03111A]' };
   }
 
@@ -634,7 +698,7 @@ const guardarCambiosCita = async () => {
                       return slotKey >= inicio && slotKey <= fin;
                     })();
 
-                    const bloqueadoAutomatico = isHorarioNoDisponible(hora, dia);
+                    const bloqueadoAutomatico = isHorarioNoDisponible(hora, dia, agendaActiva);
                     const bloqueado = bloqueadoAutomatico || esBloqueoEvento;
 
                     return (
