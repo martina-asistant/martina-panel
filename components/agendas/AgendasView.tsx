@@ -752,33 +752,6 @@ export default function AgendasView() {
   </div>
 )}
 
-                  <input
-                    type="time"
-                    step={300}
-                    value={toInputTime(eventoSeleccionado.fecha_inicio)}
-                   onChange={(e) => {
-  const fecha = toInputDate(eventoSeleccionado.fecha_inicio);
-  const nuevaHoraInicio = e.target.value;
-
-  const nuevaFechaInicio = buildISOFromDateTime(fecha, nuevaHoraInicio);
-
-  const duracion = getDuracionPorMotivo(
-    eventoSeleccionado.motivo || eventoSeleccionado.titulo || ''
-  );
-
-  const nuevaFechaFin = sumarMinutosISO(nuevaFechaInicio, duracion);
-
-  setEventoSeleccionado({
-    ...eventoSeleccionado,
-    fecha_inicio: nuevaFechaInicio,
-    fecha_fin: nuevaFechaFin,
-  });
-}}
-                    className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
-                  />
-                </div>
-              )}
-
               <div className="grid grid-cols-2 gap-6">
                 <div>
                   <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
