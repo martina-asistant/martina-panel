@@ -388,7 +388,7 @@ export default function AgendasView() {
     setSlotInicio(null);
     setSlotFin(null);
 
-    await cargarAgenda();
+    cargarAgenda();
   } catch (error) {
     console.error('Error guardando cambios cita:', error);
   } finally {
