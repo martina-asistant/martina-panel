@@ -273,6 +273,15 @@ export default function AgendasView() {
   const [mostrarCancelar, setMostrarCancelar] = useState(false);
   const [modalCitaAbierto, setModalCitaAbierto] = useState(false);
   const [usuarioPanel, setUsuarioPanel] = useState('panel');
+  const [mostrarInsertar, setMostrarInsertar] = useState(false);
+  const [nuevaCita, setNuevaCita] = useState({
+  nombre_paciente: '',
+  telefono: '',
+  motivo: 'Primera visita',
+  detalle_motivo: '',
+  fecha_inicio: '',
+  fecha_fin: '',
+});
     
 
   const agenda = agendas.find(a => a.key === agendaActiva);
@@ -548,6 +557,75 @@ const guardarCambiosCita = async () => {
   }
 };
 
+  const abrirInsertarCita = () => {
+  const rango = getRangoSeleccionado();
+
+  if (!rango || loading) return;
+
+  const motivo = 'Primera visita';
+  const fechaInicio = rango.inicio.toISOString();
+  const fechaFin = sumarMinutosISO(fechaInicio, getDuracionPorMotivo(motivo));
+
+  setNuevaCita({
+    nombre_paciente: '',
+    telefono: '',
+    motivo,
+    detalle_motivo: '',
+    fecha_inicio: fechaInicio,
+    fecha_fin: fechaFin,
+  });
+
+  setMostrarInsertar(true);
+};
+
+const guardarInsertarCita = async () => {
+  if (loading) return;
+
+  if (!nuevaCita.nombre_paciente.trim() || !nuevaCita.telefono.trim()) {
+    console.error('Falta nombre o teléfono');
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const response = await fetch('/agendas/gestionar', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        accion: 'insertar_cita',
+        agenda: agendaActiva,
+        nombre_paciente: nuevaCita.nombre_paciente,
+        telefono: nuevaCita.telefono,
+        motivo: nuevaCita.motivo,
+        detalle_motivo: nuevaCita.detalle_motivo,
+        fecha_inicio: nuevaCita.fecha_inicio,
+        fecha_fin: nuevaCita.fecha_fin,
+        usuario: usuarioPanel,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!data?.ok) {
+      console.error('Error insertando cita:', data);
+      await cargarAgenda();
+      return;
+    }
+
+    setMostrarInsertar(false);
+    setSlotInicio(null);
+    setSlotFin(null);
+    await cargarAgenda();
+  } catch (error) {
+    console.error('Error insertando cita:', error);
+  } finally {
+    setLoading(false);
+  }
+};
+
   useEffect(() => {
     cargarAgenda();
   }, [agendaActiva, semanaInicio]);
@@ -644,6 +722,11 @@ const guardarCambiosCita = async () => {
                     if (accion === 'CANCELAR CITA' && eventoActivo) {
                       setMostrarCancelar(true);
                     }
+
+                    if (accion === 'INSERTAR CITA') {
+                    abrirInsertarCita();
+                    }
+                    
                   }}
                   className="rounded-full border border-cyan-400/30 bg-cyan-500/10 px-3.5 py-1.5 text-[10px] tracking-[0.12em] text-cyan-100 hover:bg-cyan-500/20 hover:border-cyan-300/50 transition-all whitespace-nowrap"
                 >
@@ -1026,6 +1109,143 @@ const guardarCambiosCita = async () => {
         </div>
       )}
 
+      {mostrarInsertar && (
+  <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm pt-[13vh]">
+    <div className="w-full max-w-2xl rounded-3xl border border-cyan-300/45 bg-[#03111A]/95 overflow-hidden shadow-[0_0_46px_rgba(34,211,238,.24)]">
+      <div className="px-6 py-5 border-b border-cyan-300/20 flex items-start justify-between">
+        <div>
+          <h2 className="text-xl font-semibold text-white">Insertar cita</h2>
+          <p className="text-cyan-200 text-sm mt-1">
+            {new Date(nuevaCita.fecha_inicio).toLocaleDateString('es-ES')} · {toInputTime(nuevaCita.fecha_inicio)} - {toInputTime(nuevaCita.fecha_fin)}
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={guardarInsertarCita}
+            disabled={loading}
+            className="text-cyan-200 hover:text-white text-2xl disabled:opacity-50"
+          >
+            ✓
+          </button>
+
+          <button
+            onClick={() => setMostrarInsertar(false)}
+            className="text-white/80 hover:text-white text-xl"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <div className="p-6 space-y-5">
+        <div className="grid grid-cols-3 gap-4">
+          <input
+            type="date"
+            value={toInputDate(nuevaCita.fecha_inicio)}
+            onChange={(e) => {
+              const fecha = e.target.value;
+              const inicio = toInputTime(nuevaCita.fecha_inicio);
+              const fin = toInputTime(nuevaCita.fecha_fin);
+
+              setNuevaCita({
+                ...nuevaCita,
+                fecha_inicio: buildISOFromDateTime(fecha, inicio),
+                fecha_fin: buildISOFromDateTime(fecha, fin),
+              });
+            }}
+            className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
+          />
+
+          <input
+            type="time"
+            step={300}
+            value={toInputTime(nuevaCita.fecha_inicio)}
+            onChange={(e) => {
+              const fecha = toInputDate(nuevaCita.fecha_inicio);
+              const nuevaFechaInicio = buildISOFromDateTime(fecha, e.target.value);
+              const nuevaFechaFin = sumarMinutosISO(
+                nuevaFechaInicio,
+                getDuracionPorMotivo(nuevaCita.motivo)
+              );
+
+              setNuevaCita({
+                ...nuevaCita,
+                fecha_inicio: nuevaFechaInicio,
+                fecha_fin: nuevaFechaFin,
+              });
+            }}
+            className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
+          />
+
+          <input
+            type="time"
+            step={300}
+            value={toInputTime(nuevaCita.fecha_fin)}
+            onChange={(e) => {
+              const fecha = toInputDate(nuevaCita.fecha_inicio);
+
+              setNuevaCita({
+                ...nuevaCita,
+                fecha_fin: buildISOFromDateTime(fecha, e.target.value),
+              });
+            }}
+            className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-6">
+          <input
+            placeholder="Paciente"
+            value={nuevaCita.nombre_paciente}
+            onChange={(e) => setNuevaCita({ ...nuevaCita, nombre_paciente: e.target.value })}
+            className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+          />
+
+          <input
+            placeholder="Teléfono"
+            value={nuevaCita.telefono}
+            onChange={(e) => setNuevaCita({ ...nuevaCita, telefono: e.target.value })}
+            className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+          />
+        </div>
+
+        <select
+          value={nuevaCita.motivo}
+          onChange={(e) => {
+            const motivo = e.target.value;
+            const fechaFin = sumarMinutosISO(
+              nuevaCita.fecha_inicio,
+              getDuracionPorMotivo(motivo)
+            );
+
+            setNuevaCita({
+              ...nuevaCita,
+              motivo,
+              fecha_fin: fechaFin,
+            });
+          }}
+          className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+        >
+          {TRATAMIENTOS.map((tratamiento) => (
+            <option key={tratamiento} value={tratamiento} className="bg-[#03111A]">
+              {tratamiento}
+            </option>
+          ))}
+        </select>
+
+        <textarea
+          placeholder="Detalle del motivo"
+          value={nuevaCita.detalle_motivo}
+          onChange={(e) => setNuevaCita({ ...nuevaCita, detalle_motivo: e.target.value })}
+          rows={3}
+          className="w-full rounded-2xl border border-white/25 bg-black/20 p-4 text-white resize-none outline-none"
+        />
+      </div>
+    </div>
+  </div>
+)}
+      
       {mostrarCancelar && eventoActivo && (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 backdrop-blur-sm">
     <div className="w-full max-w-[330px] rounded-3xl border border-cyan-300/45 bg-[#03111A]/95 px-6 py-5 shadow-[0_0_46px_rgba(34,211,238,.28)]">
