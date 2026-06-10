@@ -910,6 +910,7 @@ const guardarCambiosCita = async () => {
     <Clock className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-cyan-200" />
   </div>
 </div>
+            )}
 
               <div className="grid grid-cols-2 gap-6">
                 <div>
