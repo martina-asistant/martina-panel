@@ -1301,7 +1301,7 @@ const guardarInsertarCita = async () => {
     className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
   />
 </div>
-        <div className="max-w-[360px]">
+    
   <select
     value={nuevaCita.motivo}
     onChange={(e) => {
@@ -1325,7 +1325,6 @@ const guardarInsertarCita = async () => {
       </option>
     ))}
   </select>
-</div>
 
         <textarea
   placeholder="Detalle del motivo"
