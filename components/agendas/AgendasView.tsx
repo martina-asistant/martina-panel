@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { CalendarDays, ChevronLeft, ChevronRight, Lock, Clock } from 'lucide-react';
+import { CalendarDays, ChevronLeft, ChevronRight, Lock } from 'lucide-react';
 import { getAgendaFede, getAgendaCelia, getAgendaAna, type EventoAgenda } from '@/lib/repos/agendas.repo';
 import { createClient } from '@/lib/supabase/client';
 
@@ -909,7 +909,7 @@ const guardarInsertarCita = async () => {
       </div>
 
       {modalCitaAbierto && eventoSeleccionado && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm pt-[13vh]">
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm pt-[4vh]">
           <div
             style={{
               backgroundColor: getColorTratamiento(eventoSeleccionado).bg.replace(/\.[0-9]+\)/, '.28)'),
@@ -1154,7 +1154,7 @@ const guardarInsertarCita = async () => {
       )}
 
       {mostrarInsertar && (
-  <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm pt-[8vh]">
+  <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm pt-[4vh]">
     <div className="w-full max-w-2xl rounded-3xl border border-cyan-300/45 bg-[#03111A]/95 overflow-visible shadow-[0_0_46px_rgba(34,211,238,.24)]">
       <div className="px-6 py-5 border-b border-cyan-300/20 flex items-start justify-between">
         <div>
@@ -1289,7 +1289,7 @@ const guardarInsertarCita = async () => {
   <button
   type="button"
   onClick={() => setMostrarNuevoPaciente(true)}
-  className="mt-0 flex h-9 w-9 items-center justify-center rounded-full border border-cyan-300/60 bg-cyan-500/15 text-[22px] leading-none text-cyan-100 shadow-[0_0_18px_rgba(34,211,238,.35)] hover:bg-cyan-500/25 hover:shadow-[0_0_26px_rgba(34,211,238,.55)] transition-all"
+  className="mt-[1px] flex h-9 w-9 items-center justify-center rounded-full border border-cyan-300/60 bg-cyan-500/15 text-[22px] leading-none text-cyan-100 shadow-[0_0_18px_rgba(34,211,238,.35)] hover:bg-cyan-500/25 hover:shadow-[0_0_26px_rgba(34,211,238,.55)] transition-all"
 >
   <span className="-translate-y-[1px]">+</span>
 </button>
