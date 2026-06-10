@@ -1289,7 +1289,7 @@ const guardarInsertarCita = async () => {
   <button
   type="button"
   onClick={() => setMostrarNuevoPaciente(true)}
-  className="mt-[2px] flex h-9 w-9 items-center justify-center rounded-full border border-cyan-300/60 bg-cyan-500/15 text-[22px] leading-none text-cyan-100 shadow-[0_0_18px_rgba(34,211,238,.35)] hover:bg-cyan-500/25 hover:shadow-[0_0_26px_rgba(34,211,238,.55)] transition-all"
+  className="mt-0 flex h-9 w-9 items-center justify-center rounded-full border border-cyan-300/60 bg-cyan-500/15 text-[22px] leading-none text-cyan-100 shadow-[0_0_18px_rgba(34,211,238,.35)] hover:bg-cyan-500/25 hover:shadow-[0_0_26px_rgba(34,211,238,.55)] transition-all"
 >
   <span className="-translate-y-[1px]">+</span>
 </button>
