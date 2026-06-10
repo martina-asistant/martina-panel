@@ -926,7 +926,7 @@ const guardarCambiosCita = async () => {
     {eventoSeleccionado.motivo || '-'}
   </div>
 )}
-
+</div>
                 <div>
                   <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
                     Teléfono
