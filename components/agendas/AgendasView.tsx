@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { CalendarDays, ChevronLeft, ChevronRight, Lock } from 'lucide-react';
+import { CalendarDays, ChevronLeft, ChevronRight, Lock, Clock } from 'lucide-react';
 import { getAgendaFede, getAgendaCelia, getAgendaAna, type EventoAgenda } from '@/lib/repos/agendas.repo';
 import { createClient } from '@/lib/supabase/client';
 
@@ -30,6 +30,23 @@ const TRATAMIENTOS = [
   'Prótesis',
   'Férula Michigan',
 ];
+
+const normalizarTexto = (texto: string) =>
+  texto
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+
+const getTratamientoValue = (motivo: string) => {
+  const normalizado = normalizarTexto(motivo || '');
+
+  return (
+    TRATAMIENTOS.find(
+      (tratamiento) => normalizarTexto(tratamiento) === normalizado
+    ) || ''
+  );
+};
 
 const SLOT_HEIGHT = 22;
 const START_HOUR = 9;
@@ -824,6 +841,7 @@ const guardarCambiosCita = async () => {
             <div className="p-6 space-y-5">
               {modoEdicion && (
   <div className="grid grid-cols-3 gap-4">
+  <div className="relative">
     <input
       type="date"
       value={toInputDate(eventoSeleccionado.fecha_inicio)}
@@ -838,9 +856,12 @@ const guardarCambiosCita = async () => {
           fecha_fin: buildISOFromDateTime(fecha, fin),
         });
       }}
-      className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+      className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 pr-10 text-white outline-none [color-scheme:dark]"
     />
+    <CalendarDays className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-cyan-200" />
+  </div>
 
+  <div className="relative">
     <input
       type="time"
       step={300}
@@ -848,11 +869,13 @@ const guardarCambiosCita = async () => {
       onChange={(e) => {
         const fecha = toInputDate(eventoSeleccionado.fecha_inicio);
         const nuevaHoraInicio = e.target.value;
-
         const nuevaFechaInicio = buildISOFromDateTime(fecha, nuevaHoraInicio);
 
         const duracion = getDuracionPorMotivo(
-          eventoSeleccionado.motivo || eventoSeleccionado.titulo || ''
+          getTratamientoValue(eventoSeleccionado.motivo) ||
+          eventoSeleccionado.motivo ||
+          eventoSeleccionado.titulo ||
+          ''
         );
 
         const nuevaFechaFin = sumarMinutosISO(nuevaFechaInicio, duracion);
@@ -863,9 +886,12 @@ const guardarCambiosCita = async () => {
           fecha_fin: nuevaFechaFin,
         });
       }}
-      className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+      className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 pr-10 text-white outline-none [color-scheme:dark]"
     />
+    <Clock className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-cyan-200" />
+  </div>
 
+  <div className="relative">
     <input
       type="time"
       step={300}
@@ -879,10 +905,11 @@ const guardarCambiosCita = async () => {
           fecha_fin: buildISOFromDateTime(fecha, nuevaHoraFin),
         });
       }}
-      className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+      className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 pr-10 text-white outline-none [color-scheme:dark]"
     />
+    <Clock className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-cyan-200" />
   </div>
-)}
+</div>
 
               <div className="grid grid-cols-2 gap-6">
                 <div>
@@ -892,7 +919,7 @@ const guardarCambiosCita = async () => {
 
                   {modoEdicion ? (
   <select
-    value={eventoSeleccionado.motivo || ''}
+    value={getTratamientoValue(eventoSeleccionado.motivo)}
     onChange={(e) => {
       const nuevoMotivo = e.target.value;
 
@@ -931,7 +958,7 @@ const guardarCambiosCita = async () => {
                   <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
                     Teléfono
                   </div>
-                  <div className="text-white text-lg font-medium">
+                  <div className="text-white text-sm font-medium">
                     {eventoSeleccionado.telefono || 'No disponible'}
                   </div>
                 </div>
