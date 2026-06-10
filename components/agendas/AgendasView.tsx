@@ -1028,17 +1028,17 @@ const guardarCambiosCita = async () => {
 
       {mostrarCancelar && eventoActivo && (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 backdrop-blur-sm">
-    <div className="w-full max-w-[360px] rounded-3xl border border-cyan-200/45 bg-[#03111A]/95 px-6 py-5 shadow-[0_0_38px_rgba(34,211,238,.18)]">
+    <div className="w-full max-w-[330px] rounded-3xl border border-cyan-300/45 bg-[#03111A]/95 px-6 py-5 shadow-[0_0_46px_rgba(34,211,238,.28)]">
 
-      <div className="text-center text-cyan-300 text-[13px] uppercase tracking-[0.24em] font-bold mb-4">
+      <div className="text-center text-cyan-300 text-[12px] uppercase tracking-[0.28em] font-medium mb-4">
         Va a cancelar esta cita
       </div>
 
-      <div className="text-white text-base font-semibold mb-5">
+      <div className="text-center text-cyan-100 text-sm font-medium mb-5">
         {eventoActivo.titulo || eventoActivo.nombre_paciente}
       </div>
 
-      <div className="text-white/95 text-[15px] mb-6">
+      <div className="text-center text-white/95 text-sm mb-5">
         ¿Desea continuar?
       </div>
 
@@ -1055,9 +1055,9 @@ const guardarCambiosCita = async () => {
           disabled={loading}
           style={{
             backgroundColor: getColorTratamiento(eventoActivo).bg
-              .replace('.95)', '.72)')
-              .replace('.90)', '.72)')
-              .replace('.85)', '.72)'),
+              .replace('.95)', '.68)')
+              .replace('.90)', '.68)')
+              .replace('.85)', '.68)'),
           }}
           className="rounded-full border border-white/25 px-5 py-1.5 text-sm text-white hover:brightness-110 disabled:opacity-50 transition-all"
         >
