@@ -299,6 +299,7 @@ const [nuevoPaciente, setNuevoPaciente] = useState({
   telefono: '',
 });
   const [mostrarResultadosPaciente, setMostrarResultadosPaciente] = useState(false);
+  const [mostrarMotivos, setMostrarMotivos] = useState(false);
     
 
   const agenda = agendas.find(a => a.key === agendaActiva);
@@ -1289,42 +1290,72 @@ const guardarInsertarCita = async () => {
   <button
   type="button"
   onClick={() => setMostrarNuevoPaciente(true)}
-  className="mt-[1px] flex h-9 w-9 items-center justify-center rounded-full border border-cyan-300/60 bg-cyan-500/15 text-[22px] leading-none text-cyan-100 shadow-[0_0_18px_rgba(34,211,238,.35)] hover:bg-cyan-500/25 hover:shadow-[0_0_26px_rgba(34,211,238,.55)] transition-all"
+  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-cyan-300/60 bg-cyan-500/15 text-cyan-100 shadow-[0_0_14px_rgba(34,211,238,.32)] hover:bg-cyan-500/25 hover:shadow-[0_0_22px_rgba(34,211,238,.5)] transition-all"
 >
-  <span className="-translate-y-[1px]">+</span>
+  <span className="text-[18px] leading-none -translate-y-[1px]">+</span>
 </button>
 
-  <input
-    placeholder="Teléfono"
-    value={nuevaCita.telefono}
-    onChange={(e) => setNuevaCita({ ...nuevaCita, telefono: e.target.value })}
-    className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
-  />
+<input
+  placeholder="Teléfono"
+  value={nuevaCita.telefono}
+  onChange={(e) => setNuevaCita({ ...nuevaCita, telefono: e.target.value })}
+  className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+/>
 </div>
-    
-  <select
-    value={nuevaCita.motivo}
-    onChange={(e) => {
-      const motivo = e.target.value;
-      const fechaFin = sumarMinutosISO(
-        nuevaCita.fecha_inicio,
-        getDuracionPorMotivo(motivo)
-      );
 
-      setNuevaCita({
-        ...nuevaCita,
-        motivo,
-        fecha_fin: fechaFin,
-      });
-    }}
-    className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+<div className="relative overflow-visible">
+  <button
+    type="button"
+    onClick={() => setMostrarMotivos(!mostrarMotivos)}
+    className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-left text-white outline-none flex items-center justify-between"
   >
-    {TRATAMIENTOS.map((tratamiento) => (
-      <option key={tratamiento} value={tratamiento} className="bg-[#03111A]">
-        {tratamiento}
-      </option>
-    ))}
-  </select>
+    <span>{nuevaCita.motivo}</span>
+
+    <svg
+      className={`w-4 h-4 text-cyan-200 transition-transform ${
+        mostrarMotivos ? 'rotate-180' : ''
+      }`}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M19 9l-7 7-7-7"
+      />
+    </svg>
+  </button>
+
+  {mostrarMotivos && (
+    <div className="absolute left-0 top-[calc(100%+8px)] z-[120] w-full max-h-64 overflow-y-auto rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
+      {TRATAMIENTOS.map((tratamiento) => (
+        <button
+          key={tratamiento}
+          type="button"
+          onClick={() => {
+            const fechaFin = sumarMinutosISO(
+              nuevaCita.fecha_inicio,
+              getDuracionPorMotivo(tratamiento)
+            );
+
+            setNuevaCita({
+              ...nuevaCita,
+              motivo: tratamiento,
+              fecha_fin: fechaFin,
+            });
+
+            setMostrarMotivos(false);
+          }}
+          className="block w-full px-4 py-2 text-left text-sm text-white hover:bg-cyan-500/15"
+        >
+          {tratamiento}
+        </button>
+      ))}
+    </div>
+  )}
+</div>
 
         <textarea
   placeholder="Detalle del motivo"
