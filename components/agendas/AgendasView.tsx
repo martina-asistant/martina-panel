@@ -548,25 +548,6 @@ const guardarCambiosCita = async () => {
   }
 };
 
-    const data = await response.json();
-
-    setLoading(false);
-
-    if (!data?.ok) {
-      console.error('Error cancelando cita:', data);
-      return;
-    }
-
-    setMostrarCancelar(false);
-    setEventoSeleccionado(null);
-    setEventoActivo(null);
-    setModoEdicion(false);
-    setSlotInicio(null);
-    setSlotFin(null);
-
-    await cargarAgenda();
-  };
-
   useEffect(() => {
     cargarAgenda();
   }, [agendaActiva, semanaInicio]);
