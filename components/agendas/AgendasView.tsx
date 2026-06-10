@@ -298,6 +298,7 @@ const [nuevoPaciente, setNuevoPaciente] = useState({
   apellidos: '',
   telefono: '',
 });
+  const [mostrarResultadosPaciente, setMostrarResultadosPaciente] = useState(false);
     
 
   const agenda = agendas.find(a => a.key === agendaActiva);
@@ -1248,6 +1249,7 @@ const guardarInsertarCita = async () => {
       value={busquedaPaciente}
       onChange={(e) => {
         setBusquedaPaciente(e.target.value);
+        setMostrarResultadosPaciente(true);
         setNuevaCita({
           ...nuevaCita,
           nombre_paciente: e.target.value,
@@ -1256,7 +1258,7 @@ const guardarInsertarCita = async () => {
       className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
     />
 
-    {busquedaPaciente && pacientesFiltrados.length > 0 && (
+    {mostrarResultadosPaciente && busquedaPaciente && pacientesFiltrados.length > 0 && (
       <div className="absolute z-50 mt-2 max-h-44 w-full overflow-y-auto rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.18)]">
         {pacientesFiltrados.slice(0, 8).map((patient) => (
           <button
@@ -1264,6 +1266,7 @@ const guardarInsertarCita = async () => {
             type="button"
             onClick={() => {
               const nombreCompleto = patient.nombre_completo || `${patient.nombre || ''} ${patient.apellidos || ''}`.trim();
+              setMostrarResultadosPaciente(false);
 
               setNuevaCita({
                 ...nuevaCita,
@@ -1284,12 +1287,12 @@ const guardarInsertarCita = async () => {
   </div>
 
   <button
-    type="button"
-    onClick={() => setMostrarNuevoPaciente(true)}
-    className="mt-0 flex h-10 w-10 items-center justify-center rounded-full border border-cyan-300/60 bg-cyan-500/15 text-xl text-cyan-100 shadow-[0_0_22px_rgba(34,211,238,.35)] hover:bg-cyan-500/25 hover:shadow-[0_0_30px_rgba(34,211,238,.55)] transition-all"
-  >
-    +
-  </button>
+  type="button"
+  onClick={() => setMostrarNuevoPaciente(true)}
+  className="mt-[2px] flex h-9 w-9 items-center justify-center rounded-full border border-cyan-300/60 bg-cyan-500/15 text-[22px] leading-none text-cyan-100 shadow-[0_0_18px_rgba(34,211,238,.35)] hover:bg-cyan-500/25 hover:shadow-[0_0_26px_rgba(34,211,238,.55)] transition-all"
+>
+  <span className="-translate-y-[1px]">+</span>
+</button>
 
   <input
     placeholder="Teléfono"
@@ -1298,29 +1301,31 @@ const guardarInsertarCita = async () => {
     className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
   />
 </div>
-        <select
-          value={nuevaCita.motivo}
-          onChange={(e) => {
-            const motivo = e.target.value;
-            const fechaFin = sumarMinutosISO(
-              nuevaCita.fecha_inicio,
-              getDuracionPorMotivo(motivo)
-            );
+        <div className="max-w-[360px]">
+  <select
+    value={nuevaCita.motivo}
+    onChange={(e) => {
+      const motivo = e.target.value;
+      const fechaFin = sumarMinutosISO(
+        nuevaCita.fecha_inicio,
+        getDuracionPorMotivo(motivo)
+      );
 
-            setNuevaCita({
-              ...nuevaCita,
-              motivo,
-              fecha_fin: fechaFin,
-            });
-          }}
-          className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
-        >
-          {TRATAMIENTOS.map((tratamiento) => (
-            <option key={tratamiento} value={tratamiento} className="bg-[#03111A]">
-              {tratamiento}
-            </option>
-          ))}
-        </select>
+      setNuevaCita({
+        ...nuevaCita,
+        motivo,
+        fecha_fin: fechaFin,
+      });
+    }}
+    className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+  >
+    {TRATAMIENTOS.map((tratamiento) => (
+      <option key={tratamiento} value={tratamiento} className="bg-[#03111A]">
+        {tratamiento}
+      </option>
+    ))}
+  </select>
+</div>
 
         <textarea
   placeholder="Detalle del motivo"
