@@ -1114,7 +1114,11 @@ const guardarInsertarCita = async () => {
     <div className="w-full max-w-2xl rounded-3xl border border-cyan-300/45 bg-[#03111A]/95 overflow-hidden shadow-[0_0_46px_rgba(34,211,238,.24)]">
       <div className="px-6 py-5 border-b border-cyan-300/20 flex items-start justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-white">Insertar cita</h2>
+          <h2 className="text-xl font-semibold text-white">
+  {nuevaCita.nombre_paciente && nuevaCita.motivo
+    ? `${nuevaCita.nombre_paciente} - ${nuevaCita.motivo}`
+    : 'Insertar cita'}
+</h2>
           <p className="text-cyan-200 text-sm mt-1">
             {new Date(nuevaCita.fecha_inicio).toLocaleDateString('es-ES')} · {toInputTime(nuevaCita.fecha_inicio)} - {toInputTime(nuevaCita.fecha_fin)}
           </p>
@@ -1245,6 +1249,35 @@ const guardarInsertarCita = async () => {
     </div>
   </div>
 )}
+
+      <div className="grid grid-cols-3 gap-5 pt-2 border-t border-white/20">
+  <div>
+    <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">
+      Origen
+    </div>
+    <div className="text-white/95 text-sm">
+      {usuarioPanel}
+    </div>
+  </div>
+
+  <div>
+    <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">
+      Estado
+    </div>
+    <div className="text-white/95 text-sm">
+      confirmada
+    </div>
+  </div>
+
+  <div>
+    <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">
+      Cambios
+    </div>
+    <div className="text-white/95 text-sm">
+      0
+    </div>
+  </div>
+</div>
       
       {mostrarCancelar && eventoActivo && (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 backdrop-blur-sm">
