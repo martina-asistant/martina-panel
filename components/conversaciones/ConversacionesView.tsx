@@ -114,8 +114,13 @@ setNotasConv(conv?.notas_internas || '');
     return;
   }
 
-  if (conv.telefono) {
-    const p = await getPatientByTelefono(conv.telefono);
+  const telefonoParaBuscarPaciente =
+    conv.telefono ||
+    conv.telefono_e164 ||
+    '';
+
+  if (telefonoParaBuscarPaciente) {
+    const p = await getPatientByTelefono(telefonoParaBuscarPaciente);
     setPaciente(p);
     setNotasPaciente(p?.notas_internas || '');
   } else {
@@ -327,11 +332,11 @@ setNotasConv(conv?.notas_internas || '');
               <div className="h-16 shrink-0 border-b border-martina-border bg-white px-5 flex items-center justify-between gap-4">
                 <div className="min-w-0">
   <div className="font-medium truncate">
-    {paciente?.nombre_completo || selected.nombre_paciente || 'Sin nombre registrado'}
-  </div>
-  <div className="text-xs text-martina-muted">
-    {paciente?.telefono || selected.telefono || selected.telefono_e164 || 'Sin teléfono registrado'}
-  </div>
+  {selected.nombre_paciente || 'Sin nombre registrado'}
+</div>
+<div className="text-xs text-martina-muted">
+  {selected.telefono_e164 || 'Sin WhatsApp registrado'}
+</div>
 </div>
 
                 <div className="flex items-center gap-2 shrink-0">
@@ -445,12 +450,12 @@ setNotasConv(conv?.notas_internas || '');
 
                <div className="min-w-0">
   <div className="font-medium truncate">
-    {paciente?.nombre_completo || selected.nombre_paciente || 'Sin nombre registrado'}
-  </div>
+  {paciente?.nombre_completo || 'Sin ficha de paciente'}
+</div>
 
-  <div className="text-xs text-martina-muted">
-    {paciente?.telefono || selected.telefono || 'Sin teléfono registrado'}
-  </div>
+<div className="text-xs text-martina-muted">
+  {paciente?.telefono || 'Sin teléfono indicado'}
+</div>
 </div>
 </div>
                 
