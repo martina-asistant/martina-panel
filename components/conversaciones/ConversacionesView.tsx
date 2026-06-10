@@ -129,6 +129,8 @@ setNotasConv(conv?.notas_internas || '');
     p = await getPatientByNombre(conv.nombre_paciente);
   }
 
+  console.log('PACIENTE ENCONTRADO:', p);
+console.log('CONVERSACION:', conv);
   setPaciente(p);
   setNotasPaciente(p?.notas_internas || '');
 })();
