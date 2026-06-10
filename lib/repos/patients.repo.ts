@@ -83,6 +83,62 @@ export async function getPatientByTelefono(
   return (found as Patient) || null;
 }
 
+export async function getPatientByNombre(
+  nombre: string | null | undefined
+): Promise<Patient | null> {
+  if (!nombre) return null;
+
+  const clean = nombre.trim().toLowerCase();
+
+  if (!clean) return null;
+
+  const supa = createBrowserSupa();
+
+  if (!supa) {
+    return (
+      mockPatients.find(p => {
+        const nombreCompleto = (
+          p.nombre_completo ||
+          `${p.nombre || ''} ${p.apellidos || ''}`
+        )
+          .trim()
+          .toLowerCase();
+
+        return (
+          nombreCompleto === clean ||
+          nombreCompleto.includes(clean)
+        );
+      }) || null
+    );
+  }
+
+  const { data, error } = await supa
+    .from('patients')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error(error);
+    return null;
+  }
+
+  const found = (data || []).find(p => {
+    const nombreCompleto = (
+      p.nombre_completo ||
+      `${p.nombre || ''} ${p.apellidos || ''}`
+    )
+      .trim()
+      .toLowerCase();
+
+    return (
+      nombreCompleto === clean ||
+      nombreCompleto.includes(clean)
+    );
+  });
+
+  return (found as Patient) || null;
+}
+
 export async function updatePatientNotas(
   id: string,
   notas: string
