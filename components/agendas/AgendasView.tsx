@@ -856,9 +856,8 @@ const guardarCambiosCita = async () => {
           fecha_fin: buildISOFromDateTime(fecha, fin),
         });
       }}
-      className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 pr-10 text-white outline-none [color-scheme:dark]"
+      className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
     />
-    <CalendarDays className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-cyan-200" />
   </div>
 
   <div className="relative">
