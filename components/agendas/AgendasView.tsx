@@ -1248,7 +1248,6 @@ const guardarInsertarCita = async () => {
       </div>
     </div>
   </div>
-)}
 
       <div className="grid grid-cols-3 gap-5 pt-2 border-t border-white/20">
   <div>
