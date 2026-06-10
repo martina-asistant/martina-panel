@@ -16,7 +16,7 @@ import {
   listMensajesByConversation,
   crearMensajeSaliente
 } from '@/lib/repos/mensajes.repo';
-import { getPatientById, getPatientByTelefono, getPatientByNombre, updatePatientNotas } from '@/lib/repos/patients.repo';
+import { getPatientByTelefono, getPatientByNombre, updatePatientNotas } from '@/lib/repos/patients.repo';
 import type {
   ConversacionWhatsapp,
   MensajeWhatsapp,
