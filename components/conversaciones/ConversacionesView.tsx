@@ -16,7 +16,7 @@ import {
   listMensajesByConversation,
   crearMensajeSaliente
 } from '@/lib/repos/mensajes.repo';
-import { getPatientById, getPatientByTelefono, updatePatientNotas } from '@/lib/repos/patients.repo';
+import { getPatientById, getPatientByTelefono, getPatientByNombre, updatePatientNotas } from '@/lib/repos/patients.repo';
 import type {
   ConversacionWhatsapp,
   MensajeWhatsapp,
@@ -114,19 +114,23 @@ setNotasConv(conv?.notas_internas || '');
     return;
   }
 
+  let p = null;
+
   const telefonoParaBuscarPaciente =
     conv.telefono ||
     conv.telefono_e164 ||
     '';
 
   if (telefonoParaBuscarPaciente) {
-    const p = await getPatientByTelefono(telefonoParaBuscarPaciente);
-    setPaciente(p);
-    setNotasPaciente(p?.notas_internas || '');
-  } else {
-    setPaciente(null);
-    setNotasPaciente('');
+    p = await getPatientByTelefono(telefonoParaBuscarPaciente);
   }
+
+  if (!p && conv.nombre_paciente) {
+    p = await getPatientByNombre(conv.nombre_paciente);
+  }
+
+  setPaciente(p);
+  setNotasPaciente(p?.notas_internas || '');
 })();
 }, [selectedId, convs]);
 
