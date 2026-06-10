@@ -1154,7 +1154,7 @@ const guardarInsertarCita = async () => {
       )}
 
       {mostrarInsertar && (
-  <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm pt-[13vh]">
+  <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm pt-[8vh]">
     <div className="w-full max-w-2xl rounded-3xl border border-cyan-300/45 bg-[#03111A]/95 overflow-hidden shadow-[0_0_46px_rgba(34,211,238,.24)]">
       <div className="px-6 py-5 border-b border-cyan-300/20 flex items-start justify-between">
         <div>
@@ -1259,7 +1259,7 @@ const guardarInsertarCita = async () => {
     />
 
     {mostrarResultadosPaciente && busquedaPaciente && pacientesFiltrados.length > 0 && (
-      <div className="absolute z-50 mt-2 max-h-44 w-full overflow-y-auto rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.18)]">
+      <div className="absolute left-0 top-[calc(100%+8px)] z-[100] max-h-44 w-full overflow-y-auto rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.18)]">
         {pacientesFiltrados.slice(0, 8).map((patient) => (
           <button
             key={patient.id}
