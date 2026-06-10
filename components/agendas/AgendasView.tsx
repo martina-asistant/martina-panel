@@ -1239,17 +1239,14 @@ const guardarInsertarCita = async () => {
         </select>
 
         <textarea
-          placeholder="Detalle del motivo"
-          value={nuevaCita.detalle_motivo}
-          onChange={(e) => setNuevaCita({ ...nuevaCita, detalle_motivo: e.target.value })}
-          rows={3}
-          className="w-full rounded-2xl border border-white/25 bg-black/20 p-4 text-white resize-none outline-none"
-        />
-      </div>
-    </div>
-  </div>
+  placeholder="Detalle del motivo"
+  value={nuevaCita.detalle_motivo}
+  onChange={(e) => setNuevaCita({ ...nuevaCita, detalle_motivo: e.target.value })}
+  rows={3}
+  className="w-full rounded-2xl border border-white/25 bg-black/20 p-4 text-white resize-none outline-none"
+/>
 
-      <div className="grid grid-cols-3 gap-5 pt-2 border-t border-white/20">
+<div className="grid grid-cols-3 gap-5 pt-2 border-t border-white/20">
   <div>
     <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">
       Origen
