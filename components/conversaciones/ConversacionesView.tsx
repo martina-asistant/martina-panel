@@ -114,7 +114,7 @@ setNotasConv(conv?.notas_internas || '');
     return;
   }
 
-  let p = null;
+  let p: Patient | null = null;
 
   const telefonoParaBuscarPaciente =
     conv.telefono ||
