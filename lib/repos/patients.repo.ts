@@ -10,6 +10,11 @@ const normalizePhone = (phone?: string | number | null) => {
 export async function getPatientById(id: string | null | undefined): Promise<Patient | null> {
   if (!id) return null;
 
+  const isUuid =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
+  if (!isUuid) return null;
+
   const supa = createBrowserSupa();
 
   if (!supa) {
