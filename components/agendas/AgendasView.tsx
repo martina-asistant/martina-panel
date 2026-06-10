@@ -1028,23 +1028,24 @@ const guardarCambiosCita = async () => {
 
       {mostrarCancelar && eventoActivo && (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 backdrop-blur-sm">
-    <div className="w-full max-w-sm rounded-3xl border border-white/35 bg-[#03111A]/95 px-6 py-5 shadow-[0_0_40px_rgba(255,255,255,.22)]">
-      <div className="text-cyan-300 text-[11px] uppercase tracking-[0.22em] font-bold mb-3">
+    <div className="w-full max-w-[360px] rounded-3xl border border-cyan-200/45 bg-[#03111A]/95 px-6 py-5 shadow-[0_0_38px_rgba(34,211,238,.18)]">
+
+      <div className="text-center text-cyan-300 text-[13px] uppercase tracking-[0.24em] font-bold mb-4">
         Va a cancelar esta cita
       </div>
 
-      <div className="text-white text-sm font-semibold mb-4">
+      <div className="text-white text-base font-semibold mb-5">
         {eventoActivo.titulo || eventoActivo.nombre_paciente}
       </div>
 
-      <div className="text-white/90 text-sm mb-6">
+      <div className="text-white/95 text-[15px] mb-6">
         ¿Desea continuar?
       </div>
 
-      <div className="flex justify-center gap-4">
+      <div className="flex justify-center gap-3">
         <button
           onClick={() => setMostrarCancelar(false)}
-          className="rounded-full border border-cyan-400/40 bg-cyan-500/10 px-6 py-2 text-cyan-100 hover:bg-cyan-500/20 hover:border-cyan-300/60 transition-all"
+          className="rounded-full border border-cyan-400/50 bg-cyan-500/10 px-5 py-1.5 text-sm text-cyan-100 hover:bg-cyan-500/20 hover:border-cyan-300/70 transition-all"
         >
           No
         </button>
@@ -1053,13 +1054,17 @@ const guardarCambiosCita = async () => {
           onClick={cancelarCita}
           disabled={loading}
           style={{
-            backgroundColor: getColorTratamiento(eventoActivo).bg,
+            backgroundColor: getColorTratamiento(eventoActivo).bg
+              .replace('.95)', '.72)')
+              .replace('.90)', '.72)')
+              .replace('.85)', '.72)'),
           }}
-          className="rounded-full border border-white/25 px-6 py-2 text-white hover:brightness-110 disabled:opacity-50 transition-all"
+          className="rounded-full border border-white/25 px-5 py-1.5 text-sm text-white hover:brightness-110 disabled:opacity-50 transition-all"
         >
           Sí, cancelar
         </button>
       </div>
+
     </div>
   </div>
 )}
