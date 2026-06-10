@@ -500,10 +500,24 @@ const guardarCambiosCita = async () => {
 };
   
   const cancelarCita = async () => {
-    if (!eventoActivo || loading) return;
+  if (!eventoActivo || loading) return;
 
-    setLoading(true);
+  const citaCancelada = eventoActivo;
 
+  setMostrarCancelar(false);
+  setEventoSeleccionado(null);
+  setEventoActivo(null);
+  setModoEdicion(false);
+  setSlotInicio(null);
+  setSlotFin(null);
+
+  setEventos((prev) =>
+    prev.filter((evento) => evento.event_id !== citaCancelada.event_id)
+  );
+
+  setLoading(true);
+
+  try {
     const response = await fetch('/agendas/gestionar', {
       method: 'POST',
       headers: {
@@ -512,15 +526,27 @@ const guardarCambiosCita = async () => {
       body: JSON.stringify({
         accion: 'cancelar_cita',
         agenda: agendaActiva,
-        calendar_id: eventoActivo.calendar_id,
-        event_id: eventoActivo.event_id,
-        telefono: eventoActivo.telefono,
-        fecha_inicio: eventoActivo.fecha_inicio,
-        fecha_fin: eventoActivo.fecha_fin,
-        motivo: eventoActivo.motivo,
+        calendar_id: citaCancelada.calendar_id,
+        event_id: citaCancelada.event_id,
+        telefono: citaCancelada.telefono,
+        fecha_inicio: citaCancelada.fecha_inicio,
+        fecha_fin: citaCancelada.fecha_fin,
+        motivo: citaCancelada.motivo,
         usuario: usuarioPanel,
       }),
     });
+
+    const data = await response.json();
+
+    if (!data?.ok) {
+      console.error('Error cancelando cita:', data);
+    }
+  } catch (error) {
+    console.error('Error cancelando cita:', error);
+  } finally {
+    setLoading(false);
+  }
+};
 
     const data = await response.json();
 
@@ -1020,35 +1046,42 @@ const guardarCambiosCita = async () => {
       )}
 
       {mostrarCancelar && eventoActivo && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-3xl border border-white/45 bg-[#03111A]/95 p-6 shadow-[0_0_45px_rgba(255,255,255,.25)]">
-            <h3 className="text-xl font-semibold text-white mb-2">
-              ¿Cancelar esta cita?
-            </h3>
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 backdrop-blur-sm">
+    <div className="w-full max-w-sm rounded-3xl border border-white/35 bg-[#03111A]/95 px-6 py-5 shadow-[0_0_40px_rgba(255,255,255,.22)]">
+      <div className="text-cyan-300 text-[11px] uppercase tracking-[0.22em] font-bold mb-3">
+        Va a cancelar esta cita
+      </div>
 
-            <p className="text-cyan-100/80 text-sm mb-6">
-              {eventoActivo.titulo || eventoActivo.nombre_paciente}
-            </p>
+      <div className="text-white text-sm font-semibold mb-4">
+        {eventoActivo.titulo || eventoActivo.nombre_paciente}
+      </div>
 
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setMostrarCancelar(false)}
-                className="rounded-full border border-white/20 px-5 py-2 text-white/80 hover:text-white hover:bg-white/10"
-              >
-                No
-              </button>
+      <div className="text-white/90 text-sm mb-6">
+        ¿Desea continuar?
+      </div>
 
-              <button
-                onClick={cancelarCita}
-                disabled={loading}
-                className="rounded-full border border-red-300/40 bg-red-500/20 px-5 py-2 text-red-100 hover:bg-red-500/30 disabled:opacity-50"
-              >
-                Sí, cancelar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <div className="flex justify-center gap-4">
+        <button
+          onClick={() => setMostrarCancelar(false)}
+          className="rounded-full border border-cyan-400/40 bg-cyan-500/10 px-6 py-2 text-cyan-100 hover:bg-cyan-500/20 hover:border-cyan-300/60 transition-all"
+        >
+          No
+        </button>
+
+        <button
+          onClick={cancelarCita}
+          disabled={loading}
+          style={{
+            backgroundColor: getColorTratamiento(eventoActivo).bg,
+          }}
+          className="rounded-full border border-white/25 px-6 py-2 text-white hover:brightness-110 disabled:opacity-50 transition-all"
+        >
+          Sí, cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }
