@@ -891,8 +891,7 @@ const guardarCambiosCita = async () => {
                   </div>
 
                   {modoEdicion ? (
-  <input
-    type="text"
+  <select
     value={eventoSeleccionado.motivo || ''}
     onChange={(e) => {
       const nuevoMotivo = e.target.value;
@@ -911,13 +910,23 @@ const guardarCambiosCita = async () => {
       });
     }}
     className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
-  />
+  >
+    {TRATAMIENTOS.map((tratamiento) => (
+      <option
+        key={tratamiento}
+        value={tratamiento}
+        className="bg-[#03111A]"
+      >
+        {tratamiento}
+      </option>
+    ))}
+  </select>
 ) : (
-  <div className="text-white text-lg font-medium">
-    {eventoSeleccionado.motivo || 'No indicado'}
+  <div className="text-white">
+    {eventoSeleccionado.motivo || '-'}
   </div>
 )}
-</div>
+
                 <div>
                   <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
                     Teléfono
