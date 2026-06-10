@@ -1155,7 +1155,7 @@ const guardarInsertarCita = async () => {
 
       {mostrarInsertar && (
   <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm pt-[8vh]">
-    <div className="w-full max-w-2xl rounded-3xl border border-cyan-300/45 bg-[#03111A]/95 overflow-hidden shadow-[0_0_46px_rgba(34,211,238,.24)]">
+    <div className="w-full max-w-2xl rounded-3xl border border-cyan-300/45 bg-[#03111A]/95 overflow-visible shadow-[0_0_46px_rgba(34,211,238,.24)]">
       <div className="px-6 py-5 border-b border-cyan-300/20 flex items-start justify-between">
         <div>
           <h2 className="text-xl font-semibold text-white">
