@@ -16,7 +16,7 @@ import {
   listMensajesByConversation,
   crearMensajeSaliente
 } from '@/lib/repos/mensajes.repo';
-import { getPatientById, updatePatientNotas } from '@/lib/repos/patients.repo';
+import { getPatientByPacienteId, updatePatientNotas } from '@/lib/repos/patients.repo';
 import type {
   ConversacionWhatsapp,
   MensajeWhatsapp,
@@ -109,30 +109,31 @@ const ConversacionesView = () => {
   }, []);
 
   useEffect(() => {
-    if (!selectedId) {
-      setMensajes([]);
-      setPaciente(null);
-      return;
-    }
+  if (!selectedId) {
+    setMensajes([]);
+    setPaciente(null);
+    setNotasPaciente('');
+    return;
+  }
 
-    (async () => {
-      const ms = await listMensajesByConversation(selectedId);
-      setMensajes(ms);
-    })();
+  (async () => {
+    const ms = await listMensajesByConversation(selectedId);
+    setMensajes(ms);
+  })();
 
-    const conv = convs.find(c => c.id === selectedId);
-    setNotasConv(conv?.notas_internas || '');
+  const conv = convs.find(c => c.id === selectedId);
+  setNotasConv(conv?.notas_internas || '');
 
-    if (conv?.paciente_id) {
-      getPatientById(conv.paciente_id).then(p => {
-        setPaciente(p);
-        setNotasPaciente(p?.notas_internas || '');
-      });
-    } else {
-      setPaciente(null);
-      setNotasPaciente('');
-    }
-  }, [selectedId, convs]);
+  if (conv?.paciente_id) {
+    getPatientByPacienteId(conv.paciente_id).then(p => {
+      setPaciente(p);
+      setNotasPaciente(p?.notas_internas || '');
+    });
+  } else {
+    setPaciente(null);
+    setNotasPaciente('');
+  }
+}, [selectedId, convs]);
 
   useEffect(() => {
     const supa = createClient();
