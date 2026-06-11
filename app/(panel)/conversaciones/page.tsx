@@ -215,11 +215,25 @@ const ConversacionesView = () => {
   };
 
   const saveNotasPaciente = async () => {
-    if (!paciente) return;
-    await updatePatientNotas(paciente.id, notasPaciente);
-    toast.success('Notas del paciente guardadas');
-  };
+  if (!paciente) return;
 
+  const actualizado = await updatePatientNotas(
+    paciente.id,
+    notasPaciente
+  );
+
+  if (!actualizado) {
+    toast.error('No se han podido guardar las notas del paciente');
+    return;
+  }
+
+  setPaciente(actualizado);
+  setNotasPaciente(actualizado.notas_internas || '');
+
+  toast.success('Notas del paciente guardadas');
+};
+
+⚠️ No h
   const enviarMensaje = async () => {
     if (!selected || !nuevoMensaje.trim()) return;
 
