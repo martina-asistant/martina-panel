@@ -260,28 +260,28 @@ const recallsAceptadosHoy = recalls.filter(r => r.estado === 'cita_agendada' && 
 
 return (
   <div className="min-h-full p-8 bg-[#02141B] text-white">
-    <div className="mb-10">
-      <h1
-        className="
-          flex items-center gap-3 text-4xl font-bold
-          bg-gradient-to-r from-white to-cyan-300
-          bg-clip-text text-transparent mb-4
-        "
-      >
-        ¡Hola {nombreUsuario || '...'}!
+    <div className="mb-10 flex items-start justify-between gap-8">
+      <div>
+        <h1
+          className="
+            flex items-center gap-3 text-3xl font-bold
+            bg-gradient-to-r from-white to-cyan-300
+            bg-clip-text text-transparent mb-4
+          "
+        >
+          ¡Hola {nombreUsuario || '...'}!
 
-        <span className="text-cyan-300 text-3xl drop-shadow-[0_0_12px_rgba(34,211,238,.8)]">
-          ✦
-        </span>
-      </h1>
+          <span className="text-cyan-300 text-2xl drop-shadow-[0_0_12px_rgba(34,211,238,.8)]">
+            ✦
+          </span>
+        </h1>
 
-      <div className="flex flex-wrap items-center gap-5">
         <div
           className="
-            inline-flex items-center gap-3 rounded-full
+            inline-flex items-center gap-2.5 rounded-full
             border border-cyan-400/20 bg-cyan-500/10
-            px-5 py-2.5 text-cyan-100 text-sm font-medium
-            shadow-[0_0_20px_rgba(34,211,238,.08)]
+            px-4 py-2 text-cyan-100 text-xs font-medium
+            shadow-[0_0_16px_rgba(34,211,238,.08)]
           "
         >
           <span
@@ -301,38 +301,38 @@ return (
                 ? 'Martina llamadas activa'
                 : 'Martina inactiva'}
         </div>
+      </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => toggleCanal('whatsapp')}
-            disabled={guardandoCanal === 'whatsapp'}
-            title={whatsappActivo ? 'Desactivar WhatsApp' : 'Activar WhatsApp'}
-            className={cn(
-              'w-14 h-14 rounded-full border flex items-center justify-center transition-all duration-300',
-              whatsappActivo
-                ? 'bg-[radial-gradient(circle_at_35%_30%,#1A6C78_0%,#0D4450_45%,#072B34_100%)] border-cyan-200/80 text-white shadow-[0_0_12px_rgba(34,211,238,.65),0_0_28px_rgba(34,211,238,.30),inset_0_0_12px_rgba(255,255,255,.18)]'
-                : 'bg-white/5 border-cyan-500/15 text-cyan-100/35'
-            )}
-          >
-            <MessageCircle className="w-6 h-6" />
-          </button>
+      <div className="flex items-center gap-5 pt-2 pr-8">
+        <button
+          type="button"
+          onClick={() => toggleCanal('whatsapp')}
+          disabled={guardandoCanal === 'whatsapp'}
+          title={whatsappActivo ? 'Desactivar WhatsApp' : 'Activar WhatsApp'}
+          className={cn(
+            'w-11 h-11 rounded-full border flex items-center justify-center transition-all duration-300',
+            whatsappActivo
+              ? 'bg-[radial-gradient(circle_at_35%_30%,#1A6C78_0%,#0D4450_45%,#072B34_100%)] border-cyan-200/80 text-white shadow-[0_0_10px_rgba(34,211,238,.55),0_0_20px_rgba(34,211,238,.24),inset_0_0_10px_rgba(255,255,255,.14)]'
+              : 'bg-white/5 border-cyan-500/15 text-cyan-100/35'
+          )}
+        >
+          <MessageCircle className="w-5 h-5" />
+        </button>
 
-          <button
-            type="button"
-            onClick={() => toggleCanal('llamadas')}
-            disabled={guardandoCanal === 'llamadas'}
-            title={llamadasActivo ? 'Desactivar llamadas' : 'Activar llamadas'}
-            className={cn(
-              'w-14 h-14 rounded-full border flex items-center justify-center transition-all duration-300',
-              llamadasActivo
-                ? 'bg-[radial-gradient(circle_at_35%_30%,#1A6C78_0%,#0D4450_45%,#072B34_100%)] border-cyan-200/80 text-white shadow-[0_0_12px_rgba(34,211,238,.65),0_0_28px_rgba(34,211,238,.30),inset_0_0_12px_rgba(255,255,255,.18)]'
-                : 'bg-white/5 border-cyan-500/15 text-cyan-100/35'
-            )}
-          >
-            <PhoneCall className="w-6 h-6" />
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => toggleCanal('llamadas')}
+          disabled={guardandoCanal === 'llamadas'}
+          title={llamadasActivo ? 'Desactivar llamadas' : 'Activar llamadas'}
+          className={cn(
+            'w-11 h-11 rounded-full border flex items-center justify-center transition-all duration-300',
+            llamadasActivo
+              ? 'bg-[radial-gradient(circle_at_35%_30%,#1A6C78_0%,#0D4450_45%,#072B34_100%)] border-cyan-200/80 text-white shadow-[0_0_10px_rgba(34,211,238,.55),0_0_20px_rgba(34,211,238,.24),inset_0_0_10px_rgba(255,255,255,.14)]'
+              : 'bg-white/5 border-cyan-500/15 text-cyan-100/35'
+          )}
+        >
+          <PhoneCall className="w-5 h-5" />
+        </button>
       </div>
     </div>
 
