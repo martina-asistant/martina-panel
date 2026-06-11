@@ -233,7 +233,6 @@ const ConversacionesView = () => {
   toast.success('Notas del paciente guardadas');
 };
 
-⚠️ No h
   const enviarMensaje = async () => {
     if (!selected || !nuevoMensaje.trim()) return;
 
