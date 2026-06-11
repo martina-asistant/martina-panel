@@ -595,14 +595,13 @@ const ConversacionesView = () => {
               />
 
               <Button
-                size="sm"
-                variant="outline"
-                onClick={saveNotasConv}
-                className="w-full border-cyan-400/30 text-white hover:bg-cyan-500/10"
-              >
-                <Save className="w-4 h-4 mr-2" />
-                Guardar recado
-              </Button>
+  size="sm"
+  onClick={saveNotasConv}
+  className="w-full bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-400/30 text-white"
+>
+  <Save className="w-4 h-4 mr-2" />
+  Guardar recado
+</Button>
             </div>
           </div>
         )}
