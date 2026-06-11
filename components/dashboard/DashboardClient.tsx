@@ -24,12 +24,17 @@ import {
 import type {
   ConversacionWhatsapp,
   RecordatorioCita,
-  Recall
+  Recall,
+  CanalMartina
 } from '@/lib/types/db.types';
 
 import { listConversaciones } from '@/lib/repos/conversaciones.repo';
 import { listRecordatorios } from '@/lib/repos/recordatorios.repo';
 import { listRecalls } from '@/lib/repos/recalls.repo';
+import {
+  getConfiguracionMartina,
+  updateCanalMartina
+} from '@/lib/repos/configuracion.repo';
 import { createClient } from '@/lib/supabase/client';
 
 interface Props {
@@ -94,6 +99,9 @@ const DashboardClient = ({
   const [recs, setRecs] = useState<RecordatorioCita[]>(initialRecs);
   const [recalls, setRecalls] = useState<Recall[]>(initialRecalls);
   const [nombreUsuario, setNombreUsuario] = useState('');
+  const [whatsappActivo, setWhatsappActivo] = useState(true);
+  const [llamadasActivo, setLlamadasActivo] = useState(true);
+  const [guardandoCanal, setGuardandoCanal] = useState<CanalMartina | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -133,6 +141,19 @@ const DashboardClient = ({
     })();
   }, []);
 
+useEffect(() => {
+  (async () => {
+    const config = await getConfiguracionMartina();
+
+    const whatsapp = config.find(c => c.canal === 'whatsapp');
+    const llamadas = config.find(c => c.canal === 'llamadas');
+
+    if (whatsapp) setWhatsappActivo(whatsapp.activo);
+    if (llamadas) setLlamadasActivo(llamadas.activo);
+  })();
+}, []);
+
+  
   useEffect(() => {
     const supa = createClient();
 
@@ -211,23 +232,52 @@ const recallsAceptadosHoy = recalls.filter(r => r.estado === 'cita_agendada' && 
   const recMod = recs.filter(r => r.estado === 'cita_modificada').length;
   const recCancel = recs.filter(r => r.estado === 'cancelada_recado').length;
 
-  return (
-    <div className="min-h-full p-8 bg-[#02141B] text-white">
-      <div className="mb-10">
-        <h1
-          className="
-            flex items-center gap-3 text-4xl font-bold
-            bg-gradient-to-r from-white to-cyan-300
-            bg-clip-text text-transparent mb-4
-          "
-        >
-          ¡Hola {nombreUsuario || '...'}!
+  const toggleCanal = async (canal: CanalMartina) => {
+  const nuevoEstado =
+    canal === 'whatsapp'
+      ? !whatsappActivo
+      : !llamadasActivo;
 
-          <span className="text-cyan-300 text-3xl drop-shadow-[0_0_12px_rgba(34,211,238,.8)]">
-            ✦
-          </span>
-        </h1>
+  setGuardandoCanal(canal);
 
+  const actualizado = await updateCanalMartina(
+    canal,
+    nuevoEstado,
+    nombreUsuario || null
+  );
+
+  setGuardandoCanal(null);
+
+  if (!actualizado) return;
+
+  if (canal === 'whatsapp') {
+    setWhatsappActivo(actualizado.activo);
+  } else {
+    setLlamadasActivo(actualizado.activo);
+  }
+};
+
+return (
+
+  
+return (
+  <div className="min-h-full p-8 bg-[#02141B] text-white">
+    <div className="mb-10">
+      <h1
+        className="
+          flex items-center gap-3 text-4xl font-bold
+          bg-gradient-to-r from-white to-cyan-300
+          bg-clip-text text-transparent mb-4
+        "
+      >
+        ¡Hola {nombreUsuario || '...'}!
+
+        <span className="text-cyan-300 text-3xl drop-shadow-[0_0_12px_rgba(34,211,238,.8)]">
+          ✦
+        </span>
+      </h1>
+
+      <div className="flex flex-wrap items-center gap-5">
         <div
           className="
             inline-flex items-center gap-3 rounded-full
@@ -237,15 +287,56 @@ const recallsAceptadosHoy = recalls.filter(r => r.estado === 'cita_agendada' && 
           "
         >
           <span
-            className="
-              w-2 h-2 rounded-full bg-cyan-300 animate-pulse
-              shadow-[0_0_12px_rgba(34,211,238,.95)]
-            "
+            className={cn(
+              'w-2 h-2 rounded-full',
+              whatsappActivo || llamadasActivo
+                ? 'bg-cyan-300 animate-pulse shadow-[0_0_12px_rgba(34,211,238,.95)]'
+                : 'bg-slate-500'
+            )}
           />
 
-          Martina activa
+          {whatsappActivo && llamadasActivo
+            ? 'Martina activa'
+            : whatsappActivo
+              ? 'Martina WhatsApp activa'
+              : llamadasActivo
+                ? 'Martina llamadas activa'
+                : 'Martina inactiva'}
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => toggleCanal('whatsapp')}
+            disabled={guardandoCanal === 'whatsapp'}
+            title={whatsappActivo ? 'Desactivar WhatsApp' : 'Activar WhatsApp'}
+            className={cn(
+              'w-14 h-14 rounded-full border flex items-center justify-center transition-all duration-300',
+              whatsappActivo
+                ? 'bg-[radial-gradient(circle_at_35%_30%,#1A6C78_0%,#0D4450_45%,#072B34_100%)] border-cyan-200/80 text-white shadow-[0_0_12px_rgba(34,211,238,.65),0_0_28px_rgba(34,211,238,.30),inset_0_0_12px_rgba(255,255,255,.18)]'
+                : 'bg-white/5 border-cyan-500/15 text-cyan-100/35'
+            )}
+          >
+            <MessageCircle className="w-6 h-6" />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => toggleCanal('llamadas')}
+            disabled={guardandoCanal === 'llamadas'}
+            title={llamadasActivo ? 'Desactivar llamadas' : 'Activar llamadas'}
+            className={cn(
+              'w-14 h-14 rounded-full border flex items-center justify-center transition-all duration-300',
+              llamadasActivo
+                ? 'bg-[radial-gradient(circle_at_35%_30%,#1A6C78_0%,#0D4450_45%,#072B34_100%)] border-cyan-200/80 text-white shadow-[0_0_12px_rgba(34,211,238,.65),0_0_28px_rgba(34,211,238,.30),inset_0_0_12px_rgba(255,255,255,.18)]'
+                : 'bg-white/5 border-cyan-500/15 text-cyan-100/35'
+            )}
+          >
+            <PhoneCall className="w-6 h-6" />
+          </button>
         </div>
       </div>
+    </div>
 
       <div className="space-y-10">
         <section>
