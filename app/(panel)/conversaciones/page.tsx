@@ -547,7 +547,7 @@ const ConversacionesView = () => {
               </div>
             </div>
 
-            {paciente?.etiquetas && paciente.etiquetas.length > 0 && (
+            {Array.isArray(paciente?.etiquetas) && paciente.etiquetas.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
                 {paciente?.etiquetas.map(t => (
                   <span
