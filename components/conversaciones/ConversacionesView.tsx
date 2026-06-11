@@ -24,7 +24,6 @@ import type {
 import { createClient, isSupabaseConfigured } from '@/lib/supabase/client';
 import { formatRelativeOrTime, formatTime, lastActivity } from '@/lib/utils/formatDate';
 import { conversacionLabel } from '@/lib/utils/visualMaps';
-import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 
 type Filtro = 'todas' | EstadoVisualConv;
@@ -40,10 +39,8 @@ const ConversacionesView = () => {
   const [convs, setConvs] = useState<ConversacionWhatsapp[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mensajes, setMensajes] = useState<MensajeWhatsapp[]>([]);
-  const [paciente, setPaciente] = useState<Patient | null>(null);
   const [filter, setFilter] = useState<Filtro>('todas');
   const [search, setSearch] = useState('');
-  const [notasPaciente, setNotasPaciente] = useState('');
   const [notasConv, setNotasConv] = useState('');
   const [nuevoMensaje, setNuevoMensaje] = useState('');
   const [userEmail, setUserEmail] = useState<string>('demo@martina.local');
@@ -89,21 +86,20 @@ const ConversacionesView = () => {
   }, []);
 
   useEffect(() => {
-    if (!selectedId) {
-      setMensajes([]);
-      setPaciente(null);
-      setNotasPaciente('');
-      return;
-    }
+  if (!selectedId) {
+    setMensajes([]);
+    setNotasConv('');
+    return;
+  }
 
-    (async () => {
-      const ms = await listMensajesByConversation(selectedId);
-      setMensajes(ms);
-    })();
+  (async () => {
+    const ms = await listMensajesByConversation(selectedId);
+    setMensajes(ms);
+  })();
 
-    const conv = convs.find(c => c.id === selectedId);
-
-setNotasConv(conv?.notas_internas || '');
+  const conv = convs.find(c => c.id === selectedId);
+  setNotasConv(conv?.notas_internas || '');
+}, [selectedId, convs]);
 
   useEffect(() => {
     const supa = createClient();
