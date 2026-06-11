@@ -402,9 +402,6 @@ const ConversacionesView = () => {
           )}
         </div>
 
-
-        </div>
-
       </div>
     </div>
   );
