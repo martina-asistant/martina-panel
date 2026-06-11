@@ -259,7 +259,7 @@ const recallsAceptadosHoy = recalls.filter(r => r.estado === 'cita_agendada' && 
 };
 
 return (
-  <div className="min-h-full p-8 bg-[#02141B] text-white">
+  <div className="h-full overflow-y-auto p-8 pb-24 bg-[#02141B] text-white">
     <div className="mb-10 flex items-center justify-between gap-8">
       <div>
         <h1 className="flex items-center gap-3 text-4xl font-bold text-white mb-4">
