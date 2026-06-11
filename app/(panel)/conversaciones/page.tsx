@@ -110,11 +110,12 @@ const ConversacionesView = () => {
 
   useEffect(() => {
   if (!selectedId) {
-    setMensajes([]);
-    setPaciente(null);
-    setNotasPaciente('');
-    return;
-  }
+  setMensajes([]);
+  setPaciente(null);
+  setNotasPaciente('');
+  setNotasConv('');
+  return;
+}
 
   (async () => {
     const ms = await listMensajesByConversation(selectedId);
