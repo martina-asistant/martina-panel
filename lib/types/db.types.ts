@@ -20,6 +20,7 @@ export interface ConfiguracionMartina {
 export interface Patient {
   id: string;
   created_at: string;
+  paciente_id: string | null;
   telefono: string | null;
   nombre: string | null;
   apellidos: string | null;
