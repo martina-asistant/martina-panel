@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search } from 'lucide-react';
+import { Search, Save } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import {
   listConversaciones,
@@ -19,12 +19,15 @@ import {
 import type {
   ConversacionWhatsapp,
   MensajeWhatsapp,
+  Patient,
   EstadoVisualConv
 } from '@/lib/types/db.types';
 import { createClient, isSupabaseConfigured } from '@/lib/supabase/client';
-import { formatRelativeOrTime, formatTime, lastActivity } from '@/lib/utils/formatDate';
+import { formatRelativeOrTime, formatTime, lastActivity, formatDate } from '@/lib/utils/formatDate';
 import { conversacionLabel } from '@/lib/utils/visualMaps';
 import { toast } from 'sonner';
+import { Textarea } from '@/components/ui/textarea';
+import { getPatientByPacienteId, updatePatientNotas } from '@/lib/repos/patients.repo';
 
 type Filtro = 'todas' | EstadoVisualConv;
 
@@ -44,6 +47,8 @@ const ConversacionesView = () => {
   const [notasConv, setNotasConv] = useState('');
   const [nuevoMensaje, setNuevoMensaje] = useState('');
   const [userEmail, setUserEmail] = useState<string>('demo@martina.local');
+  const [paciente, setPaciente] = useState<Patient | null>(null);
+  const [notasPaciente, setNotasPaciente] = useState('');
 
   const selected = useMemo(
     () => convs.find(c => c.id === selectedId) || null,
@@ -89,6 +94,8 @@ const ConversacionesView = () => {
   if (!selectedId) {
     setMensajes([]);
     setNotasConv('');
+    setPaciente(null);
+    setNotasPaciente('');
     return;
   }
 
@@ -99,6 +106,16 @@ const ConversacionesView = () => {
 
   const conv = convs.find(c => c.id === selectedId);
   setNotasConv(conv?.notas_internas || '');
+
+  if (conv?.paciente_id) {
+    getPatientByPacienteId(conv.paciente_id).then(p => {
+      setPaciente(p);
+      setNotasPaciente(p?.notas_internas || '');
+    });
+  } else {
+    setPaciente(null);
+    setNotasPaciente('');
+  }
 }, [selectedId, convs]);
 
   useEffect(() => {
@@ -181,6 +198,13 @@ const ConversacionesView = () => {
     toast.success('Notas guardadas');
     setConvs(await listConversaciones());
   };
+
+  const saveNotasPaciente = async () => {
+  if (!paciente) return;
+
+  await updatePatientNotas(paciente.id, notasPaciente);
+  toast.success('Notas del paciente guardadas');
+};
 
   const enviarMensaje = async () => {
     if (!selected || !nuevoMensaje.trim()) return;
@@ -400,6 +424,118 @@ const ConversacionesView = () => {
               </div>
             </>
           )}
+</div>
+         <div className="hidden xl:block w-[320px] h-full min-h-0 shrink-0 border-l border-martina-border bg-white overflow-y-auto">
+  {!selected ? null : (
+    <div className="p-5 space-y-5">
+      <div className="flex items-center gap-3">
+        <div className="w-14 h-14 rounded-full bg-martina-beige border border-martina-border flex items-center justify-center text-lg font-semibold text-martina-text">
+          {(paciente?.nombre_completo || selected.nombre_paciente || '?')
+            .split(' ')
+            .map(s => s[0])
+            .slice(0, 2)
+            .join('')}
+        </div>
+
+        <div className="min-w-0">
+          <div className="font-semibold truncate text-martina-text">
+            {paciente?.nombre_completo || selected.nombre_paciente || 'Sin nombre registrado'}
+          </div>
+
+          <div className="text-xs text-martina-muted">
+            {paciente?.telefono || selected.telefono_e164 || selected.telefono || 'Sin teléfono registrado'}
+          </div>
+        </div>
+      </div>
+
+      {paciente?.alerta_urgencia && (
+        <div className="text-xs px-3 py-2 rounded-xl bg-red-50 text-red-700 border border-red-200">
+          Posible urgencia
+        </div>
+      )}
+
+      <div className="grid grid-cols-2 gap-3 text-xs">
+        <div>
+          <div className="text-martina-muted mb-1">Última cita</div>
+          <div className="font-medium text-martina-text">
+            {formatDate(paciente?.ultima_cita_fecha)}
+          </div>
+          <div className="text-martina-muted">
+            {paciente?.ultima_cita_motivo || '—'}
+          </div>
+        </div>
+
+        <div>
+          <div className="text-martina-muted mb-1">Próxima cita</div>
+          <div className="font-medium text-martina-text">
+            {formatDate(paciente?.proxima_cita_fecha)}
+          </div>
+          <div className="text-martina-muted">
+            {paciente?.proxima_cita_motivo || '—'}
+          </div>
+        </div>
+      </div>
+
+      {paciente?.etiquetas && paciente.etiquetas.length > 0 && (
+        <div className="flex flex-wrap gap-1.5">
+          {paciente.etiquetas.map(t => (
+            <span
+              key={t}
+              className="text-[10px] px-2.5 py-1 rounded-full bg-martina-beige text-martina-text border border-martina-border"
+            >
+              {t}
+            </span>
+          ))}
+        </div>
+      )}
+
+      <div className="space-y-2">
+        <div className="text-xs font-medium text-martina-muted uppercase tracking-wide">
+          Notas del paciente
+        </div>
+
+        <Textarea
+          value={notasPaciente}
+          onChange={e => setNotasPaciente(e.target.value)}
+          rows={4}
+          className="text-sm bg-martina-bg border-martina-border"
+          placeholder="Añade notas…"
+        />
+
+        <Button
+          size="sm"
+          onClick={saveNotasPaciente}
+          className="w-full bg-martina-text hover:bg-black text-white"
+        >
+          <Save className="w-4 h-4 mr-2" />
+          Guardar notas paciente
+        </Button>
+      </div>
+
+      <div className="space-y-2 pt-4 border-t border-martina-border">
+        <div className="text-xs font-medium text-martina-muted uppercase tracking-wide">
+          Notas de esta conversación
+        </div>
+
+        <Textarea
+          value={notasConv}
+          onChange={e => setNotasConv(e.target.value)}
+          rows={3}
+          className="text-sm bg-martina-bg border-martina-border"
+          placeholder="Recado, contexto…"
+        />
+
+        <Button
+          size="sm"
+          onClick={saveNotasConv}
+          className="w-full bg-martina-text hover:bg-black text-white"
+        >
+          <Save className="w-4 h-4 mr-2" />
+          Guardar recado
+        </Button>
+      </div>
+    </div>
+  )} 
         </div>
 
       </div>
