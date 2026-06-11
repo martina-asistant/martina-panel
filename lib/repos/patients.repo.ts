@@ -7,32 +7,29 @@ const normalizePhone = (phone?: string | number | null) => {
   return String(phone).replace(/\D/g, '');
 };
 
-export async function getPatientById(id: string | null | undefined): Promise<Patient | null> {
-  if (!id) return null;
-
-  const isUuid =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-
-  if (!isUuid) return null;
+export async function getPatientByPacienteId(
+  paciente_id: string | null | undefined
+): Promise<Patient | null> {
+  if (!paciente_id) return null;
 
   const supa = createBrowserSupa();
 
   if (!supa) {
-    return mockPatients.find(p => p.id === id) || null;
+    return mockPatients.find(p => p.paciente_id === paciente_id) || null;
   }
 
   const { data, error } = await supa
     .from('patients')
     .select('*')
-    .eq('id', id)
-    .single();
+    .eq('paciente_id', paciente_id)
+    .maybeSingle();
 
   if (error) {
     console.error(error);
     return null;
   }
 
-  return data as Patient;
+  return data as Patient | null;
 }
 
 export async function getPatientByTelefono(
