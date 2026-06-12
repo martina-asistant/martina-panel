@@ -135,8 +135,10 @@ const RecallsView = () => {
               <th className="text-left px-6 py-4 font-medium">Paciente</th>
               <th className="text-left px-6 py-4 font-medium">Teléfono</th>
               <th className="text-left px-6 py-4 font-medium">Tipo</th>
+              <th className="text-left px-6 py-4 font-medium">Detalle</th>
               <th className="text-left px-6 py-4 font-medium">Fecha envío</th>
               <th className="text-left px-6 py-4 font-medium">Estado</th>
+              <th className="text-left px-6 py-4 font-medium">Próxima cita</th>
             </tr>
           </thead>
 
