@@ -105,6 +105,8 @@ const RecordatoriosView = () => {
               <th className="text-left pl-6 pr-2 py-4 font-medium">Paciente</th>
               <th className="text-left px-6 py-4 font-medium">Teléfono</th>
               <th className="text-left px-6 py-4 font-medium">Fecha cita</th>
+              <th className="text-left px-6 py-4 font-medium">Motivo</th>
+              <th className="text-left px-6 py-4 font-medium">Agenda</th>
               <th className="text-left px-6 py-4 font-medium">Estado</th>
             </tr>
           </thead>
