@@ -63,7 +63,7 @@ const RecordatoriosView = () => {
     <div className="min-h-full overflow-y-auto p-8 bg-[#02141B] text-white">
       <div className="mb-8">
         <h1 className="inline-block text-2xl font-semibold tracking-[-0.015em] bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent mb-1">
-        Recordatorios
+          Recordatorios
         </h1>
 
         <p className="text-sm text-cyan-100/55">
@@ -71,32 +71,32 @@ const RecordatoriosView = () => {
         </p>
       </div>
 
-<div className="flex flex-wrap gap-2 mb-6">
-  {filtros.map(f => (
-    <button
-      key={f.key}
-      onClick={() => setFilter(f.key)}
-      className={cn(
-        'text-[13px] px-4 py-[9px] rounded-full border transition-all whitespace-nowrap',
-        filter === f.key
-          ? 'bg-cyan-500/20 text-cyan-100 border-cyan-300/50 shadow-[0_0_18px_rgba(34,211,238,.22)]'
-          : 'bg-white/5 text-cyan-100/65 border-cyan-500/20 hover:bg-cyan-500/10 hover:text-white'
-      )}
-    >
-      <div className="flex items-center gap-2">
-        <span
-          className={cn(
-            'w-2.5 h-2.5 rounded-full shadow-[0_0_10px_currentColor]',
-            f.color
-          )}
-        />
-        <span className={f.key === 'todos' ? 'font-bold uppercase' : ''}>
-  {f.label}
-</span>
+      <div className="flex flex-wrap gap-2 mb-6">
+        {filtros.map(f => (
+          <button
+            key={f.key}
+            onClick={() => setFilter(f.key)}
+            className={cn(
+              'text-[13px] px-4 py-[9px] rounded-full border transition-all whitespace-nowrap',
+              filter === f.key
+                ? 'bg-cyan-500/20 text-cyan-100 border-cyan-300/50 shadow-[0_0_18px_rgba(34,211,238,.22)]'
+                : 'bg-white/5 text-cyan-100/65 border-cyan-500/20 hover:bg-cyan-500/10 hover:text-white'
+            )}
+          >
+            <div className="flex items-center gap-2">
+              <span
+                className={cn(
+                  'w-2.5 h-2.5 rounded-full shadow-[0_0_10px_currentColor]',
+                  f.color
+                )}
+              />
+              <span className={f.key === 'todos' ? 'font-bold uppercase' : ''}>
+                {f.label}
+              </span>
+            </div>
+          </button>
+        ))}
       </div>
-    </button>
-  ))}
-</div>
 
       <div className="rounded-3xl border border-cyan-500/20 bg-[rgba(5,18,24,.78)] backdrop-blur-xl overflow-hidden shadow-[0_0_35px_rgba(34,211,238,.10)]">
         <table className="w-full text-sm">
@@ -112,53 +112,63 @@ const RecordatoriosView = () => {
           </thead>
 
           <tbody>
-            {filtered.map(r => {
-              const lbl = recordatorioLabel[r.estado] || recordatorioLabel.sin_respuesta;
+            {filtered.map(recordatorio => {
+              const lbl =
+                recordatorioLabel[recordatorio.estado] ||
+                recordatorioLabel.sin_respuesta;
 
               return (
                 <tr
-                  key={r.id}
+                  key={recordatorio.id}
                   className="border-t border-cyan-500/10 hover:bg-cyan-500/5 transition-colors"
                 >
                   <td className="px-6 py-4 font-medium text-white">
-                    {r.nombre_completo || '—'}
+                    {recordatorio.nombre_paciente || '—'}
                   </td>
 
                   <td className="px-6 py-4 text-cyan-100/65">
-                    {formatTelefono(r.telefono)}
+                    {formatTelefono(recordatorio.telefono)}
                   </td>
 
                   <td className="px-6 py-4 text-cyan-100/80">
-                    {formatDate(r.fecha_cita)}
+                    {formatDate(recordatorio.proxima_cita_fecha)}
+                  </td>
+
+                  <td className="px-6 py-4 text-cyan-100/75">
+                    {recordatorio.proxima_cita_motivo || '—'}
+                  </td>
+
+                  <td className="px-6 py-4 text-cyan-100/75">
+                    {recordatorio.profesional || '—'}
                   </td>
 
                   <td className="px-6 py-4">
-                   <span
-  className={cn(
-    'inline-flex items-center gap-2 px-4 py-2 rounded-full border border-cyan-500/20 bg-cyan-500/5 text-cyan-100 shadow-[0_0_12px_rgba(34,211,238,.10)]',
-  )}
->
-  <span
-    className={cn(
-      'w-2.5 h-2.5 rounded-full shadow-[0_0_10px_currentColor]',
-      r.estado === 'confirmada' && 'bg-green-400',
-      r.estado === 'sin_respuesta' && 'bg-violet-300',
-      r.estado === 'no_podra_asistir' && 'bg-pink-400',
-      r.estado === 'cita_modificada' && 'bg-indigo-400',
-      r.estado === 'cancelada_recado' && 'bg-red-400'
-    )}
-  />
+                    <span
+                      className={cn(
+                        'inline-flex items-center gap-2 px-4 py-2 rounded-full border border-cyan-500/20 bg-cyan-500/5 text-cyan-100 shadow-[0_0_12px_rgba(34,211,238,.10)]',
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          'w-2.5 h-2.5 rounded-full shadow-[0_0_10px_currentColor]',
+                          recordatorio.estado === 'confirmada' && 'bg-green-400',
+                          recordatorio.estado === 'sin_respuesta' && 'bg-violet-300',
+                          recordatorio.estado === 'no_podra_asistir' && 'bg-pink-400',
+                          recordatorio.estado === 'cita_modificada' && 'bg-indigo-400',
+                          recordatorio.estado === 'cancelada_recado' && 'bg-red-400'
+                        )}
+                      />
 
-   {lbl.label}
-  </span>
-</td>
-</tr>
-);
-})}
+                      {lbl.label}
+                    </span>
+                  </td>
+                </tr>
+              );
+            })}
 
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-6 py-10 text-center text-cyan-100/45">
+                <td colSpan={6} className="px-6 py-10 text-center text-cyan-100/45">
                   Sin resultados
                 </td>
               </tr>
