@@ -101,37 +101,34 @@ export interface Recall {
 export interface RecordatorioCita {
   id: string | number;
   created_at: string;
-  updated_at: string | null;
 
-  event_id: string | null;
-  calendar_id: string | null;
+  updated_at?: string | null;
+  event_id?: string | null;
+  calendar_id?: string | null;
+  telefono?: string | null;
 
-  telefono: string | null;
-  nombre_paciente: string | null;
+  nombre_paciente?: string | null;
+  nombre_completo?: string | null;
 
-  proxima_cita_fecha: string | null;
-  proxima_cita_motivo: string | null;
+  proxima_cita_fecha?: string | null;
+  proxima_cita_motivo?: string | null;
+  fecha_cita?: string | null;
 
-  mensaje: string | null;
-  tipo_recordatorio: string | null;
-
+  mensaje?: string | null;
+  tipo_recordatorio?: string | null;
   estado: EstadoRecordatorio;
 
-  enviado_at: string | null;
-  respondido_at: string | null;
-  respuesta_usuario: string | null;
+  enviado_at?: string | null;
+  respondido_at?: string | null;
+  respuesta_usuario?: string | null;
 
-  conversation_id: string | null;
-  profesional: string | null;
-
-  estado_cita: string | null;
-  detalle_motivo: string | null;
-  fecha_inicio: string | null;
-  fecha_fin: string | null;
-  duracion_minutos: number | null;
-
-  // Compatibilidad con código/mock antiguo
   paciente_id?: string | null;
-  nombre_completo?: string | null;
-  fecha_cita?: string | null;
+  conversation_id?: string | null;
+  profesional?: string | null;
+
+  estado_cita?: string | null;
+  detalle_motivo?: string | null;
+  fecha_inicio?: string | null;
+  fecha_fin?: string | null;
+  duracion_minutos?: string | number | null;
 }
