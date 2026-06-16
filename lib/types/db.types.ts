@@ -4,7 +4,7 @@
 export type ModoAtencion = 'ia' | 'martina' | 'recepcion';
 export type EstadoVisualConv = 'nueva' | 'en_curso' | 'recepcion' | 'gestionada';
 export type EstadoRecordatorio = 'sin_respuesta' | 'confirmada' | 'no_podra_asistir' | 'cita_modificada' | 'cancelada_recado';
-export type EstadoRecall = 'enviado' | 'quiere_cita' | 'cita_agendada' | 'pospuesto' | 'sin_respuesta';
+export type EstadoRecall = 'pendiente_envio' | 'pendiente' | 'confirmada' | 'pospuesta';
 export type RolMensaje = 'paciente' | 'martina' | 'recepcion' | 'sistema';
 
 export type CanalMartina = 'whatsapp' | 'llamadas';
@@ -90,12 +90,31 @@ export interface MensajeWhatsapp {
 export interface Recall {
   id: string;
   created_at: string;
+  updated_at?: string | null;
+
   paciente_id: string | null;
   telefono: string | null;
-  nombre_completo: string | null;
-  tipo: string | null;
+  nombre_paciente: string | null;
+
+  motivo_recall: string | null;
+  detalle_recall: string | null;
+  profesional: string | null;
+
+  fecha_recall: string | null;
   fecha_envio: string | null;
+
+  mensaje: string | null;
   estado: EstadoRecall;
+
+  estado_cita: string | null;
+  respuesta_usuario: string | null;
+  respondido_at: string | null;
+
+  proxima_cita_fecha: string | null;
+  proxima_cita_motivo: string | null;
+
+  conversacion_id: string | null;
+  origen: 'manual' | 'agenda' | string | null;
 }
 
 export interface RecordatorioCita {
