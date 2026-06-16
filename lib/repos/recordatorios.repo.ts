@@ -1,3 +1,7 @@
+import { createClient as createBrowserSupa } from '@/lib/supabase/client';
+import { mockRecordatorios } from '@/lib/mock/data';
+import type { RecordatorioCita } from '@/lib/types/db.types';
+
 export async function listRecordatorios(): Promise<RecordatorioCita[]> {
   const supa = createBrowserSupa();
 
