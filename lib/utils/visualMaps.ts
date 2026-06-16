@@ -8,7 +8,7 @@ export const conversacionLabel: Record<EstadoVisualConv, { emoji: string; label:
 };
 
 export const recordatorioLabel: Record<EstadoRecordatorio, { emoji: string; label: string; color: string }> = {
-  sin_respuesta:     { emoji: '⚪', label: 'Sin respuesta',    color: 'bg-neutral-100 text-neutral-700' },
+  sin_respuesta:     { emoji: '⚪', label: 'Pendiente',    color: 'bg-neutral-100 text-neutral-700' },
   confirmada:        { emoji: '🟢', label: 'Confirmada',       color: 'bg-emerald-50 text-emerald-800' },
   no_podra_asistir:  { emoji: '❌', label: 'No podrá asistir', color: 'bg-rose-50 text-rose-800' },
   cita_modificada:   { emoji: '✔️', label: 'Cita modificada',  color: 'bg-blue-50 text-blue-800' },
