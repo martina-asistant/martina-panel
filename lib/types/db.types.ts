@@ -94,29 +94,29 @@ export interface Recall {
 
   paciente_id: string | null;
   telefono: string | null;
-  nombre_paciente: string | null;
+
+  nombre_paciente?: string | null;
   nombre_completo?: string | null;
 
-  motivo_recall: string | null;
+  motivo_recall?: string | null;
   tipo?: string | null;
-  detalle_recall: string | null;
-  profesional: string | null;
+  detalle_recall?: string | null;
+  profesional?: string | null;
 
-  fecha_recall: string | null;
+  fecha_recall?: string | null;
   fecha_envio: string | null;
 
-  mensaje: string | null;
+  mensaje?: string | null;
   estado: EstadoRecall;
 
-  estado_cita: string | null;
-  respuesta_usuario: string | null;
-  respondido_at: string | null;
+  estado_cita?: string | null;
+  respuesta_usuario?: string | null;
+  respondido_at?: string | null;
 
-  proxima_cita_fecha: string | null;
-  proxima_cita_motivo: string | null;
+  proxima_cita_fecha?: string | null;
+  proxima_cita_motivo?: string | null;
 
-  conversacion_id: string | null;
-  origen: 'manual' | 'agenda' | string | null;
+  conversacion_id?: string | null;
 }
 
 export interface RecordatorioCita {
