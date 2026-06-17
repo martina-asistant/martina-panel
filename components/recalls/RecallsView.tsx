@@ -628,23 +628,23 @@ setNuevoRecall({
     <div className="absolute left-0 top-[calc(100%+8px)] z-[120] w-full max-h-56 overflow-y-auto rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
       {TIPOS_RECALL.map((tipo) => (
         <button
-          key={tipo.value}
-          type="button"
-          onClick={() => {
-            setNuevoRecall({
-              ...nuevoRecall,
-              motivo_recall: tipo.value,
-              fecha_recall: tipo.meses
-    ? sumarMesesISO(tipo.meses)
-    : nuevoRecall.fecha_recall,
-});
-            });
-            setMostrarTiposRecall(false);
-          }}
-          className="block w-full px-4 py-2 text-left text-sm text-white hover:bg-cyan-500/15"
-        >
-          {tipo.label}
-        </button>
+  key={tipo.value}
+  type="button"
+  onClick={() => {
+    setNuevoRecall({
+      ...nuevoRecall,
+      motivo_recall: tipo.value,
+      fecha_recall: tipo.meses
+        ? sumarMesesISO(tipo.meses)
+        : nuevoRecall.fecha_recall,
+    });
+
+    setMostrarTiposRecall(false);
+  }}
+  className="block w-full px-4 py-2 text-left text-sm text-white hover:bg-cyan-500/15"
+>
+  {tipo.label}
+</button>
       ))}
     </div>
   )}
