@@ -257,7 +257,7 @@ setNuevoRecall({
   nombre_paciente: '',
   telefono: '',
   motivo_recall: 'Limpieza',
-  tipo_recall: 'MTO Periodontal 4 meses',
+  tipo_recall: 'MTO Periodontal',
   detalle_recall: '',
   fecha_recall: '',
   profesional: 'fede',
@@ -710,7 +710,7 @@ setNuevoRecall({
                   </div>
                 </div>
 
-                <div className="relative overflow-visible justify-self-end min-w-[130px] mr-4">
+                <div className="relative overflow-visible justify-self-end min-w-[130px] mr-6">
                   <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">
                     Agenda
                   </div>
