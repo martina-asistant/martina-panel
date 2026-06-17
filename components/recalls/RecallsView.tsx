@@ -673,7 +673,7 @@ setNuevoRecall({
                 />
               </div>
 
-              <div className="grid grid-cols-[1fr_1.2fr_1fr_1fr_1fr] gap-5 pt-2 border-t border-white/20">
+              <div className="grid grid-cols-[1fr_0.9fr_1fr_1fr_1fr] gap-5 pt-2 border-t border-white/20">
                 <div>
                   <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">
                     Origen
