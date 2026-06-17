@@ -624,7 +624,31 @@ const guardarCambiosCita = async () => {
 };
 
   const abrirInsertarRecall = () => {
-  if (!selectedEvent) return;
+  if (!eventoActivo) return;
+
+  const motivoOriginal = (eventoActivo.motivo || '').toLowerCase();
+
+  let motivoRecall = 'Revisión general';
+
+  if (
+    motivoOriginal.includes('limpieza') ||
+    motivoOriginal.includes('higiene')
+  ) {
+    motivoRecall = 'Limpieza';
+  }
+
+  setNuevoRecall({
+    paciente_id: '',
+    nombre_paciente: eventoActivo.nombre_paciente || '',
+    telefono: eventoActivo.telefono || '',
+    motivo_recall: motivoRecall,
+    detalle_recall: '',
+    fecha_recall: '',
+    profesional: eventoActivo.profesional || agendaActiva,
+  });
+
+  setMostrarInsertarRecall(true);
+};
 
   const motivoOriginal =
     (selectedEvent.motivo || '').toLowerCase();
