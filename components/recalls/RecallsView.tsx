@@ -440,8 +440,8 @@ setNuevoRecall({
       </div>
 
       {mostrarInsertarRecall && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm pt-[4vh]">
-          <div className="w-full max-w-2xl rounded-3xl border border-cyan-300/45 bg-[#03111A]/95 overflow-visible shadow-[0_0_46px_rgba(34,211,238,.24)]">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm px-4 py-6">
+          <div className="mx-auto w-full max-w-2xl rounded-3xl border border-cyan-300/45 bg-[#03111A]/95 overflow-visible shadow-[0_0_46px_rgba(34,211,238,.24)]">
             <div className="px-6 py-5 border-b border-cyan-300/20 flex items-start justify-between">
               <div>
                 <h2 className="text-xl font-semibold text-white">
@@ -668,12 +668,12 @@ setNuevoRecall({
                       detalle_recall: e.target.value,
                     })
                   }
-                  rows={3}
-                  className="w-full rounded-2xl border border-white/25 bg-black/20 p-4 text-white resize-none outline-none"
+                  rows={2}
+                  className="w-full min-h-[86px] rounded-2xl border border-white/25 bg-black/20 p-4 text-white resize-y outline-none"
                 />
               </div>
 
-              <div className="grid grid-cols-5 gap-5 pt-2 border-t border-white/20">
+              <div className="grid grid-cols-[1fr_1.2fr_1fr_1fr_1fr] gap-5 pt-2 border-t border-white/20">
                 <div>
                   <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">
                     Origen
