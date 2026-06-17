@@ -66,7 +66,7 @@ const recallEstadoVisual = (estado: EstadoRecall | null | undefined) => {
 const tipoRecallLabel = (tipo?: string | null) => {
   if (!tipo) return '—';
 
-  if (tipo === 'mto_periodontal') return 'Mto. periodontal';
+  if (tipo === 'mto_periodontal') return 'Mto. Periodontal';
   if (tipo === 'revision_general') return 'Revisión general';
 
   return tipo;
@@ -195,7 +195,7 @@ const RecallsView = () => {
                   className="border-t border-cyan-500/10 hover:bg-cyan-500/5 transition-colors"
                 >
                   <td className="px-6 py-4 font-medium text-white">
-                    {r.nombre_paciente || '—'}
+                    {r.nombre_paciente || r.nombre_completo || '—'}
                   </td>
 
                   <td className="px-6 py-4 text-cyan-100/65">
@@ -203,7 +203,7 @@ const RecallsView = () => {
                   </td>
 
                   <td className="px-6 py-4 text-cyan-100/80">
-                    {tipoRecallLabel(r.motivo_recall)}
+                    {tipoRecallLabel(r.motivo_recall || r.tipo)}
                   </td>
 
                   <td className="px-6 py-4 text-cyan-100/65 max-w-[280px]">
