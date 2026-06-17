@@ -29,7 +29,6 @@ export async function createRecall(payload: Partial<Recall>): Promise<Recall | n
     .insert({
       ...payload,
       estado: payload.estado || 'pendiente_envio',
-      origen: payload.origen || 'manual',
     })
     .select('*')
     .single();
