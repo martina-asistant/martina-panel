@@ -132,7 +132,7 @@ const RecallsView = () => {
   nombre_paciente: '',
   telefono: '',
   motivo_recall: 'Limpieza',
-  tipo_recall: 'MTO Periodontal 4 meses',
+  tipo_recall: 'MTO Periodontal',
   detalle_recall: '',
   fecha_recall: '',
   profesional: 'fede',
@@ -636,11 +636,11 @@ setNuevoRecall({
   onClick={() => {
     setNuevoRecall({
       ...nuevoRecall,
-      motivo_recall: tipo.value,
+    motivo_recall: tipo.value,
     tipo_recall: tipo.label,
     fecha_recall: tipo.meses
       ? sumarMesesISO(tipo.meses)
-      : nuevoRecall.fecha_recall,
+      : '',
   });
 
     setMostrarTiposRecall(false);
