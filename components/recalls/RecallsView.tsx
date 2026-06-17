@@ -232,6 +232,7 @@ const RecallsView = () => {
         tipo_recall: nuevoRecall.tipo_recall,
         detalle_recall: nuevoRecall.detalle_recall,
         fecha_recall: nuevoRecall.fecha_recall,
+        fecha_registro: new Date().toISOString(),
         fecha_envio: null,
         profesional: nuevoRecall.profesional,
         origen: usuarioPanel,
@@ -672,7 +673,7 @@ setNuevoRecall({
                 />
               </div>
 
-              <div className="grid grid-cols-4 gap-5 pt-2 border-t border-white/20">
+              <div className="grid grid-cols-5 gap-5 pt-2 border-t border-white/20">
                 <div>
                   <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">
                     Origen
@@ -681,6 +682,15 @@ setNuevoRecall({
                     {usuarioPanel}
                   </div>
                 </div>
+
+                <div>
+  <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">
+    Fecha registro
+  </div>
+  <div className="text-white/95 text-sm">
+    {new Date().toLocaleDateString('es-ES')}
+  </div>
+</div>
 
                 <div>
                   <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">
