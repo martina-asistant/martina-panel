@@ -95,8 +95,10 @@ export interface Recall {
   paciente_id: string | null;
   telefono: string | null;
   nombre_paciente: string | null;
+  nombre_completo?: string | null;
 
   motivo_recall: string | null;
+  tipo?: string | null;
   detalle_recall: string | null;
   profesional: string | null;
 
