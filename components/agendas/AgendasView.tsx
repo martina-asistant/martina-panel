@@ -321,6 +321,7 @@ const [nuevoPaciente, setNuevoPaciente] = useState({
 });
   const [mostrarResultadosPaciente, setMostrarResultadosPaciente] = useState(false);
   const [mostrarMotivos, setMostrarMotivos] = useState(false);
+  const [mostrarMotivosEditar, setMostrarMotivosEditar] = useState(false);
   const [mostrarAgendas, setMostrarAgendas] = useState(false);
   const [mostrarInsertarRecall, setMostrarInsertarRecall] = useState(false);
 
@@ -1217,36 +1218,63 @@ const guardarInsertarCita = async () => {
                   </div>
 
                   {modoEdicion ? (
-  <select
-    value={getTratamientoValue(eventoSeleccionado.motivo)}
-    onChange={(e) => {
-      const nuevoMotivo = e.target.value;
+  <div className="relative">
+    <button
+      type="button"
+      onClick={() => setMostrarMotivosEditar(!mostrarMotivosEditar)}
+      className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-left text-white outline-none flex items-center justify-between"
+    >
+      <span>
+        {eventoSeleccionado.motivo || 'Seleccionar tratamiento'}
+      </span>
 
-      const duracion = getDuracionPorMotivo(nuevoMotivo);
-
-      const nuevaFechaFin = sumarMinutosISO(
-        eventoSeleccionado.fecha_inicio,
-        duracion
-      );
-
-      setEventoSeleccionado({
-        ...eventoSeleccionado,
-        motivo: nuevoMotivo,
-        fecha_fin: nuevaFechaFin,
-      });
-    }}
-    className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
-  >
-    {TRATAMIENTOS.map((tratamiento) => (
-      <option
-        key={tratamiento}
-        value={tratamiento}
-        className="bg-[#03111A]"
+      <svg
+        className={`w-4 h-4 text-cyan-200 transition-transform ${
+          mostrarMotivosEditar ? 'rotate-180' : ''
+        }`}
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
       >
-        {tratamiento}
-      </option>
-    ))}
-  </select>
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M19 9l-7 7-7-7"
+        />
+      </svg>
+    </button>
+
+    {mostrarMotivosEditar && (
+      <div className="absolute left-0 top-[calc(100%+8px)] z-[120] w-full overflow-hidden rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
+        {TRATAMIENTOS.map((tratamiento) => (
+          <button
+            key={tratamiento}
+            type="button"
+            onClick={() => {
+              const duracion = getDuracionPorMotivo(tratamiento);
+
+              const nuevaFechaFin = sumarMinutosISO(
+                eventoSeleccionado.fecha_inicio,
+                duracion
+              );
+
+              setEventoSeleccionado({
+                ...eventoSeleccionado,
+                motivo: tratamiento,
+                fecha_fin: nuevaFechaFin,
+              });
+
+              setMostrarMotivosEditar(false);
+            }}
+            className="block w-full px-4 py-2 text-left text-sm text-white hover:bg-cyan-500/15"
+          >
+            {tratamiento}
+          </button>
+        ))}
+      </div>
+    )}
+  </div>
 ) : (
   <div className="text-white">
     {eventoSeleccionado.motivo || '-'}
