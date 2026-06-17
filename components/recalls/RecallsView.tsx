@@ -9,6 +9,15 @@ import { cn } from '@/lib/utils/cn';
 import { createClient } from '@/lib/supabase/client';
 
 type Filtro = 'todos' | EstadoRecall;
+type PatientOption = {
+  id: string;
+  paciente_id: string | null;
+  nombre: string | null;
+  apellidos: string | null;
+  nombre_completo: string | null;
+  telefono: string | null;
+};
+
 
 const filtros: { key: Filtro; label: string; color: string }[] = [
   { key: 'todos', label: 'Todos', color: 'bg-amber-400' },
@@ -29,6 +38,11 @@ const TIPOS_RECALL = [
   { label: 'Revisión', value: 'Revisión' },
   { label: 'Revisión general', value: 'Revisión general' },
 ];
+
+const getDuracionRecall = (motivo: string) => {
+  if (motivo === 'Revisión') return 5;
+  return 30;
+};
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
@@ -100,8 +114,12 @@ const RecallsView = () => {
   const [mostrarTiposRecall, setMostrarTiposRecall] = useState(false);
   const [mostrarAgendaRecall, setMostrarAgendaRecall] = useState(false);
   const [loadingGuardar, setLoadingGuardar] = useState(false);
+  const [patients, setPatients] = useState<PatientOption[]>([]);
+  const [busquedaPaciente, setBusquedaPaciente] = useState('');
+  const [mostrarResultadosPaciente, setMostrarResultadosPaciente] = useState(false);
 
   const [nuevoRecall, setNuevoRecall] = useState({
+    paciente_id: '',
     nombre_paciente: '',
     telefono: '',
     motivo_recall: 'Limpieza',
@@ -160,6 +178,27 @@ const RecallsView = () => {
     };
   }, []);
 
+  useEffect(() => {
+  const cargarPatients = async () => {
+    const supa = createClient();
+    if (!supa) return;
+
+    const { data, error } = await supa
+      .from('patients')
+      .select('id, paciente_id, nombre, apellidos, nombre_completo, telefono')
+      .order('nombre_completo', { ascending: true });
+
+    if (error) {
+      console.error('Error cargando pacientes:', error);
+      return;
+    }
+
+    setPatients(data || []);
+  };
+
+  cargarPatients();
+}, []);
+
   const guardarInsertarRecall = async () => {
     if (loadingGuardar) return;
 
@@ -187,6 +226,8 @@ const RecallsView = () => {
         origen: usuarioPanel,
         numero_cambios: 0,
         estado: 'pendiente_envio',
+        paciente_id: nuevoRecall.paciente_id || null,
+        duracion_minutos: getDuracionRecall(nuevoRecall.motivo_recall),
       });
 
       if (!recallCreado) {
@@ -195,14 +236,19 @@ const RecallsView = () => {
       }
 
       setMostrarInsertarRecall(false);
-      setNuevoRecall({
-        nombre_paciente: '',
-        telefono: '',
-        motivo_recall: 'Limpieza',
-        detalle_recall: '',
-        fecha_recall: '',
-        profesional: 'fede',
-      });
+
+setBusquedaPaciente('');
+setMostrarResultadosPaciente(false);
+
+setNuevoRecall({
+  paciente_id: '',
+  nombre_paciente: '',
+  telefono: '',
+  motivo_recall: 'Limpieza',
+  detalle_recall: '',
+  fecha_recall: '',
+  profesional: 'fede',
+});
 
       await cargarRecalls();
     } catch (error) {
@@ -222,6 +268,13 @@ const RecallsView = () => {
       return fechaA - fechaB;
     });
   }, [items, filter]);
+
+  const pacientesFiltrados = patients.filter((patient) => {
+  const texto =
+  `${patient.nombre_completo || ''} ${patient.nombre || ''} ${patient.apellidos || ''} ${patient.telefono || ''}`
+    .toLowerCase();
+  return texto.includes(busquedaPaciente.toLowerCase());
+});
 
   return (
     <div className="min-h-full overflow-y-auto p-8 bg-[#02141B] text-white">
@@ -466,69 +519,123 @@ const RecallsView = () => {
               </div>
 
               <div className="grid grid-cols-[minmax(0,1fr)_260px] gap-10 items-start">
-                <div className="relative overflow-visible min-w-0">
-                  <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
-                    Tipo
-                  </div>
+  <div className="relative overflow-visible min-w-0">
+    <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
+      Paciente
+    </div>
 
-                  <button
-                    type="button"
-                    onClick={() => setMostrarTiposRecall(!mostrarTiposRecall)}
-                    className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-left text-white outline-none flex items-center justify-between"
-                  >
-                    <span>{tipoRecallLabel(nuevoRecall.motivo_recall)}</span>
+    <input
+      placeholder="Buscar paciente"
+      value={busquedaPaciente}
+      onChange={(e) => {
+        setBusquedaPaciente(e.target.value);
+        setMostrarResultadosPaciente(true);
+        setNuevoRecall({
+          ...nuevoRecall,
+          paciente_id: '',
+          nombre_paciente: e.target.value,
+        });
+      }}
+      className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+    />
 
-                    <svg
-                      className={`w-4 h-4 text-cyan-200 transition-transform ${
-                        mostrarTiposRecall ? 'rotate-180' : ''
-                      }`}
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
+    {mostrarResultadosPaciente && busquedaPaciente && pacientesFiltrados.length > 0 && (
+      <div className="absolute left-0 top-[calc(100%+8px)] z-[120] max-h-44 w-full overflow-y-auto rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.18)]">
+        {pacientesFiltrados.slice(0, 8).map((patient) => {
+          const nombreCompleto =
+            patient.nombre_completo ||
+            `${patient.nombre || ''} ${patient.apellidos || ''}`.trim();
 
-                  {mostrarTiposRecall && (
-                    <div className="absolute left-0 top-[calc(100%+8px)] z-[120] w-full max-h-56 overflow-y-auto rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
-                      {TIPOS_RECALL.map((tipo) => (
-                        <button
-                          key={tipo.value}
-                          type="button"
-                          onClick={() => {
-                            setNuevoRecall({
-                              ...nuevoRecall,
-                              motivo_recall: tipo.value,
-                            });
-                            setMostrarTiposRecall(false);
-                          }}
-                          className="block w-full px-4 py-2 text-left text-sm text-white hover:bg-cyan-500/15"
-                        >
-                          {tipo.label}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
+          return (
+            <button
+              key={patient.id}
+              type="button"
+              onClick={() => {
+                setMostrarResultadosPaciente(false);
 
-                <div>
-                  <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
-                    Teléfono
-                  </div>
+                setNuevoRecall({
+                  ...nuevoRecall,
+                  paciente_id: patient.paciente_id || patient.id,
+                  nombre_paciente: nombreCompleto,
+                  telefono: patient.telefono || '',
+                });
 
-                  <input
-                    value={nuevoRecall.telefono}
-                    onChange={(e) =>
-                      setNuevoRecall({
-                        ...nuevoRecall,
-                        telefono: e.target.value,
-                      })
-                    }
-                    className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
-                  />
-                </div>
-              </div>
+                setBusquedaPaciente(nombreCompleto);
+              }}
+              className="block w-full px-4 py-2 text-left text-sm text-white hover:bg-cyan-500/15"
+            >
+              <div>{nombreCompleto}</div>
+              <div className="text-xs text-cyan-100/60">{patient.telefono}</div>
+            </button>
+          );
+        })}
+      </div>
+    )}
+  </div>
+
+  <div>
+    <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
+      Teléfono
+    </div>
+
+    <input
+      value={nuevoRecall.telefono}
+      onChange={(e) =>
+        setNuevoRecall({
+          ...nuevoRecall,
+          telefono: e.target.value,
+        })
+      }
+      className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+    />
+  </div>
+</div>
+
+<div className="relative overflow-visible">
+  <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
+    Tipo
+  </div>
+
+  <button
+    type="button"
+    onClick={() => setMostrarTiposRecall(!mostrarTiposRecall)}
+    className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-left text-white outline-none flex items-center justify-between"
+  >
+    <span>{tipoRecallLabel(nuevoRecall.motivo_recall)}</span>
+
+    <svg
+      className={`w-4 h-4 text-cyan-200 transition-transform ${
+        mostrarTiposRecall ? 'rotate-180' : ''
+      }`}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+    </svg>
+  </button>
+
+  {mostrarTiposRecall && (
+    <div className="absolute left-0 top-[calc(100%+8px)] z-[120] w-full max-h-56 overflow-y-auto rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
+      {TIPOS_RECALL.map((tipo) => (
+        <button
+          key={tipo.value}
+          type="button"
+          onClick={() => {
+            setNuevoRecall({
+              ...nuevoRecall,
+              motivo_recall: tipo.value,
+            });
+            setMostrarTiposRecall(false);
+          }}
+          className="block w-full px-4 py-2 text-left text-sm text-white hover:bg-cyan-500/15"
+        >
+          {tipo.label}
+        </button>
+      ))}
+    </div>
+  )}
+</div>
 
               <div>
                 <div className="text-cyan-300 text-xs uppercase tracking-wider mb-2 font-bold">
