@@ -1211,7 +1211,7 @@ const guardarInsertarCita = async () => {
 </div>
             )}
 
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-[1.4fr_1fr] gap-8">
                 <div>
                   <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
                     Motivo
