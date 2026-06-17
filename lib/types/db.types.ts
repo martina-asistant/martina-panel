@@ -117,6 +117,8 @@ export interface Recall {
   proxima_cita_motivo?: string | null;
 
   conversacion_id?: string | null;
+  origen?: string | null;
+numero_cambios?: number | null;
 }
 
 export interface RecordatorioCita {
