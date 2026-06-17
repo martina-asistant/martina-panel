@@ -1790,7 +1790,7 @@ const guardarInsertarCita = async () => {
               Estado
             </div>
             <div className="text-white/95 text-sm">
-              Pendiente envio
+              Pendiente envío
             </div>
           </div>
 
