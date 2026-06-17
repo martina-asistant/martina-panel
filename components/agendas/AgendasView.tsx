@@ -698,6 +698,70 @@ const guardarInsertarCita = async () => {
   }
 };
 
+  const guardarInsertarRecall = async () => {
+  if (loading || !eventoActivo) return;
+
+  if (!nuevoRecall.nombre_paciente.trim() || !nuevoRecall.telefono.trim()) {
+    console.error('Falta nombre o teléfono en recall');
+    return;
+  }
+
+  if (!nuevoRecall.fecha_recall) {
+    console.error('Falta fecha recall');
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const telefonoOriginal = eventoActivo.telefono || '';
+    const telefonoNuevo = nuevoRecall.telefono.trim();
+
+    if (telefonoOriginal && telefonoNuevo && telefonoOriginal !== telefonoNuevo) {
+      const supabase = createClient();
+
+      if (supabase) {
+        const { error } = await supabase
+          .from('patients')
+          .update({ telefono: telefonoNuevo })
+          .eq('telefono', telefonoOriginal);
+
+        if (error) {
+          console.error('Error actualizando teléfono paciente:', error);
+        }
+      }
+    }
+
+    const recallCreado = await createRecall({
+      paciente_id: nuevoRecall.paciente_id || null,
+      nombre_paciente: nuevoRecall.nombre_paciente,
+      telefono: telefonoNuevo,
+      motivo_recall: nuevoRecall.motivo_recall,
+      detalle_recall: nuevoRecall.detalle_recall,
+      fecha_recall: nuevoRecall.fecha_recall,
+      fecha_envio: null,
+      profesional: nuevoRecall.profesional,
+      origen: usuarioPanel,
+      numero_cambios: 0,
+      estado: 'pendiente_envio',
+    });
+
+    if (!recallCreado) {
+      console.error('Error creando recall');
+      return;
+    }
+
+    setMostrarInsertarRecall(false);
+    setEventoActivo(null);
+    setSlotInicio(null);
+    setSlotFin(null);
+  } catch (error) {
+    console.error('Error guardando recall:', error);
+  } finally {
+    setLoading(false);
+  }
+};
+  
   useEffect(() => {
     cargarAgenda();
   }, [agendaActiva, semanaInicio]);
