@@ -710,7 +710,7 @@ setNuevoRecall({
                   </div>
                 </div>
 
-                <div className="relative overflow-visible justify-self-end min-w-[130px]">
+                <div className="relative overflow-visible justify-self-end min-w-[130px] mr-4">
                   <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">
                     Agenda
                   </div>
