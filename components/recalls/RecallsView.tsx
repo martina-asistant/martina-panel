@@ -126,6 +126,8 @@ const RecallsView = () => {
   const [patients, setPatients] = useState<PatientOption[]>([]);
   const [busquedaPaciente, setBusquedaPaciente] = useState('');
   const [mostrarResultadosPaciente, setMostrarResultadosPaciente] = useState(false);
+  const [recallSeleccionado, setRecallSeleccionado] = useState<Recall | null>(null);
+  const [modoEdicionRecall, setModoEdicionRecall] = useState(false);
 
   const [nuevoRecall, setNuevoRecall] = useState({
     paciente_id: '',
@@ -367,9 +369,14 @@ setNuevoRecall({
 
               return (
                 <tr
-                  key={r.id}
-                  className="border-t border-cyan-500/10 hover:bg-cyan-500/5 transition-colors"
-                >
+  key={r.id}
+  onDoubleClick={() => {
+    setRecallSeleccionado(r);
+    setModoEdicionRecall(true);
+    setMostrarInsertarRecall(true);
+  }}
+  className="border-t border-cyan-500/10 hover:bg-cyan-500/5 transition-colors cursor-pointer"
+>
                   <td className="px-6 py-4 font-medium text-white">
                     {r.nombre_paciente || r.nombre_completo || '—'}
                   </td>
