@@ -120,6 +120,7 @@ export interface Recall {
   conversacion_id?: string | null;
   origen?: string | null;
 numero_cambios?: number | null;
+  tipo_recall?: string | null;
 }
 
 export interface RecordatorioCita {
