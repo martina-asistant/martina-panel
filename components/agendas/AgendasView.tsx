@@ -23,12 +23,14 @@ const TRATAMIENTOS = [
   'Rec+Post',
   'Implante',
   'Cirugía',
+  'Quitar puntos',
   'Impresiones',
   'Prueba-colocar',
   'Raspados',
   'Tallados',
   'Prótesis',
   'Férula Michigan',
+  'Fotos',
 ];
 
 type PatientOption = {
@@ -98,6 +100,8 @@ const getDuracionPorMotivo = (motivo: string) => {
 
   if (m === 'cirugía' || m === 'cirugia') return 60;
 
+  if (m === 'quitar puntos' ) return 5;
+
   if (m === 'impresiones') return 30;
 
   if (m === 'prueba-colocar') return 30;
@@ -109,6 +113,8 @@ const getDuracionPorMotivo = (motivo: string) => {
   if (m === 'prótesis' || m === 'protesis') return 30;
 
   if (m === 'férula michigan' || m === 'ferula michigan') return 30;
+
+  if (m === 'fotos' ) return 5;
 
   return 30;
 };
@@ -260,6 +266,14 @@ const getColorTratamiento = (evento: EventoAgenda) => {
   if (motivo === 'implante') {
     return { bg: 'rgba(14,165,233,.90)', text: 'text-white' };
   }
+
+  if (motivo === 'quitar puntos') {
+  return { bg: 'rgba(34,197,94,.90)', text: 'text-white' };
+}
+
+if (motivo === 'fotos') {
+  return { bg: 'rgba(161,98,7,.90)', text: 'text-white' };
+}
 
   if (motivo === 'cirugía' || motivo === 'cirugia') {
     return { bg: 'rgba(255,255,255,.95)', text: 'text-[#03111A]' };
