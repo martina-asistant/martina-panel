@@ -64,6 +64,13 @@ const buildISOFromDateTime = (date: string, time: string) => {
   return new Date(year, month - 1, day, hours, minutes, 0, 0).toISOString();
 };
 
+const sumarMesesISO = (meses: number) => {
+  const fecha = new Date();
+  fecha.setMonth(fecha.getMonth() + meses);
+  fecha.setHours(10, 0, 0, 0);
+  return fecha.toISOString();
+};
+
 const formatTelefono = (telefono?: string | null) => {
   if (!telefono) return '—';
 
@@ -626,7 +633,7 @@ setNuevoRecall({
           onClick={() => {
             setNuevoRecall({
               ...nuevoRecall,
-              motivo_recall: tipo.meses,
+              motivo_recall: tipo.value,
               fecha_recall: tipo.meses
     ? sumarMesesISO(tipo.meses)
     : nuevoRecall.fecha_recall,
