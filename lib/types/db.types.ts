@@ -104,6 +104,7 @@ export interface Recall {
   profesional?: string | null;
 
   fecha_recall?: string | null;
+  fecha_registro?: string | null;
   fecha_envio: string | null;
   duracion_minutos?: number | null;
 
