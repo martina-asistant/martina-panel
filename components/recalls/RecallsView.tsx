@@ -133,7 +133,7 @@ const RecallsView = () => {
               key={f.key}
               onClick={() => setFilter(f.key)}
               className={cn(
-                'text-[13px] px-4 py-[9px] rounded-full border transition-all whitespace-nowrap',
+                'text-[12px] px-3.5 py-[7px] rounded-full border transition-all whitespace-nowrap',
                 filter === f.key
                   ? 'bg-cyan-500/20 text-cyan-100 border-cyan-300/50 shadow-[0_0_18px_rgba(34,211,238,.22)]'
                   : 'bg-white/5 text-cyan-100/65 border-cyan-500/20 hover:bg-cyan-500/10 hover:text-white'
@@ -151,7 +151,7 @@ const RecallsView = () => {
                   className={cn(
                     f.key === 'todos'
                       ? 'font-bold uppercase'
-                      : 'font-normal text-[14px] tracking-[-0.01em]'
+                      : 'font-normal text-[13px] tracking-[-0.01em]'
                   )}
                 >
                   {f.label}
@@ -163,7 +163,7 @@ const RecallsView = () => {
 
         <button
           type="button"
-          className="inline-flex items-center gap-2 rounded-full border border-cyan-300/45 bg-cyan-400/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-cyan-100 shadow-[0_0_18px_rgba(34,211,238,.16)] transition-all hover:bg-cyan-400/18 hover:border-cyan-200/70 whitespace-nowrap"
+          className="inline-flex items-center gap-2 rounded-full border border-cyan-300/45 bg-cyan-400/10 px-3.5 py-[7px] text-[10px] font-semibold uppercase tracking-[0.15em] text-cyan-100 shadow-[0_0_16px_rgba(34,211,238,.14)] transition-all hover:bg-cyan-400/18 hover:border-cyan-200/70 whitespace-nowrap"
         >
           <Plus className="h-3.5 w-3.5" />
           Insertar recall
