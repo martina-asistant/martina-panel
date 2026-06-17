@@ -1246,7 +1246,7 @@ const guardarInsertarCita = async () => {
     </button>
 
     {mostrarMotivosEditar && (
-      <div className="absolute left-0 top-[calc(100%+8px)] z-[120] w-full overflow-hidden rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
+      <div className="absolute left-0 top-[calc(100%+8px)] z-[120] w-full max-h-64 overflow-y-auto rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
         {TRATAMIENTOS.map((tratamiento) => (
           <button
             key={tratamiento}
