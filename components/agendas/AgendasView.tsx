@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { CalendarDays, ChevronLeft, ChevronRight, Lock } from 'lucide-react';
 import { getAgendaFede, getAgendaCelia, getAgendaAna, type EventoAgenda } from '@/lib/repos/agendas.repo';
 import { createClient } from '@/lib/supabase/client';
+import { createRecall } from '@/lib/repos/recalls.repo';
 
 const agendas = [
   { key: 'fede', nombre: 'Agenda Fede' },
@@ -315,6 +316,17 @@ const [nuevoPaciente, setNuevoPaciente] = useState({
   const [mostrarResultadosPaciente, setMostrarResultadosPaciente] = useState(false);
   const [mostrarMotivos, setMostrarMotivos] = useState(false);
   const [mostrarAgendas, setMostrarAgendas] = useState(false);
+  const [mostrarInsertarRecall, setMostrarInsertarRecall] = useState(false);
+
+const [nuevoRecall, setNuevoRecall] = useState({
+  paciente_id: '',
+  nombre_paciente: '',
+  telefono: '',
+  motivo_recall: 'Limpieza',
+  detalle_recall: '',
+  fecha_recall: '',
+  profesional: '',
+});
     
 
   const agenda = agendas.find(a => a.key === agendaActiva);
@@ -611,6 +623,34 @@ const guardarCambiosCita = async () => {
   setMostrarInsertar(true);
 };
 
+  const abrirInsertarRecall = () => {
+  if (!selectedEvent) return;
+
+  const motivoOriginal =
+    (selectedEvent.motivo || '').toLowerCase();
+
+  let motivoRecall = 'Revisión general';
+
+  if (
+    motivoOriginal.includes('limpieza') ||
+    motivoOriginal.includes('higiene')
+  ) {
+    motivoRecall = 'Limpieza';
+  }
+
+  setNuevoRecall({
+    paciente_id: '',
+    nombre_paciente: selectedEvent.nombre_paciente || '',
+    telefono: selectedEvent.telefono || '',
+    motivo_recall: motivoRecall,
+    detalle_recall: '',
+    fecha_recall: '',
+    profesional: selectedEvent.profesional || agendaActiva,
+  });
+
+  setMostrarInsertarRecall(true);
+};
+
 const guardarInsertarCita = async () => {
   if (loading) return;
 
@@ -821,6 +861,10 @@ const guardarInsertarCita = async () => {
 
                     if (accion === 'INSERTAR CITA') {
                     abrirInsertarCita();
+                    }
+
+                    if (accion === 'INSERTAR RECALL') {
+                    abrirInsertarRecall();
                     }
                     
                   }}
