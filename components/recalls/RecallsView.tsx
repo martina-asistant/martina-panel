@@ -34,9 +34,11 @@ const agendas = [
 ];
 
 const TIPOS_RECALL = [
-  { label: 'MTO Periodontal', value: 'Limpieza' },
-  { label: 'Revisión', value: 'Revisión' },
-  { label: 'Revisión general', value: 'Revisión general' },
+  { label: 'MTO Periodontal 4 meses', value: 'Limpieza', meses: 4 },
+  { label: 'MTO Periodontal 6 meses', value: 'Limpieza', meses: 6 },
+  { label: 'MTO Periodontal 1 año', value: 'Limpieza', meses: 12 },
+  { label: 'Revisión', value: 'Revisión', meses: null },
+  { label: 'Revisión general', value: 'Revisión general', meses: null },
 ];
 
 const getDuracionRecall = (motivo: string) => {
@@ -624,7 +626,11 @@ setNuevoRecall({
           onClick={() => {
             setNuevoRecall({
               ...nuevoRecall,
-              motivo_recall: tipo.value,
+              motivo_recall: tipo.meses,
+              fecha_recall: tipo.meses
+    ? sumarMesesISO(tipo.meses)
+    : nuevoRecall.fecha_recall,
+});
             });
             setMostrarTiposRecall(false);
           }}
