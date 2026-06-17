@@ -129,13 +129,14 @@ const RecallsView = () => {
 
   const [nuevoRecall, setNuevoRecall] = useState({
     paciente_id: '',
-    nombre_paciente: '',
-    telefono: '',
-    motivo_recall: 'Limpieza',
-    detalle_recall: '',
-    fecha_recall: '',
-    profesional: 'fede',
-  });
+  nombre_paciente: '',
+  telefono: '',
+  motivo_recall: 'Limpieza',
+  tipo_recall: 'MTO Periodontal 4 meses',
+  detalle_recall: '',
+  fecha_recall: '',
+  profesional: 'fede',
+});
 
   const cargarRecalls = async () => {
     const data = await listRecalls();
@@ -228,6 +229,7 @@ const RecallsView = () => {
         nombre_paciente: nuevoRecall.nombre_paciente.trim(),
         telefono: nuevoRecall.telefono.trim(),
         motivo_recall: nuevoRecall.motivo_recall,
+        tipo_recall: nuevoRecall.tipo_recall,
         detalle_recall: nuevoRecall.detalle_recall,
         fecha_recall: nuevoRecall.fecha_recall,
         fecha_envio: null,
@@ -254,6 +256,7 @@ setNuevoRecall({
   nombre_paciente: '',
   telefono: '',
   motivo_recall: 'Limpieza',
+  tipo_recall: 'MTO Periodontal 4 meses',
   detalle_recall: '',
   fecha_recall: '',
   profesional: 'fede',
@@ -375,7 +378,7 @@ setNuevoRecall({
                   </td>
 
                   <td className="px-6 py-4 text-cyan-100/80">
-                    {tipoRecallLabel(r.motivo_recall || r.tipo)}
+                    {r.tipo_recall || tipoRecallLabel(r.motivo_recall || r.tipo)}
                   </td>
 
                   <td className="px-6 py-4 text-cyan-100/65 max-w-[280px]">
@@ -634,10 +637,11 @@ setNuevoRecall({
     setNuevoRecall({
       ...nuevoRecall,
       motivo_recall: tipo.value,
-      fecha_recall: tipo.meses
-        ? sumarMesesISO(tipo.meses)
-        : nuevoRecall.fecha_recall,
-    });
+    tipo_recall: tipo.label,
+    fecha_recall: tipo.meses
+      ? sumarMesesISO(tipo.meses)
+      : nuevoRecall.fecha_recall,
+  });
 
     setMostrarTiposRecall(false);
   }}
