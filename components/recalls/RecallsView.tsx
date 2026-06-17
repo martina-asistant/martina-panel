@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { Plus } from 'lucide-react';
-import { createRecall, listRecalls } from '@/lib/repos/recalls.repo';
+import { createRecall, listRecalls, updateRecall } from '@/lib/repos/recalls.repo';
 import type { Recall, EstadoRecall } from '@/lib/types/db.types';
 import { formatDate } from '@/lib/utils/formatDate';
 import { cn } from '@/lib/utils/cn';
@@ -212,66 +212,76 @@ const RecallsView = () => {
 }, []);
 
   const guardarInsertarRecall = async () => {
-    if (loadingGuardar) return;
+  if (loadingGuardar) return;
 
-    if (!nuevoRecall.nombre_paciente.trim() || !nuevoRecall.telefono.trim()) {
-      console.error('Falta nombre o teléfono');
+  if (!nuevoRecall.nombre_paciente.trim() || !nuevoRecall.telefono.trim()) {
+    console.error('Falta nombre o teléfono');
+    return;
+  }
+
+  if (!nuevoRecall.fecha_recall) {
+    console.error('Falta fecha recall');
+    return;
+  }
+
+  setLoadingGuardar(true);
+
+  try {
+    const payload = {
+      nombre_paciente: nuevoRecall.nombre_paciente.trim(),
+      telefono: nuevoRecall.telefono.trim(),
+      motivo_recall: nuevoRecall.motivo_recall,
+      tipo_recall: nuevoRecall.tipo_recall,
+      detalle_recall: nuevoRecall.detalle_recall,
+      fecha_recall: nuevoRecall.fecha_recall,
+      fecha_envio: null,
+      profesional: nuevoRecall.profesional,
+      origen: usuarioPanel,
+      paciente_id: nuevoRecall.paciente_id || null,
+      duracion_minutos: getDuracionRecall(nuevoRecall.motivo_recall),
+      estado: 'pendiente_envio' as EstadoRecall,
+    };
+
+    const recallGuardado = recallSeleccionado
+      ? await updateRecall(recallSeleccionado.id, {
+          ...payload,
+          numero_cambios: ((recallSeleccionado as any).numero_cambios || 0) + 1,
+        })
+      : await createRecall({
+          ...payload,
+          fecha_registro: new Date().toISOString(),
+          numero_cambios: 0,
+        });
+
+    if (!recallGuardado) {
+      console.error('Error guardando recall');
       return;
     }
 
-    if (!nuevoRecall.fecha_recall) {
-      console.error('Falta fecha recall');
-      return;
-    }
+    setMostrarInsertarRecall(false);
+    setRecallSeleccionado(null);
+    setModoEdicionRecall(false);
+    setBusquedaPaciente('');
+    setMostrarResultadosPaciente(false);
 
-    setLoadingGuardar(true);
+    setNuevoRecall({
+      paciente_id: '',
+      nombre_paciente: '',
+      telefono: '',
+      motivo_recall: 'Limpieza',
+      tipo_recall: 'MTO Periodontal',
+      detalle_recall: '',
+      fecha_recall: '',
+      profesional: 'fede',
+    });
 
-    try {
-      const recallCreado = await createRecall({
-        nombre_paciente: nuevoRecall.nombre_paciente.trim(),
-        telefono: nuevoRecall.telefono.trim(),
-        motivo_recall: nuevoRecall.motivo_recall,
-        tipo_recall: nuevoRecall.tipo_recall,
-        detalle_recall: nuevoRecall.detalle_recall,
-        fecha_recall: nuevoRecall.fecha_recall,
-        fecha_registro: new Date().toISOString(),
-        fecha_envio: null,
-        profesional: nuevoRecall.profesional,
-        origen: usuarioPanel,
-        numero_cambios: 0,
-        estado: 'pendiente_envio',
-        paciente_id: nuevoRecall.paciente_id || null,
-        duracion_minutos: getDuracionRecall(nuevoRecall.motivo_recall),
-      });
-
-      if (!recallCreado) {
-        console.error('Error creando recall');
-        return;
-      }
-
-      setMostrarInsertarRecall(false);
-
-setBusquedaPaciente('');
-setMostrarResultadosPaciente(false);
-
-setNuevoRecall({
-  paciente_id: '',
-  nombre_paciente: '',
-  telefono: '',
-  motivo_recall: 'Limpieza',
-  tipo_recall: 'MTO Periodontal',
-  detalle_recall: '',
-  fecha_recall: '',
-  profesional: 'fede',
-});
-
-      await cargarRecalls();
-    } catch (error) {
-      console.error('Error guardando recall:', error);
-    } finally {
-      setLoadingGuardar(false);
-    }
-  };
+    await cargarRecalls();
+  } catch (error) {
+    console.error('Error guardando recall:', error);
+  } finally {
+    setLoadingGuardar(false);
+  }
+};
 
   const filtered = useMemo(() => {
     const data =
