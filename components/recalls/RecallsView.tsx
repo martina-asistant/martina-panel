@@ -613,7 +613,7 @@ setNuevoRecall({
     onClick={() => setMostrarTiposRecall(!mostrarTiposRecall)}
     className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-left text-white outline-none flex items-center justify-between"
   >
-    <span>{tipoRecallLabel(nuevoRecall.motivo_recall)}</span>
+    <span>{nuevoRecall.tipo_recall || tipoRecallLabel(nuevoRecall.motivo_recall)}</span>
 
     <svg
       className={`w-4 h-4 text-cyan-200 transition-transform ${
