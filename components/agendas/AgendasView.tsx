@@ -43,10 +43,22 @@ type PatientOption = {
 };
 
 const TIPOS_RECALL = [
-  { label: 'MTO Periodontal', value: 'Limpieza' },
-  { label: 'Revisión', value: 'Revisión' },
-  { label: 'Revisión general', value: 'Revisión general' },
+  { label: 'MTO Periodontal 4 meses', value: 'Limpieza', meses: 4 },
+  { label: 'MTO Periodontal 6 meses', value: 'Limpieza', meses: 6 },
+  { label: 'MTO Periodontal 1 año', value: 'Limpieza', meses: 12 },
+  { label: 'Revisión', value: 'Revisión', meses: null },
+  { label: 'Revisión general', value: 'Revisión general', meses: null },
 ];
+
+const tipoRecallLabel = (tipo?: string | null) => {
+  if (!tipo) return '—';
+
+  if (tipo === 'Limpieza') return 'MTO Periodontal';
+  if (tipo === 'Revisión') return 'Revisión';
+  if (tipo === 'Revisión general') return 'Revisión general';
+
+  return tipo;
+};
 
 const normalizarTexto = (texto: string) =>
   texto
@@ -85,6 +97,13 @@ const buildISOFromDateTime = (date: string, time: string) => {
   const [year, month, day] = date.split('-').map(Number);
   const [hours, minutes] = time.split(':').map(Number);
   return new Date(year, month - 1, day, hours, minutes, 0, 0).toISOString();
+};
+
+const sumarMesesISO = (meses: number) => {
+  const fecha = new Date();
+  fecha.setMonth(fecha.getMonth() + meses);
+  fecha.setHours(10, 0, 0, 0);
+  return fecha.toISOString();
 };
 
 const getDuracionPorMotivo = (motivo: string) => {
@@ -330,6 +349,7 @@ const [nuevoRecall, setNuevoRecall] = useState({
   nombre_paciente: '',
   telefono: '',
   motivo_recall: 'Limpieza',
+  tipo_recall: 'MTO Periodontal',
   detalle_recall: '',
   fecha_recall: '',
   profesional: '',
@@ -651,6 +671,7 @@ const guardarCambiosCita = async () => {
     nombre_paciente: eventoActivo.nombre_paciente || '',
     telefono: eventoActivo.telefono || '',
     motivo_recall: motivoRecall,
+    tipo_recall: 'MTO Periodontal',
     detalle_recall: '',
     fecha_recall: '',
     profesional: eventoActivo.profesional || agendaActiva,
@@ -747,7 +768,10 @@ const guardarInsertarCita = async () => {
       telefono: telefonoNuevo,
       motivo_recall: nuevoRecall.motivo_recall,
       detalle_recall: nuevoRecall.detalle_recall,
+      tipo_recall: nuevoRecall.tipo_recall,
+      duracion_minutos: getDuracionPorMotivo(nuevoRecall.motivo_recall),
       fecha_recall: nuevoRecall.fecha_recall,
+      fecha_registro: new Date().toISOString(),
       fecha_envio: null,
       profesional: nuevoRecall.profesional,
       origen: usuarioPanel,
@@ -865,7 +889,7 @@ const guardarInsertarCita = async () => {
   </button>
 
   {mostrarAgendas && (
-    <div className="absolute left-0 top-[calc(100%+10px)] z-[120] min-w-[180px] overflow-hidden rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
+    <div className="absolute left-0 top-[calc(100%+8px)] z-[120] w-full max-h-56 overflow-y-auto rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
       {agendas.map((a) => (
         <button
           key={a.key}
@@ -1701,8 +1725,7 @@ const guardarInsertarCita = async () => {
               className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-left text-white outline-none flex items-center justify-between"
             >
               <span>
-                {TIPOS_RECALL.find(t => t.value === nuevoRecall.motivo_recall)?.label ||
-                  nuevoRecall.motivo_recall}
+                {nuevoRecall.tipo_recall || tipoRecallLabel(nuevoRecall.motivo_recall)}
               </span>
 
               <svg
@@ -1727,7 +1750,11 @@ const guardarInsertarCita = async () => {
                       setNuevoRecall({
                         ...nuevoRecall,
                         motivo_recall: tipo.value,
-                      });
+  tipo_recall: tipo.label,
+  fecha_recall: tipo.meses
+    ? sumarMesesISO(tipo.meses)
+    : '',
+});
                       setMostrarTiposRecall(false);
                     }}
                     className="block w-full px-4 py-2 text-left text-sm text-white hover:bg-cyan-500/15"
