@@ -16,9 +16,8 @@ export const recordatorioLabel: Record<EstadoRecordatorio, { emoji: string; labe
 };
 
 export const recallLabel: Record<EstadoRecall, { emoji: string; label: string; color: string }> = {
-  enviado:        { emoji: '⚪', label: 'Enviado',          color: 'bg-neutral-100 text-neutral-700' },
-  sin_respuesta:  { emoji: '⚪', label: 'Sin respuesta',    color: 'bg-neutral-100 text-neutral-700' },
-  quiere_cita:    { emoji: '🟢', label: 'Quiere cita',      color: 'bg-emerald-50 text-emerald-800' },
-  cita_agendada:  { emoji: '✅', label: 'Cita agendada',    color: 'bg-emerald-100 text-emerald-900' },
-  pospuesto:      { emoji: '🔴', label: 'Más adelante',     color: 'bg-red-50 text-red-800' },
+  pendiente_envio: { emoji: '🔵', label: 'Pendiente envío', color: 'bg-sky-100 text-sky-800' },
+  pendiente: { emoji: '🟣', label: 'Pendiente', color: 'bg-violet-100 text-violet-800' },
+  confirmada: { emoji: '🟢', label: 'Confirmada', color: 'bg-emerald-100 text-emerald-800' },
+  pospuesta: { emoji: '🔴', label: 'Pospuesta', color: 'bg-red-100 text-red-800' },
 };
