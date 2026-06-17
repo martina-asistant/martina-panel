@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { Plus } from 'lucide-react';
-import { listRecalls } from '@/lib/repos/recalls.repo';
+import { createRecall, listRecalls } from '@/lib/repos/recalls.repo';
 import type { Recall, EstadoRecall } from '@/lib/types/db.types';
 import { formatDate } from '@/lib/utils/formatDate';
 import { cn } from '@/lib/utils/cn';
@@ -18,6 +18,36 @@ const filtros: { key: Filtro; label: string; color: string }[] = [
   { key: 'pospuesta', label: 'Pospuestas', color: 'bg-red-400' },
 ];
 
+const agendas = [
+  { key: 'fede', nombre: 'Agenda Fede' },
+  { key: 'celia', nombre: 'Agenda Celia' },
+  { key: 'ana', nombre: 'Agenda Ana' },
+];
+
+const TIPOS_RECALL = [
+  { label: 'MTO Periodontal', value: 'Limpieza' },
+  { label: 'Revisión', value: 'Revisión' },
+  { label: 'Revisión general', value: 'Revisión general' },
+];
+
+const pad = (n: number) => String(n).padStart(2, '0');
+
+const toInputDate = (iso: string) => {
+  const d = new Date(iso);
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+};
+
+const toInputTime = (iso: string) => {
+  const d = new Date(iso);
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
+
+const buildISOFromDateTime = (date: string, time: string) => {
+  const [year, month, day] = date.split('-').map(Number);
+  const [hours, minutes] = time.split(':').map(Number);
+  return new Date(year, month - 1, day, hours, minutes, 0, 0).toISOString();
+};
+
 const formatTelefono = (telefono?: string | null) => {
   if (!telefono) return '—';
 
@@ -30,43 +60,32 @@ const formatTelefono = (telefono?: string | null) => {
 
 const recallEstadoVisual = (estado: EstadoRecall | null | undefined) => {
   if (estado === 'pendiente_envio') {
-    return {
-      label: 'Pendiente envío',
-      color: 'bg-sky-300',
-    };
+    return { label: 'Pendiente envío', color: 'bg-sky-300' };
   }
 
   if (estado === 'pendiente') {
-    return {
-      label: 'Pendiente contestar',
-      color: 'bg-violet-300',
-    };
+    return { label: 'Pendiente contestar', color: 'bg-violet-300' };
   }
 
   if (estado === 'confirmada') {
-    return {
-      label: 'Confirmada',
-      color: 'bg-green-400',
-    };
+    return { label: 'Confirmada', color: 'bg-green-400' };
   }
 
   if (estado === 'pospuesta') {
-    return {
-      label: 'Pospuesta',
-      color: 'bg-red-400',
-    };
+    return { label: 'Pospuesta', color: 'bg-red-400' };
   }
 
-  return {
-    label: 'Pendiente envío',
-    color: 'bg-sky-300',
-  };
+  return { label: 'Pendiente envío', color: 'bg-sky-300' };
 };
 
 const tipoRecallLabel = (tipo?: string | null) => {
   if (!tipo) return '—';
 
-  if (tipo === 'mto_periodontal') return 'Mto. Periodontal';
+  if (tipo === 'Limpieza') return 'MTO Periodontal';
+  if (tipo === 'Revisión') return 'Revisión';
+  if (tipo === 'Revisión general') return 'Revisión general';
+
+  if (tipo === 'mto_periodontal') return 'MTO Periodontal';
   if (tipo === 'revision_general') return 'Revisión general';
 
   return tipo;
@@ -76,6 +95,21 @@ const RecallsView = () => {
   const [items, setItems] = useState<Recall[]>([]);
   const [filter, setFilter] = useState<Filtro>('todos');
 
+  const [usuarioPanel, setUsuarioPanel] = useState('panel');
+  const [mostrarInsertarRecall, setMostrarInsertarRecall] = useState(false);
+  const [mostrarTiposRecall, setMostrarTiposRecall] = useState(false);
+  const [mostrarAgendaRecall, setMostrarAgendaRecall] = useState(false);
+  const [loadingGuardar, setLoadingGuardar] = useState(false);
+
+  const [nuevoRecall, setNuevoRecall] = useState({
+    nombre_paciente: '',
+    telefono: '',
+    motivo_recall: 'Limpieza',
+    detalle_recall: '',
+    fecha_recall: '',
+    profesional: 'fede',
+  });
+
   const cargarRecalls = async () => {
     const data = await listRecalls();
     setItems(data);
@@ -83,6 +117,29 @@ const RecallsView = () => {
 
   useEffect(() => {
     cargarRecalls();
+  }, []);
+
+  useEffect(() => {
+    const cargarUsuarioPanel = async () => {
+      const supa = createClient();
+      if (!supa) return;
+
+      const {
+        data: { user },
+      } = await supa.auth.getUser();
+
+      if (!user?.email) return;
+
+      const { data } = await supa
+        .from('usuarios_panel')
+        .select('nombre')
+        .eq('email', user.email)
+        .single();
+
+      setUsuarioPanel(data?.nombre || user.email);
+    };
+
+    cargarUsuarioPanel();
   }, []);
 
   useEffect(() => {
@@ -102,6 +159,58 @@ const RecallsView = () => {
       supa.removeChannel(ch);
     };
   }, []);
+
+  const guardarInsertarRecall = async () => {
+    if (loadingGuardar) return;
+
+    if (!nuevoRecall.nombre_paciente.trim() || !nuevoRecall.telefono.trim()) {
+      console.error('Falta nombre o teléfono');
+      return;
+    }
+
+    if (!nuevoRecall.fecha_recall) {
+      console.error('Falta fecha recall');
+      return;
+    }
+
+    setLoadingGuardar(true);
+
+    try {
+      const recallCreado = await createRecall({
+        nombre_paciente: nuevoRecall.nombre_paciente.trim(),
+        telefono: nuevoRecall.telefono.trim(),
+        motivo_recall: nuevoRecall.motivo_recall,
+        detalle_recall: nuevoRecall.detalle_recall,
+        fecha_recall: nuevoRecall.fecha_recall,
+        fecha_envio: null,
+        profesional: nuevoRecall.profesional,
+        origen: usuarioPanel,
+        numero_cambios: 0,
+        estado: 'pendiente_envio',
+      });
+
+      if (!recallCreado) {
+        console.error('Error creando recall');
+        return;
+      }
+
+      setMostrarInsertarRecall(false);
+      setNuevoRecall({
+        nombre_paciente: '',
+        telefono: '',
+        motivo_recall: 'Limpieza',
+        detalle_recall: '',
+        fecha_recall: '',
+        profesional: 'fede',
+      });
+
+      await cargarRecalls();
+    } catch (error) {
+      console.error('Error guardando recall:', error);
+    } finally {
+      setLoadingGuardar(false);
+    }
+  };
 
   const filtered = useMemo(() => {
     const data =
@@ -163,6 +272,7 @@ const RecallsView = () => {
 
         <button
           type="button"
+          onClick={() => setMostrarInsertarRecall(true)}
           className="inline-flex items-center gap-2 rounded-full border border-cyan-300/45 bg-cyan-400/10 px-3.5 py-[7px] text-[10px] font-semibold uppercase tracking-[0.15em] text-cyan-100 shadow-[0_0_16px_rgba(34,211,238,.14)] transition-all hover:bg-cyan-400/18 hover:border-cyan-200/70 whitespace-nowrap"
         >
           <Plus className="h-3.5 w-3.5" />
@@ -262,6 +372,263 @@ const RecallsView = () => {
           </tbody>
         </table>
       </div>
+
+      {mostrarInsertarRecall && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm pt-[4vh]">
+          <div className="w-full max-w-2xl rounded-3xl border border-cyan-300/45 bg-[#03111A]/95 overflow-visible shadow-[0_0_46px_rgba(34,211,238,.24)]">
+            <div className="px-6 py-5 border-b border-cyan-300/20 flex items-start justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-white">
+                  {nuevoRecall.nombre_paciente && nuevoRecall.motivo_recall
+                    ? `${nuevoRecall.nombre_paciente} - ${tipoRecallLabel(nuevoRecall.motivo_recall)}`
+                    : 'Insertar recall'}
+                </h2>
+
+                <p className="text-cyan-200 text-sm mt-1">
+                  {nuevoRecall.fecha_recall
+                    ? `${new Date(nuevoRecall.fecha_recall).toLocaleDateString('es-ES')} · ${toInputTime(nuevoRecall.fecha_recall)}`
+                    : 'Selecciona fecha y hora de envío'}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={guardarInsertarRecall}
+                  disabled={loadingGuardar}
+                  className="text-cyan-200 hover:text-white text-2xl disabled:opacity-50"
+                >
+                  ✓
+                </button>
+
+                <button
+                  onClick={() => setMostrarInsertarRecall(false)}
+                  className="text-white/80 hover:text-white text-xl"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-5">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
+                    Fecha recall
+                  </div>
+
+                  <input
+                    type="date"
+                    value={
+                      nuevoRecall.fecha_recall
+                        ? toInputDate(nuevoRecall.fecha_recall)
+                        : ''
+                    }
+                    onChange={(e) => {
+                      const hora = nuevoRecall.fecha_recall
+                        ? toInputTime(nuevoRecall.fecha_recall)
+                        : '10:00';
+
+                      setNuevoRecall({
+                        ...nuevoRecall,
+                        fecha_recall: buildISOFromDateTime(e.target.value, hora),
+                      });
+                    }}
+                    className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
+                  />
+                </div>
+
+                <div>
+                  <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
+                    Hora envío
+                  </div>
+
+                  <input
+                    type="time"
+                    step={300}
+                    value={
+                      nuevoRecall.fecha_recall
+                        ? toInputTime(nuevoRecall.fecha_recall)
+                        : '10:00'
+                    }
+                    onChange={(e) => {
+                      const fecha = nuevoRecall.fecha_recall
+                        ? toInputDate(nuevoRecall.fecha_recall)
+                        : toInputDate(new Date().toISOString());
+
+                      setNuevoRecall({
+                        ...nuevoRecall,
+                        fecha_recall: buildISOFromDateTime(fecha, e.target.value),
+                      });
+                    }}
+                    className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-[minmax(0,1fr)_260px] gap-10 items-start">
+                <div className="relative overflow-visible min-w-0">
+                  <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
+                    Tipo
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setMostrarTiposRecall(!mostrarTiposRecall)}
+                    className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-left text-white outline-none flex items-center justify-between"
+                  >
+                    <span>{tipoRecallLabel(nuevoRecall.motivo_recall)}</span>
+
+                    <svg
+                      className={`w-4 h-4 text-cyan-200 transition-transform ${
+                        mostrarTiposRecall ? 'rotate-180' : ''
+                      }`}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  {mostrarTiposRecall && (
+                    <div className="absolute left-0 top-[calc(100%+8px)] z-[120] w-full max-h-56 overflow-y-auto rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
+                      {TIPOS_RECALL.map((tipo) => (
+                        <button
+                          key={tipo.value}
+                          type="button"
+                          onClick={() => {
+                            setNuevoRecall({
+                              ...nuevoRecall,
+                              motivo_recall: tipo.value,
+                            });
+                            setMostrarTiposRecall(false);
+                          }}
+                          className="block w-full px-4 py-2 text-left text-sm text-white hover:bg-cyan-500/15"
+                        >
+                          {tipo.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
+                    Teléfono
+                  </div>
+
+                  <input
+                    value={nuevoRecall.telefono}
+                    onChange={(e) =>
+                      setNuevoRecall({
+                        ...nuevoRecall,
+                        telefono: e.target.value,
+                      })
+                    }
+                    className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <div className="text-cyan-300 text-xs uppercase tracking-wider mb-2 font-bold">
+                  Detalle recall
+                </div>
+
+                <textarea
+                  value={nuevoRecall.detalle_recall}
+                  onChange={(e) =>
+                    setNuevoRecall({
+                      ...nuevoRecall,
+                      detalle_recall: e.target.value,
+                    })
+                  }
+                  rows={3}
+                  className="w-full rounded-2xl border border-white/25 bg-black/20 p-4 text-white resize-none outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-4 gap-5 pt-2 border-t border-white/20">
+                <div>
+                  <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">
+                    Origen
+                  </div>
+                  <div className="text-white/95 text-sm">
+                    {usuarioPanel}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">
+                    Estado
+                  </div>
+                  <div className="text-white/95 text-sm">
+                    Pendiente envío
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">
+                    Cambios
+                  </div>
+                  <div className="text-white/95 text-sm">
+                    0
+                  </div>
+                </div>
+
+                <div className="relative overflow-visible">
+                  <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">
+                    Agenda
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setMostrarAgendaRecall(!mostrarAgendaRecall)}
+                    className="w-full text-left text-white/95 text-sm flex items-center justify-between gap-2"
+                  >
+                    <span>
+                      {agendas.find((a) => a.key === nuevoRecall.profesional)
+                        ?.nombre || 'Agenda'}
+                    </span>
+
+                    <svg
+                      className={`w-4 h-4 text-cyan-200 transition-transform ${
+                        mostrarAgendaRecall ? 'rotate-180' : ''
+                      }`}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  {mostrarAgendaRecall && (
+                    <div className="absolute right-0 top-[calc(100%+8px)] z-[120] min-w-[160px] overflow-hidden rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
+                      {agendas.map((a) => (
+                        <button
+                          key={a.key}
+                          type="button"
+                          onClick={() => {
+                            setNuevoRecall({
+                              ...nuevoRecall,
+                              profesional: a.key,
+                            });
+                            setMostrarAgendaRecall(false);
+                          }}
+                          className="block w-full px-4 py-2 text-left text-sm text-white hover:bg-cyan-500/15"
+                        >
+                          {a.nombre}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
