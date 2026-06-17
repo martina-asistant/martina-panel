@@ -1211,85 +1211,98 @@ const guardarInsertarCita = async () => {
 </div>
             )}
 
-              <div className="grid grid-cols-[1.35fr_1fr] gap-12 items-start">
-                <div>
-                  <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
-                    Motivo
-                  </div>
+              <div className="grid grid-cols-[minmax(0,1fr)_260px] gap-10 items-start">
+  <div className="min-w-0">
+    <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
+      Motivo
+    </div>
 
-                  {modoEdicion ? (
-  <div className="relative">
-    <button
-      type="button"
-      onClick={() => setMostrarMotivosEditar(!mostrarMotivosEditar)}
-      className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-left text-white outline-none flex items-center justify-between"
-    >
-      <span>
-        {eventoSeleccionado.motivo || 'Seleccionar tratamiento'}
-      </span>
+    {modoEdicion ? (
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => setMostrarMotivosEditar(!mostrarMotivosEditar)}
+          className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-left text-white outline-none flex items-center justify-between"
+        >
+          <span>{eventoSeleccionado.motivo || 'Seleccionar tratamiento'}</span>
 
-      <svg
-        className={`w-4 h-4 text-cyan-200 transition-transform ${
-          mostrarMotivosEditar ? 'rotate-180' : ''
-        }`}
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M19 9l-7 7-7-7"
-        />
-      </svg>
-    </button>
-
-    {mostrarMotivosEditar && (
-      <div className="absolute left-0 top-[calc(100%+8px)] z-[120] w-full max-h-64 overflow-y-auto rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
-        {TRATAMIENTOS.map((tratamiento) => (
-          <button
-            key={tratamiento}
-            type="button"
-            onClick={() => {
-              const duracion = getDuracionPorMotivo(tratamiento);
-
-              const nuevaFechaFin = sumarMinutosISO(
-                eventoSeleccionado.fecha_inicio,
-                duracion
-              );
-
-              setEventoSeleccionado({
-                ...eventoSeleccionado,
-                motivo: tratamiento,
-                fecha_fin: nuevaFechaFin,
-              });
-
-              setMostrarMotivosEditar(false);
-            }}
-            className="block w-full px-4 py-2 text-left text-sm text-white hover:bg-cyan-500/15"
+          <svg
+            className={`w-4 h-4 text-cyan-200 transition-transform ${
+              mostrarMotivosEditar ? 'rotate-180' : ''
+            }`}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
           >
-            {tratamiento}
-          </button>
-        ))}
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </button>
+
+        {mostrarMotivosEditar && (
+          <div className="absolute left-0 top-[calc(100%+8px)] z-[120] w-full max-h-56 overflow-y-auto rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
+            {TRATAMIENTOS.map((tratamiento) => (
+              <button
+                key={tratamiento}
+                type="button"
+                onClick={() => {
+                  const duracion = getDuracionPorMotivo(tratamiento);
+
+                  const nuevaFechaFin = sumarMinutosISO(
+                    eventoSeleccionado.fecha_inicio,
+                    duracion
+                  );
+
+                  setEventoSeleccionado({
+                    ...eventoSeleccionado,
+                    motivo: tratamiento,
+                    fecha_fin: nuevaFechaFin,
+                  });
+
+                  setMostrarMotivosEditar(false);
+                }}
+                className="block w-full px-4 py-2 text-left text-sm text-white hover:bg-cyan-500/15"
+              >
+                {tratamiento}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    ) : (
+      <div className="text-white">
+        {eventoSeleccionado.motivo || '-'}
       </div>
     )}
   </div>
-) : (
-  <div className="text-white">
-    {eventoSeleccionado.motivo || '-'}
+
+  <div>
+    <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
+      Teléfono
+    </div>
+
+    {modoEdicion ? (
+      <input
+        value={eventoSeleccionado.telefono || ''}
+        onChange={(e) =>
+          setEventoSeleccionado({
+            ...eventoSeleccionado,
+            telefono: e.target.value,
+          })
+        }
+        className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+      />
+    ) : (
+      <div className="text-white text-sm font-medium">
+        {eventoSeleccionado.telefono || 'No disponible'}
+      </div>
+    )}
   </div>
-)}
 </div>
-                <div className="pl-4">
-                  <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
-                    Teléfono
-                  </div>
-                  <div className="text-white text-sm font-medium">
-                    {eventoSeleccionado.telefono || 'No disponible'}
-                  </div>
-                </div>
-              </div>
 
               <div>
                 <div className="text-cyan-300 text-xs uppercase tracking-wider mb-2 font-bold">
