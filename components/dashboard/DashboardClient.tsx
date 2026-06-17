@@ -224,8 +224,19 @@ const recados = convs.filter(
 
 const citasHoy = convs.filter(c => c.estado_cita === 'gestionada' && isToday(c.updated_at)).length;
 const recordatoriosHoy = recs.filter(r => isToday(r.created_at)).length;
-const recallsEnviadosHoy = recalls.filter(r => r.estado === 'enviado' && isToday(r.fecha_envio)).length;
-const recallsAceptadosHoy = recalls.filter(r => r.estado === 'cita_agendada' && isToday(r.fecha_envio)).length;
+const recallsEnviadosHoy = recalls.filter(
+  r =>
+    (r.estado === 'pendiente' ||
+      r.estado === 'confirmada' ||
+      r.estado === 'pospuesta') &&
+    isToday(r.fecha_envio)
+).length;
+
+const recallsAceptadosHoy = recalls.filter(
+  r =>
+    r.estado === 'confirmada' &&
+    isToday(r.fecha_envio)
+).length;
 
   const recPendiente = recs.filter(r => r.estado === 'sin_respuesta').length;
   const recConf = recs.filter(r => r.estado === 'confirmada').length;
