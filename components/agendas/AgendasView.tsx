@@ -650,31 +650,6 @@ const guardarCambiosCita = async () => {
   setMostrarInsertarRecall(true);
 };
 
-  const motivoOriginal =
-    (selectedEvent.motivo || '').toLowerCase();
-
-  let motivoRecall = 'Revisión general';
-
-  if (
-    motivoOriginal.includes('limpieza') ||
-    motivoOriginal.includes('higiene')
-  ) {
-    motivoRecall = 'Limpieza';
-  }
-
-  setNuevoRecall({
-    paciente_id: '',
-    nombre_paciente: selectedEvent.nombre_paciente || '',
-    telefono: selectedEvent.telefono || '',
-    motivo_recall: motivoRecall,
-    detalle_recall: '',
-    fecha_recall: '',
-    profesional: selectedEvent.profesional || agendaActiva,
-  });
-
-  setMostrarInsertarRecall(true);
-};
-
 const guardarInsertarCita = async () => {
   if (loading) return;
 
