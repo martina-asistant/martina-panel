@@ -116,58 +116,58 @@ const RecallsView = () => {
 
   return (
     <div className="min-h-full overflow-y-auto p-8 bg-[#02141B] text-white">
-      <div className="mb-8 flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-[-0.015em] origin-left inline-block bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent">
-            Recalls
-          </h1>
+      <div className="mb-8">
+        <h1 className="text-2xl font-semibold tracking-[-0.015em] origin-left inline-block bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent">
+          Recalls
+        </h1>
 
-          <p className="text-sm text-cyan-100/55">
-            Reactivación de pacientes
-          </p>
+        <p className="text-sm text-cyan-100/55">
+          Reactivación de pacientes
+        </p>
+      </div>
+
+      <div className="mb-6 flex items-center justify-between gap-4">
+        <div className="flex flex-wrap gap-2">
+          {filtros.map((f) => (
+            <button
+              key={f.key}
+              onClick={() => setFilter(f.key)}
+              className={cn(
+                'text-[13px] px-4 py-[9px] rounded-full border transition-all whitespace-nowrap',
+                filter === f.key
+                  ? 'bg-cyan-500/20 text-cyan-100 border-cyan-300/50 shadow-[0_0_18px_rgba(34,211,238,.22)]'
+                  : 'bg-white/5 text-cyan-100/65 border-cyan-500/20 hover:bg-cyan-500/10 hover:text-white'
+              )}
+            >
+              <div className="flex items-center gap-2">
+                <span
+                  className={cn(
+                    'w-2.5 h-2.5 rounded-full shadow-[0_0_12px_currentColor]',
+                    f.color
+                  )}
+                />
+
+                <span
+                  className={cn(
+                    f.key === 'todos'
+                      ? 'font-bold uppercase'
+                      : 'font-normal text-[14px] tracking-[-0.01em]'
+                  )}
+                >
+                  {f.label}
+                </span>
+              </div>
+            </button>
+          ))}
         </div>
 
         <button
           type="button"
-          className="inline-flex items-center gap-2 rounded-full border border-cyan-300/45 bg-cyan-400/10 px-5 py-2.5 text-sm font-medium text-cyan-100 shadow-[0_0_22px_rgba(34,211,238,.18)] transition-all hover:bg-cyan-400/18 hover:border-cyan-200/70"
+          className="inline-flex items-center gap-2 rounded-full border border-cyan-300/45 bg-cyan-400/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-cyan-100 shadow-[0_0_18px_rgba(34,211,238,.16)] transition-all hover:bg-cyan-400/18 hover:border-cyan-200/70 whitespace-nowrap"
         >
-          <Plus className="h-4 w-4" />
+          <Plus className="h-3.5 w-3.5" />
           Insertar recall
         </button>
-      </div>
-
-      <div className="flex flex-wrap gap-2 mb-6">
-        {filtros.map((f) => (
-          <button
-            key={f.key}
-            onClick={() => setFilter(f.key)}
-            className={cn(
-              'text-[13px] px-4 py-[9px] rounded-full border transition-all whitespace-nowrap',
-              filter === f.key
-                ? 'bg-cyan-500/20 text-cyan-100 border-cyan-300/50 shadow-[0_0_18px_rgba(34,211,238,.22)]'
-                : 'bg-white/5 text-cyan-100/65 border-cyan-500/20 hover:bg-cyan-500/10 hover:text-white'
-            )}
-          >
-            <div className="flex items-center gap-2">
-              <span
-                className={cn(
-                  'w-2.5 h-2.5 rounded-full shadow-[0_0_12px_currentColor]',
-                  f.color
-                )}
-              />
-
-              <span
-                className={cn(
-                  f.key === 'todos'
-                    ? 'font-bold uppercase'
-                    : 'font-normal text-[14px] tracking-[-0.01em]'
-                )}
-              >
-                {f.label}
-              </span>
-            </div>
-          </button>
-        ))}
       </div>
 
       <div className="rounded-3xl border border-cyan-500/20 bg-[rgba(5,18,24,.78)] backdrop-blur-xl overflow-hidden shadow-[0_0_35px_rgba(34,211,238,.10)]">
