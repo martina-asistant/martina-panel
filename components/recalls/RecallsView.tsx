@@ -213,7 +213,7 @@ const RecallsView = () => {
                   </td>
 
                   <td className="px-6 py-4 text-cyan-100/75">
-                    {formatDate(r.fecha_recall)}
+                    {r.fecha_recall ? formatDate(r.fecha_recall) : '—'}
                   </td>
 
                   <td className="px-6 py-4 text-cyan-100/55">
