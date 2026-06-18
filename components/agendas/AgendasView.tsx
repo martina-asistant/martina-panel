@@ -1636,7 +1636,7 @@ const guardarInsertarCita = async () => {
         <div>
           <h2 className="text-xl font-semibold text-white">
             {nuevoRecall.nombre_paciente && nuevoRecall.motivo_recall
-              ? `${nuevoRecall.nombre_paciente} - ${nuevoRecall.motivo_recall}`
+              ? `${nuevoRecall.nombre_paciente} - ${nuevoRecall.tipo_recall || nuevoRecall.motivo_recall}`
               : 'Insertar recall'}
           </h2>
 
@@ -1802,7 +1802,7 @@ const guardarInsertarCita = async () => {
           />
         </div>
 
-        <div className="grid grid-cols-4 gap-5 pt-2 border-t border-white/20">
+        <div className="grid grid-cols-[auto_auto_auto_auto_1fr] gap-x-8 gap-y-3 pt-2 border-t border-white/20">
           <div>
             <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">
               Origen
@@ -1811,6 +1811,15 @@ const guardarInsertarCita = async () => {
               {usuarioPanel}
             </div>
           </div>
+
+          <div>
+  <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">
+    Fecha registro
+  </div>
+  <div className="text-white/95 text-sm">
+    {new Date().toLocaleDateString('es-ES')}
+  </div>
+</div>
 
           <div>
             <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">
@@ -1830,7 +1839,7 @@ const guardarInsertarCita = async () => {
             </div>
           </div>
 
-          <div className="relative overflow-visible">
+          <div className="relative overflow-visible justify-self-end min-w-[130px] mr-6">
             <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">
               Agenda
             </div>
