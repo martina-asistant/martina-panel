@@ -729,7 +729,7 @@ const guardarInsertarCita = async () => {
 };
 
   const guardarInsertarRecall = async () => {
-  if (loading || !eventoActivo) return;
+  if (loading) return;
 
   if (!nuevoRecall.nombre_paciente.trim() || !nuevoRecall.telefono.trim()) {
     console.error('Falta nombre o teléfono en recall');
@@ -744,7 +744,7 @@ const guardarInsertarCita = async () => {
   setLoading(true);
 
   try {
-    const telefonoOriginal = eventoActivo.telefono || '';
+    const telefonoOriginal = eventoActivo?.telefono || '';
     const telefonoNuevo = nuevoRecall.telefono.trim();
 
     if (telefonoOriginal && telefonoNuevo && telefonoOriginal !== telefonoNuevo) {
