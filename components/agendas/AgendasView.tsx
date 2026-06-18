@@ -208,6 +208,12 @@ const sameDay = (iso: string, date: Date) => {
 
 const isHorarioNoDisponible = (hora: string, dia: Date, agenda: string) => {
   const diaSemana = dia.getDay();
+  const mes = dia.getMonth(); // agosto = 7
+
+  // Horario verano: agosto abierto solo hasta las 15:00
+  if (mes === 7) {
+    return hora >= '15:00';
+  }
 
   if (agenda === 'celia') {
     if (diaSemana !== 3) return true;
