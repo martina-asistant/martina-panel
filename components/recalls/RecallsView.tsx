@@ -381,10 +381,31 @@ const RecallsView = () => {
                 <tr
   key={r.id}
   onDoubleClick={() => {
-    setRecallSeleccionado(r);
-    setModoEdicionRecall(true);
-    setMostrarInsertarRecall(true);
-  }}
+  setRecallSeleccionado(r);
+  setModoEdicionRecall(true);
+
+  setNuevoRecall({
+    paciente_id: r.paciente_id || '',
+    nombre_paciente: r.nombre_paciente || r.nombre_completo || '',
+    telefono: r.telefono || '',
+    motivo_recall: r.motivo_recall || 'Limpieza',
+    tipo_recall:
+      r.tipo_recall ||
+      tipoRecallLabel(r.motivo_recall || r.tipo),
+    detalle_recall: r.detalle_recall || '',
+    fecha_recall: r.fecha_recall || '',
+    profesional: r.profesional || 'fede',
+  });
+
+  setBusquedaPaciente(
+    r.nombre_paciente ||
+    r.nombre_completo ||
+    ''
+  );
+
+  setMostrarResultadosPaciente(false);
+  setMostrarInsertarRecall(true);
+}}
   className="border-t border-cyan-500/10 hover:bg-cyan-500/5 transition-colors cursor-pointer"
 >
                   <td className="px-6 py-4 font-medium text-white">
