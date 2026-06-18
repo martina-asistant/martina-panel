@@ -726,7 +726,9 @@ const RecallsView = () => {
     Fecha registro
   </div>
   <div className="text-white/95 text-sm">
-    {new Date().toLocaleDateString('es-ES')}
+    {recallSeleccionado?.fecha_registro
+  ? formatDate(recallSeleccionado.fecha_registro)
+  : new Date().toLocaleDateString('es-ES')}
   </div>
 </div>
 
@@ -735,7 +737,7 @@ const RecallsView = () => {
                     Estado
                   </div>
                   <div className="text-white/95 text-sm">
-                    Pendiente envío
+                    {recallEstadoVisual(recallSeleccionado?.estado || 'pendiente_envio').label}
                   </div>
                 </div>
 
@@ -744,7 +746,7 @@ const RecallsView = () => {
                     Cambios
                   </div>
                   <div className="text-white/95 text-sm">
-                    0
+                    {recallSeleccionado?.numero_cambios ?? 0}
                   </div>
                 </div>
 
