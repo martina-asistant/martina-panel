@@ -483,16 +483,16 @@ const RecallsView = () => {
             <div className="px-6 py-5 border-b border-cyan-300/20 flex items-start justify-between">
               <div>
                 <h2 className="text-xl font-semibold text-white">
-                  {nuevoRecall.nombre_paciente && nuevoRecall.motivo_recall
-                    ? `${nuevoRecall.nombre_paciente} - ${tipoRecallLabel(nuevoRecall.motivo_recall)}`
-                    : 'Insertar recall'}
-                </h2>
+  {modoEdicionRecall
+    ? 'Editar recall'
+    : 'Insertar recall'}
+</h2>
 
                 <p className="text-cyan-200 text-sm mt-1">
-                  {nuevoRecall.fecha_recall
-                    ? `${new Date(nuevoRecall.fecha_recall).toLocaleDateString('es-ES')} · ${toInputTime(nuevoRecall.fecha_recall)}`
-                    : 'Selecciona fecha y hora de envío'}
-                </p>
+  {modoEdicionRecall
+    ? `${nuevoRecall.nombre_paciente} · ${nuevoRecall.tipo_recall}`
+    : `${nuevoRecall.nombre_paciente || 'Nuevo recall'}${nuevoRecall.tipo_recall ? ` · ${nuevoRecall.tipo_recall}` : ''}`}
+</p>
               </div>
 
               <div className="flex items-center gap-3">
