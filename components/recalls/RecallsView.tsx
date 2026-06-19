@@ -24,7 +24,7 @@ const filtros: { key: Filtro; label: string; color: string }[] = [
 
   { key: 'pendiente_envio', label: 'Pendiente envío', color: 'bg-violet-300' },
 
-  { key: 'enviado', label: 'Pendiente respuesta', color: 'bg-pink-300' },
+  { key: 'enviado', label: 'Pendiente respuesta', color: 'bg-pink-400' },
 
   { key: 'quiere_cita', label: 'En curso', color: 'bg-cyan-300' },
 
@@ -95,7 +95,7 @@ const recallEstadoVisual = (
   }
 
   if (estado === 'enviado') {
-    return { label: 'Pendiente respuesta', color: 'bg-pink-300' };
+    return { label: 'Pendiente respuesta', color: 'bg-pink-400' };
   }
 
   if (estado === 'quiere_cita') {
