@@ -113,11 +113,19 @@ export async function updateCanalMartina(
     .from('configuracion_martina_log')
     .insert({
       canal,
-      activo_anterior: activoAnterior,
-      activo_nuevo: activo,
-      accion: activo ? 'activado' : 'desactivado',
-      updated_by,
-      minutos_desactivado: minutosDesactivado
+  activo_anterior: activoAnterior,
+  activo_nuevo: activo,
+  accion: activo ? 'activado' : 'desactivado',
+  updated_by,
+  minutos_desactivado: minutosDesactivado,
+  hora: new Date().toLocaleString('es-ES', {
+    timeZone: 'Europe/Madrid',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+    })
     });
 
   if (errorLog) {
