@@ -19,13 +19,13 @@ export const recallLabel: Record<EstadoRecall, { emoji: string; label: string; c
   pendiente_envio: {
     emoji: '🌸',
     label: 'Pendiente envío',
-    color: 'bg-rose-100 text-rose-800'
+    color: 'bg-violet-100 text-violet-800'
   },
 
   enviado: {
-    emoji: '🟣',
+    emoji: '🩷',
     label: 'Pendiente respuesta',
-    color: 'bg-violet-100 text-violet-800'
+    color: 'bg-pink-100 text-pink-800'
   },
 
   quiere_cita: {
