@@ -22,7 +22,7 @@ type PatientOption = {
 const filtros: { key: Filtro; label: string; color: string }[] = [
   { key: 'todos', label: 'Todos', color: 'bg-amber-400' },
 
-  { key: 'pendiente_envio', label: 'Pendiente envío', color: 'bg-sky-300' },
+  { key: 'pendiente_envio', label: 'Pendiente envío', color: 'bg-rose-300' },
 
   { key: 'enviado', label: 'Pendiente respuesta', color: 'bg-cyan-300' },
 
