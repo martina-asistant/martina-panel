@@ -226,7 +226,8 @@ const citasHoy = convs.filter(c => c.estado_cita === 'gestionada' && isToday(c.u
 const recordatoriosHoy = recs.filter(r => isToday(r.created_at)).length;
 const recallsEnviadosHoy = recalls.filter(
   r =>
-    (r.estado === 'pendiente' ||
+    (r.estado === 'enviado' ||
+      r.estado === 'quiere_cita' ||
       r.estado === 'confirmada' ||
       r.estado === 'pospuesta') &&
     isToday(r.fecha_envio)
