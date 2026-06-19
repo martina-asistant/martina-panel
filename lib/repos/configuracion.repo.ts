@@ -110,23 +110,24 @@ export async function updateCanalMartina(
   }
 
   const { error: errorLog } = await supa
-    .from('configuracion_martina_log')
-    .insert({
-      canal,
-  activo_anterior: activoAnterior,
-  activo_nuevo: activo,
-  accion: activo ? 'activado' : 'desactivado',
-  updated_by,
-  minutos_desactivado: minutosDesactivado,
-  hora: new Date().toLocaleString('es-ES', {
-    timeZone: 'Europe/Madrid',
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
+  .from('configuracion_martina_log')
+  .insert({
+    canal,
+    activo_anterior: activoAnterior,
+    activo_nuevo: activo,
+    accion: activo ? 'activado' : 'desactivado',
+    updated_by,
+    minutos_desactivado: minutosDesactivado,
+
+    fecha_hora: new Date().toLocaleString('es-ES', {
+      timeZone: 'Europe/Madrid',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     })
-    });
+  });
 
   if (errorLog) {
     console.error('Error insertando log Martina:', errorLog);
