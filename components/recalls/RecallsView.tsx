@@ -91,15 +91,15 @@ const recallEstadoVisual = (
   estado: EstadoRecall | string | null | undefined
 ) => {
   if (estado === 'pendiente_envio') {
-    return { label: 'Pendiente envío', color: 'bg-rose-300' };
+    return { label: 'Pendiente envío', color: 'bg-pink-400' };
   }
 
   if (estado === 'enviado') {
-    return { label: 'Pendiente respuesta', color: 'bg-cyan-300' };
+    return { label: 'Pendiente respuesta', color: 'bg-violet-300' };
   }
 
   if (estado === 'quiere_cita') {
-    return { label: 'En curso', color: 'bg-emerald-300' };
+    return { label: 'En curso', color: 'bg-sky-800' };
   }
 
   if (estado === 'confirmada') {
@@ -110,7 +110,7 @@ const recallEstadoVisual = (
     return { label: 'Pospuesta', color: 'bg-red-400' };
   }
 
-  return { label: 'Pendiente envío', color: 'bg-sky-300' };
+  return { label: 'Pendiente envío', color: 'bg-pink-400' };
 };
 
 const tipoRecallLabel = (tipo?: string | null) => {
