@@ -21,9 +21,15 @@ type PatientOption = {
 
 const filtros: { key: Filtro; label: string; color: string }[] = [
   { key: 'todos', label: 'Todos', color: 'bg-amber-400' },
+
   { key: 'pendiente_envio', label: 'Pendiente envío', color: 'bg-sky-300' },
-  { key: 'pendiente', label: 'Pendientes', color: 'bg-violet-300' },
-  { key: 'confirmada', label: 'Confirmadas', color: 'bg-green-400' },
+
+  { key: 'enviado', label: 'Pendiente respuesta', color: 'bg-cyan-300' },
+
+  { key: 'quiere_cita', label: 'En curso', color: 'bg-emerald-300' },
+
+  { key: 'confirmada', label: 'Cita agendada', color: 'bg-green-400' },
+
   { key: 'pospuesta', label: 'Pospuestas', color: 'bg-red-400' },
 ];
 
@@ -81,17 +87,23 @@ const formatTelefono = (telefono?: string | null) => {
   return sinPrefijo.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
 };
 
-const recallEstadoVisual = (estado: EstadoRecall | null | undefined) => {
+const recallEstadoVisual = (
+  estado: EstadoRecall | string | null | undefined
+) => {
   if (estado === 'pendiente_envio') {
-    return { label: 'Pendiente envío', color: 'bg-sky-300' };
+    return { label: 'Pendiente envío', color: 'bg-rose-300' };
   }
 
-  if (estado === 'pendiente') {
-    return { label: 'Pendiente contestar', color: 'bg-violet-300' };
+  if (estado === 'enviado') {
+    return { label: 'Pendiente respuesta', color: 'bg-cyan-300' };
+  }
+
+  if (estado === 'quiere_cita') {
+    return { label: 'En curso', color: 'bg-emerald-300' };
   }
 
   if (estado === 'confirmada') {
-    return { label: 'Confirmada', color: 'bg-green-400' };
+    return { label: 'Cita agendada', color: 'bg-green-400' };
   }
 
   if (estado === 'pospuesta') {
