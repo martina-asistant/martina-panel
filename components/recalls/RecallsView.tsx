@@ -22,11 +22,11 @@ type PatientOption = {
 const filtros: { key: Filtro; label: string; color: string }[] = [
   { key: 'todos', label: 'Todos', color: 'bg-amber-400' },
 
-  { key: 'pendiente_envio', label: 'Pendiente envío', color: 'bg-rose-300' },
+  { key: 'pendiente_envio', label: 'Pendiente envío', color: 'bg-pink-400' },
 
-  { key: 'enviado', label: 'Pendiente respuesta', color: 'bg-cyan-300' },
+  { key: 'enviado', label: 'Pendiente respuesta', color: 'bg-violet-300' },
 
-  { key: 'quiere_cita', label: 'En curso', color: 'bg-emerald-300' },
+  { key: 'quiere_cita', label: 'En curso', color: 'bg-sky-800' },
 
   { key: 'confirmada', label: 'Cita agendada', color: 'bg-green-400' },
 
