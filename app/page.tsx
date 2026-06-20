@@ -41,32 +41,40 @@ const Home = () => {
         />
       </div>
 
-      {/* MÓVIL: imagen plana, sin reconstruir nada encima */}
-      <div className="relative block w-full md:hidden">
-        <img
-          src="/martina-hero-v2.png"
-          alt="Martina"
-          className="block w-full h-auto"
-        />
+     {/* MÓVIL: imagen plana ampliada y centrada */}
+<div className="relative block w-full min-h-screen md:hidden overflow-hidden bg-[#020f14]">
+  <img
+    src="/martina-hero-v2.png"
+    alt="Martina"
+    className="
+      absolute
+      top-0
+      left-1/2
+      h-auto
+      w-[180vw]
+      max-w-none
+      -translate-x-1/2
+    "
+  />
 
-        <button
-          onClick={() => router.push('/login')}
-          aria-label="Acceder"
-          className="
-            absolute
-            left-1/2
-            top-[63.2%]
-            w-[80%]
-            h-[5.8%]
-            -translate-x-1/2
-            rounded-full
-            bg-transparent
-            cursor-pointer
-            active:scale-[0.965]
-            touch-manipulation
-          "
-        />
-      </div>
+  <button
+    onClick={() => router.push('/login')}
+    aria-label="Acceder"
+    className="
+      absolute
+      left-1/2
+      top-[37.5%]
+      w-[52%]
+      h-[4.2%]
+      -translate-x-1/2
+      rounded-full
+      bg-transparent
+      cursor-pointer
+      active:scale-[0.965]
+      touch-manipulation
+    "
+  />
+</div>
     </main>
   );
 };
