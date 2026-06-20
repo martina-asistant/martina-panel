@@ -14,7 +14,7 @@ import {
 } from '@/lib/repos/conversaciones.repo';
 import {
   listMensajesByConversation,
-  crearMensajeSaliente
+  enviarMensajePanelWhatsapp
 } from '@/lib/repos/mensajes.repo';
 import type {
   ConversacionWhatsapp,
@@ -207,22 +207,35 @@ const ConversacionesView = () => {
 };
 
   const enviarMensaje = async () => {
-    if (!selected || !nuevoMensaje.trim()) return;
+  if (!selected || !nuevoMensaje.trim()) return;
 
-    const creado = await crearMensajeSaliente(
-      selected.id,
-      nuevoMensaje.trim()
-    );
+  const telefono =
+    selected.telefono_e164 ||
+    selected.telefono ||
+    '';
 
-    if (!creado) {
-      toast.error('No se ha podido guardar el mensaje');
-      return;
-    }
+  if (!telefono) {
+    toast.error('Esta conversación no tiene teléfono válido');
+    return;
+  }
 
-    setNuevoMensaje('');
-    setMensajes(await listMensajesByConversation(selected.id));
-    toast.success('Mensaje guardado');
-  };
+  const texto = nuevoMensaje.trim();
+
+  const resultado = await enviarMensajePanelWhatsapp({
+    conversationId: selected.id,
+    telefono,
+    mensaje: texto
+  });
+
+  if (!resultado?.ok) {
+    toast.error(resultado?.error || 'No se ha podido enviar el WhatsApp');
+    return;
+  }
+
+  setNuevoMensaje('');
+  setMensajes(await listMensajesByConversation(selected.id));
+  toast.success('Mensaje enviado por WhatsApp');
+};
 
     return (
     <div className="h-full min-h-0 w-full overflow-hidden">
@@ -419,7 +432,7 @@ const ConversacionesView = () => {
                 </div>
 
                 <div className="text-[11px] text-martina-muted mt-2">
-                  El mensaje se guarda en el historial. Pendiente conectar envío real por WhatsApp.
+                  El mensaje se enviará por WhatsApp y quedará registrado en el historial.
                 </div>
               </div>
             </>
