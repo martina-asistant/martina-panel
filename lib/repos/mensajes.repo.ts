@@ -60,3 +60,46 @@ export async function crearMensajeSaliente(conversationId: string, contenido: st
 
   return data as MensajeWhatsapp;
 }
+
+export async function enviarMensajePanelWhatsapp({
+  conversationId,
+  telefono,
+  mensaje
+}: {
+  conversationId: string;
+  telefono: string;
+  mensaje: string;
+}): Promise<{ ok: boolean; error?: string; message?: string }> {
+  const telefonoLimpio = String(telefono || '').replace(/\D/g, '');
+  const telefonoE164 = telefonoLimpio.startsWith('34')
+    ? telefonoLimpio
+    : `34${telefonoLimpio}`;
+
+  const url =
+    process.env.NEXT_PUBLIC_N8N_WHATSAPP_PANEL_SALIENTE_URL ||
+    'https://sheilacg.app.n8n.cloud/webhook/whatsapp-panel-saliente';
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      conversation_id: conversationId,
+      telefono: telefonoE164,
+      mensaje,
+      emisor: 'recepcion'
+    })
+  });
+
+  const data = await res.json().catch(() => null);
+
+  if (!res.ok) {
+    return {
+      ok: false,
+      error: data?.error || 'Error enviando WhatsApp'
+    };
+  }
+
+  return data;
+}
