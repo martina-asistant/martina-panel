@@ -55,12 +55,12 @@ const Home = () => {
             className="block w-full h-auto"
           />
 
-          {/* pequeño degradado para unir con la parte inferior */}
-          <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-b from-transparent to-[#020f14]" />
+          {/* degradado suave para unir con la parte inferior */}
+          <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-b from-transparent to-[#020f14]" />
         </div>
 
         {/* BLOQUE INFERIOR REAL */}
-        <div className="-mt-2 px-5 pb-8">
+        <div className="mt-4 px-5 pb-8">
           {/* Botón acceder */}
           <button
             onClick={() => router.push('/login')}
