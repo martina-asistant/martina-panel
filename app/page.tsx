@@ -6,9 +6,9 @@ const Home = () => {
   const router = useRouter();
 
   return (
-    <main className="min-h-screen bg-[#020f14] overflow-y-auto flex flex-col justify-between md:block">
+    <main className="min-h-screen bg-[#020f14] overflow-hidden relative w-full flex flex-col justify-between md:block">
       
-      {/* 💻 VERSIÓN PC: Intacta, no se toca ni un solo píxel */}
+      {/* 💻 VERSIÓN PC: Tu configuración exacta e intocable */}
       <div className="hidden md:relative md:block md:w-full">
         <img
           src="/martina-hero-v2.png"
@@ -41,48 +41,55 @@ const Home = () => {
         />
       </div>
 
-      {/* 📱 VERSIÓN MÓVIL: Optimizada para pantallas táctiles verticales */}
-      <div className="flex flex-col flex-1 justify-between p-6 md:hidden">
-        {/* Contenedor superior para la imagen y los textos */}
-        <div className="flex-1 flex flex-col justify-center items-center text-center space-y-6 pt-8">
-          <div className="relative w-48 h-48 rounded-full overflow-hidden border-2 border-cyan-400/30 shadow-[0_0_30px_rgba(34,211,238,0.2)]">
-            <img
-              src="/martina-hero-v2.png" 
-              alt="Martina Móvil"
-              className="w-full h-full object-cover scale-[1.3] object-top mt-[-10px]" 
-            />
-          </div>
-          
-          <div className="space-y-3 px-2">
-            <h1 className="text-3xl font-bold tracking-tight text-white">
-              Hola, soy <span className="text-cyan-400 drop-shadow-[0_0_15px_rgba(34,211,238,0.6)]">Martina</span> 👋
-            </h1>
-            <p className="text-cyan-300/90 text-sm font-medium">
-              Tu asistente virtual inteligente.
-            </p>
-            <p className="text-slate-400 text-xs leading-relaxed max-w-xs mx-auto">
-              Gestiono conversaciones, citas, recordatorios y tareas mientras tú te centras en lo importante.
-            </p>
-          </div>
+      {/* 📱 VERSIÓN MÓVIL: Mismo fondo con glow plano, pero con botón elástico y accesible */}
+      <div className="relative flex flex-col flex-1 justify-between min-h-screen w-full md:hidden">
+        {/* Capa de fondo: Mapea la imagen completa preservando proporciones y el glow original */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/martina-hero-v2.png" 
+            alt="Martina Fondo"
+            className="w-full h-full object-cover object-top opacity-90"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#020f14] via-[#020f14]/40 to-transparent" />
         </div>
 
-        {/* Contenedor inferior para el botón táctil y el estado */}
-        <div className="w-full space-y-5 pb-6">
-          <button
-            onClick={() => router.push('/login')}
-            className="
-              w-full py-4 rounded-full text-center font-bold tracking-[0.15em] uppercase text-slate-900
-              bg-white shadow-[0_0_20px_rgba(36,244,234,0.4)]
-              transition-all duration-300 active:scale-[0.965] touch-manipulation
-            "
-          >
-            Acceder
-          </button>
+        {/* Capa de contenido: Flota por encima de la imagen sin romper el arte de fondo */}
+        <div className="relative z-10 flex flex-col flex-1 justify-between p-6 pt-24 pb-8">
           
-          <div className="flex items-center justify-center gap-2 text-xs text-slate-400">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
-            Martina activa
+          {/* Espaciador invisible para que el texto baje y no tape la cara de Martina */}
+          <div className="h-[25vh]" />
+
+          {/* Bloque inferior con los textos y el acceso */}
+          <div className="space-y-6 w-full backdrop-blur-sm bg-[#020f14]/40 p-4 rounded-3xl border border-cyan-500/10 shadow-[0_0_30px_rgba(2,15,20,0.8)]">
+            <div className="text-center space-y-2">
+              <h1 className="text-2xl font-bold tracking-tight text-white">
+                Hola, soy <span className="text-cyan-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]">Martina</span> 👋
+              </h1>
+              <p className="text-cyan-300/90 text-xs font-medium uppercase tracking-[0.18em]">
+                Tu asistente virtual inteligente
+              </p>
+            </div>
+
+            {/* El botón móvil ahora se estira al ancho del teléfono y es reactivo al tacto */}
+            <div className="w-full space-y-4">
+              <button
+                onClick={() => router.push('/login')}
+                className="
+                  w-full py-3.5 rounded-full text-center font-bold tracking-[0.15em] uppercase text-slate-900
+                  bg-cyan-300 shadow-[0_0_25px_rgba(34,211,238,0.6)]
+                  transition-all duration-300 active:scale-[0.965] touch-manipulation
+                "
+              >
+                Acceder
+              </button>
+              
+              <div className="flex items-center justify-center gap-2 text-[11px] text-slate-400 font-medium tracking-wider uppercase">
+                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
+                Martina activa
+              </div>
+            </div>
           </div>
+
         </div>
       </div>
 
