@@ -358,7 +358,23 @@ const RecallsView = () => {
 
         <button
           type="button"
-          onClick={() => setMostrarInsertarRecall(true)}
+          onClick={() => {
+            setRecallSeleccionado(null);
+            setModoEdicionRecall(false);
+            setBusquedaPaciente('');
+            setMostrarResultadosPaciente(false);
+            setNuevoRecall({
+              paciente_id: '',
+              nombre_paciente: '',
+              telefono: '',
+              motivo_recall: 'Limpieza',
+              tipo_recall: 'MTO Periodontal',
+              detalle_recall: '',
+              fecha_recall: '',
+              profesional: 'fede',
+            });
+            setMostrarInsertarRecall(true);
+          }}
           className="inline-flex w-fit items-center gap-2 rounded-full border border-cyan-300/45 bg-cyan-400/10 px-3.5 py-[7px] text-[10px] font-semibold uppercase tracking-[0.15em] text-cyan-100 shadow-[0_0_16px_rgba(34,211,238,.14)] transition-all hover:bg-cyan-400/18 hover:border-cyan-200/70 whitespace-nowrap"
         >
           <Plus className="h-3.5 w-3.5" />
@@ -367,18 +383,27 @@ const RecallsView = () => {
       </div>
 
       <div className="rounded-3xl border border-cyan-500/20 bg-[rgba(5,18,24,.78)] backdrop-blur-xl overflow-hidden shadow-[0_0_35px_rgba(34,211,238,.10)]">
-        <div className="w-full overflow-x-auto">
-          <table className="min-w-[1280px] w-full text-sm">
+        <div className="w-full overflow-hidden">
+          <table className="w-full table-fixed text-sm">
+            <colgroup>
+              <col className="w-[18%]" />
+              <col className="w-[12%]" />
+              <col className="w-[14%]" />
+              <col className="w-[18%]" />
+              <col className="w-[12%]" />
+              <col className="w-[12%]" />
+              <col className="w-[14%]" />
+            </colgroup>
+
             <thead className="bg-cyan-500/10 text-cyan-300/75 text-xs uppercase tracking-[0.18em]">
               <tr>
-                <th className="text-left px-6 py-4 font-medium min-w-[220px]">Paciente</th>
-                <th className="text-left px-6 py-4 font-medium min-w-[140px]">Teléfono</th>
-                <th className="text-left px-6 py-4 font-medium min-w-[170px]">Tipo</th>
-                <th className="text-left px-6 py-4 font-medium min-w-[220px]">Detalle</th>
-                <th className="text-left px-6 py-4 font-medium min-w-[150px]">Fecha recall</th>
-                <th className="text-left px-6 py-4 font-medium min-w-[150px]">Fecha envío</th>
-                <th className="text-left px-6 py-4 font-medium min-w-[220px]">Estado</th>
-                <th className="text-left px-6 py-4 font-medium min-w-[180px]">Próxima cita</th>
+                <th className="text-left px-5 py-4 font-medium">Paciente</th>
+                <th className="text-left px-5 py-4 font-medium">Teléfono</th>
+                <th className="text-left px-5 py-4 font-medium">Tipo</th>
+                <th className="text-left px-5 py-4 font-medium">Detalle</th>
+                <th className="text-left px-5 py-4 font-medium">Fecha recall</th>
+                <th className="text-left px-5 py-4 font-medium">Fecha envío</th>
+                <th className="text-left px-5 py-4 font-medium">Estado</th>
               </tr>
             </thead>
 
@@ -408,8 +433,8 @@ const RecallsView = () => {
 
                       setBusquedaPaciente(
                         r.nombre_paciente ||
-                        r.nombre_completo ||
-                        ''
+                          r.nombre_completo ||
+                          ''
                       );
 
                       setMostrarResultadosPaciente(false);
@@ -417,58 +442,43 @@ const RecallsView = () => {
                     }}
                     className="border-t border-cyan-500/10 hover:bg-cyan-500/5 transition-colors cursor-pointer"
                   >
-                    <td className="px-6 py-4 font-medium text-white min-w-[220px] whitespace-nowrap">
+                    <td className="px-5 py-4 font-medium text-white truncate">
                       {r.nombre_paciente || r.nombre_completo || '—'}
                     </td>
 
-                    <td className="px-6 py-4 text-cyan-100/65 min-w-[140px] whitespace-nowrap">
+                    <td className="px-5 py-4 text-cyan-100/65 whitespace-nowrap">
                       {formatTelefono(r.telefono)}
                     </td>
 
-                    <td className="px-6 py-4 text-cyan-100/80 min-w-[170px]">
+                    <td className="px-5 py-4 text-cyan-100/80 truncate">
                       {r.tipo_recall || tipoRecallLabel(r.motivo_recall || r.tipo)}
                     </td>
 
-                    <td className="px-6 py-4 text-cyan-100/65 min-w-[220px] max-w-[280px]">
-                      <div className="line-clamp-2">
-                        {r.detalle_recall || '—'}
-                      </div>
+                    <td className="px-5 py-4 text-cyan-100/65 truncate">
+                      {r.detalle_recall || '—'}
                     </td>
 
-                    <td className="px-6 py-4 text-cyan-100/75 min-w-[150px] whitespace-nowrap">
+                    <td className="px-5 py-4 text-cyan-100/75 whitespace-nowrap">
                       {r.fecha_recall ? formatDate(r.fecha_recall) : '—'}
                     </td>
 
-                    <td className="px-6 py-4 text-cyan-100/55 min-w-[150px] whitespace-nowrap">
+                    <td className="px-5 py-4 text-cyan-100/55 whitespace-nowrap">
                       {r.fecha_envio ? formatDate(r.fecha_envio) : '—'}
                     </td>
 
-                    <td className="px-6 py-4 min-w-[220px]">
-                      <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-cyan-500/20 bg-cyan-500/5 text-cyan-100 shadow-[0_0_12px_rgba(34,211,238,.10)] whitespace-nowrap">
+                    <td className="px-5 py-4">
+                      <span className="inline-flex max-w-full items-center gap-2 px-3.5 py-2 rounded-full border border-cyan-500/20 bg-cyan-500/5 text-cyan-100 shadow-[0_0_12px_rgba(34,211,238,.10)]">
                         <span
                           className={cn(
-                            'w-2.5 h-2.5 rounded-full shadow-[0_0_10px_currentColor]',
+                            'w-2.5 h-2.5 shrink-0 rounded-full shadow-[0_0_10px_currentColor]',
                             lbl.color
                           )}
                         />
 
-                        {lbl.label}
+                        <span className="truncate">
+                          {lbl.label}
+                        </span>
                       </span>
-                    </td>
-
-                    <td className="px-6 py-4 text-cyan-100/65 min-w-[180px]">
-                      {r.proxima_cita_fecha ? (
-                        <div>
-                          <div className="whitespace-nowrap">
-                            {formatDate(r.proxima_cita_fecha)}
-                          </div>
-                          <div className="text-xs text-cyan-100/40">
-                            {r.proxima_cita_motivo || ''}
-                          </div>
-                        </div>
-                      ) : (
-                        '—'
-                      )}
                     </td>
                   </tr>
                 );
@@ -477,7 +487,7 @@ const RecallsView = () => {
               {filtered.length === 0 && (
                 <tr>
                   <td
-                    colSpan={8}
+                    colSpan={7}
                     className="px-6 py-10 text-center text-cyan-100/45"
                   >
                     Sin resultados
@@ -495,9 +505,7 @@ const RecallsView = () => {
             <div className="px-6 py-5 border-b border-cyan-300/20 flex items-start justify-between">
               <div>
                 <h2 className="text-xl font-semibold text-white">
-                  {modoEdicionRecall
-                    ? 'Editar recall'
-                    : 'Insertar recall'}
+                  {modoEdicionRecall ? 'Editar recall' : 'Insertar recall'}
                 </h2>
 
                 <p className="text-cyan-200 text-sm mt-1">
@@ -517,7 +525,13 @@ const RecallsView = () => {
                 </button>
 
                 <button
-                  onClick={() => setMostrarInsertarRecall(false)}
+                  onClick={() => {
+                    setMostrarInsertarRecall(false);
+                    setRecallSeleccionado(null);
+                    setModoEdicionRecall(false);
+                    setBusquedaPaciente('');
+                    setMostrarResultadosPaciente(false);
+                  }}
                   className="text-white/80 hover:text-white text-xl"
                 >
                   ✕
