@@ -384,9 +384,9 @@ return (
 {/* MOBILE */}
 <div className="lg:hidden min-h-screen bg-[#02141B] text-white px-5 pt-6 pb-16 overflow-x-hidden">
   <div className="mb-7">
-    <h1 className="flex items-center gap-2 text-[2.35rem] leading-none font-bold text-white whitespace-nowrap">
+    <h1 className="flex items-center gap-2 text-[2rem] leading-none font-bold text-white whitespace-nowrap">
       ¡Hola {nombreUsuario || '...'}!
-      <span className="text-cyan-300 text-[1.7rem] drop-shadow-[0_0_12px_rgba(34,211,238,.8)]">
+      <span className="text-cyan-300 text-[1.35rem] drop-shadow-[0_0_12px_rgba(34,211,238,.8)]">
         ✦
       </span>
     </h1>
