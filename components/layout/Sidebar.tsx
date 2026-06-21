@@ -113,7 +113,7 @@ const Sidebar = () => {
         {/* MOBILE */}
         <div className="lg:hidden">
           <div className="flex items-center justify-between gap-3">
-            <div className="min-w-0 flex items-center gap-3 rounded-3xl border border-cyan-400/25 bg-cyan-500/10 px-4 py-3 shadow-[0_0_24px_rgba(34,211,238,.10)]">
+            <div className="lg:hidden h-[calc(100dvh-190px)] overflow-y-auto bg-[#02141B] text-white px-5 pt-6 pb-24 overflow-x-hidden">
               <div
                 key={avatarKey}
                 className="
