@@ -46,23 +46,27 @@ const Home = () => {
     "
   />
 
-  <button
-    onClick={() => router.push('/login')}
-    aria-label="Acceder"
-    className="
-      absolute
-      left-1/2
-      top-[38.7%]
-      w-[58%]
-      h-[4.8%]
-      -translate-x-1/2
-      rounded-full
-      bg-transparent
-      cursor-pointer
-      touch-manipulation
-      active:scale-[0.97]
-    "
-  />
+ <button
+  onClick={() => router.push('/login')}
+  aria-label="Acceder"
+  className="
+    absolute
+    left-1/2
+    top-[41.2%]
+    w-[64%]
+    h-[5.2%]
+    -translate-x-1/2
+    rounded-full
+    bg-transparent
+    cursor-pointer
+    touch-manipulation
+    transition-all
+    duration-300
+    ease-out
+    active:scale-[0.965]
+    active:translate-y-[2px]
+  "
+/>
 </div>
     </main>
   );
