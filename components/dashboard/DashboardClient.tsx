@@ -59,10 +59,9 @@ const Metric = ({
     <Card
       className="
         group relative overflow-hidden rounded-3xl border border-cyan-500/20
-        bg-[rgba(5,18,24,.78)] backdrop-blur-xl p-5 cursor-pointer
-        transition-all duration-500 hover:-translate-y-1 hover:scale-[1.015]
-        hover:border-cyan-300/60 hover:shadow-[0_0_35px_rgba(34,211,238,.32)]
-      "
+    bg-[rgba(5,18,24,.78)] backdrop-blur-xl p-4 cursor-pointer
+    transition-all duration-500 hover:-translate-y-1 hover:scale-[1.015]
+    hover:border-cyan-300/60 hover:shadow-[0_0_35px_rgba(34,211,238,.32)]"
     >
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-cyan-400/15 via-transparent to-transparent" />
       <div className="absolute -bottom-10 left-1/2 h-20 w-32 -translate-x-1/2 rounded-full bg-cyan-400/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
