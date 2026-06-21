@@ -382,7 +382,7 @@ return (
     </div>
 
 {/* MOBILE */}
-<div className="lg:hidden min-h-screen bg-[#02141B] text-white px-5 pt-6 pb-16 overflow-x-hidden">
+<div className="lg:hidden h-[calc(100dvh-190px)] overflow-y-auto bg-[#02141B] text-white px-5 pt-6 pb-32 overflow-x-hidden">
   <div className="mb-7">
     <h1 className="flex items-center gap-2 text-[2rem] leading-none font-bold text-white whitespace-nowrap">
       ¡Hola {nombreUsuario || '...'}!
