@@ -32,31 +32,38 @@ const Home = () => {
       </div>
 
       {/* MOBILE */}
-      <div className="relative block w-full min-h-screen md:hidden bg-[#020f14]">
-        <img
-          src="/martina-mobile-full.png"
-          alt="Martina"
-          className="block w-full h-auto"
-        />
+<div className="relative block w-full min-h-screen md:hidden bg-[#020f14] overflow-hidden">
+  <img
+    src="/martina-mobile-full.png"
+    alt="Martina"
+    className="
+      absolute
+      top-0
+      left-1/2
+      w-[112vw]
+      max-w-none
+      -translate-x-1/2
+    "
+  />
 
-        <button
-          onClick={() => router.push('/login')}
-          aria-label="Acceder"
-          className="
-            absolute
-            left-1/2
-            top-[50.4%]
-            w-[56%]
-            h-[5.8%]
-            -translate-x-1/2
-            rounded-full
-            bg-transparent
-            cursor-pointer
-            touch-manipulation
-            active:scale-[0.97]
-          "
-        />
-      </div>
+  <button
+    onClick={() => router.push('/login')}
+    aria-label="Acceder"
+    className="
+      absolute
+      left-1/2
+      top-[38.7%]
+      w-[58%]
+      h-[4.8%]
+      -translate-x-1/2
+      rounded-full
+      bg-transparent
+      cursor-pointer
+      touch-manipulation
+      active:scale-[0.97]
+    "
+  />
+</div>
     </main>
   );
 };
