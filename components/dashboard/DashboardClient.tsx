@@ -381,104 +381,104 @@ return (
       </div>
     </div>
 
-    {/* MOBILE */}
-    <div className="lg:hidden min-h-screen bg-[#02141B] text-white px-5 pt-8 pb-24 overflow-x-hidden">
-      <div className="mb-8">
-        <h1 className="flex items-center gap-3 text-[3rem] leading-none font-bold text-white whitespace-nowrap">
-          ¡Hola {nombreUsuario || '...'}!
-          <span className="text-cyan-300 text-[2.2rem] drop-shadow-[0_0_12px_rgba(34,211,238,.8)]">
-            ✦
-          </span>
-        </h1>
+{/* MOBILE */}
+<div className="lg:hidden min-h-screen bg-[#02141B] text-white px-5 pt-6 pb-16 overflow-x-hidden">
+  <div className="mb-7">
+    <h1 className="flex items-center gap-2 text-[2.35rem] leading-none font-bold text-white whitespace-nowrap">
+      ¡Hola {nombreUsuario || '...'}!
+      <span className="text-cyan-300 text-[1.7rem] drop-shadow-[0_0_12px_rgba(34,211,238,.8)]">
+        ✦
+      </span>
+    </h1>
 
-        <div className="mt-6 flex items-center justify-between gap-5">
-          <div className="inline-flex items-center gap-3 rounded-full border border-cyan-400/20 bg-cyan-500/10 px-5 py-3 text-cyan-100 text-base font-medium shadow-[0_0_20px_rgba(34,211,238,.08)] whitespace-nowrap">
-            <span
-              className={cn(
-                'w-2.5 h-2.5 rounded-full shrink-0',
-                whatsappActivo || llamadasActivo
-                  ? 'bg-cyan-300 animate-pulse shadow-[0_0_12px_rgba(34,211,238,.95)]'
-                  : 'bg-slate-500'
-              )}
-            />
-            Martina activa
-          </div>
-
-          <div className="flex items-center gap-5">
-            <button
-              type="button"
-              onClick={() => toggleCanal('whatsapp')}
-              disabled={guardandoCanal === 'whatsapp'}
-              className={cn(
-                'w-16 h-16 rounded-full border flex items-center justify-center transition-all duration-300',
-                whatsappActivo
-                  ? 'bg-[radial-gradient(circle_at_35%_30%,#1A6C78_0%,#0D4450_45%,#072B34_100%)] border-cyan-200/80 text-white shadow-[0_0_16px_rgba(34,211,238,.7)]'
-                  : 'bg-white/5 border-cyan-500/15 text-cyan-100/35'
-              )}
-            >
-              <MessageCircle className="w-7 h-7" />
-            </button>
-
-            <button
-              type="button"
-              onClick={() => toggleCanal('llamadas')}
-              disabled={guardandoCanal === 'llamadas'}
-              className={cn(
-                'w-16 h-16 rounded-full border flex items-center justify-center transition-all duration-300',
-                llamadasActivo
-                  ? 'bg-[radial-gradient(circle_at_35%_30%,#1A6C78_0%,#0D4450_45%,#072B34_100%)] border-cyan-200/80 text-white shadow-[0_0_16px_rgba(34,211,238,.7)]'
-                  : 'bg-white/5 border-cyan-500/15 text-cyan-100/35'
-              )}
-            >
-              <PhoneCall className="w-7 h-7" />
-            </button>
-          </div>
-        </div>
+    <div className="mt-5 flex items-center justify-between gap-4">
+      <div className="inline-flex items-center gap-2.5 rounded-full border border-cyan-400/20 bg-cyan-500/10 px-4 py-2.5 text-cyan-100 text-sm font-medium shadow-[0_0_20px_rgba(34,211,238,.08)] whitespace-nowrap">
+        <span
+          className={cn(
+            'w-2.5 h-2.5 rounded-full shrink-0',
+            whatsappActivo || llamadasActivo
+              ? 'bg-cyan-300 animate-pulse shadow-[0_0_12px_rgba(34,211,238,.95)]'
+              : 'bg-slate-500'
+          )}
+        />
+        Martina activa
       </div>
 
-      <div className="space-y-9">
-        <section>
-          <h2 className="mb-4 uppercase tracking-[0.32em] text-cyan-300/70 text-sm">
-            Conversaciones
-          </h2>
+      <div className="flex items-center gap-4">
+        <button
+          type="button"
+          onClick={() => toggleCanal('whatsapp')}
+          disabled={guardandoCanal === 'whatsapp'}
+          className={cn(
+            'w-14 h-14 rounded-full border flex items-center justify-center transition-all duration-300',
+            whatsappActivo
+              ? 'bg-[radial-gradient(circle_at_35%_30%,#1A6C78_0%,#0D4450_45%,#072B34_100%)] border-cyan-200/80 text-white shadow-[0_0_14px_rgba(34,211,238,.65)]'
+              : 'bg-white/5 border-cyan-500/15 text-cyan-100/35'
+          )}
+        >
+          <MessageCircle className="w-6 h-6" />
+        </button>
 
-          <div className="grid grid-cols-1 gap-4">
-            <Metric icon={MessageCircle} label="Nuevas" value={nuevas} href="/conversaciones" />
-            <Metric icon={LoaderCircle} label="Martina" value={enCurso} href="/conversaciones" />
-            <Metric icon={Building2} label="Recepción" value={recepcion} href="/conversaciones" />
-            <Metric icon={Check} label="Gestionadas" value={gestion} href="/conversaciones" />
-            <Metric icon={ClipboardPen} label="Recados" value={recados} href="/conversaciones" />
-          </div>
-        </section>
-
-        <section>
-          <h2 className="mb-4 uppercase tracking-[0.32em] text-cyan-300/70 text-sm">
-            Actividad de hoy
-          </h2>
-
-          <div className="grid grid-cols-1 gap-4">
-            <Metric icon={CalendarDays} label="Citas creadas" value={citasHoy} href="/conversaciones" />
-            <Metric icon={Bell} label="Recordatorios" value={recordatoriosHoy} href="/recordatorios" />
-            <Metric icon={PhoneOutgoing} label="Recalls enviados" value={recallsEnviadosHoy} href="/recalls" />
-            <Metric icon={PhoneCall} label="Recalls aceptados" value={recallsAceptadosHoy} href="/recalls" />
-          </div>
-        </section>
-
-        <section>
-          <h2 className="mb-4 uppercase tracking-[0.32em] text-cyan-300/70 text-sm">
-            Estado recordatorios
-          </h2>
-
-          <div className="grid grid-cols-1 gap-4">
-            <Metric icon={CircleDot} label="Pendiente" value={recPendiente} href="/recordatorios" />
-            <Metric icon={CircleCheck} label="Confirmadas" value={recConf} href="/recordatorios" />
-            <Metric icon={CircleX} label="No podrá asistir" value={recNo} href="/recordatorios" />
-            <Metric icon={RefreshCcw} label="Modificadas" value={recMod} href="/recordatorios" />
-            <Metric icon={Ban} label="Canceladas" value={recCancel} href="/recordatorios" />
-          </div>
-        </section>
+        <button
+          type="button"
+          onClick={() => toggleCanal('llamadas')}
+          disabled={guardandoCanal === 'llamadas'}
+          className={cn(
+            'w-14 h-14 rounded-full border flex items-center justify-center transition-all duration-300',
+            llamadasActivo
+              ? 'bg-[radial-gradient(circle_at_35%_30%,#1A6C78_0%,#0D4450_45%,#072B34_100%)] border-cyan-200/80 text-white shadow-[0_0_14px_rgba(34,211,238,.65)]'
+              : 'bg-white/5 border-cyan-500/15 text-cyan-100/35'
+          )}
+        >
+          <PhoneCall className="w-6 h-6" />
+        </button>
       </div>
     </div>
+  </div>
+
+  <div className="space-y-7">
+    <section>
+      <h2 className="mb-3 uppercase tracking-[0.28em] text-cyan-300/70 text-xs">
+        Conversaciones
+      </h2>
+
+      <div className="grid grid-cols-1 gap-3.5">
+        <Metric icon={MessageCircle} label="Nuevas" value={nuevas} href="/conversaciones" />
+        <Metric icon={LoaderCircle} label="Martina" value={enCurso} href="/conversaciones" />
+        <Metric icon={Building2} label="Recepción" value={recepcion} href="/conversaciones" />
+        <Metric icon={Check} label="Gestionadas" value={gestion} href="/conversaciones" />
+        <Metric icon={ClipboardPen} label="Recados" value={recados} href="/conversaciones" />
+      </div>
+    </section>
+
+    <section>
+      <h2 className="mb-3 uppercase tracking-[0.28em] text-cyan-300/70 text-xs">
+        Actividad de hoy
+      </h2>
+
+      <div className="grid grid-cols-1 gap-3.5">
+        <Metric icon={CalendarDays} label="Citas creadas" value={citasHoy} href="/conversaciones" />
+        <Metric icon={Bell} label="Recordatorios" value={recordatoriosHoy} href="/recordatorios" />
+        <Metric icon={PhoneOutgoing} label="Recalls enviados" value={recallsEnviadosHoy} href="/recalls" />
+        <Metric icon={PhoneCall} label="Recalls aceptados" value={recallsAceptadosHoy} href="/recalls" />
+      </div>
+    </section>
+
+    <section>
+      <h2 className="mb-3 uppercase tracking-[0.28em] text-cyan-300/70 text-xs">
+        Estado recordatorios
+      </h2>
+
+      <div className="grid grid-cols-1 gap-3.5">
+        <Metric icon={CircleDot} label="Pendiente" value={recPendiente} href="/recordatorios" />
+        <Metric icon={CircleCheck} label="Confirmadas" value={recConf} href="/recordatorios" />
+        <Metric icon={CircleX} label="No podrá asistir" value={recNo} href="/recordatorios" />
+        <Metric icon={RefreshCcw} label="Modificadas" value={recMod} href="/recordatorios" />
+        <Metric icon={Ban} label="Canceladas" value={recCancel} href="/recordatorios" />
+      </div>
+    </section>
+  </div>
+</div>
   </>
 );
 };
