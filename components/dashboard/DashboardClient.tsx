@@ -382,7 +382,7 @@ return (
     </div>
 
 {/* MOBILE */}
-<div className="lg:hidden min-h-screen bg-[#02141B] text-white px-5 pt-6 pb-16 overflow-x-hidden">
+<div className="lg:hidden min-h-screen bg-[#02141B] text-white px-5 pt-6 pb-24 overflow-x-hidden">
   <div className="mb-7">
     <h1 className="flex items-center gap-2 text-[2.35rem] leading-none font-bold text-white whitespace-nowrap">
       ¡Hola {nombreUsuario || '...'}!
@@ -401,7 +401,13 @@ return (
               : 'bg-slate-500'
           )}
         />
-        Martina activa
+        {whatsappActivo && llamadasActivo
+          ? 'Martina activa'
+          : whatsappActivo
+            ? 'Martina WhatsApp activa'
+            : llamadasActivo
+              ? 'Martina llamadas activa'
+              : 'Martina inactiva'}
       </div>
 
       <div className="flex items-center gap-4">
@@ -409,10 +415,11 @@ return (
           type="button"
           onClick={() => toggleCanal('whatsapp')}
           disabled={guardandoCanal === 'whatsapp'}
+          title={whatsappActivo ? 'Desactivar WhatsApp' : 'Activar WhatsApp'}
           className={cn(
             'w-14 h-14 rounded-full border flex items-center justify-center transition-all duration-300',
             whatsappActivo
-              ? 'bg-[radial-gradient(circle_at_35%_30%,#1A6C78_0%,#0D4450_45%,#072B34_100%)] border-cyan-200/80 text-white shadow-[0_0_14px_rgba(34,211,238,.65)]'
+              ? 'bg-[radial-gradient(circle_at_35%_30%,#1A6C78_0%,#0D4450_45%,#072B34_100%)] border-cyan-200/80 text-white shadow-[0_0_12px_rgba(34,211,238,.65),0_0_24px_rgba(34,211,238,.24),inset_0_0_10px_rgba(255,255,255,.16)]'
               : 'bg-white/5 border-cyan-500/15 text-cyan-100/35'
           )}
         >
@@ -423,10 +430,11 @@ return (
           type="button"
           onClick={() => toggleCanal('llamadas')}
           disabled={guardandoCanal === 'llamadas'}
+          title={llamadasActivo ? 'Desactivar llamadas' : 'Activar llamadas'}
           className={cn(
             'w-14 h-14 rounded-full border flex items-center justify-center transition-all duration-300',
             llamadasActivo
-              ? 'bg-[radial-gradient(circle_at_35%_30%,#1A6C78_0%,#0D4450_45%,#072B34_100%)] border-cyan-200/80 text-white shadow-[0_0_14px_rgba(34,211,238,.65)]'
+              ? 'bg-[radial-gradient(circle_at_35%_30%,#1A6C78_0%,#0D4450_45%,#072B34_100%)] border-cyan-200/80 text-white shadow-[0_0_12px_rgba(34,211,238,.65),0_0_24px_rgba(34,211,238,.24),inset_0_0_10px_rgba(255,255,255,.16)]'
               : 'bg-white/5 border-cyan-500/15 text-cyan-100/35'
           )}
         >
@@ -436,13 +444,13 @@ return (
     </div>
   </div>
 
-  <div className="space-y-7">
+  <div className="space-y-10">
     <section>
-      <h2 className="mb-3 uppercase tracking-[0.28em] text-cyan-300/70 text-xs">
+      <h2 className="mb-4 uppercase tracking-[0.22em] text-cyan-300/70">
         Conversaciones
       </h2>
 
-      <div className="grid grid-cols-1 gap-3.5">
+      <div className="grid grid-cols-1 gap-4">
         <Metric icon={MessageCircle} label="Nuevas" value={nuevas} href="/conversaciones" />
         <Metric icon={LoaderCircle} label="Martina" value={enCurso} href="/conversaciones" />
         <Metric icon={Building2} label="Recepción" value={recepcion} href="/conversaciones" />
@@ -452,11 +460,11 @@ return (
     </section>
 
     <section>
-      <h2 className="mb-3 uppercase tracking-[0.28em] text-cyan-300/70 text-xs">
+      <h2 className="mb-4 uppercase tracking-[0.22em] text-cyan-300/70">
         Actividad de hoy
       </h2>
 
-      <div className="grid grid-cols-1 gap-3.5">
+      <div className="grid grid-cols-1 gap-4">
         <Metric icon={CalendarDays} label="Citas creadas" value={citasHoy} href="/conversaciones" />
         <Metric icon={Bell} label="Recordatorios" value={recordatoriosHoy} href="/recordatorios" />
         <Metric icon={PhoneOutgoing} label="Recalls enviados" value={recallsEnviadosHoy} href="/recalls" />
@@ -465,11 +473,11 @@ return (
     </section>
 
     <section>
-      <h2 className="mb-3 uppercase tracking-[0.28em] text-cyan-300/70 text-xs">
+      <h2 className="mb-4 uppercase tracking-[0.22em] text-cyan-300/70">
         Estado recordatorios
       </h2>
 
-      <div className="grid grid-cols-1 gap-3.5">
+      <div className="grid grid-cols-1 gap-4">
         <Metric icon={CircleDot} label="Pendiente" value={recPendiente} href="/recordatorios" />
         <Metric icon={CircleCheck} label="Confirmadas" value={recConf} href="/recordatorios" />
         <Metric icon={CircleX} label="No podrá asistir" value={recNo} href="/recordatorios" />
