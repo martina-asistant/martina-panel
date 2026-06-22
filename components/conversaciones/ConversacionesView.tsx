@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Save, Menu, ChevronDown, X } from 'lucide-react';
+import { Search, Save, Menu, ChevronDown, X, Paperclip, Send } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import {
   listConversaciones,
@@ -14,7 +14,8 @@ import {
 } from '@/lib/repos/conversaciones.repo';
 import {
   listMensajesByConversation,
-  enviarMensajePanelWhatsapp
+  enviarMensajePanelWhatsapp,
+  enviarAdjuntoPanelWhatsapp
 } from '@/lib/repos/mensajes.repo';
 import type {
   ConversacionWhatsapp,
@@ -53,6 +54,7 @@ const ConversacionesView = () => {
   // Estados elásticos de control para la UI móvil
   const [mostrarListaMovil, setMostrarListaMovil] = useState(false);
   const [mostrarFichaMovil, setMostrarFichaMovil] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const selected = useMemo(
     () => convs.find(c => c.id === selectedId) || null,
@@ -222,23 +224,68 @@ const ConversacionesView = () => {
       return;
     }
 
-    const texto = nuevoMensaje.trim();
+    const enviarMensaje = async () => {
+  if (!selected || !nuevoMensaje.trim()) return;
 
-    const resultado = await enviarMensajePanelWhatsapp({
-      conversationId: selected.id,
-      telefono,
-      mensaje: texto
-    });
+  const telefono =
+    selected.telefono_e164 ||
+    selected.telefono ||
+    '';
 
-    if (!resultado?.ok) {
-      toast.error(resultado?.error || 'No se ha podido enviar el WhatsApp');
-      return;
-    }
+  if (!telefono) {
+    toast.error('Esta conversación no tiene teléfono válido');
+    return;
+  }
 
-    setNuevoMensaje('');
-    setMensajes(await listMensajesByConversation(selected.id));
-    toast.success('Mensaje enviado por WhatsApp');
-  };
+  const texto = nuevoMensaje.trim();
+
+  const resultado = await enviarMensajePanelWhatsapp({
+    conversationId: selected.id,
+    telefono,
+    mensaje: texto
+  });
+
+  if (!resultado?.ok) {
+    toast.error(resultado?.error || 'No se ha podido enviar el WhatsApp');
+    return;
+  }
+
+  setNuevoMensaje('');
+  setMensajes(await listMensajesByConversation(selected.id));
+  toast.success('Mensaje enviado por WhatsApp');
+};
+
+const enviarAdjunto = async (file: File) => {
+  if (!selected || !file) return;
+
+  const telefono =
+    selected.telefono_e164 ||
+    selected.telefono ||
+    '';
+
+  if (!telefono) {
+    toast.error('Esta conversación no tiene teléfono válido');
+    return;
+  }
+
+  const resultado = await enviarAdjuntoPanelWhatsapp({
+    conversationId: selected.id,
+    telefono,
+    file
+  });
+
+  if (!resultado?.ok) {
+    toast.error(resultado?.error || 'No se ha podido enviar el adjunto');
+    return;
+  }
+
+  if (fileInputRef.current) {
+    fileInputRef.current.value = '';
+  }
+
+  setMensajes(await listMensajesByConversation(selected.id));
+  toast.success('Adjunto enviado');
+};
 
   return (
     <div className="h-full min-h-0 w-full overflow-hidden relative">
@@ -401,33 +448,53 @@ const ConversacionesView = () => {
               </div>
 
               <div className="px-6 py-3 shrink-0 border-t border-martina-border bg-white">
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Escribe un mensaje..."
-                    value={nuevoMensaje}
-                    onChange={(e) => setNuevoMensaje(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        enviarMensaje();
-                      }
-                    }}
-                    className="flex-1 h-10 bg-martina-bg border-martina-border"
-                  />
+  <div className="flex gap-2 items-center">
+    <input
+      ref={fileInputRef}
+      type="file"
+      className="hidden"
+      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+      onChange={(e) => {
+        const file = e.target.files?.[0];
+        if (file) enviarAdjunto(file);
+      }}
+    />
 
-                  <Button
-                    onClick={enviarMensaje}
-                    disabled={!nuevoMensaje.trim()}
-                    className="bg-martina-text hover:bg-black text-white"
-                  >
-                    Enviar
-                  </Button>
-                </div>
+    <button
+      type="button"
+      onClick={() => fileInputRef.current?.click()}
+      className="h-10 w-10 shrink-0 rounded-xl border border-martina-border bg-martina-bg flex items-center justify-center text-martina-text hover:bg-martina-beige transition-colors"
+      title="Adjuntar archivo"
+    >
+      <Paperclip className="w-4 h-4" />
+    </button>
 
-                <div className="text-[11px] text-martina-muted mt-2">
-                  El mensaje se enviará por WhatsApp y quedará registrado en el historial.
-                </div>
-              </div>
+    <Input
+      placeholder="Escribe un mensaje..."
+      value={nuevoMensaje}
+      onChange={(e) => setNuevoMensaje(e.target.value)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          enviarMensaje();
+        }
+      }}
+      className="flex-1 h-10 bg-martina-bg border-martina-border"
+    />
+
+    <Button
+      onClick={enviarMensaje}
+      disabled={!nuevoMensaje.trim()}
+      className="bg-martina-text hover:bg-black text-white"
+    >
+      Enviar
+    </Button>
+  </div>
+
+  <div className="text-[11px] text-martina-muted mt-2">
+    Puedes enviar texto o adjuntar PDF, Word e imágenes.
+  </div>
+</div>
             </>
           )}
         </div>
@@ -635,23 +702,51 @@ const ConversacionesView = () => {
             </div>
 
             <div className="p-3 shrink-0 border-t border-cyan-500/10 bg-[#03161d]">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="Escribe un mensaje por WhatsApp..."
-                  value={nuevoMensaje}
-                  onChange={(e) => setNuevoMensaje(e.target.value)}
-                  className="flex-1 h-9 rounded-md text-xs bg-[#020f14] border border-cyan-500/20 px-3 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400"
-                />
-                <button 
-                  onClick={enviarMensaje}
-                  disabled={!nuevoMensaje.trim()}
-                  className="h-9 text-xs px-4 rounded-md font-bold bg-cyan-400 text-slate-900 disabled:opacity-40"
-                >
-                  Enviar
-                </button>
-              </div>
-            </div>
+  <div className="flex gap-2 items-center">
+    <input
+      ref={fileInputRef}
+      type="file"
+      className="hidden"
+      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+      onChange={(e) => {
+        const file = e.target.files?.[0];
+        if (file) enviarAdjunto(file);
+      }}
+    />
+
+    <button
+      type="button"
+      onClick={() => fileInputRef.current?.click()}
+      className="h-9 w-9 shrink-0 rounded-md border border-cyan-500/20 bg-[#020f14] text-cyan-300 flex items-center justify-center"
+      title="Adjuntar archivo"
+    >
+      <Paperclip className="w-4 h-4" />
+    </button>
+
+    <input
+      type="text"
+      placeholder="Escribe un mensaje..."
+      value={nuevoMensaje}
+      onChange={(e) => setNuevoMensaje(e.target.value)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          enviarMensaje();
+        }
+      }}
+      className="flex-1 h-9 rounded-md text-xs bg-[#020f14] border border-cyan-500/20 px-3 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400"
+    />
+
+    <button 
+      onClick={enviarMensaje}
+      disabled={!nuevoMensaje.trim()}
+      className="h-9 w-9 shrink-0 rounded-md bg-cyan-400 text-slate-900 disabled:opacity-40 flex items-center justify-center"
+      title="Enviar"
+    >
+      <Send className="w-4 h-4" />
+    </button>
+  </div>
+</div>
 
             {/* Telón de fondo ordenado correctamente en el DOM */}
             {(mostrarListaMovil || mostrarFichaMovil) && (
