@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Save } from 'lucide-react';
+import { Search, Save, Menu, ChevronDown, X } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import {
   listConversaciones,
@@ -50,6 +50,10 @@ const ConversacionesView = () => {
   const [paciente, setPaciente] = useState<Patient | null>(null);
   const [notasPaciente, setNotasPaciente] = useState('');
 
+  // Estados elásticos de control para la UI móvil
+  const [mostrarListaMovil, setMostrarListaMovil] = useState(false);
+  const [mostrarFichaMovil, setMostrarFichaMovil] = useState(false);
+
   const selected = useMemo(
     () => convs.find(c => c.id === selectedId) || null,
     [convs, selectedId]
@@ -91,32 +95,32 @@ const ConversacionesView = () => {
   }, []);
 
   useEffect(() => {
-  if (!selectedId) {
-    setMensajes([]);
-    setNotasConv('');
-    setPaciente(null);
-    setNotasPaciente('');
-    return;
-  }
+    if (!selectedId) {
+      setMensajes([]);
+      setNotasConv('');
+      setPaciente(null);
+      setNotasPaciente('');
+      return;
+    }
 
-  (async () => {
-    const ms = await listMensajesByConversation(selectedId);
-    setMensajes(ms);
-  })();
+    (async () => {
+      const ms = await listMensajesByConversation(selectedId);
+      setMensajes(ms);
+    })();
 
-  const conv = convs.find(c => c.id === selectedId);
-  setNotasConv(conv?.notas_internas || '');
+    const conv = convs.find(c => c.id === selectedId);
+    setNotasConv(conv?.notas_internas || '');
 
-  if (conv?.paciente_id) {
-    getPatientByPacienteId(conv.paciente_id).then(p => {
-      setPaciente(p);
-      setNotasPaciente(p?.notas_internas || '');
-    });
-  } else {
-    setPaciente(null);
-    setNotasPaciente('');
-  }
-}, [selectedId, convs]);
+    if (conv?.paciente_id) {
+      getPatientByPacienteId(conv.paciente_id).then(p => {
+        setPaciente(p);
+        setNotasPaciente(p?.notas_internas || '');
+      });
+    } else {
+      setPaciente(null);
+      setNotasPaciente('');
+    }
+  }, [selectedId, convs]);
 
   useEffect(() => {
     const supa = createClient();
@@ -200,46 +204,47 @@ const ConversacionesView = () => {
   };
 
   const saveNotasPaciente = async () => {
-  if (!paciente) return;
-
-  await updatePatientNotas(paciente.id, notasPaciente);
-  toast.success('Notas del paciente guardadas');
-};
+    if (!paciente) return;
+    await updatePatientNotas(paciente.id, notasPaciente);
+    toast.success('Notas del paciente guardadas');
+  };
 
   const enviarMensaje = async () => {
-  if (!selected || !nuevoMensaje.trim()) return;
+    if (!selected || !nuevoMensaje.trim()) return;
 
-  const telefono =
-    selected.telefono_e164 ||
-    selected.telefono ||
-    '';
+    const telefono =
+      selected.telefono_e164 ||
+      selected.telefono ||
+      '';
 
-  if (!telefono) {
-    toast.error('Esta conversación no tiene teléfono válido');
-    return;
-  }
+    if (!telefono) {
+      toast.error('Esta conversación no tiene teléfono válido');
+      return;
+    }
 
-  const texto = nuevoMensaje.trim();
+    const texto = nuevoMensaje.trim();
 
-  const resultado = await enviarMensajePanelWhatsapp({
-    conversationId: selected.id,
-    telefono,
-    mensaje: texto
-  });
+    const resultado = await enviarMensajePanelWhatsapp({
+      conversationId: selected.id,
+      telefono,
+      mensaje: texto
+    });
 
-  if (!resultado?.ok) {
-    toast.error(resultado?.error || 'No se ha podido enviar el WhatsApp');
-    return;
-  }
+    if (!resultado?.ok) {
+      toast.error(resultado?.error || 'No se ha podido enviar el WhatsApp');
+      return;
+    }
 
-  setNuevoMensaje('');
-  setMensajes(await listMensajesByConversation(selected.id));
-  toast.success('Mensaje enviado por WhatsApp');
-};
+    setNuevoMensaje('');
+    setMensajes(await listMensajesByConversation(selected.id));
+    toast.success('Mensaje enviado por WhatsApp');
+  };
 
-    return (
-    <div className="h-full min-h-0 w-full overflow-hidden">
-      <div className="flex min-w-[1180px] h-full min-h-0">
+  return (
+    <div className="h-full min-h-0 w-full overflow-hidden relative">
+      
+      {/* 💻 SECCIÓN DESKTOP */}
+      <div className="hidden md:flex min-w-[1180px] h-full min-h-0">
 
         <div className="w-[320px] h-full min-h-0 shrink-0 border-r border-martina-border bg-white flex flex-col">
           <div className="p-3 border-b border-martina-border space-y-3">
@@ -333,13 +338,13 @@ const ConversacionesView = () => {
             <>
               <div className="h-16 shrink-0 border-b border-martina-border bg-white px-5 flex items-center justify-between gap-4">
                 <div className="min-w-0">
-  <div className="font-medium truncate">
-  {selected.nombre_paciente || 'Sin nombre registrado'}
-</div>
-<div className="text-xs text-martina-muted">
-  {selected.telefono_e164 || 'Sin WhatsApp registrado'}
-</div>
-</div>
+                  <div className="font-medium truncate">
+                    {selected.nombre_paciente || 'Sin nombre registrado'}
+                  </div>
+                  <div className="text-xs text-martina-muted">
+                    {selected.telefono_e164 || 'Sin WhatsApp registrado'}
+                  </div>
+                </div>
 
                 <div className="flex items-center gap-2 shrink-0">
                   <Button size="sm" variant="outline" onClick={doTomar} className="border-martina-border">
@@ -357,21 +362,9 @@ const ConversacionesView = () => {
               <div className="flex-1 min-h-0 overflow-y-scroll px-6 py-5 space-y-2">
                 {mensajes.map(m => {
                   const msg = m as any;
-
-                  const isPaciente =
-                    msg.tipo_emisor === 'paciente' ||
-                    msg.direccion === 'entrante' ||
-                    msg.rol === 'paciente';
-
-                  const contenido =
-                    msg.contenido_texto ||
-                    msg.contenido ||
-                    '';
-
-                  const emisor =
-                    msg.tipo_emisor ||
-                    msg.rol ||
-                    '';
+                  const isPaciente = msg.tipo_emisor === 'paciente' || msg.direccion === 'entrante' || msg.rol === 'paciente';
+                  const contenido = msg.contenido_texto || msg.contenido || '';
+                  const emisor = msg.tipo_emisor || msg.rol || '';
 
                   return (
                     <div key={msg.id} className={cn('flex', isPaciente ? 'justify-start' : 'justify-end')}>
@@ -437,121 +430,374 @@ const ConversacionesView = () => {
               </div>
             </>
           )}
-</div>
-         <div className="hidden xl:block w-[320px] h-full min-h-0 shrink-0 border-l border-martina-border bg-white overflow-y-auto">
-  {!selected ? null : (
-    <div className="p-5 space-y-5">
-      <div className="flex items-center gap-3">
-        <div className="w-14 h-14 rounded-full bg-martina-beige border border-martina-border flex items-center justify-center text-lg font-semibold text-martina-text">
-          {(paciente?.nombre_completo || selected.nombre_paciente || '?')
-            .split(' ')
-            .map(s => s[0])
-            .slice(0, 2)
-            .join('')}
         </div>
 
-        <div className="min-w-0">
-          <div className="font-semibold truncate text-martina-text">
-            {paciente?.nombre_completo || selected.nombre_paciente || 'Sin nombre registrado'}
-          </div>
+        <div className="hidden xl:block w-[320px] h-full min-h-0 shrink-0 border-l border-martina-border bg-white overflow-y-auto">
+          {!selected ? null : (
+            <div className="p-5 space-y-5">
+              <div className="flex items-center gap-3">
+                <div className="w-14 h-14 rounded-full bg-martina-beige border border-martina-border flex items-center justify-center text-lg font-semibold text-martina-text">
+                  {(paciente?.nombre_completo || selected.nombre_paciente || '?')
+                    .split(' ')
+                    .map(s => s[0])
+                    .slice(0, 2)
+                    .join('')}
+                </div>
 
-          <div className="text-xs text-martina-muted">
-            {paciente?.telefono || selected.telefono_e164 || selected.telefono || 'Sin teléfono registrado'}
-          </div>
+                <div className="min-w-0">
+                  <div className="font-semibold truncate text-martina-text">
+                    {paciente?.nombre_completo || selected.nombre_paciente || 'Sin nombre registrado'}
+                  </div>
+
+                  <div className="text-xs text-martina-muted">
+                    {paciente?.telefono || selected.telefono_e164 || selected.telefono || 'Sin teléfono registrado'}
+                  </div>
+                </div>
+              </div>
+
+              {paciente?.alerta_urgencia && (
+                <div className="text-xs px-3 py-2 rounded-xl bg-red-50 text-red-700 border border-red-200">
+                  Posible urgencia
+                </div>
+              )}
+
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <div className="text-martina-muted mb-1">Última cita</div>
+                  <div className="font-medium text-martina-text">
+                    {formatDate(paciente?.ultima_cita_fecha)}
+                  </div>
+                  <div className="text-martina-muted">
+                    {paciente?.ultima_cita_motivo || '—'}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-martina-muted mb-1">Próxima cita</div>
+                  <div className="font-medium text-martina-text">
+                    {formatDate(paciente?.proxima_cita_fecha)}
+                  </div>
+                  <div className="text-martina-muted">
+                    {paciente?.proxima_cita_motivo || '—'}
+                  </div>
+                </div>
+              </div>
+
+              {paciente?.etiquetas && paciente.etiquetas.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {paciente.etiquetas.map(t => (
+                    <span
+                      key={t}
+                      className="text-[10px] px-2.5 py-1 rounded-full bg-martina-beige text-martina-text border border-martina-border"
+                    >
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <div className="text-xs font-medium text-martina-muted uppercase tracking-wide">
+                  Notas del paciente
+                </div>
+
+                <Textarea
+                  value={notasPaciente}
+                  onChange={e => setNotasPaciente(e.target.value)}
+                  rows={4}
+                  className="text-sm bg-martina-bg border-martina-border"
+                  placeholder="Añade notas…"
+                />
+
+                <Button
+                  size="sm"
+                  onClick={saveNotasPaciente}
+                  className="w-full bg-martina-text hover:bg-black text-white"
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  Guardar notas paciente
+                </Button>
+              </div>
+
+              <div className="space-y-2 pt-4 border-t border-martina-border">
+                <div className="text-xs font-medium text-martina-muted uppercase tracking-wide">
+                  Notas de esta conversación
+                </div>
+
+                <Textarea
+                  value={notasConv}
+                  onChange={e => setNotasConv(e.target.value)}
+                  rows={3}
+                  className="text-sm bg-martina-bg border-martina-border"
+                  placeholder="Recado, contexto…"
+                />
+
+                <Button
+                  size="sm"
+                  onClick={saveNotasConv}
+                  className="w-full bg-martina-text hover:bg-black text-white"
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  Guardar recado
+                </Button>
+              </div>
+            </div>
+          )} 
         </div>
       </div>
 
-      {paciente?.alerta_urgencia && (
-        <div className="text-xs px-3 py-2 rounded-xl bg-red-50 text-red-700 border border-red-200">
-          Posible urgencia
-        </div>
-      )}
 
-      <div className="grid grid-cols-2 gap-3 text-xs">
-        <div>
-          <div className="text-martina-muted mb-1">Última cita</div>
-          <div className="font-medium text-martina-text">
-            {formatDate(paciente?.ultima_cita_fecha)}
+      {/* 📱 SECCIÓN MÓVIL CORRECTA (h-[calc(100dvh-180px)] aplicada con éxito) */}
+      <div className="flex md:hidden flex-col h-[calc(100dvh-180px)] w-full bg-[#020f14] min-h-0 relative">
+        {!selected ? (
+          <div className="flex-1 flex items-center justify-center text-cyan-400 text-xs p-4 text-center">
+            Abre el menú superior para cargar una conversación activa.
           </div>
-          <div className="text-martina-muted">
-            {paciente?.ultima_cita_motivo || '—'}
-          </div>
-        </div>
+        ) : (
+          <>
+            <div className="h-14 shrink-0 border-b border-cyan-500/10 bg-[#03161d] px-2 flex items-center justify-between gap-1">
+              <div className="flex items-center gap-1 min-w-0 flex-1">
+                <button 
+                  onClick={() => setMostrarListaMovil(!mostrarListaMovil)}
+                  className="p-1.5 rounded-lg text-cyan-400 hover:bg-[#020f14] shrink-0"
+                >
+                  <Menu className="w-5 h-5" />
+                </button>
+                
+                <button 
+                  onClick={() => setMostrarFichaMovil(!mostrarFichaMovil)}
+                  className="flex items-center gap-0.5 text-left min-w-0"
+                >
+                  <div className="min-w-0">
+                    <div className="font-semibold text-xs text-white truncate">
+                      {selected.nombre_paciente || 'Sin nombre'}
+                    </div>
+                    <div className="text-[9px] text-cyan-400/70 truncate">
+                      {selected.telefono_e164 || 'Sin número'}
+                    </div>
+                  </div>
+                  <ChevronDown className={cn("w-3.5 h-3.5 text-cyan-400 shrink-0 transition-transform duration-300", mostrarFichaMovil && "rotate-180")} />
+                </button>
+              </div>
 
-        <div>
-          <div className="text-martina-muted mb-1">Próxima cita</div>
-          <div className="font-medium text-martina-text">
-            {formatDate(paciente?.proxima_cita_fecha)}
-          </div>
-          <div className="text-martina-muted">
-            {paciente?.proxima_cita_motivo || '—'}
-          </div>
-        </div>
-      </div>
+              <div className="flex items-center gap-1 shrink-0">
+                <button 
+                  onClick={doTomar}
+                  className="h-7 text-[10px] px-2 font-medium rounded-md border border-cyan-500/20 text-cyan-400 bg-transparent"
+                >
+                  Tomar
+                </button>
+                <button 
+                  onClick={doDevolver}
+                  className="h-7 text-[10px] px-2 font-medium rounded-md bg-cyan-950/60 border border-cyan-400/30 text-cyan-300"
+                >
+                  Martina
+                </button>
+                <button 
+                  onClick={doCerrar}
+                  className="h-7 text-[10px] px-2 font-bold rounded-md bg-cyan-400 text-slate-900"
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
 
-      {paciente?.etiquetas && paciente.etiquetas.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {paciente.etiquetas.map(t => (
-            <span
-              key={t}
-              className="text-[10px] px-2.5 py-1 rounded-full bg-martina-beige text-martina-text border border-martina-border"
+            <div className="flex-1 min-h-0 overflow-y-auto px-4 py-3 space-y-2.5 bg-[#020f14]/40">
+              {mensajes.map(m => {
+                const msg = m as any;
+                const isPaciente = msg.tipo_emisor === 'paciente' || msg.direccion === 'entrante' || msg.rol === 'paciente';
+                const contenido = msg.contenido_texto || msg.contenido || '';
+                const emisor = msg.tipo_emisor || msg.rol || '';
+
+                return (
+                  <div key={msg.id} className={cn('flex w-full', isPaciente ? 'justify-start' : 'justify-end')}>
+                    <div 
+                      className={cn(
+                        'max-w-[85%] rounded-xl px-3 py-2 text-xs shadow-md break-words',
+                        isPaciente 
+                          ? 'bg-[#03161d] border border-cyan-500/10 text-slate-200 rounded-bl-none' 
+                          : 'bg-cyan-950/40 border border-cyan-400/20 text-cyan-100 rounded-br-none'
+                      )}
+                    >
+                      <div className="whitespace-pre-wrap">{contenido}</div>
+                      <div className="text-[9px] opacity-60 mt-1 text-right">
+                        {!isPaciente && emisor && <span className="mr-1.5 uppercase font-bold">{emisor}</span>}
+                        {formatTime(msg.created_at)}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {mensajes.length === 0 && (
+                <div className="text-center text-xs text-slate-500 py-6">Sin mensajes históricos</div>
+              )}
+            </div>
+
+            <div className="p-3 shrink-0 border-t border-cyan-500/10 bg-[#03161d]">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Escribe un mensaje por WhatsApp..."
+                  value={nuevoMensaje}
+                  onChange={(e) => setNuevoMensaje(e.target.value)}
+                  className="flex-1 h-9 rounded-md text-xs bg-[#020f14] border border-cyan-500/20 px-3 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400"
+                />
+                <button 
+                  onClick={enviarMensaje}
+                  disabled={!nuevoMensaje.trim()}
+                  className="h-9 text-xs px-4 rounded-md font-bold bg-cyan-400 text-slate-900 disabled:opacity-40"
+                >
+                  Enviar
+                </button>
+              </div>
+            </div>
+
+            {/* Telón de fondo ordenado correctamente en el DOM */}
+            {(mostrarListaMovil || mostrarFichaMovil) && (
+              <div 
+                onClick={() => { setMostrarListaMovil(false); setMostrarFichaMovil(false); }} 
+                className="absolute inset-0 bg-black/60 backdrop-blur-xs z-20 pointer-events-auto" 
+              />
+            )}
+
+            {/* Desplegable lateral izquierdo (Lista de chats) */}
+            <div 
+              className={cn(
+                "absolute inset-y-0 left-0 z-30 w-[290px] bg-[#03161d] border-r border-cyan-500/10 flex flex-col transition-transform duration-300 ease-out",
+                mostrarListaMovil ? "translate-x-0" : "-translate-x-full"
+              )}
             >
-              {t}
-            </span>
-          ))}
-        </div>
-      )}
+              <div className="p-3 border-b border-cyan-500/10 flex items-center justify-between bg-[#020f14]">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-cyan-400">Conversaciones</span>
+                <button onClick={() => setMostrarListaMovil(false)} className="p-1 text-slate-400 hover:text-white"><X className="w-4 h-4" /></button>
+              </div>
+              
+              <div className="p-3 border-b border-cyan-500/10 space-y-2.5">
+                <div className="relative">
+                  <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400/60" />
+                  <input
+                    placeholder="Buscar paciente..."
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    className="w-full pl-8 h-8 rounded-md bg-[#020f14] border border-cyan-500/20 text-xs text-white placeholder-slate-500"
+                  />
+                </div>
+                <div className="flex flex-wrap gap-1">
+                  {filtros.map(f => (
+                    <button
+                      key={f.key}
+                      onClick={() => setFilter(f.key)}
+                      className={cn(
+                        'text-[10px] px-2.5 py-1 rounded-full border transition-colors',
+                        filter === f.key
+                          ? 'bg-cyan-400 text-slate-900 border-cyan-400 font-medium'
+                          : 'bg-transparent text-slate-400 border-cyan-500/10'
+                      )}
+                    >
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-      <div className="space-y-2">
-        <div className="text-xs font-medium text-martina-muted uppercase tracking-wide">
-          Notas del paciente
-        </div>
+              <div className="flex-1 overflow-y-auto divide-y divide-cyan-500/5">
+                {filtered.map(c => {
+                  const lbl = c.estado_visual ? conversacionLabel[c.estado_visual] : null;
+                  return (
+                    <button
+                      key={c.id}
+                      onClick={() => {
+                        setSelectedId(c.id);
+                        setMostrarListaMovil(false);
+                      }}
+                      className={cn(
+                        'w-full text-left px-3.5 py-3 transition-colors',
+                        c.id === selectedId ? 'bg-[#020f14]/80 border-l-2 border-cyan-400' : ''
+                      )}
+                    >
+                      <div className="flex items-start justify-between gap-1.5">
+                        <div className="min-w-0 flex-1">
+                          <div className="text-xs font-medium text-slate-200 truncate">{c.nombre_paciente || 'Sin nombre'}</div>
+                          <div className="text-[10px] text-slate-500 truncate mt-0.5">{c.motivo || c.telefono_e164}</div>
+                        </div>
+                        <div className="text-[9px] text-slate-500 shrink-0">{formatRelativeOrTime(lastActivity(c))}</div>
+                      </div>
+                      {lbl && (
+                        <div className="mt-1 flex text-[9px] text-cyan-300 bg-cyan-950/50 border border-cyan-500/10 px-2 py-0.5 rounded-full w-max">
+                          <span className="mr-1">{lbl.emoji}</span>{lbl.label}
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
 
-        <Textarea
-          value={notasPaciente}
-          onChange={e => setNotasPaciente(e.target.value)}
-          rows={4}
-          className="text-sm bg-martina-bg border-martina-border"
-          placeholder="Añade notas…"
-        />
+            {/* Desplegable superior (Ficha del Paciente) */}
+            <div 
+              className={cn(
+                "absolute inset-x-0 top-14 z-30 bg-[#03161d] border-b border-cyan-500/10 rounded-b-2xl shadow-2xl overflow-y-auto transition-all duration-300 ease-out origin-top",
+                mostrarFichaMovil ? "scale-y-100 opacity-100 visible max-h-[75vh]" : "scale-y-0 opacity-0 invisible max-h-0"
+              )}
+            >
+              <div className="p-4 space-y-4 text-xs text-slate-300">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-full bg-cyan-950/50 border border-cyan-500/20 flex items-center justify-center text-sm font-bold text-cyan-400 shrink-0">
+                    {(paciente?.nombre_completo || selected.nombre_paciente || '?').split(' ').map(s => s[0]).slice(0, 2).join('')}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="font-semibold text-white truncate">{paciente?.nombre_completo || selected.nombre_paciente || 'Sin nombre'}</div>
+                    <div className="text-[10px] text-slate-500">{paciente?.telefono || selected.telefono_e164 || 'Sin teléfono'}</div>
+                  </div>
+                </div>
 
-        <Button
-          size="sm"
-          onClick={saveNotasPaciente}
-          className="w-full bg-martina-text hover:bg-black text-white"
-        >
-          <Save className="w-4 h-4 mr-2" />
-          Guardar notas paciente
-        </Button>
+                <div className="grid grid-cols-2 gap-2.5 bg-[#020f14]/50 p-2.5 rounded-xl border border-cyan-500/5">
+                  <div>
+                    <div className="text-slate-500 text-[10px] mb-0.5">Última cita</div>
+                    <div className="font-medium text-slate-300">{formatDate(paciente?.ultima_cita_fecha)}</div>
+                    <div className="text-slate-500 text-[10px] truncate">{paciente?.ultima_cita_motivo || '—'}</div>
+                  </div>
+                  <div>
+                    <div className="text-slate-500 text-[10px] mb-0.5">Próxima cita</div>
+                    <div className="font-medium text-slate-300">{formatDate(paciente?.proxima_cita_fecha)}</div>
+                    <div className="text-slate-500 text-[10px] truncate">{paciente?.proxima_cita_motivo || '—'}</div>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">Notas del paciente</label>
+                  <textarea
+                    value={notasPaciente}
+                    onChange={e => setNotasPaciente(e.target.value)}
+                    rows={3}
+                    className="w-full text-xs rounded-md bg-[#020f14] border border-cyan-500/10 p-2 text-white focus:outline-none"
+                    placeholder="Modificar notas..."
+                  />
+                  <button onClick={saveNotasPaciente} className="w-full h-8 text-xs font-semibold rounded-md bg-[#020f14] border border-cyan-400/30 text-cyan-400 flex items-center justify-center gap-1.5">
+                    <Save className="w-3.5 h-3.5" /> Guardar notas paciente
+                  </button>
+                </div>
+
+                <div className="space-y-1.5 pt-3 border-t border-cyan-500/5">
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">Notas de esta conversación</label>
+                  <textarea
+                    value={notasConv}
+                    onChange={e => setNotasConv(e.target.value)}
+                    rows={2}
+                    className="w-full text-xs rounded-md bg-[#020f14] border border-cyan-500/10 p-2 text-white focus:outline-none"
+                    placeholder="Contexto o recado rápido..."
+                  />
+                  <button onClick={saveNotasConv} className="w-full h-8 text-xs font-semibold rounded-md bg-[#020f14] border border-cyan-400/30 text-cyan-400 flex items-center justify-center gap-1.5">
+                    <Save className="w-3.5 h-3.5" /> Guardar recado
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
-      <div className="space-y-2 pt-4 border-t border-martina-border">
-        <div className="text-xs font-medium text-martina-muted uppercase tracking-wide">
-          Notas de esta conversación
-        </div>
-
-        <Textarea
-          value={notasConv}
-          onChange={e => setNotasConv(e.target.value)}
-          rows={3}
-          className="text-sm bg-martina-bg border-martina-border"
-          placeholder="Recado, contexto…"
-        />
-
-        <Button
-          size="sm"
-          onClick={saveNotasConv}
-          className="w-full bg-martina-text hover:bg-black text-white"
-        >
-          <Save className="w-4 h-4 mr-2" />
-          Guardar recado
-        </Button>
-      </div>
-    </div>
-  )} 
-        </div>
-
-      </div>
     </div>
   );
 };
