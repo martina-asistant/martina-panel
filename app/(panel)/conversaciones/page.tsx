@@ -14,7 +14,7 @@ import {
 } from '@/lib/repos/conversaciones.repo';
 import {
   listMensajesByConversation,
-  crearMensajeSaliente
+  enviarMensajePanelWhatsapp
 } from '@/lib/repos/mensajes.repo';
 import { getPatientByPacienteId, updatePatientNotas } from '@/lib/repos/patients.repo';
 import type {
@@ -234,22 +234,25 @@ const ConversacionesView = () => {
 };
 
   const enviarMensaje = async () => {
-    if (!selected || !nuevoMensaje.trim()) return;
+  if (!selected || !nuevoMensaje.trim()) return;
 
-    const creado = await crearMensajeSaliente(
-      selected.id,
-      nuevoMensaje.trim()
-    );
+  const texto = nuevoMensaje.trim();
 
-    if (!creado) {
-      toast.error('No se ha podido guardar el mensaje');
-      return;
-    }
+  const res = await enviarMensajePanelWhatsapp({
+    conversationId: selected.id,
+    telefono: selected.telefono_e164 || selected.telefono || '',
+    mensaje: texto
+  });
 
-    setNuevoMensaje('');
-    setMensajes(await listMensajesByConversation(selected.id));
-    toast.success('Mensaje guardado');
-  };
+  if (!res.ok) {
+    toast.error(res.error || 'No se ha podido enviar el mensaje');
+    return;
+  }
+
+  setNuevoMensaje('');
+  setMensajes(await listMensajesByConversation(selected.id));
+  toast.success('Mensaje enviado');
+};
 
   return (
     <div className="h-full flex bg-[#02141B] text-white overflow-hidden">
