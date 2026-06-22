@@ -25,7 +25,10 @@ export async function listMensajesByConversation(conversationId: string): Promis
   return (data || []) as MensajeWhatsapp[];
 }
 
-export async function crearMensajeSaliente(conversationId: string, contenido: string): Promise<MensajeWhatsapp | null> {
+export async function crearMensajeSaliente(
+  conversationId: string,
+  contenido: string
+): Promise<MensajeWhatsapp | null> {
   const supa = createBrowserSupa();
 
   const nuevo = {
@@ -75,11 +78,7 @@ export async function enviarMensajePanelWhatsapp({
     ? telefonoLimpio
     : `34${telefonoLimpio}`;
 
-  const url =
-    process.env.NEXT_PUBLIC_N8N_WHATSAPP_PANEL_SALIENTE_URL ||
-    'https://sheilacg.app.n8n.cloud/webhook/whatsapp-panel-saliente';
-
-  const res = await fetch(url, {
+  const res = await fetch('/api/whatsapp-panel-saliente', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -101,5 +100,5 @@ export async function enviarMensajePanelWhatsapp({
     };
   }
 
-  return data;
+  return data || { ok: true, message: 'Mensaje enviado' };
 }
