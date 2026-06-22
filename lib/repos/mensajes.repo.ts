@@ -102,3 +102,40 @@ export async function enviarMensajePanelWhatsapp({
 
   return data || { ok: true, message: 'Mensaje enviado' };
 }
+
+export async function enviarAdjuntoPanelWhatsapp({
+  conversationId,
+  telefono,
+  file
+}: {
+  conversationId: string;
+  telefono: string;
+  file: File;
+}): Promise<{ ok: boolean; error?: string; message?: string }> {
+  const telefonoLimpio = String(telefono || '').replace(/\D/g, '');
+  const telefonoE164 = telefonoLimpio.startsWith('34')
+    ? telefonoLimpio
+    : `34${telefonoLimpio}`;
+
+  const formData = new FormData();
+  formData.append('conversation_id', conversationId);
+  formData.append('telefono', telefonoE164);
+  formData.append('emisor', 'recepcion');
+  formData.append('file', file);
+
+  const res = await fetch('/api/whatsapp-panel-adjuntos', {
+    method: 'POST',
+    body: formData
+  });
+
+  const data = await res.json().catch(() => null);
+
+  if (!res.ok) {
+    return {
+      ok: false,
+      error: data?.error || 'Error enviando adjunto'
+    };
+  }
+
+  return data || { ok: true, message: 'Adjunto enviado' };
+}
