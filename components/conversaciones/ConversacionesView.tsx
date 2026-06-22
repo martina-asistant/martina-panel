@@ -211,19 +211,6 @@ const ConversacionesView = () => {
     toast.success('Notas del paciente guardadas');
   };
 
-  const enviarMensaje = async () => {
-    if (!selected || !nuevoMensaje.trim()) return;
-
-    const telefono =
-      selected.telefono_e164 ||
-      selected.telefono ||
-      '';
-
-    if (!telefono) {
-      toast.error('Esta conversación no tiene teléfono válido');
-      return;
-    }
-
     const enviarMensaje = async () => {
   if (!selected || !nuevoMensaje.trim()) return;
 
