@@ -342,7 +342,7 @@ return (
             Conversaciones
           </h2>
 
-          <div className="grid lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-[repeat(5,240px)] gap-4">
             <Metric icon={MessageCircle} label="Nuevas" value={nuevas} href="/conversaciones" />
             <Metric icon={LoaderCircle} label="Martina" value={enCurso} href="/conversaciones" />
             <Metric icon={Building2} label="Recepción" value={recepcion} href="/conversaciones" />
