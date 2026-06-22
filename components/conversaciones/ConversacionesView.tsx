@@ -447,14 +447,24 @@ const enviarAdjunto = async (file: File) => {
       }}
     />
 
-    <button
-      type="button"
-      onClick={() => fileInputRef.current?.click()}
-      className="h-10 w-10 shrink-0 rounded-xl border border-martina-border bg-martina-bg flex items-center justify-center text-martina-text hover:bg-martina-beige transition-colors"
-      title="Adjuntar archivo"
-    >
-      <Paperclip className="w-4 h-4" />
-    </button>
+    <input
+  ref={fileInputRef}
+  type="file"
+  className="hidden"
+  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+  onChange={(e) => {
+    const file = e.target.files?.[0];
+    if (file) enviarAdjunto(file);
+  }}
+/>
+
+<button
+  type="button"
+  onClick={() => fileInputRef.current?.click()}
+  className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] hover:scale-[1.03] shadow-[0_0_20px_rgba(14,124,139,.35)] text-white flex items-center justify-center transition-all"
+>
+  <Paperclip className="w-4 h-4" />
+</button>
 
     <Input
       placeholder="Escribe un mensaje..."
