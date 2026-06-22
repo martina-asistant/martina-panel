@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, Paperclip, Send, Save } from 'lucide-react';
@@ -14,7 +14,8 @@ import {
 } from '@/lib/repos/conversaciones.repo';
 import {
   listMensajesByConversation,
-  enviarMensajePanelWhatsapp
+  enviarMensajePanelWhatsapp,
+  enviarAdjuntoPanelWhatsapp
 } from '@/lib/repos/mensajes.repo';
 import { getPatientByPacienteId, updatePatientNotas } from '@/lib/repos/patients.repo';
 import type {
@@ -67,6 +68,7 @@ const ConversacionesView = () => {
   const [notasConv, setNotasConv] = useState('');
   const [nuevoMensaje, setNuevoMensaje] = useState('');
   const [userEmail, setUserEmail] = useState<string>('demo@martina.local');
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const selected = useMemo(
     () => convs.find(c => c.id === selectedId) || null,
@@ -252,6 +254,35 @@ const ConversacionesView = () => {
   setNuevoMensaje('');
   setMensajes(await listMensajesByConversation(selected.id));
   toast.success('Mensaje enviado');
+};
+
+  const enviarAdjunto = async (file: File) => {
+  if (!selected || !file) return;
+
+  const telefono = selected.telefono_e164 || selected.telefono || '';
+
+  if (!telefono) {
+    toast.error('Esta conversación no tiene teléfono válido');
+    return;
+  }
+
+  const res = await enviarAdjuntoPanelWhatsapp({
+    conversationId: selected.id,
+    telefono,
+    file
+  });
+
+  if (!res.ok) {
+    toast.error(res.error || 'No se ha podido enviar el adjunto');
+    return;
+  }
+
+  if (fileInputRef.current) {
+    fileInputRef.current.value = '';
+  }
+
+  setMensajes(await listMensajesByConversation(selected.id));
+  toast.success('Adjunto enviado');
 };
 
   return (
@@ -478,12 +509,24 @@ const ConversacionesView = () => {
 
             <div className="px-6 py-4 border-t border-[#6FD7E2]/20 bg-[#F8FBFC] shadow-[0_-6px_20px_rgba(14,124,139,.08)] shrink-0">
               <div className="flex items-center gap-3 rounded-2xl border border-[#6FD7E2]/35 bg-[linear-gradient(180deg,#0F2C35_0%,#163C46_100%)] p-3 shadow-[0_-10px_35px_rgba(34,211,238,.14),0_14px_30px_rgba(34,211,238,.10),inset_0_1px_0_rgba(255,255,255,.05)]">
-                <button
-                  type="button"
-                  className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] hover:scale-[1.03] shadow-[0_0_20px_rgba(14,124,139,.35)] text-white flex items-center justify-center transition-all"
-                >
-                  <Paperclip className="w-4 h-4" />
-                </button>
+                <input
+  ref={fileInputRef}
+  type="file"
+  className="hidden"
+  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+  onChange={(e) => {
+    const file = e.target.files?.[0];
+    if (file) enviarAdjunto(file);
+  }}
+/>
+
+<button
+  type="button"
+  onClick={() => fileInputRef.current?.click()}
+  className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] hover:scale-[1.03] shadow-[0_0_20px_rgba(14,124,139,.35)] text-white flex items-center justify-center transition-all"
+>
+  <Paperclip className="w-4 h-4" />
+</button>
 
                 <Input
                   placeholder="Escribe un mensaje..."
