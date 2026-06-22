@@ -16,9 +16,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const n8nUrl =
-      process.env.NEXT_PUBLIC_N8N_WHATSAPP_PANEL_ADJUNTOS_URL ||
-      'https://sheilacg.app.n8n.cloud/webhook/martina-panel-adjuntos';
+    const n8nUrl = process.env.N8N_WHATSAPP_PANEL_ADJUNTOS_URL;
+
+if (!n8nUrl) {
+  return NextResponse.json(
+    { ok: false, error: 'Falta configurar N8N_WHATSAPP_PANEL_ADJUNTOS_URL' },
+    { status: 500 }
+  );
+}
 
     const payload = new FormData();
     payload.append('conversation_id', conversationId);
