@@ -456,183 +456,11 @@ const ConversacionesView = () => {
     mediaRecorderRef.current.stop();
   };
 
-  const renderAudioComposer = (isMobile = false) => {
-    const baseButton =
-      isMobile
-        ? 'h-9 w-9 shrink-0 rounded-md flex items-center justify-center'
-        : 'h-10 w-10 shrink-0 rounded-xl flex items-center justify-center';
-
-    const inputClass =
-      isMobile
-        ? 'flex-1 h-9 rounded-md text-xs bg-[#020f14] border border-cyan-500/20 px-3 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 disabled:opacity-60'
-        : 'flex-1 h-10 bg-martina-bg border-martina-border';
-
-    const previewWrapper =
-      isMobile
-        ? 'flex-1 h-9 rounded-md bg-[#020f14] border border-cyan-500/20 px-2 flex items-center gap-2 min-w-0'
-        : 'flex-1 h-10 rounded-xl bg-martina-bg border border-martina-border px-2 flex items-center gap-2 min-w-0';
-
-    return (
-      <div className="flex gap-2 items-center">
-        <input
-          ref={fileInputRef}
-          type="file"
-          className="hidden"
-          accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) enviarAdjunto(file);
-          }}
-        />
-
-        <button
-          type="button"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={grabandoAudio || enviandoAudio}
-          className={cn(
-            baseButton,
-            isMobile
-              ? 'border border-cyan-500/20 bg-[#020f14] text-cyan-300 disabled:opacity-40'
-              : 'border border-martina-border bg-martina-bg text-martina-text hover:bg-martina-beige transition-colors disabled:opacity-40'
-          )}
-          title="Adjuntar archivo"
-        >
-          <Paperclip className="w-4 h-4" />
-        </button>
-
-        {audioPreviewUrl ? (
-          <div className={previewWrapper}>
-            <audio
-              ref={audioPreviewRef}
-              src={audioPreviewUrl}
-              onEnded={() => setReproduciendoPreview(false)}
-              className="hidden"
-            />
-
-            <button
-              type="button"
-              onClick={limpiarPreviewAudio}
-              disabled={enviandoAudio}
-              className={cn(
-                baseButton,
-                isMobile
-                  ? 'h-7 w-7 rounded-md text-red-400 hover:bg-red-500/10 disabled:opacity-40'
-                  : 'h-8 w-8 rounded-lg text-red-500 hover:bg-red-50 disabled:opacity-40'
-              )}
-              title="Borrar audio"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
-
-            <button
-              type="button"
-              onClick={togglePreviewAudio}
-              disabled={enviandoAudio}
-              className={cn(
-                baseButton,
-                isMobile
-                  ? 'h-7 w-7 rounded-md text-cyan-300 hover:bg-cyan-500/10 disabled:opacity-40'
-                  : 'h-8 w-8 rounded-lg text-martina-text hover:bg-martina-beige disabled:opacity-40'
-              )}
-              title={reproduciendoPreview ? 'Pausar audio' : 'Escuchar audio'}
-            >
-              {reproduciendoPreview ? (
-                <Pause className="w-4 h-4" />
-              ) : (
-                <Play className="w-4 h-4" />
-              )}
-            </button>
-
-            <div
-              className={cn(
-                'min-w-0 flex-1 truncate',
-                isMobile ? 'text-[11px] text-cyan-100' : 'text-sm text-martina-text'
-              )}
-            >
-              Audio listo para enviar
-            </div>
-
-            <button
-              type="button"
-              onClick={enviarAudioPreview}
-              disabled={enviandoAudio}
-              className={cn(
-                baseButton,
-                isMobile
-                  ? 'h-7 w-7 rounded-md bg-cyan-400 text-slate-900 disabled:opacity-40'
-                  : 'h-8 w-8 rounded-lg bg-martina-text text-white hover:bg-black disabled:opacity-40'
-              )}
-              title="Enviar audio"
-            >
-              <Send className="w-4 h-4" />
-            </button>
-          </div>
-        ) : (
-          <>
-            <Input
-              placeholder={grabandoAudio ? 'Grabando audio…' : 'Escribe un mensaje...'}
-              value={nuevoMensaje}
-              onChange={(e) => setNuevoMensaje(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  if (!grabandoAudio) enviarMensaje();
-                }
-              }}
-              disabled={grabandoAudio}
-              className={inputClass}
-            />
-
-            <button
-              type="button"
-              onClick={enviarMensaje}
-              disabled={!nuevoMensaje.trim() || grabandoAudio}
-              className={cn(
-                baseButton,
-                isMobile
-                  ? 'bg-cyan-400 text-slate-900 disabled:opacity-40'
-                  : 'bg-martina-text hover:bg-black text-white disabled:opacity-40'
-              )}
-              title="Enviar"
-            >
-              <Send className="w-4 h-4" />
-            </button>
-          </>
-        )}
-
-        {!audioPreviewUrl && (
-          <button
-            type="button"
-            onClick={grabandoAudio ? pararGrabacionAudio : iniciarGrabacionAudio}
-            disabled={enviandoAudio}
-            className={cn(
-              baseButton,
-              isMobile
-                ? grabandoAudio
-                  ? 'bg-red-500 text-white'
-                  : 'border border-cyan-500/20 bg-[#020f14] text-cyan-300'
-                : grabandoAudio
-                  ? 'border border-red-300 bg-red-50 text-red-600'
-                  : 'border border-martina-border bg-martina-bg text-martina-text hover:bg-martina-beige transition-colors'
-            )}
-            title={grabandoAudio ? 'Parar grabación' : 'Grabar audio'}
-          >
-            {grabandoAudio ? (
-              <Square className="w-4 h-4" />
-            ) : (
-              <Mic className="w-4 h-4" />
-            )}
-          </button>
-        )}
-      </div>
-    );
-  };
-
   return (
     <div className="h-full min-h-0 w-full overflow-hidden relative">
-      {/* DESKTOP */}
+      {/* 💻 SECCIÓN DESKTOP */}
       <div className="hidden md:flex min-w-[1180px] h-full min-h-0">
-        {/* Sidebar conversaciones */}
+        {/* Sidebar */}
         <div className="w-[320px] h-full min-h-0 shrink-0 border-r border-martina-border bg-white flex flex-col">
           <div className="p-3 border-b border-martina-border space-y-3">
             <div className="relative">
@@ -716,7 +544,7 @@ const ConversacionesView = () => {
           </div>
         </div>
 
-        {/* Chat */}
+        {/* Chat central */}
         <div className="flex-[1_1_700px] min-w-[700px] flex flex-col bg-martina-bg min-h-0">
           {!selected ? (
             <div className="flex-1 flex items-center justify-center text-martina-muted text-sm">
@@ -792,19 +620,128 @@ const ConversacionesView = () => {
                 )}
               </div>
 
+              {/* Composer desktop Martina + audio preview */}
               <div className="px-6 py-3 shrink-0 border-t border-martina-border bg-white">
-                {renderAudioComposer(false)}
+                <div className="flex gap-2 items-center">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    className="hidden"
+                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) enviarAdjunto(file);
+                    }}
+                  />
 
-                {!audioPreviewUrl && (
-                  <div className="text-[11px] text-martina-muted mt-2">
-                    Puedes enviar texto, adjuntar archivos o grabar audio.
-                  </div>
-                )}
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={grabandoAudio || enviandoAudio}
+                    className="h-10 w-10 shrink-0 rounded-xl border border-martina-border bg-martina-bg flex items-center justify-center text-martina-text hover:bg-martina-beige transition-colors disabled:opacity-40"
+                    title="Adjuntar archivo"
+                  >
+                    <Paperclip className="w-4 h-4" />
+                  </button>
+
+                  {audioPreviewUrl ? (
+                    <div className="flex-1 h-10 rounded-xl bg-martina-bg border border-martina-border px-2 flex items-center gap-2 min-w-0">
+                      <audio
+                        ref={audioPreviewRef}
+                        src={audioPreviewUrl}
+                        onEnded={() => setReproduciendoPreview(false)}
+                        className="hidden"
+                      />
+
+                      <button
+                        type="button"
+                        onClick={limpiarPreviewAudio}
+                        disabled={enviandoAudio}
+                        className="h-8 w-8 shrink-0 rounded-lg text-red-500 hover:bg-red-50 disabled:opacity-40 flex items-center justify-center"
+                        title="Borrar audio"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={togglePreviewAudio}
+                        disabled={enviandoAudio}
+                        className="h-8 w-8 shrink-0 rounded-lg text-martina-text hover:bg-martina-beige disabled:opacity-40 flex items-center justify-center"
+                        title={reproduciendoPreview ? 'Pausar audio' : 'Escuchar audio'}
+                      >
+                        {reproduciendoPreview ? (
+                          <Pause className="w-4 h-4" />
+                        ) : (
+                          <Play className="w-4 h-4" />
+                        )}
+                      </button>
+
+                      <div className="min-w-0 flex-1 truncate text-sm text-martina-text">
+                        Audio listo para enviar
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={enviarAudioPreview}
+                        disabled={enviandoAudio}
+                        className="h-8 w-8 shrink-0 rounded-lg bg-martina-text text-white hover:bg-black disabled:opacity-40 flex items-center justify-center"
+                        title="Enviar audio"
+                      >
+                        <Send className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <Input
+                        placeholder={grabandoAudio ? 'Grabando audio…' : 'Escribe un mensaje...'}
+                        value={nuevoMensaje}
+                        onChange={(e) => setNuevoMensaje(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            if (!grabandoAudio) enviarMensaje();
+                          }
+                        }}
+                        disabled={grabandoAudio}
+                        className="flex-1 h-10 bg-martina-bg border-martina-border"
+                      />
+
+                      <button
+                        type="button"
+                        onClick={enviarMensaje}
+                        disabled={!nuevoMensaje.trim() || grabandoAudio}
+                        className="h-10 w-10 shrink-0 rounded-xl bg-martina-text hover:bg-black text-white disabled:opacity-40 flex items-center justify-center"
+                        title="Enviar"
+                      >
+                        <Send className="w-4 h-4" />
+                      </button>
+                    </>
+                  )}
+
+                  {!audioPreviewUrl && (
+                    <button
+                      type="button"
+                      onClick={grabandoAudio ? pararGrabacionAudio : iniciarGrabacionAudio}
+                      disabled={enviandoAudio}
+                      className={cn(
+                        'h-10 w-10 shrink-0 rounded-xl border flex items-center justify-center transition-colors',
+                        grabandoAudio
+                          ? 'border-red-300 bg-red-50 text-red-600'
+                          : 'border-martina-border bg-martina-bg text-martina-text hover:bg-martina-beige'
+                      )}
+                      title={grabandoAudio ? 'Parar grabación' : 'Grabar audio'}
+                    >
+                      {grabandoAudio ? <Square className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                    </button>
+                  )}
+                </div>
               </div>
             </>
           )}
         </div>
-                {/* Ficha paciente desktop */}
+
+        {/* Ficha paciente desktop */}
         <div className="hidden xl:block w-[320px] h-full min-h-0 shrink-0 border-l border-martina-border bg-white overflow-y-auto">
           {!selected ? null : (
             <div className="p-5 space-y-5">
@@ -919,8 +856,8 @@ const ConversacionesView = () => {
         </div>
       </div>
 
-      {/* MÓVIL */}
-      <div className="flex md:hidden flex-col h-[calc(100dvh-180px)] w-full bg-[#020f14] min-h-0 relative">
+      {/* 📱 SECCIÓN MOBILE */}
+            <div className="flex md:hidden flex-col h-[calc(100dvh-180px)] w-full bg-[#020f14] min-h-0 relative">
         {!selected ? (
           <div className="flex-1 flex items-center justify-center text-cyan-400 text-xs p-4 text-center">
             Abre el menú superior para cargar una conversación activa.
@@ -1020,8 +957,122 @@ const ConversacionesView = () => {
               )}
             </div>
 
+            {/* Composer móvil con estilo actual + preview audio */}
             <div className="p-3 shrink-0 border-t border-cyan-500/10 bg-[#03161d]">
-              {renderAudioComposer(true)}
+              <div className="flex gap-2 items-center">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  className="hidden"
+                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) enviarAdjunto(file);
+                  }}
+                />
+
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={grabandoAudio || enviandoAudio}
+                  className="h-9 w-9 shrink-0 rounded-md border border-cyan-500/20 bg-[#020f14] text-cyan-300 disabled:opacity-40 flex items-center justify-center"
+                  title="Adjuntar archivo"
+                >
+                  <Paperclip className="w-4 h-4" />
+                </button>
+
+                {audioPreviewUrl ? (
+                  <div className="flex-1 h-9 rounded-md bg-[#020f14] border border-cyan-500/20 px-2 flex items-center gap-2 min-w-0">
+                    <audio
+                      ref={audioPreviewRef}
+                      src={audioPreviewUrl}
+                      onEnded={() => setReproduciendoPreview(false)}
+                      className="hidden"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={limpiarPreviewAudio}
+                      disabled={enviandoAudio}
+                      className="h-7 w-7 shrink-0 rounded-md text-red-400 hover:bg-red-500/10 disabled:opacity-40 flex items-center justify-center"
+                      title="Borrar audio"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={togglePreviewAudio}
+                      disabled={enviandoAudio}
+                      className="h-7 w-7 shrink-0 rounded-md text-cyan-300 hover:bg-cyan-500/10 disabled:opacity-40 flex items-center justify-center"
+                      title={reproduciendoPreview ? 'Pausar audio' : 'Escuchar audio'}
+                    >
+                      {reproduciendoPreview ? (
+                        <Pause className="w-4 h-4" />
+                      ) : (
+                        <Play className="w-4 h-4" />
+                      )}
+                    </button>
+
+                    <div className="min-w-0 flex-1 truncate text-[11px] text-cyan-100">
+                      Audio listo para enviar
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={enviarAudioPreview}
+                      disabled={enviandoAudio}
+                      className="h-7 w-7 shrink-0 rounded-md bg-cyan-400 text-slate-900 disabled:opacity-40 flex items-center justify-center"
+                      title="Enviar audio"
+                    >
+                      <Send className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <Input
+                      placeholder={grabandoAudio ? 'Grabando audio…' : 'Escribe un mensaje...'}
+                      value={nuevoMensaje}
+                      onChange={(e) => setNuevoMensaje(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          if (!grabandoAudio) enviarMensaje();
+                        }
+                      }}
+                      disabled={grabandoAudio}
+                      className="flex-1 h-9 rounded-md text-xs bg-[#020f14] border border-cyan-500/20 px-3 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 disabled:opacity-60"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={enviarMensaje}
+                      disabled={!nuevoMensaje.trim() || grabandoAudio}
+                      className="h-9 w-9 shrink-0 rounded-md bg-cyan-400 text-slate-900 disabled:opacity-40 flex items-center justify-center"
+                      title="Enviar"
+                    >
+                      <Send className="w-4 h-4" />
+                    </button>
+                  </>
+                )}
+
+                {!audioPreviewUrl && (
+                  <button
+                    type="button"
+                    onClick={grabandoAudio ? pararGrabacionAudio : iniciarGrabacionAudio}
+                    disabled={enviandoAudio}
+                    className={cn(
+                      'h-9 w-9 shrink-0 rounded-md flex items-center justify-center',
+                      grabandoAudio
+                        ? 'bg-red-500 text-white'
+                        : 'border border-cyan-500/20 bg-[#020f14] text-cyan-300'
+                    )}
+                    title={grabandoAudio ? 'Parar grabación' : 'Grabar audio'}
+                  >
+                    {grabandoAudio ? <Square className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                  </button>
+                )}
+              </div>
             </div>
 
             {(mostrarListaMovil || mostrarFichaMovil) && (
