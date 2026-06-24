@@ -579,7 +579,7 @@ const toggleAudioMessage = async (id: string) => {
 
     toast.error('No se ha podido reproducir el audio');
   }
-};ok
+};
 
   const guardarDuracionAudio = (id: string, audio: HTMLAudioElement) => {
   const duration = audio.duration;
