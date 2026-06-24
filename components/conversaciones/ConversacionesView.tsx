@@ -136,6 +136,7 @@ const [menuMensajeId, setMenuMensajeId] = useState<string | null>(null);
 const audioRefs = useRef<Record<string, HTMLAudioElement | null>>({});
 const [audioPlayingId, setAudioPlayingId] = useState<string | null>(null);
 const [audioProgress, setAudioProgress] = useState<Record<string, number>>({});
+const [segundosGrabacion, setSegundosGrabacion] = useState(0);
 
   const selected = useMemo(
     () => convs.find(c => c.id === selectedId) || null,
@@ -237,6 +238,19 @@ const [audioProgress, setAudioProgress] = useState<Record<string, number>>({});
       }
     };
   }, [audioPreviewUrl]);
+
+  useEffect(() => {
+  if (!grabandoAudio) {
+    setSegundosGrabacion(0);
+    return;
+  }
+
+  const interval = window.setInterval(() => {
+    setSegundosGrabacion(prev => prev + 1);
+  }, 1000);
+
+  return () => window.clearInterval(interval);
+}, [grabandoAudio]);
 
   const filtered = convs.filter(c => {
     if (filter !== 'todas' && c.estado_visual !== filter) return false;
@@ -968,7 +982,11 @@ onLoadedData={(e) => {
                 ) : (
                   <>
                     <Input
-                      placeholder={grabandoAudio ? 'Grabando audio...' : 'Escribe un mensaje...'}
+                      placeholder={
+  grabandoAudio
+    ? `Grabando audio... ${formatAudioTime(segundosGrabacion)}`
+    : 'Escribe un mensaje...'
+}
                       value={nuevoMensaje}
                       onChange={(e) => setNuevoMensaje(e.target.value)}
                       onKeyDown={(e) => {
