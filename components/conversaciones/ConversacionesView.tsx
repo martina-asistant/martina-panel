@@ -740,20 +740,20 @@ const toggleAudioMessage = async (id: string) => {
                       )}
                     >
                     {isAudioMessage(m.contenido_texto) ? (
-  <div className="relative w-[390px] max-w-full rounded-[22px] border border-cyan-300/55 bg-gradient-to-br from-cyan-50 to-white px-4 py-3 shadow-[0_0_20px_rgba(34,211,238,.16)]">
+  <div className="relative w-[520px] max-w-full rounded-[24px] border border-cyan-300/55 bg-gradient-to-br from-cyan-50 to-white px-5 py-3 shadow-[0_0_20px_rgba(34,211,238,.16)]">
     <button
       type="button"
       onClick={() =>
         setMenuMensajeId(menuMensajeId === m.id ? null : m.id)
       }
-      className="absolute top-3 right-3 w-7 h-7 rounded-full text-black hover:bg-cyan-100 flex items-center justify-center z-10"
+      className="absolute top-1/2 right-4 -translate-y-1/2 w-7 h-7 rounded-full text-black hover:bg-cyan-100 flex items-center justify-center z-10"
       title="Opciones"
     >
       <MoreVertical className="w-5 h-5" />
     </button>
 
     {menuMensajeId === m.id && (
-      <div className="absolute top-10 right-3 z-20 w-36 rounded-xl border border-cyan-200 bg-white shadow-xl overflow-hidden">
+      <div className="absolute top-10 right-4 z-20 w-36 rounded-xl border border-cyan-200 bg-white shadow-xl overflow-hidden">
         <button
           type="button"
           onClick={() => eliminarMensaje(m.id)}
@@ -795,30 +795,30 @@ const toggleAudioMessage = async (id: string) => {
       }}
     />
 
-    <div className="flex items-center gap-4 pr-8">
-      <div className="w-11 h-11 shrink-0 rounded-full bg-[#03111A] border-2 border-cyan-300 flex items-center justify-center overflow-hidden shadow-[0_0_12px_rgba(34,211,238,.35)]">
+    <div className="flex items-center gap-5 pr-12">
+      <div className="w-14 h-14 shrink-0 rounded-full bg-[#03111A] border-2 border-cyan-300 flex items-center justify-center overflow-hidden shadow-[0_0_14px_rgba(34,211,238,.38)]">
         <img
           src="/m-icon.png"
           alt="Martina"
-          className="w-7 h-7 object-contain"
+          className="w-9 h-9 object-contain"
         />
       </div>
 
       <button
         type="button"
         onClick={() => toggleAudioMessage(m.id)}
-        className="w-9 h-9 shrink-0 text-black flex items-center justify-center"
+        className="w-10 h-10 shrink-0 text-black flex items-center justify-center"
         title={audioPlayingId === m.id ? 'Pausar audio' : 'Reproducir audio'}
       >
         {audioPlayingId === m.id ? (
-          <Pause className="w-7 h-7 fill-black" />
+          <Pause className="w-8 h-8 fill-black" />
         ) : (
-          <Play className="w-7 h-7 fill-black" />
+          <Play className="w-8 h-8 fill-black" />
         )}
       </button>
 
       <div className="flex-1 min-w-0">
-        <div className="relative h-1.5 rounded-full bg-cyan-200/70 overflow-hidden">
+        <div className="relative h-1.5 rounded-full bg-cyan-200/80 overflow-visible">
           <div
             className="absolute left-0 top-0 h-full rounded-full bg-[#12B8C8]"
             style={{
@@ -832,6 +832,7 @@ const toggleAudioMessage = async (id: string) => {
               }%`
             }}
           />
+
           <div
             className="absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#12B8C8] shadow-[0_0_8px_rgba(18,184,200,.45)]"
             style={{
@@ -853,9 +854,7 @@ const toggleAudioMessage = async (id: string) => {
         </div>
       </div>
 
-      <div className="w-8 h-8 shrink-0 text-black flex items-center justify-center">
-  <Volume2 className="w-6 h-6 fill-black" />
-</div>
+      <Volume2 className="w-7 h-7 shrink-0 text-black fill-black" />
     </div>
   </div>
 ) : (
@@ -863,7 +862,6 @@ const toggleAudioMessage = async (id: string) => {
     {m.contenido_texto || ''}
   </div>
 )}
-
                       <div
                         className={cn(
                           'text-[10px] mt-2 text-right',
