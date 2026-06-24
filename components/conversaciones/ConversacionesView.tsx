@@ -443,60 +443,57 @@ const [segundosGrabacion, setSegundosGrabacion] = useState(0);
   };
 
   const iniciarGrabacionAudio = async () => {
-    if (grabandoAudio || enviandoAudio) return;
+  if (grabandoAudio || enviandoAudio) return;
 
-    if (audioPreviewUrl || audioPreviewFile) {
-      toast.message('Tienes un audio pendiente. Envíalo o bórralo antes de grabar otro.');
-      return;
-    }
+  if (audioPreviewUrl || audioPreviewFile) {
+    toast.message('Tienes un audio pendiente. Envíalo o bórralo antes de grabar otro.');
+    return;
+  }
 
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
-        ? 'audio/webm;codecs=opus'
-        : 'audio/webm';
+    const mimeType = 'audio/webm';
+    const mediaRecorder = new MediaRecorder(stream);
 
-      const mediaRecorder = new MediaRecorder(stream, { mimeType });
+    audioChunksRef.current = [];
+    mediaRecorderRef.current = mediaRecorder;
 
+    mediaRecorder.ondataavailable = event => {
+      if (event.data && event.data.size > 0) {
+        audioChunksRef.current.push(event.data);
+      }
+    };
+
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(audioChunksRef.current, {
+        type: mimeType
+      });
+
+      const audioFile = new File(
+        [blob],
+        `audio_${Date.now()}.webm`,
+        { type: mimeType }
+      );
+
+      const previewUrl = URL.createObjectURL(blob);
+
+      stream.getTracks().forEach(track => track.stop());
       audioChunksRef.current = [];
-      mediaRecorderRef.current = mediaRecorder;
+      mediaRecorderRef.current = null;
 
-      mediaRecorder.ondataavailable = event => {
-        if (event.data && event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-        }
-      };
+      setAudioPreviewFile(audioFile);
+      setAudioPreviewUrl(previewUrl);
+      setReproduciendoPreview(false);
+    };
 
-      mediaRecorder.onstop = async () => {
-        const blob = new Blob(audioChunksRef.current, {
-          type: mediaRecorder.mimeType || 'audio/webm'
-        });
-
-        const audioFile = new File(
-          [blob],
-          `audio_${Date.now()}.webm`,
-          { type: blob.type || 'audio/webm' }
-        );
-
-        const previewUrl = URL.createObjectURL(blob);
-
-        stream.getTracks().forEach(track => track.stop());
-        audioChunksRef.current = [];
-        mediaRecorderRef.current = null;
-
-        setAudioPreviewFile(audioFile);
-        setAudioPreviewUrl(previewUrl);
-        setReproduciendoPreview(false);
-      };
-
-      mediaRecorder.start();
-      setGrabandoAudio(true);
-    } catch (error) {
-      console.error(error);
-      toast.error('No se ha podido acceder al micrófono');
-    }
-  };
+    mediaRecorder.start();
+    setGrabandoAudio(true);
+  } catch (error) {
+    console.error(error);
+    toast.error('No se ha podido acceder al micrófono');
+  }
+};
 
   const pararGrabacionAudio = () => {
     if (!mediaRecorderRef.current) return;
@@ -550,16 +547,6 @@ const eliminarMensaje = async (mensajeId: string) => {
 const toggleAudioMessage = async (id: string) => {
   const audio = audioRefs.current[id];
 
-  console.log('CLICK PLAY AUDIO', {
-    id,
-    audio,
-    src: audio?.src,
-    currentSrc: audio?.currentSrc,
-    readyState: audio?.readyState,
-    duration: audio?.duration,
-    paused: audio?.paused,
-  });
-
   if (!audio) {
     toast.error('Audio no disponible');
     return;
@@ -567,7 +554,8 @@ const toggleAudioMessage = async (id: string) => {
 
   try {
     if (audioPlayingId && audioPlayingId !== id) {
-      audioRefs.current[audioPlayingId]?.pause();
+      const previous = audioRefs.current[audioPlayingId];
+      if (previous) previous.pause();
     }
 
     if (audio.ended) {
@@ -585,16 +573,18 @@ const toggleAudioMessage = async (id: string) => {
     console.error('ERROR PLAY AUDIO', {
       error,
       src: audio.currentSrc || audio.src,
+      readyState: audio.readyState,
+      duration: audio.duration
     });
 
     toast.error('No se ha podido reproducir el audio');
   }
-};
+};ok
 
   const guardarDuracionAudio = (id: string, audio: HTMLAudioElement) => {
   const duration = audio.duration;
 
-  if (duration && Number.isFinite(duration) && !Number.isNaN(duration)) {
+  if (Number.isFinite(duration) && duration > 0) {
     setAudioDurations(prev => ({
       ...prev,
       [id]: duration
@@ -817,35 +807,39 @@ const toggleAudioMessage = async (id: string) => {
     )}
 
     <audio
-      ref={(el) => {
-        audioRefs.current[m.id] = el;
-      }}
-      src={getAudioUrl(m.url_archivo || m.contenido_texto)}
-      preload="metadata"
-      className="hidden"
-      onLoadedMetadata={(e) => {
-  guardarDuracionAudio(m.id, e.currentTarget);
-}}
-onDurationChange={(e) => {
-  guardarDuracionAudio(m.id, e.currentTarget);
-}}
-onLoadedData={(e) => {
-  guardarDuracionAudio(m.id, e.currentTarget);
-}}
-onTimeUpdate={(e) => {
-  setAudioProgress(prev => ({
-    ...prev,
-    [m.id]: e.currentTarget.currentTime
-  }));
-}}
-onEnded={() => {
-  setAudioPlayingId(null);
-  setAudioProgress(prev => ({
-    ...prev,
-    [m.id]: 0
-  }));
-}}
-    />
+  ref={(el) => {
+    audioRefs.current[m.id] = el;
+  }}
+  src={m.url_archivo || ''}
+  preload="metadata"
+  className="hidden"
+  onLoadedMetadata={(e) => {
+    guardarDuracionAudio(m.id, e.currentTarget);
+  }}
+  onCanPlay={(e) => {
+    guardarDuracionAudio(m.id, e.currentTarget);
+  }}
+  onTimeUpdate={(e) => {
+    setAudioProgress(prev => ({
+      ...prev,
+      [m.id]: e.currentTarget.currentTime
+    }));
+  }}
+  onEnded={() => {
+    setAudioPlayingId(null);
+    setAudioProgress(prev => ({
+      ...prev,
+      [m.id]: 0
+    }));
+  }}
+  onError={(e) => {
+    console.error('Error cargando audio del mensaje', {
+      id: m.id,
+      src: (e.currentTarget as HTMLAudioElement).currentSrc || m.url_archivo,
+      error: e.currentTarget.error
+    });
+  }}
+/>
 
     <div className="flex items-center gap-1.5 pr-6">
       <div className="w-8 h-8 shrink-0 rounded-full bg-[#03111A] border border-cyan-400/40 flex items-center justify-center overflow-hidden shadow-[0_0_10px_rgba(34,211,238,.22)]">
