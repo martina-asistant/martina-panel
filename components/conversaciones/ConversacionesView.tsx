@@ -550,6 +550,16 @@ const eliminarMensaje = async (mensajeId: string) => {
 const toggleAudioMessage = async (id: string) => {
   const audio = audioRefs.current[id];
 
+  console.log('CLICK PLAY AUDIO', {
+    id,
+    audio,
+    src: audio?.src,
+    currentSrc: audio?.currentSrc,
+    readyState: audio?.readyState,
+    duration: audio?.duration,
+    paused: audio?.paused,
+  });
+
   if (!audio) {
     toast.error('Audio no disponible');
     return;
@@ -572,7 +582,7 @@ const toggleAudioMessage = async (id: string) => {
       setAudioPlayingId(null);
     }
   } catch (error) {
-    console.error('Error reproduciendo audio:', {
+    console.error('ERROR PLAY AUDIO', {
       error,
       src: audio.currentSrc || audio.src,
     });
