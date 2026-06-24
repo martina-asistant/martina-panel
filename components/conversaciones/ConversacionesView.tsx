@@ -817,42 +817,36 @@ const toggleAudioMessage = async (id: string) => {
         )}
       </button>
 
-      <div className="flex-1 min-w-0 -ml-1">
-        <div className="relative h-[2px] rounded-full bg-cyan-200/80 overflow-visible">
-          <div
-            className="absolute left-0 top-0 h-full rounded-full bg-[#12B8C8]"
-            style={{
-              width: `${
-                audioDurations[m.id]
-                  ? Math.min(
-                      100,
-                      ((audioProgress[m.id] || 0) / audioDurations[m.id]) * 100
-                    )
-                  : 0
-              }%`
-            }}
-          />
+     <div className="relative flex-1 min-w-0 -ml-1 h-8">
+  <div className="absolute left-0 right-0 top-[8px] h-[2px] rounded-full bg-cyan-200/80">
+    <div
+      className="absolute left-0 top-0 h-full rounded-full bg-[#12B8C8]"
+      style={{
+        width: `${
+          audioDurations[m.id]
+            ? Math.min(100, ((audioProgress[m.id] || 0) / audioDurations[m.id]) * 100)
+            : 0
+        }%`
+      }}
+    />
 
-          <div
-            className="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-[#12B8C8] shadow-[0_0_8px_rgba(18,184,200,.45)]"
-            style={{
-              left: `calc(${
-                audioDurations[m.id]
-                  ? Math.min(
-                      100,
-                      ((audioProgress[m.id] || 0) / audioDurations[m.id]) * 100
-                    )
-                  : 0
-              }% - 5px)`
-            }}
-          />
-        </div>
+    <div
+      className="absolute top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-[#12B8C8] shadow-[0_0_8px_rgba(18,184,200,.45)]"
+      style={{
+        left: `calc(${
+          audioDurations[m.id]
+            ? Math.min(100, ((audioProgress[m.id] || 0) / audioDurations[m.id]) * 100)
+            : 0
+        }% - 5px)`
+      }}
+    />
+  </div>
 
-        <div className="mt-[6px] flex items-center justify-between text-[10px] leading-none text-cyan-800">
-          <span>{formatAudioTime(audioProgress[m.id])}</span>
-          <span>{formatAudioTime(audioDurations[m.id])}</span>
-        </div>
-      </div>
+  <div className="absolute left-0 right-0 top-[18px] flex items-center justify-between text-[10px] leading-none text-cyan-800">
+    <span>{formatAudioTime(audioProgress[m.id])}</span>
+    <span>{formatAudioTime(audioDurations[m.id])}</span>
+  </div>
+</div>
     </div>
   </div>
 ) : (
