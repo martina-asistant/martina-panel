@@ -818,9 +818,9 @@ const toggleAudioMessage = async (id: string) => {
       </button>
 
     <div className="relative flex-1 min-w-0 ml-[2px] h-10">
-  <div className="absolute left-[7px] right-0 top-[18px] h-[2px] rounded-full bg-[#9DEBF3]">
+  <div className="absolute left-[7px] right-0 top-[18px] h-[1.5px] rounded-full bg-[#74D8E6]">
     <div
-      className="absolute left-0 top-0 h-full rounded-full bg-[#18D7E7]"
+      className="absolute left-0 top-0 h-full rounded-full bg-[#12B8C8]"
       style={{
         width: `${
           audioDurations[m.id]
@@ -831,18 +831,18 @@ const toggleAudioMessage = async (id: string) => {
     />
 
     <div
-      className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-[#18D7E7] shadow-[0_0_10px_rgba(24,215,231,.38)]"
+      className="absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[#12B8C8] shadow-[0_0_6px_rgba(18,184,200,.28)]"
       style={{
         left: `calc(${
           audioDurations[m.id]
             ? Math.min(100, ((audioProgress[m.id] || 0) / audioDurations[m.id]) * 100)
             : 0
-        }% - 6px)`
+        }% - 4px)`
       }}
     />
   </div>
 
-  <div className="absolute left-[7px] right-0 top-[29px] flex items-center justify-between text-[10px] leading-none text-[#129CB0]">
+  <div className="absolute left-[7px] right-0 top-[29px] flex items-center justify-between text-[10px] leading-none text-[#0E8FA0]">
     <span>{formatAudioTime(audioProgress[m.id])}</span>
     <span>{formatAudioTime(audioDurations[m.id])}</span>
   </div>
