@@ -740,20 +740,18 @@ const toggleAudioMessage = async (id: string) => {
                       )}
                     >
                     {isAudioMessage(m.contenido_texto) ? (
-  <div className="relative w-[520px] max-w-full rounded-[24px] border border-cyan-300/55 bg-gradient-to-br from-cyan-50 to-white px-5 py-3 shadow-[0_0_20px_rgba(34,211,238,.16)]">
+  <div className="relative w-[680px] max-w-full rounded-[30px] border-2 border-[#103842] bg-gradient-to-br from-cyan-50/70 via-white to-cyan-50/40 px-10 py-8 shadow-[0_0_28px_rgba(16,56,66,.12)]">
     <button
       type="button"
-      onClick={() =>
-        setMenuMensajeId(menuMensajeId === m.id ? null : m.id)
-      }
-      className="absolute top-1/2 right-4 -translate-y-1/2 w-7 h-7 rounded-full text-black hover:bg-cyan-100 flex items-center justify-center z-10"
+      onClick={() => setMenuMensajeId(menuMensajeId === m.id ? null : m.id)}
+      className="absolute top-[72px] right-10 w-8 h-8 rounded-full text-black hover:bg-cyan-100 flex items-center justify-center z-10"
       title="Opciones"
     >
-      <MoreVertical className="w-5 h-5" />
+      <MoreVertical className="w-6 h-6" />
     </button>
 
     {menuMensajeId === m.id && (
-      <div className="absolute top-10 right-4 z-20 w-36 rounded-xl border border-cyan-200 bg-white shadow-xl overflow-hidden">
+      <div className="absolute top-[105px] right-8 z-20 w-36 rounded-xl border border-cyan-200 bg-white shadow-xl overflow-hidden">
         <button
           type="button"
           onClick={() => eliminarMensaje(m.id)}
@@ -795,66 +793,68 @@ const toggleAudioMessage = async (id: string) => {
       }}
     />
 
-    <div className="flex items-center gap-5 pr-12">
-      <div className="w-14 h-14 shrink-0 rounded-full bg-[#03111A] border-2 border-cyan-300 flex items-center justify-center overflow-hidden shadow-[0_0_14px_rgba(34,211,238,.38)]">
-        <img
-          src="/m-icon.png"
-          alt="Martina"
-          className="w-9 h-9 object-contain"
-        />
-      </div>
-
-      <button
-        type="button"
-        onClick={() => toggleAudioMessage(m.id)}
-        className="w-10 h-10 shrink-0 text-black flex items-center justify-center"
-        title={audioPlayingId === m.id ? 'Pausar audio' : 'Reproducir audio'}
-      >
-        {audioPlayingId === m.id ? (
-          <Pause className="w-8 h-8 fill-black" />
-        ) : (
-          <Play className="w-8 h-8 fill-black" />
-        )}
-      </button>
-
-      <div className="flex-1 min-w-0">
-        <div className="relative h-1.5 rounded-full bg-cyan-200/80 overflow-visible">
-          <div
-            className="absolute left-0 top-0 h-full rounded-full bg-[#12B8C8]"
-            style={{
-              width: `${
-                audioDurations[m.id]
-                  ? Math.min(
-                      100,
-                      ((audioProgress[m.id] || 0) / audioDurations[m.id]) * 100
-                    )
-                  : 0
-              }%`
-            }}
-          />
-
-          <div
-            className="absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#12B8C8] shadow-[0_0_8px_rgba(18,184,200,.45)]"
-            style={{
-              left: `calc(${
-                audioDurations[m.id]
-                  ? Math.min(
-                      100,
-                      ((audioProgress[m.id] || 0) / audioDurations[m.id]) * 100
-                    )
-                  : 0
-              }% - 8px)`
-            }}
+    <div className="rounded-[26px] border border-cyan-200/70 bg-white/70 px-5 py-5">
+      <div className="flex items-center gap-7 pr-14">
+        <div className="w-20 h-20 shrink-0 rounded-full bg-[#03111A] border-[3px] border-cyan-300 flex items-center justify-center overflow-hidden shadow-[0_0_16px_rgba(34,211,238,.35)]">
+          <img
+            src="/m-icon.png"
+            alt="Martina"
+            className="w-13 h-13 object-contain"
           />
         </div>
 
-        <div className="mt-2 flex items-center justify-between text-[13px] text-cyan-800">
-          <span>{formatAudioTime(audioProgress[m.id])}</span>
-          <span>{formatAudioTime(audioDurations[m.id])}</span>
-        </div>
-      </div>
+        <button
+          type="button"
+          onClick={() => toggleAudioMessage(m.id)}
+          className="w-12 h-12 shrink-0 text-black flex items-center justify-center"
+          title={audioPlayingId === m.id ? 'Pausar audio' : 'Reproducir audio'}
+        >
+          {audioPlayingId === m.id ? (
+            <Pause className="w-10 h-10 fill-black" />
+          ) : (
+            <Play className="w-10 h-10 fill-black" />
+          )}
+        </button>
 
-      <Volume2 className="w-7 h-7 shrink-0 text-black fill-black" />
+        <div className="flex-1 min-w-0">
+          <div className="relative h-2 rounded-full bg-cyan-200/80 overflow-visible">
+            <div
+              className="absolute left-0 top-0 h-full rounded-full bg-[#12B8C8]"
+              style={{
+                width: `${
+                  audioDurations[m.id]
+                    ? Math.min(
+                        100,
+                        ((audioProgress[m.id] || 0) / audioDurations[m.id]) * 100
+                      )
+                    : 0
+                }%`
+              }}
+            />
+
+            <div
+              className="absolute top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-[#12B8C8] shadow-[0_0_10px_rgba(18,184,200,.45)]"
+              style={{
+                left: `calc(${
+                  audioDurations[m.id]
+                    ? Math.min(
+                        100,
+                        ((audioProgress[m.id] || 0) / audioDurations[m.id]) * 100
+                      )
+                    : 0
+                }% - 10px)`
+              }}
+            />
+          </div>
+
+          <div className="mt-4 flex items-center justify-between text-[18px] font-medium text-[#087b8a]">
+            <span>{formatAudioTime(audioProgress[m.id])}</span>
+            <span>{formatAudioTime(audioDurations[m.id])}</span>
+          </div>
+        </div>
+
+        <Volume2 className="w-9 h-9 shrink-0 text-black fill-black" />
+      </div>
     </div>
   </div>
 ) : (
