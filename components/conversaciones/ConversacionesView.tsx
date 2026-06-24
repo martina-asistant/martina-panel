@@ -818,9 +818,9 @@ const toggleAudioMessage = async (id: string) => {
       </button>
 
     <div className="relative flex-1 min-w-0 ml-[2px] h-10">
-  <div className="absolute left-[7px] right-0 top-[18px] h-[1.5px] rounded-full bg-[#74D8E6]">
-    <div
-      className="absolute left-0 top-0 h-full rounded-full bg-[#12B8C8]"
+  <div className="absolute left-[7px] right-0 top-[18px] h-[1.5px] rounded-full bg-[#7CCFDC]">
+  <div
+    className="absolute left-0 top-0 h-full rounded-full bg-[#0E8FA0]"
       style={{
         width: `${
           audioDurations[m.id]
@@ -831,7 +831,7 @@ const toggleAudioMessage = async (id: string) => {
     />
 
     <div
-      className="absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[#12B8C8] shadow-[0_0_6px_rgba(18,184,200,.28)]"
+      className="absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[#0E8FA0] shadow-[0_0_4px_rgba(14,143,160,.18)]"
       style={{
         left: `calc(${
           audioDurations[m.id]
