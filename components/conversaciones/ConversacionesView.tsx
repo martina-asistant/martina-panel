@@ -674,16 +674,28 @@ const ConversacionesView = () => {
                       )}
                     >
                      {isAudioMessage(m.contenido_texto) ? (
-  <div className="w-[260px] max-w-full">
+  <div className="w-[280px] max-w-full rounded-2xl border border-cyan-300/40 bg-gradient-to-br from-cyan-50 to-white px-3 py-3 shadow-[0_0_18px_rgba(34,211,238,.16)]">
+    <div className="flex items-center gap-2 mb-2">
+      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] flex items-center justify-center text-white shadow-[0_0_14px_rgba(14,124,139,.35)]">
+        <Mic className="w-4 h-4" />
+      </div>
+
+      <div className="min-w-0">
+        <div className="text-xs font-semibold text-[#184B53]">
+          Audio de recepción
+        </div>
+        <div className="text-[10px] text-cyan-800/55">
+          Mensaje de voz
+        </div>
+      </div>
+    </div>
+
     <audio
       controls
       preload="metadata"
-      className="w-full h-10"
+      className="w-full h-9 rounded-xl accent-cyan-500"
       src={getAudioUrl(m.contenido_texto)}
     />
-    <div className="mt-1 text-[10px] opacity-70">
-      Audio
-    </div>
   </div>
 ) : (
   <div className="whitespace-pre-wrap break-words leading-relaxed">
