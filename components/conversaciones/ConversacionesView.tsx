@@ -508,13 +508,24 @@ const eliminarMensaje = async (mensajeId: string) => {
     return;
   }
 
-  const { error } = await supa
+  console.log('Intentando eliminar mensaje:', mensajeId);
+
+  const { data, error } = await supa
     .from('mensajes_whatsapp')
     .delete()
-    .eq('id', mensajeId);
+    .eq('id', mensajeId)
+    .select();
+
+  console.log('Resultado eliminar mensaje:', { data, error });
 
   if (error) {
-    toast.error('No se ha podido eliminar el mensaje');
+    console.error('Error eliminando mensaje:', error);
+    toast.error(error.message || 'No se ha podido eliminar el mensaje');
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    toast.error('No se ha eliminado ninguna fila. Revisa permisos RLS o id.');
     return;
   }
 
