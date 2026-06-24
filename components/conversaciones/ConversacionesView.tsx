@@ -549,6 +549,17 @@ const toggleAudioMessage = async (id: string) => {
   }
 };
 
+  const guardarDuracionAudio = (id: string, audio: HTMLAudioElement) => {
+  const duration = audio.duration;
+
+  if (duration && Number.isFinite(duration) && !Number.isNaN(duration)) {
+    setAudioDurations(prev => ({
+      ...prev,
+      [id]: duration
+    }));
+  }
+};
+
   return (
     <div className="h-full flex bg-[#02141B] text-white overflow-hidden">
       <div className="w-[28%] min-w-[280px] max-w-[340px] border-r border-cyan-500/15 bg-[#03111A] flex flex-col shrink-0 min-h-0">
@@ -771,15 +782,20 @@ const toggleAudioMessage = async (id: string) => {
       preload="metadata"
       className="hidden"
       onLoadedMetadata={(e) => {
-        const duration = e.currentTarget.duration;
+  const audio = e.currentTarget;
 
-        if (duration && !Number.isNaN(duration)) {
-          setAudioDurations(prev => ({
-            ...prev,
-            [m.id]: duration
-          }));
-        }
-      }}
+  guardarDuracionAudio(m.id, audio);
+
+  if (!Number.isFinite(audio.duration)) {
+    audio.currentTime = 999999;
+  }
+}}
+onDurationChange={(e) => {
+  guardarDuracionAudio(m.id, e.currentTarget);
+}}
+onLoadedData={(e) => {
+  guardarDuracionAudio(m.id, e.currentTarget);
+}}
       onTimeUpdate={(e) => {
         setAudioProgress(prev => ({
           ...prev,
