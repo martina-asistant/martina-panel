@@ -15,7 +15,8 @@ import {
   Square,
   Play,
   Pause,
-  Trash2
+  Trash2,
+  MoreVertical
 } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import {
@@ -129,6 +130,8 @@ const ConversacionesView = () => {
   const [audioPreviewFile, setAudioPreviewFile] = useState<File | null>(null);
   const [audioPreviewUrl, setAudioPreviewUrl] = useState<string | null>(null);
   const [reproduciendoPreview, setReproduciendoPreview] = useState(false);
+  const [audioDurations, setAudioDurations] = useState<Record<string, number>>({});
+  const [menuMensajeId, setMenuMensajeId] = useState<string | null>(null);
 
   const selected = useMemo(
     () => convs.find(c => c.id === selectedId) || null,
@@ -484,6 +487,38 @@ const ConversacionesView = () => {
     mediaRecorderRef.current.stop();
   };
 
+  const formatAudioDuration = (seconds?: number) => {
+  if (!seconds || Number.isNaN(seconds)) return '0:00';
+
+  const min = Math.floor(seconds / 60);
+  const sec = Math.floor(seconds % 60);
+
+  return `${min}:${sec.toString().padStart(2, '0')}`;
+};
+
+const eliminarMensaje = async (mensajeId: string) => {
+  const supa = createClient();
+
+  if (!supa) {
+    toast.error('Supabase no está configurado');
+    return;
+  }
+
+  const { error } = await supa
+    .from('mensajes_whatsapp')
+    .delete()
+    .eq('id', mensajeId);
+
+  if (error) {
+    toast.error('No se ha podido eliminar el mensaje');
+    return;
+  }
+
+  setMensajes(prev => prev.filter(m => m.id !== mensajeId));
+  setMenuMensajeId(null);
+  toast.success('Mensaje eliminado');
+};
+
   return (
     <div className="h-full flex bg-[#02141B] text-white overflow-hidden">
       <div className="w-[28%] min-w-[280px] max-w-[340px] border-r border-cyan-500/15 bg-[#03111A] flex flex-col shrink-0 min-h-0">
@@ -674,8 +709,31 @@ const ConversacionesView = () => {
                       )}
                     >
                      {isAudioMessage(m.contenido_texto) ? (
-  <div className="w-[280px] max-w-full rounded-2xl border border-cyan-300/40 bg-gradient-to-br from-cyan-50 to-white px-3 py-3 shadow-[0_0_18px_rgba(34,211,238,.16)]">
-    <div className="flex items-center gap-3">
+  <div className="relative w-[285px] max-w-full rounded-2xl border border-cyan-300/40 bg-gradient-to-br from-cyan-50 to-white px-3 py-3 shadow-[0_0_18px_rgba(34,211,238,.16)]">
+    <button
+      type="button"
+      onClick={() =>
+        setMenuMensajeId(menuMensajeId === m.id ? null : m.id)
+      }
+      className="absolute top-2 right-2 w-7 h-7 rounded-full text-cyan-900/60 hover:bg-cyan-100 flex items-center justify-center"
+      title="Opciones"
+    >
+      <MoreVertical className="w-4 h-4" />
+    </button>
+
+    {menuMensajeId === m.id && (
+      <div className="absolute top-9 right-2 z-20 w-36 rounded-xl border border-cyan-200 bg-white shadow-xl overflow-hidden">
+        <button
+          type="button"
+          onClick={() => eliminarMensaje(m.id)}
+          className="w-full px-3 py-2 text-left text-xs text-red-600 hover:bg-red-50"
+        >
+          Eliminar audio
+        </button>
+      </div>
+    )}
+
+    <div className="flex items-center gap-3 pr-7">
       <div className="w-9 h-9 shrink-0 rounded-full bg-[#03111A] border border-cyan-400/25 flex items-center justify-center overflow-hidden shadow-[0_0_12px_rgba(34,211,238,.18)]">
         <img
           src="/m-icon.png"
@@ -684,12 +742,28 @@ const ConversacionesView = () => {
         />
       </div>
 
-      <audio
-        controls
-        preload="metadata"
-        className="flex-1 h-10 rounded-xl accent-cyan-500"
-        src={getAudioUrl(m.contenido_texto)}
-      />
+      <div className="min-w-0 flex-1">
+        <audio
+          controls
+          preload="metadata"
+          className="w-full h-9 rounded-xl accent-cyan-500"
+          src={getAudioUrl(m.contenido_texto)}
+          onLoadedMetadata={(e) => {
+            const duration = e.currentTarget.duration;
+
+            if (duration && !Number.isNaN(duration)) {
+              setAudioDurations(prev => ({
+                ...prev,
+                [m.id]: duration
+              }));
+            }
+          }}
+        />
+
+        <div className="mt-1 text-[10px] text-cyan-900/55 text-right">
+          {formatAudioDuration(audioDurations[m.id])}
+        </div>
+      </div>
     </div>
   </div>
 ) : (
