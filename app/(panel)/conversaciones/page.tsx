@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Paperclip, Send, Save } from 'lucide-react';
+import { Search, Paperclip, Send, Save, Mic, Square } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import {
   listConversaciones,
@@ -15,7 +15,8 @@ import {
 import {
   listMensajesByConversation,
   enviarMensajePanelWhatsapp,
-  enviarAdjuntoPanelWhatsapp
+  enviarAdjuntoPanelWhatsapp,
+  enviarAudioPanelWhatsapp
 } from '@/lib/repos/mensajes.repo';
 import { getPatientByPacienteId, updatePatientNotas } from '@/lib/repos/patients.repo';
 import type {
@@ -508,49 +509,67 @@ const ConversacionesView = () => {
             </div>
 
             <div className="px-6 py-4 border-t border-[#6FD7E2]/20 bg-[#F8FBFC] shadow-[0_-6px_20px_rgba(14,124,139,.08)] shrink-0">
-              <div className="flex items-center gap-3 rounded-2xl border border-[#6FD7E2]/35 bg-[linear-gradient(180deg,#0F2C35_0%,#163C46_100%)] p-3 shadow-[0_-10px_35px_rgba(34,211,238,.14),0_14px_30px_rgba(34,211,238,.10),inset_0_1px_0_rgba(255,255,255,.05)]">
-                <input
-  ref={fileInputRef}
-  type="file"
-  className="hidden"
-  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-  onChange={(e) => {
-    const file = e.target.files?.[0];
-    if (file) enviarAdjunto(file);
-  }}
-/>
+  <div className="flex items-center gap-3 rounded-2xl border border-[#6FD7E2]/35 bg-[linear-gradient(180deg,#0F2C35_0%,#163C46_100%)] p-3 shadow-[0_-10px_35px_rgba(34,211,238,.14),0_14px_30px_rgba(34,211,238,.10),inset_0_1px_0_rgba(255,255,255,.05)]">
+    <input
+      ref={fileInputRef}
+      type="file"
+      className="hidden"
+      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+      onChange={(e) => {
+        const file = e.target.files?.[0];
+        if (file) enviarAdjunto(file);
+      }}
+    />
 
-<button
-  type="button"
-  onClick={() => fileInputRef.current?.click()}
-  className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] hover:scale-[1.03] shadow-[0_0_20px_rgba(14,124,139,.35)] text-white flex items-center justify-center transition-all"
->
-  <Paperclip className="w-4 h-4" />
-</button>
+    <button
+      type="button"
+      onClick={() => fileInputRef.current?.click()}
+      className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] hover:scale-[1.03] shadow-[0_0_20px_rgba(14,124,139,.35)] text-white flex items-center justify-center transition-all"
+      title="Adjuntar archivo"
+    >
+      <Paperclip className="w-4 h-4" />
+    </button>
 
-                <Input
-                  placeholder="Escribe un mensaje..."
-                  value={nuevoMensaje}
-                  onChange={(e) => setNuevoMensaje(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      enviarMensaje();
-                    }
-                  }}
-                  className="flex-1 h-10 rounded-xl bg-white border border-cyan-100 px-4 text-sm text-slate-700 placeholder:text-slate-400 focus-visible:ring-cyan-400"
-                />
+    <button
+      type="button"
+      onClick={grabandoAudio ? pararGrabacionAudio : iniciarGrabacionAudio}
+      disabled={enviandoAudio}
+      className={cn(
+        'w-10 h-10 rounded-xl text-white flex items-center justify-center transition-all',
+        grabandoAudio
+          ? 'bg-red-500 hover:bg-red-600 shadow-[0_0_20px_rgba(239,68,68,.35)]'
+          : 'bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] hover:scale-[1.03] shadow-[0_0_20px_rgba(14,124,139,.35)]'
+      )}
+      title={grabandoAudio ? 'Parar grabación' : 'Grabar audio'}
+    >
+      {grabandoAudio ? <Square className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+    </button>
 
-                <button
-                  type="button"
-                  onClick={enviarMensaje}
-                  disabled={!nuevoMensaje.trim()}
-                  className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] hover:from-[#25D6E6] hover:to-[#118FA0] disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_24px_rgba(14,124,139,.45)] text-white flex items-center justify-center"
-                >
-                  <Send className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
+    <Input
+      placeholder={grabandoAudio ? 'Grabando audio...' : 'Escribe un mensaje...'}
+      value={nuevoMensaje}
+      onChange={(e) => setNuevoMensaje(e.target.value)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          enviarMensaje();
+        }
+      }}
+      disabled={grabandoAudio}
+      className="flex-1 h-10 rounded-xl bg-white border border-cyan-100 px-4 text-sm text-slate-700 placeholder:text-slate-400 focus-visible:ring-cyan-400 disabled:opacity-60"
+    />
+
+    <button
+      type="button"
+      onClick={enviarMensaje}
+      disabled={!nuevoMensaje.trim() || grabandoAudio}
+      className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] hover:from-[#25D6E6] hover:to-[#118FA0] disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_24px_rgba(14,124,139,.45)] text-white flex items-center justify-center"
+      title="Enviar"
+    >
+      <Send className="w-4 h-4" />
+    </button>
+  </div>
+</div>
           </>
         )}
       </div>
