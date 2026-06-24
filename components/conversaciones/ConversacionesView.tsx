@@ -843,9 +843,9 @@ const toggleAudioMessage = async (id: string) => {
   </div>
 
   <div className="absolute left-[6px] right-0 top-[25px] flex items-center justify-between text-[10px] leading-none text-cyan-800">
-  <span className="-translate-x-[1px]">{formatAudioTime(audioProgress[m.id])}</span>
-  <span>{formatAudioTime(audioDurations[m.id])}</span>
-</div>
+    <span className="-translate-x-[1px]">{formatAudioTime(audioProgress[m.id])}</span>
+    <span>{formatAudioTime(audioDurations[m.id])}</span>
+  </div>
 </div>
     </div>
   </div>
