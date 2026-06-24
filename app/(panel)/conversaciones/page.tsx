@@ -70,6 +70,11 @@ const ConversacionesView = () => {
   const [nuevoMensaje, setNuevoMensaje] = useState('');
   const [userEmail, setUserEmail] = useState<string>('demo@martina.local');
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+const audioChunksRef = useRef<Blob[]>([]);
+
+const [grabandoAudio, setGrabandoAudio] = useState(false);
+const [enviandoAudio, setEnviandoAudio] = useState(false);
 
   const selected = useMemo(
     () => convs.find(c => c.id === selectedId) || null,
@@ -284,6 +289,91 @@ const ConversacionesView = () => {
 
   setMensajes(await listMensajesByConversation(selected.id));
   toast.success('Adjunto enviado');
+};
+
+  const enviarAudio = async (audioFile: File) => {
+  if (!selected || !audioFile) return;
+
+  const telefono = selected.telefono_e164 || selected.telefono || '';
+
+  if (!telefono) {
+    toast.error('Esta conversación no tiene teléfono válido');
+    return;
+  }
+
+  setEnviandoAudio(true);
+
+  try {
+    const res = await enviarAudioPanelWhatsapp({
+      conversationId: selected.id,
+      telefono,
+      audio: audioFile
+    });
+
+    if (!res.ok) {
+      toast.error(res.error || 'No se ha podido enviar el audio');
+      return;
+    }
+
+    setMensajes(await listMensajesByConversation(selected.id));
+    toast.success('Audio enviado');
+  } finally {
+    setEnviandoAudio(false);
+  }
+};
+
+  const iniciarGrabacionAudio = async () => {
+  if (grabandoAudio || enviandoAudio) return;
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+    const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+      ? 'audio/webm;codecs=opus'
+      : 'audio/webm';
+
+    const mediaRecorder = new MediaRecorder(stream, { mimeType });
+
+    audioChunksRef.current = [];
+    mediaRecorderRef.current = mediaRecorder;
+
+    mediaRecorder.ondataavailable = (event) => {
+      if (event.data && event.data.size > 0) {
+        audioChunksRef.current.push(event.data);
+      }
+    };
+
+    mediaRecorder.onstop = async () => {
+      const blob = new Blob(audioChunksRef.current, {
+        type: mediaRecorder.mimeType || 'audio/webm'
+      });
+
+      const audioFile = new File(
+        [blob],
+        `audio_${Date.now()}.webm`,
+        { type: blob.type || 'audio/webm' }
+      );
+
+      stream.getTracks().forEach(track => track.stop());
+      audioChunksRef.current = [];
+      mediaRecorderRef.current = null;
+
+      await enviarAudio(audioFile);
+    };
+
+    mediaRecorder.start();
+    setGrabandoAudio(true);
+  } catch (error) {
+    console.error(error);
+    toast.error('No se ha podido acceder al micrófono');
+  }
+};
+
+const pararGrabacionAudio = () => {
+  if (!mediaRecorderRef.current) return;
+
+  setGrabandoAudio(false);
+  mediaRecorderRef.current.stop();
 };
 
   return (
