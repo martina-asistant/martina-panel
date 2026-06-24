@@ -16,7 +16,8 @@ import {
   Play,
   Pause,
   Trash2,
-  MoreVertical
+  MoreVertical,
+  Volume2
 } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import {
@@ -126,12 +127,16 @@ const ConversacionesView = () => {
   const audioPreviewRef = useRef<HTMLAudioElement | null>(null);
 
   const [grabandoAudio, setGrabandoAudio] = useState(false);
-  const [enviandoAudio, setEnviandoAudio] = useState(false);
-  const [audioPreviewFile, setAudioPreviewFile] = useState<File | null>(null);
-  const [audioPreviewUrl, setAudioPreviewUrl] = useState<string | null>(null);
-  const [reproduciendoPreview, setReproduciendoPreview] = useState(false);
-  const [audioDurations, setAudioDurations] = useState<Record<string, number>>({});
-  const [menuMensajeId, setMenuMensajeId] = useState<string | null>(null);
+const [enviandoAudio, setEnviandoAudio] = useState(false);
+const [audioPreviewFile, setAudioPreviewFile] = useState<File | null>(null);
+const [audioPreviewUrl, setAudioPreviewUrl] = useState<string | null>(null);
+const [reproduciendoPreview, setReproduciendoPreview] = useState(false);
+
+const [audioDurations, setAudioDurations] = useState<Record<string, number>>({});
+const [menuMensajeId, setMenuMensajeId] = useState<string | null>(null);
+const audioRefs = useRef<Record<string, HTMLAudioElement | null>>({});
+const [audioPlayingId, setAudioPlayingId] = useState<string | null>(null);
+const [audioProgress, setAudioProgress] = useState<Record<string, number>>({});
 
   const selected = useMemo(
     () => convs.find(c => c.id === selectedId) || null,
@@ -519,6 +524,32 @@ const eliminarMensaje = async (mensajeId: string) => {
   toast.success('Mensaje eliminado');
 };
 
+  const formatAudioTime = (seconds?: number) => {
+  if (!seconds || Number.isNaN(seconds)) return '0:00';
+
+  const min = Math.floor(seconds / 60);
+  const sec = Math.floor(seconds % 60);
+
+  return `${min}:${sec.toString().padStart(2, '0')}`;
+};
+
+const toggleAudioMessage = async (id: string) => {
+  const audio = audioRefs.current[id];
+  if (!audio) return;
+
+  if (audioPlayingId && audioPlayingId !== id) {
+    audioRefs.current[audioPlayingId]?.pause();
+  }
+
+  if (audio.paused) {
+    await audio.play();
+    setAudioPlayingId(id);
+  } else {
+    audio.pause();
+    setAudioPlayingId(null);
+  }
+};
+
   return (
     <div className="h-full flex bg-[#02141B] text-white overflow-hidden">
       <div className="w-[28%] min-w-[280px] max-w-[340px] border-r border-cyan-500/15 bg-[#03111A] flex flex-col shrink-0 min-h-0">
@@ -708,21 +739,21 @@ const eliminarMensaje = async (mensajeId: string) => {
                           : 'bg-[#D9F7FA] border border-[#B6EAEF] text-[#184B53] rounded-br-sm shadow-[0_0_12px_rgba(34,211,238,.08)]'
                       )}
                     >
-                     {isAudioMessage(m.contenido_texto) ? (
-  <div className="relative w-[275px] max-w-full rounded-2xl border border-cyan-300/40 bg-gradient-to-br from-cyan-50 to-white px-3 py-2 shadow-[0_0_18px_rgba(34,211,238,.16)]">
+                    {isAudioMessage(m.contenido_texto) ? (
+  <div className="relative w-[390px] max-w-full rounded-[22px] border border-cyan-300/55 bg-gradient-to-br from-cyan-50 to-white px-4 py-3 shadow-[0_0_20px_rgba(34,211,238,.16)]">
     <button
       type="button"
       onClick={() =>
         setMenuMensajeId(menuMensajeId === m.id ? null : m.id)
       }
-      className="absolute top-2 right-2 w-6 h-6 rounded-full text-cyan-900/60 hover:bg-cyan-100 flex items-center justify-center z-10"
+      className="absolute top-3 right-3 w-7 h-7 rounded-full text-black hover:bg-cyan-100 flex items-center justify-center z-10"
       title="Opciones"
     >
-      <MoreVertical className="w-4 h-4" />
+      <MoreVertical className="w-5 h-5" />
     </button>
 
     {menuMensajeId === m.id && (
-      <div className="absolute top-8 right-2 z-20 w-36 rounded-xl border border-cyan-200 bg-white shadow-xl overflow-hidden">
+      <div className="absolute top-10 right-3 z-20 w-36 rounded-xl border border-cyan-200 bg-white shadow-xl overflow-hidden">
         <button
           type="button"
           onClick={() => eliminarMensaje(m.id)}
@@ -733,21 +764,98 @@ const eliminarMensaje = async (mensajeId: string) => {
       </div>
     )}
 
-    <div className="flex items-center gap-2 pr-6">
-      <div className="w-8 h-8 shrink-0 rounded-full bg-[#03111A] border border-cyan-400/25 flex items-center justify-center overflow-hidden shadow-[0_0_12px_rgba(34,211,238,.18)]">
+    <audio
+      ref={(el) => {
+        audioRefs.current[m.id] = el;
+      }}
+      src={getAudioUrl(m.contenido_texto)}
+      preload="metadata"
+      className="hidden"
+      onLoadedMetadata={(e) => {
+        const duration = e.currentTarget.duration;
+        if (duration && !Number.isNaN(duration)) {
+          setAudioDurations(prev => ({
+            ...prev,
+            [m.id]: duration
+          }));
+        }
+      }}
+      onTimeUpdate={(e) => {
+        setAudioProgress(prev => ({
+          ...prev,
+          [m.id]: e.currentTarget.currentTime
+        }));
+      }}
+      onEnded={() => {
+        setAudioPlayingId(null);
+        setAudioProgress(prev => ({
+          ...prev,
+          [m.id]: 0
+        }));
+      }}
+    />
+
+    <div className="flex items-center gap-4 pr-8">
+      <div className="w-11 h-11 shrink-0 rounded-full bg-[#03111A] border-2 border-cyan-300 flex items-center justify-center overflow-hidden shadow-[0_0_12px_rgba(34,211,238,.35)]">
         <img
           src="/m-icon.png"
           alt="Martina"
-          className="w-5 h-5 object-contain"
+          className="w-7 h-7 object-contain"
         />
       </div>
 
-      <audio
-        controls
-        preload="metadata"
-        className="flex-1 h-8 rounded-xl accent-cyan-500"
-        src={getAudioUrl(m.contenido_texto)}
-      />
+      <button
+        type="button"
+        onClick={() => toggleAudioMessage(m.id)}
+        className="w-9 h-9 shrink-0 text-black flex items-center justify-center"
+        title={audioPlayingId === m.id ? 'Pausar audio' : 'Reproducir audio'}
+      >
+        {audioPlayingId === m.id ? (
+          <Pause className="w-7 h-7 fill-black" />
+        ) : (
+          <Play className="w-7 h-7 fill-black" />
+        )}
+      </button>
+
+      <div className="flex-1 min-w-0">
+        <div className="relative h-1.5 rounded-full bg-cyan-200/70 overflow-hidden">
+          <div
+            className="absolute left-0 top-0 h-full rounded-full bg-[#12B8C8]"
+            style={{
+              width: `${
+                audioDurations[m.id]
+                  ? Math.min(
+                      100,
+                      ((audioProgress[m.id] || 0) / audioDurations[m.id]) * 100
+                    )
+                  : 0
+              }%`
+            }}
+          />
+          <div
+            className="absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#12B8C8] shadow-[0_0_8px_rgba(18,184,200,.45)]"
+            style={{
+              left: `calc(${
+                audioDurations[m.id]
+                  ? Math.min(
+                      100,
+                      ((audioProgress[m.id] || 0) / audioDurations[m.id]) * 100
+                    )
+                  : 0
+              }% - 8px)`
+            }}
+          />
+        </div>
+
+        <div className="mt-2 flex items-center justify-between text-[13px] text-cyan-800">
+          <span>{formatAudioTime(audioProgress[m.id])}</span>
+          <span>{formatAudioTime(audioDurations[m.id])}</span>
+        </div>
+      </div>
+
+      <div className="w-8 h-8 shrink-0 text-black flex items-center justify-center">
+  <Volume2 className="w-6 h-6 fill-black" />
+</div>
     </div>
   </div>
 ) : (
