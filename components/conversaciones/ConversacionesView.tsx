@@ -795,7 +795,7 @@ const toggleAudioMessage = async (id: string) => {
       }}
     />
 
-    <div className="flex items-center gap-2 pr-6">
+    <div className="flex items-center gap-1.5 pr-6">
       <div className="w-8 h-8 shrink-0 rounded-full bg-[#03111A] border border-cyan-400/40 flex items-center justify-center overflow-hidden shadow-[0_0_10px_rgba(34,211,238,.22)]">
         <img
           src="/m-icon.png"
@@ -807,7 +807,7 @@ const toggleAudioMessage = async (id: string) => {
       <button
         type="button"
         onClick={() => toggleAudioMessage(m.id)}
-        className="w-6 h-6 shrink-0 text-black flex items-center justify-center"
+        className="w-5 h-6 shrink-0 text-black flex items-center justify-center"
         title={audioPlayingId === m.id ? 'Pausar audio' : 'Reproducir audio'}
       >
         {audioPlayingId === m.id ? (
@@ -817,7 +817,7 @@ const toggleAudioMessage = async (id: string) => {
         )}
       </button>
 
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 -ml-1">
         <div className="relative h-[2px] rounded-full bg-cyan-200/80 overflow-visible">
           <div
             className="absolute left-0 top-0 h-full rounded-full bg-[#12B8C8]"
@@ -848,7 +848,7 @@ const toggleAudioMessage = async (id: string) => {
           />
         </div>
 
-        <div className="mt-1 flex items-center justify-between text-[10px] leading-none text-cyan-800">
+        <div className="mt-[6px] flex items-center justify-between text-[10px] leading-none text-cyan-800">
           <span>{formatAudioTime(audioProgress[m.id])}</span>
           <span>{formatAudioTime(audioDurations[m.id])}</span>
         </div>
