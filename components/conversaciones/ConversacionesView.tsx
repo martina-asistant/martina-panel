@@ -16,8 +16,7 @@ import {
   Play,
   Pause,
   Trash2,
-  MoreVertical,
-  Volume2
+  MoreVertical
 } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import {
@@ -796,7 +795,7 @@ const toggleAudioMessage = async (id: string) => {
       }}
     />
 
-    <div className="flex items-center gap-2 pr-7">
+    <div className="flex items-center gap-2 pr-6">
       <div className="w-8 h-8 shrink-0 rounded-full bg-[#03111A] border border-cyan-400/40 flex items-center justify-center overflow-hidden shadow-[0_0_10px_rgba(34,211,238,.22)]">
         <img
           src="/m-icon.png"
@@ -854,8 +853,6 @@ const toggleAudioMessage = async (id: string) => {
           <span>{formatAudioTime(audioDurations[m.id])}</span>
         </div>
       </div>
-
-      <Volume2 className="w-4 h-4 shrink-0 text-black fill-black" />
     </div>
   </div>
 ) : (
