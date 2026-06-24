@@ -549,18 +549,35 @@ const eliminarMensaje = async (mensajeId: string) => {
 
 const toggleAudioMessage = async (id: string) => {
   const audio = audioRefs.current[id];
-  if (!audio) return;
 
-  if (audioPlayingId && audioPlayingId !== id) {
-    audioRefs.current[audioPlayingId]?.pause();
+  if (!audio) {
+    toast.error('Audio no disponible');
+    return;
   }
 
-  if (audio.paused) {
-    await audio.play();
-    setAudioPlayingId(id);
-  } else {
-    audio.pause();
-    setAudioPlayingId(null);
+  try {
+    if (audioPlayingId && audioPlayingId !== id) {
+      audioRefs.current[audioPlayingId]?.pause();
+    }
+
+    if (audio.ended) {
+      audio.currentTime = 0;
+    }
+
+    if (audio.paused) {
+      await audio.play();
+      setAudioPlayingId(id);
+    } else {
+      audio.pause();
+      setAudioPlayingId(null);
+    }
+  } catch (error) {
+    console.error('Error reproduciendo audio:', {
+      error,
+      src: audio.currentSrc || audio.src,
+    });
+
+    toast.error('No se ha podido reproducir el audio');
   }
 };
 
@@ -797,13 +814,7 @@ const toggleAudioMessage = async (id: string) => {
       preload="metadata"
       className="hidden"
       onLoadedMetadata={(e) => {
-  const audio = e.currentTarget;
-
-  guardarDuracionAudio(m.id, audio);
-
-  if (!Number.isFinite(audio.duration)) {
-    audio.currentTime = 999999;
-  }
+  guardarDuracionAudio(m.id, e.currentTarget);
 }}
 onDurationChange={(e) => {
   guardarDuracionAudio(m.id, e.currentTarget);
@@ -811,19 +822,19 @@ onDurationChange={(e) => {
 onLoadedData={(e) => {
   guardarDuracionAudio(m.id, e.currentTarget);
 }}
-      onTimeUpdate={(e) => {
-        setAudioProgress(prev => ({
-          ...prev,
-          [m.id]: e.currentTarget.currentTime
-        }));
-      }}
-      onEnded={() => {
-        setAudioPlayingId(null);
-        setAudioProgress(prev => ({
-          ...prev,
-          [m.id]: 0
-        }));
-      }}
+onTimeUpdate={(e) => {
+  setAudioProgress(prev => ({
+    ...prev,
+    [m.id]: e.currentTarget.currentTime
+  }));
+}}
+onEnded={() => {
+  setAudioPlayingId(null);
+  setAudioProgress(prev => ({
+    ...prev,
+    [m.id]: 0
+  }));
+}}
     />
 
     <div className="flex items-center gap-1.5 pr-6">
