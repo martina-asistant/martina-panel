@@ -74,6 +74,36 @@ const formatTelefono = (telefono?: string | null) => {
   return sinPrefijo.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
 };
 
+const isAudioMessage = (contenido?: string | null) => {
+  if (!contenido) return false;
+
+  const value = contenido.trim().toLowerCase();
+
+  return (
+    value.startsWith('audio_') &&
+    (
+      value.endsWith('.webm') ||
+      value.endsWith('.ogg') ||
+      value.endsWith('.mp3') ||
+      value.endsWith('.m4a') ||
+      value.endsWith('.wav')
+    )
+  );
+};
+
+const getAudioUrl = (contenido?: string | null) => {
+  if (!contenido) return '';
+
+  // CASO 1: ya viene una URL completa
+  if (contenido.startsWith('http://') || contenido.startsWith('https://')) {
+    return contenido;
+  }
+
+  // CASO 2: de momento solo tenemos el nombre del archivo.
+  // Cuando conectemos storage real, aquí montaremos la URL pública/firma.
+  return contenido;
+};
+
 const ConversacionesView = () => {
   const [convs, setConvs] = useState<ConversacionWhatsapp[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -571,8 +601,6 @@ const ConversacionesView = () => {
           })}
         </div>
       </div>
-
-        {/* 📱 SECCIÓN MOBILE */}
             <div className="flex-1 flex flex-col min-w-0 min-h-0 bg-[#F8FBFC] text-[#06111A] shadow-[0_0_25px_rgba(14,124,139,.08)]">
         {!selected ? (
           <div className="flex-1 flex items-center justify-center text-slate-400 text-sm">
@@ -645,9 +673,23 @@ const ConversacionesView = () => {
                           : 'bg-[#D9F7FA] border border-[#B6EAEF] text-[#184B53] rounded-br-sm shadow-[0_0_12px_rgba(34,211,238,.08)]'
                       )}
                     >
-                      <div className="whitespace-pre-wrap break-words leading-relaxed">
-                        {m.contenido_texto || ''}
-                      </div>
+                     {isAudioMessage(m.contenido_texto) ? (
+  <div className="w-[260px] max-w-full">
+    <audio
+      controls
+      preload="metadata"
+      className="w-full h-10"
+      src={getAudioUrl(m.contenido_texto)}
+    />
+    <div className="mt-1 text-[10px] opacity-70">
+      Audio
+    </div>
+  </div>
+) : (
+  <div className="whitespace-pre-wrap break-words leading-relaxed">
+    {m.contenido_texto || ''}
+  </div>
+)}
 
                       <div
                         className={cn(
