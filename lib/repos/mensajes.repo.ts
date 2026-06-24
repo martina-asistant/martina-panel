@@ -139,3 +139,40 @@ export async function enviarAdjuntoPanelWhatsapp({
 
   return data || { ok: true, message: 'Adjunto enviado' };
 }
+
+export async function enviarAudioPanelWhatsapp({
+  conversationId,
+  telefono,
+  audio
+}: {
+  conversationId: string;
+  telefono: string;
+  audio: File;
+}): Promise<{ ok: boolean; error?: string; message?: string }> {
+  const telefonoLimpio = String(telefono || '').replace(/\D/g, '');
+  const telefonoE164 = telefonoLimpio.startsWith('34')
+    ? telefonoLimpio
+    : `34${telefonoLimpio}`;
+
+  const formData = new FormData();
+  formData.append('conversation_id', conversationId);
+  formData.append('telefono', telefonoE164);
+  formData.append('emisor', 'recepcion');
+  formData.append('audio', audio);
+
+  const res = await fetch('/api/whatsapp-panel-audio', {
+    method: 'POST',
+    body: formData
+  });
+
+  const data = await res.json().catch(() => null);
+
+  if (!res.ok) {
+    return {
+      ok: false,
+      error: data?.error || 'Error enviando audio'
+    };
+  }
+
+  return data || { ok: true, message: 'Audio enviado' };
+}
