@@ -778,7 +778,7 @@ const toggleAudioMessage = async (id: string) => {
       ref={(el) => {
         audioRefs.current[m.id] = el;
       }}
-      src={getAudioUrl(m.contenido_texto)}
+      src={getAudioUrl((m as any).url_archivo || m.contenido_texto)}
       preload="metadata"
       className="hidden"
       onLoadedMetadata={(e) => {
