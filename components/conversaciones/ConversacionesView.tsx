@@ -501,6 +501,9 @@ const [audioProgress, setAudioProgress] = useState<Record<string, number>>({});
 };
 
 const eliminarMensaje = async (mensajeId: string) => {
+  setMensajes(prev => prev.filter(m => m.id !== mensajeId));
+  setMenuMensajeId(null);
+
   const supa = createClient();
 
   if (!supa) {
@@ -508,32 +511,19 @@ const eliminarMensaje = async (mensajeId: string) => {
     return;
   }
 
-  console.log('Intentando eliminar mensaje:', mensajeId);
-
-  const { data, error } = await supa
+  const { error } = await supa
     .from('mensajes_whatsapp')
     .delete()
-    .eq('id', mensajeId)
-    .select();
-
-  console.log('Resultado eliminar mensaje:', { data, error });
+    .eq('id', mensajeId);
 
   if (error) {
     console.error('Error eliminando mensaje:', error);
-    toast.error(error.message || 'No se ha podido eliminar el mensaje');
+    toast.error('No se ha podido eliminar de Supabase');
     return;
   }
 
-  if (!data || data.length === 0) {
-    toast.error('No se ha eliminado ninguna fila. Revisa permisos RLS o id.');
-    return;
-  }
-
-  setMensajes(prev => prev.filter(m => m.id !== mensajeId));
-  setMenuMensajeId(null);
   toast.success('Mensaje eliminado');
 };
-
   const formatAudioTime = (seconds?: number) => {
   if (!seconds || Number.isNaN(seconds)) return '0:00';
 
