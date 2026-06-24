@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Save, Menu, ChevronDown, X, Paperclip, Send } from 'lucide-react';
+import { Search, Save, Menu, ChevronDown, X, Paperclip, Send, Mic, Square } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import {
   listConversaciones,
@@ -15,7 +15,8 @@ import {
 import {
   listMensajesByConversation,
   enviarMensajePanelWhatsapp,
-  enviarAdjuntoPanelWhatsapp
+  enviarAdjuntoPanelWhatsapp,
+  enviarAudioPanelWhatsapp
 } from '@/lib/repos/mensajes.repo';
 import type {
   ConversacionWhatsapp,
@@ -55,6 +56,11 @@ const ConversacionesView = () => {
   const [mostrarListaMovil, setMostrarListaMovil] = useState(false);
   const [mostrarFichaMovil, setMostrarFichaMovil] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+const audioChunksRef = useRef<Blob[]>([]);
+
+const [grabandoAudio, setGrabandoAudio] = useState(false);
+const [enviandoAudio, setEnviandoAudio] = useState(false);
 
   const selected = useMemo(
     () => convs.find(c => c.id === selectedId) || null,
@@ -274,6 +280,93 @@ const enviarAdjunto = async (file: File) => {
   toast.success('Adjunto enviado');
 };
 
+  const enviarAudio = async (audioFile: File) => {
+  if (!selected || !audioFile) return;
+
+  const telefono =
+    selected.telefono_e164 ||
+    selected.telefono ||
+    '';
+
+  if (!telefono) {
+    toast.error('Esta conversación no tiene teléfono válido');
+    return;
+  }
+
+  setEnviandoAudio(true);
+
+  try {
+    const resultado = await enviarAudioPanelWhatsapp({
+      conversationId: selected.id,
+      telefono,
+      audio: audioFile
+    });
+
+    if (!resultado?.ok) {
+      toast.error(resultado?.error || 'No se ha podido enviar el audio');
+      return;
+    }
+
+    setMensajes(await listMensajesByConversation(selected.id));
+    toast.success('Audio enviado');
+  } finally {
+    setEnviandoAudio(false);
+  }
+};
+
+const iniciarGrabacionAudio = async () => {
+  if (grabandoAudio || enviandoAudio) return;
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+    const mimeType =
+      MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+        ? 'audio/webm;codecs=opus'
+        : 'audio/webm';
+
+    const mediaRecorder = new MediaRecorder(stream, { mimeType });
+
+    audioChunksRef.current = [];
+    mediaRecorderRef.current = mediaRecorder;
+
+    mediaRecorder.ondataavailable = (event) => {
+      if (event.data && event.data.size > 0) {
+        audioChunksRef.current.push(event.data);
+      }
+    };
+
+    mediaRecorder.onstop = async () => {
+      const blob = new Blob(audioChunksRef.current, { type: mediaRecorder.mimeType || 'audio/webm' });
+
+      const audioFile = new File(
+        [blob],
+        `audio_${Date.now()}.webm`,
+        { type: blob.type || 'audio/webm' }
+      );
+
+      stream.getTracks().forEach(track => track.stop());
+      audioChunksRef.current = [];
+      mediaRecorderRef.current = null;
+
+      await enviarAudio(audioFile);
+    };
+
+    mediaRecorder.start();
+    setGrabandoAudio(true);
+  } catch (error) {
+    console.error(error);
+    toast.error('No se ha podido acceder al micrófono');
+  }
+};
+
+const pararGrabacionAudio = async () => {
+  if (!mediaRecorderRef.current) return;
+
+  setGrabandoAudio(false);
+  mediaRecorderRef.current.stop();
+};
+
   return (
     <div className="h-full min-h-0 w-full overflow-hidden relative">
       
@@ -447,27 +540,32 @@ const enviarAdjunto = async (file: File) => {
       }}
     />
 
-    <input
-  ref={fileInputRef}
-  type="file"
-  className="hidden"
-  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-  onChange={(e) => {
-    const file = e.target.files?.[0];
-    if (file) enviarAdjunto(file);
-  }}
-/>
+    <button
+      type="button"
+      onClick={() => fileInputRef.current?.click()}
+      className="h-10 w-10 shrink-0 rounded-xl border border-martina-border bg-martina-bg flex items-center justify-center text-martina-text hover:bg-martina-beige transition-colors"
+      title="Adjuntar archivo"
+    >
+      <Paperclip className="w-4 h-4" />
+    </button>
 
-<button
-  type="button"
-  onClick={() => fileInputRef.current?.click()}
-  className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] hover:scale-[1.03] shadow-[0_0_20px_rgba(14,124,139,.35)] text-white flex items-center justify-center transition-all"
->
-  <Paperclip className="w-4 h-4" />
-</button>
+    <button
+      type="button"
+      onClick={grabandoAudio ? pararGrabacionAudio : iniciarGrabacionAudio}
+      disabled={enviandoAudio}
+      className={cn(
+        'h-10 w-10 shrink-0 rounded-xl border flex items-center justify-center transition-colors',
+        grabandoAudio
+          ? 'border-red-300 bg-red-50 text-red-600'
+          : 'border-martina-border bg-martina-bg text-martina-text hover:bg-martina-beige'
+      )}
+      title={grabandoAudio ? 'Parar grabación' : 'Grabar audio'}
+    >
+      {grabandoAudio ? <Square className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+    </button>
 
     <Input
-      placeholder="Escribe un mensaje..."
+      placeholder={grabandoAudio ? 'Grabando audio...' : 'Escribe un mensaje...'}
       value={nuevoMensaje}
       onChange={(e) => setNuevoMensaje(e.target.value)}
       onKeyDown={(e) => {
@@ -476,12 +574,13 @@ const enviarAdjunto = async (file: File) => {
           enviarMensaje();
         }
       }}
+      disabled={grabandoAudio}
       className="flex-1 h-10 bg-martina-bg border-martina-border"
     />
 
     <Button
       onClick={enviarMensaje}
-      disabled={!nuevoMensaje.trim()}
+      disabled={!nuevoMensaje.trim() || grabandoAudio}
       className="bg-martina-text hover:bg-black text-white"
     >
       Enviar
@@ -489,7 +588,7 @@ const enviarAdjunto = async (file: File) => {
   </div>
 
   <div className="text-[11px] text-martina-muted mt-2">
-    Puedes enviar texto o adjuntar PDF, Word e imágenes.
+    Puedes enviar texto, adjuntar archivos o grabar audio.
   </div>
 </div>
             </>
