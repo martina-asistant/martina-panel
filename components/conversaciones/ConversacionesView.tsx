@@ -760,7 +760,7 @@ const toggleAudioMessage = async (id: string) => {
                           : 'bg-[#D9F7FA] border border-[#B6EAEF] text-[#184B53] rounded-br-sm shadow-[0_0_12px_rgba(34,211,238,.08)]'
                       )}
                     >
-                    {isAudioMessage(m.contenido_texto) ? (
+                    {(m.tipo_mensaje === 'audio' || isAudioMessage(m.contenido_texto)) ? (
   <div className="relative w-[285px] max-w-full rounded-2xl border border-cyan-300/40 bg-gradient-to-br from-cyan-50 to-white px-3 py-2 shadow-[0_0_18px_rgba(34,211,238,.16)]">
     <button
       type="button"
@@ -789,7 +789,7 @@ const toggleAudioMessage = async (id: string) => {
       ref={(el) => {
         audioRefs.current[m.id] = el;
       }}
-      src={getAudioUrl((m as any).url_archivo || m.contenido_texto)}
+      src={getAudioUrl(m.url_archivo || m.contenido_texto)}
       preload="metadata"
       className="hidden"
       onLoadedMetadata={(e) => {
