@@ -80,6 +80,8 @@ export interface MensajeWhatsapp {
   direccion?: 'entrante' | 'saliente' | null;
   tipo_mensaje?: string | null;
   contenido_texto?: string | null;
+  url_archivo?: string | null;
+  mime_type?: string | null;
 
   // Compatibilidad con mocks antiguos
   rol?: RolMensaje | string;
