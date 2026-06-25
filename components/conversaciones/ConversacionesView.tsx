@@ -602,7 +602,7 @@ const toggleAudioMessage = async (id: string) => {
 
   return (
     <div className="h-full flex bg-[#02141B] text-white overflow-hidden">
-      <div className="hidden lg:flex h-full">
+      <div className="hidden lg:flex h-full w-full">
       <div className="w-[28%] min-w-[280px] max-w-[340px] border-r border-cyan-500/15 bg-[#03111A] flex flex-col shrink-0 min-h-0">
         <div className="px-6 pt-6 pb-4">
           <h1 className="text-2xl font-semibold tracking-[-0.015em] scale-x-[0.97] origin-left bg-gradient-to-r from-white to-cyan-300 bg-clip-text text-transparent mb-1">
@@ -1342,58 +1342,56 @@ const toggleAudioMessage = async (id: string) => {
         </button>
 
         <div className="w-full rounded-3xl border border-[#6FD7E2]/35 bg-[linear-gradient(180deg,#0F2C35_0%,#163C46_100%)] px-4 py-4 shadow-[0_0_34px_rgba(34,211,238,.18),0_16px_32px_rgba(14,124,139,.14),inset_0_1px_0_rgba(255,255,255,.06)]">
-          <div className="flex items-start gap-3">
-            <button
-              type="button"
-              onClick={() => setMostrarListaMovil(true)}
-              className="mt-[2px] w-9 h-9 rounded-xl bg-white/10 border border-cyan-200/20 text-cyan-50 flex items-center justify-center shrink-0"
-              title="Abrir conversaciones"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
+          <div className="flex items-center gap-2">
+  <button
+    type="button"
+    onClick={() => setMostrarListaMovil(true)}
+    className="w-10 h-10 rounded-xl bg-white/10 border border-cyan-200/20 text-cyan-50 flex items-center justify-center shrink-0"
+    title="Abrir conversaciones"
+  >
+    <span className="text-3xl leading-none -translate-y-[1px]">›</span>
+  </button>
 
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2 min-w-0">
-                <div className="font-semibold text-white truncate">
-                  {selected.nombre_paciente || formatTelefono(selected.telefono_e164)}
-                </div>
+  <div className="min-w-0 flex-1">
+    <div className="font-semibold text-white truncate leading-tight">
+      {selected.nombre_paciente || formatTelefono(selected.telefono_e164)}
+    </div>
 
-                <button
-                  type="button"
-                  onClick={() => setMostrarFichaMovil(true)}
-                  className="w-8 h-8 rounded-xl bg-white/10 border border-cyan-200/20 text-cyan-50 flex items-center justify-center shrink-0"
-                  title="Ver ficha paciente"
-                >
-                  <Menu className="w-4 h-4" />
-                </button>
-              </div>
+    <div className="text-[11px] text-cyan-100/75 truncate mt-1">
+      {formatTelefono(selected.telefono_e164)} · {selected.motivo || 'Sin motivo'}
+    </div>
+  </div>
 
-              <div className="text-xs text-cyan-100/75 truncate mt-1">
-                {formatTelefono(selected.telefono_e164)} · {selected.motivo || 'Sin motivo'}
-              </div>
-            </div>
-          </div>
+  <div className="flex flex-col gap-1 shrink-0">
+    <Button
+      size="sm"
+      variant="outline"
+      onClick={doTomar}
+      className="h-7 px-2 bg-cyan-50 border-cyan-300/35 text-cyan-700 hover:bg-cyan-100 whitespace-nowrap text-[10px]"
+    >
+      Tomar
+    </Button>
 
-          <div className="flex flex-wrap items-center gap-2 mt-4">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={doTomar}
-              className="bg-cyan-50 border-cyan-300/35 text-cyan-700 hover:bg-cyan-100 whitespace-nowrap text-xs"
-            >
-              Tomar conversación
-            </Button>
+    <Button
+      size="sm"
+      variant="outline"
+      onClick={doDevolver}
+      className="h-7 px-2 bg-cyan-50 border-cyan-300/35 text-cyan-700 hover:bg-cyan-100 whitespace-nowrap text-[10px]"
+    >
+      Devolver
+    </Button>
+  </div>
 
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={doDevolver}
-              className="bg-cyan-50 border-cyan-300/35 text-cyan-700 hover:bg-cyan-100 whitespace-nowrap text-xs"
-            >
-              Devolver a Martina
-            </Button>
-          </div>
-        </div>
+  <button
+    type="button"
+    onClick={() => setMostrarFichaMovil(true)}
+    className="w-10 h-10 rounded-xl bg-white/10 border border-cyan-200/20 text-cyan-50 flex items-center justify-center shrink-0"
+    title="Ver ficha paciente"
+  >
+    <span className="text-3xl leading-none -translate-y-[1px]">‹</span>
+  </button>
+</div>
+      </div>
       </div>
 
       <div className="flex-1 min-h-0 overflow-y-auto px-3 py-4 space-y-4 bg-[radial-gradient(circle_at_top,rgba(34,211,238,.04),#F8FBFC_45%)]">
