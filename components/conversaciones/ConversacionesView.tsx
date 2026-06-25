@@ -851,7 +851,7 @@ const toggleAudioMessage = async (id: string) => {
     <button
       type="button"
       onClick={() => setMenuMensajeId(menuMensajeId === m.id ? null : m.id)}
-      className="absolute top-0 right-1 w-4 h-4 rounded-full text-cyan-900/45 hover:text-cyan-900 hover:bg-cyan-100 flex items-center justify-center z-20"
+      className="absolute top-[2px] right-1 w-4 h-4 rounded-full text-cyan-900/45 hover:text-cyan-900 hover:bg-cyan-100 flex items-center justify-center z-20"
       title="Opciones mensaje"
     >
       <MoreVertical className="w-4 h-4" />
@@ -1498,7 +1498,7 @@ const toggleAudioMessage = async (id: string) => {
     <button
       type="button"
       onClick={() => setMenuMensajeId(menuMensajeId === m.id ? null : m.id)}
-      className="absolute top-0 right-1 w-4 h-4 rounded-full text-cyan-900/45 hover:text-cyan-900 hover:bg-cyan-100 flex items-center justify-center z-20"
+      className="absolute top-[2px] right-1 w-4 h-4 rounded-full text-cyan-900/45 hover:text-cyan-900 hover:bg-cyan-100 flex items-center justify-center z-20"
       title="Opciones mensaje"
     >
       <MoreVertical className="w-4 h-4" />
