@@ -49,6 +49,7 @@ import { conversacionLabel } from '@/lib/utils/visualMaps';
 import { toast } from 'sonner';
 import { Textarea } from '@/components/ui/textarea';
 import AudioBubble from '@/components/conversaciones/AudioBubble';
+import AttachmentBubble from '@/components/conversaciones/AttachmentBubble';
 import {
   getPatientByPacienteId,
   updatePatientNotas
@@ -117,6 +118,46 @@ const getAudioUrl = (contenido?: string | null) => {
   // CASO 2: de momento solo tenemos el nombre del archivo.
   // Cuando conectemos storage real, aquí montaremos la URL pública/firma.
   return contenido;
+};
+
+const isAttachmentMessage = (m: MensajeWhatsapp) => {
+  const mime = String((m as any).mime_type || '').toLowerCase();
+  const tipo = String(m.tipo_mensaje || '').toLowerCase();
+  const url = String((m as any).url_archivo || '').trim();
+  const contenido = String(m.contenido_texto || '').trim().toLowerCase();
+
+  if (tipo === 'audio' || isAudioMessage(m.contenido_texto)) return false;
+
+  if (mime) return true;
+  if (tipo === 'archivo' || tipo === 'imagen' || tipo === 'documento') return true;
+  if (url) return true;
+
+  return (
+    contenido.endsWith('.pdf') ||
+    contenido.endsWith('.doc') ||
+    contenido.endsWith('.docx') ||
+    contenido.endsWith('.jpg') ||
+    contenido.endsWith('.jpeg') ||
+    contenido.endsWith('.png') ||
+    contenido.endsWith('.webp')
+  );
+};
+
+const getAttachmentFileName = (m: MensajeWhatsapp) => {
+  const nombre = (m as any).nombre_archivo || (m as any).file_name;
+  if (nombre) return String(nombre);
+
+  const contenido = String(m.contenido_texto || '').trim();
+  if (contenido) return contenido;
+
+  const url = String((m as any).url_archivo || '').trim();
+  if (!url) return 'Archivo';
+
+  try {
+    return decodeURIComponent(url.split('/').pop()?.split('?')[0] || 'Archivo');
+  } catch {
+    return 'Archivo';
+  }
 };
 
 const ConversacionesView = () => {
@@ -818,6 +859,8 @@ const toggleAudioMessage = async (id: string) => {
                   m.direccion === 'entrante';
             
             const audioSrc = m.url_archivo || getAudioUrl(m.contenido_texto);
+  const isAttachment = isAttachmentMessage(m);
+const attachmentName = getAttachmentFileName(m);
 
                 return (
                   <div
@@ -839,6 +882,19 @@ const toggleAudioMessage = async (id: string) => {
   <>
     <AudioBubble
       src={audioSrc}
+      onDelete={() => eliminarMensaje(m.id)}
+    />
+
+    <div className="text-[10px] mt-2 text-right whitespace-nowrap text-cyan-900/60">
+      {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
+    </div>
+  </>
+) : isAttachment ? (
+  <>
+    <AttachmentBubble
+      fileName={attachmentName}
+      url={(m as any).url_archivo || null}
+      mimeType={(m as any).mime_type || null}
       onDelete={() => eliminarMensaje(m.id)}
     />
 
@@ -870,11 +926,11 @@ const toggleAudioMessage = async (id: string) => {
     )}
 
     <div className="max-w-full whitespace-pre-wrap break-words leading-snug">
-  {m.contenido_texto || ''}
-  <span className="float-right ml-2 mt-[3px] text-[10px] whitespace-nowrap text-cyan-900/45">
-    {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
-  </span>
-</div>
+      {m.contenido_texto || ''}
+      <span className="float-right ml-2 mt-[3px] text-[10px] whitespace-nowrap text-cyan-900/45">
+        {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
+      </span>
+    </div>
   </div>
 )}
                     </div>
@@ -1465,6 +1521,8 @@ const toggleAudioMessage = async (id: string) => {
             m.direccion === 'entrante';
 
           const audioSrc = m.url_archivo || getAudioUrl(m.contenido_texto);
+  const isAttachment = isAttachmentMessage(m);
+const attachmentName = getAttachmentFileName(m);
 
           return (
             <div
@@ -1486,6 +1544,30 @@ const toggleAudioMessage = async (id: string) => {
   <>
     <AudioBubble
       src={audioSrc}
+      onDelete={() => eliminarMensaje(m.id)}
+    />
+
+    <div className="text-[10px] mt-2 text-right whitespace-nowrap text-cyan-900/60">
+      {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
+    </div>
+  </>
+{(m.tipo_mensaje === 'audio' || isAudioMessage(m.contenido_texto)) ? (
+  <>
+    <AudioBubble
+      src={audioSrc}
+      onDelete={() => eliminarMensaje(m.id)}
+    />
+
+    <div className="text-[10px] mt-2 text-right whitespace-nowrap text-cyan-900/60">
+      {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
+    </div>
+  </>
+) : isAttachment ? (
+  <>
+    <AttachmentBubble
+      fileName={attachmentName}
+      url={(m as any).url_archivo || null}
+      mimeType={(m as any).mime_type || null}
       onDelete={() => eliminarMensaje(m.id)}
     />
 
@@ -1517,11 +1599,11 @@ const toggleAudioMessage = async (id: string) => {
     )}
 
     <div className="max-w-full whitespace-pre-wrap break-words leading-snug">
-  {m.contenido_texto || ''}
-  <span className="float-right ml-2 mt-[3px] text-[10px] whitespace-nowrap text-cyan-900/45">
-    {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
-  </span>
-</div>
+      {m.contenido_texto || ''}
+      <span className="float-right ml-2 mt-[3px] text-[10px] whitespace-nowrap text-cyan-900/45">
+        {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
+      </span>
+    </div>
   </div>
 )}
               </div>
