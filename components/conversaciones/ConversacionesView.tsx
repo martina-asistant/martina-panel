@@ -1341,15 +1341,14 @@ const toggleAudioMessage = async (id: string) => {
           <span className="text-[12px] leading-[1] flex items-center justify-center translate-y-[-1px]">✕</span>
         </button>
 
-        <div className="w-full rounded-3xl border border-[#6FD7E2]/35 bg-[linear-gradient(180deg,#0F2C35_0%,#163C46_100%)] px-4 py-4 shadow-[0_0_34px_rgba(34,211,238,.18),0_16px_32px_rgba(14,124,139,.14),inset_0_1px_0_rgba(255,255,255,.06)]">
-          <div className="flex items-center gap-2">
+        className="w-full rounded-3xl border border-[#6FD7E2]/45 bg-[linear-gradient(180deg,#0F2C35_0%,#163C46_100%)] px-3 py-3 shadow-[0_0_28px_rgba(34,211,238,.16),0_12px_26px_rgba(14,124,139,.12),inset_0_1px_0_rgba(255,255,255,.06)]"
   <button
     type="button"
     onClick={() => setMostrarListaMovil(true)}
-    className="w-10 h-10 rounded-xl bg-white/10 border border-cyan-200/20 text-cyan-50 flex items-center justify-center shrink-0"
+    className="w-8 h-8 rounded-xl bg-white/5 border border-[#6FD7E2]/55 text-cyan-100 flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(34,211,238,.12)]"
     title="Abrir conversaciones"
   >
-    <span className="text-3xl leading-none -translate-y-[1px]">›</span>
+    <span className="text-2xl leading-none -translate-y-[1px]">›</span>
   </button>
 
   <div className="min-w-0 flex-1">
@@ -1367,7 +1366,7 @@ const toggleAudioMessage = async (id: string) => {
       size="sm"
       variant="outline"
       onClick={doTomar}
-      className="h-7 px-2 bg-cyan-50 border-cyan-300/35 text-cyan-700 hover:bg-cyan-100 whitespace-nowrap text-[10px]"
+      className="h-6 min-w-[74px] px-2 bg-cyan-50 border-cyan-300/40 text-cyan-700 hover:bg-cyan-100 whitespace-nowrap text-[10px] leading-none"
     >
       Tomar
     </Button>
@@ -1376,7 +1375,7 @@ const toggleAudioMessage = async (id: string) => {
       size="sm"
       variant="outline"
       onClick={doDevolver}
-      className="h-7 px-2 bg-cyan-50 border-cyan-300/35 text-cyan-700 hover:bg-cyan-100 whitespace-nowrap text-[10px]"
+      className="h-6 min-w-[74px] px-2 bg-cyan-50 border-cyan-300/40 text-cyan-700 hover:bg-cyan-100 whitespace-nowrap text-[10px] leading-none"
     >
       Devolver
     </Button>
