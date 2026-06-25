@@ -869,15 +869,12 @@ const toggleAudioMessage = async (id: string) => {
       </div>
     )}
 
-    <div className="inline-block max-w-full align-bottom">
-      <span className="whitespace-pre-wrap break-words leading-snug inline">
-        {m.contenido_texto || ''}
-      </span>
-
-      <span className="ml-2 text-[10px] whitespace-nowrap text-cyan-900/45 inline-block align-bottom">
-        {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
-      </span>
-    </div>
+    <div className="max-w-full whitespace-pre-wrap break-words leading-snug">
+  {m.contenido_texto || ''}
+  <span className="float-right ml-2 mt-[3px] text-[10px] whitespace-nowrap text-cyan-900/45">
+    {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
+  </span>
+</div>
   </div>
 )}
                     </div>
@@ -1519,15 +1516,12 @@ const toggleAudioMessage = async (id: string) => {
       </div>
     )}
 
-    <div className="inline-block max-w-full align-bottom">
-      <span className="whitespace-pre-wrap break-words leading-snug inline">
-        {m.contenido_texto || ''}
-      </span>
-
-      <span className="ml-2 text-[10px] whitespace-nowrap text-cyan-900/45 inline-block align-bottom">
-        {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
-      </span>
-    </div>
+    <div className="max-w-full whitespace-pre-wrap break-words leading-snug">
+  {m.contenido_texto || ''}
+  <span className="float-right ml-2 mt-[3px] text-[10px] whitespace-nowrap text-cyan-900/45">
+    {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
+  </span>
+</div>
   </div>
 )}
               </div>
