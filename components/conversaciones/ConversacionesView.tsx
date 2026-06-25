@@ -880,7 +880,6 @@ const toggleAudioMessage = async (id: string) => {
     </div>
   </div>
 )}
-</div>
                     </div>
                   </div>
                 );
@@ -1531,7 +1530,6 @@ const toggleAudioMessage = async (id: string) => {
     </div>
   </div>
 )}
-</div>
               </div>
             </div>
           );
