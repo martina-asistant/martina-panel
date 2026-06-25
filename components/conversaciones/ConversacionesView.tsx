@@ -811,18 +811,14 @@ const toggleAudioMessage = async (id: string) => {
     <audio
   ref={(el) => {
     audioRefs.current[m.id] = el;
-
-    if (el && audioSrc) {
-      el.load();
-    }
   }}
   src={audioSrc}
-  preload="auto"
+  preload="metadata"
   className="hidden"
   onLoadedMetadata={(e) => {
     guardarDuracionAudio(m.id, e.currentTarget);
   }}
-  onCanPlayThrough={(e) => {
+  onCanPlay={(e) => {
     guardarDuracionAudio(m.id, e.currentTarget);
   }}
   onTimeUpdate={(e) => {
