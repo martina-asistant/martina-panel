@@ -812,10 +812,12 @@ const toggleAudioMessage = async (id: string) => {
   ref={(el) => {
     audioRefs.current[m.id] = el;
   }}
-  src={audioSrc}
   preload="metadata"
   className="hidden"
   onLoadedMetadata={(e) => {
+    guardarDuracionAudio(m.id, e.currentTarget);
+  }}
+  onDurationChange={(e) => {
     guardarDuracionAudio(m.id, e.currentTarget);
   }}
   onCanPlay={(e) => {
@@ -835,13 +837,20 @@ const toggleAudioMessage = async (id: string) => {
     }));
   }}
   onError={(e) => {
+    const audio = e.currentTarget;
+
     console.error('Error cargando audio del mensaje', {
       id: m.id,
-      src: audioSrc,
-      error: e.currentTarget.error
+      audioSrc,
+      currentSrc: audio.currentSrc,
+      error: audio.error,
+      readyState: audio.readyState,
+      networkState: audio.networkState,
     });
   }}
-/>
+>
+  <source src={audioSrc} type="audio/webm" />
+</audio>
 
     <div className="flex items-center gap-1.5 pr-6">
       <div className="w-8 h-8 shrink-0 rounded-full bg-[#03111A] border border-cyan-400/40 flex items-center justify-center overflow-hidden shadow-[0_0_10px_rgba(34,211,238,.22)]">
