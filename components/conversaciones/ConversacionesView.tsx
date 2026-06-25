@@ -48,6 +48,7 @@ import {
 import { conversacionLabel } from '@/lib/utils/visualMaps';
 import { toast } from 'sonner';
 import { Textarea } from '@/components/ui/textarea';
+import AudioBubble from '@/components/conversaciones/AudioBubble';
 import {
   getPatientByPacienteId,
   updatePatientNotas
@@ -784,128 +785,10 @@ const toggleAudioMessage = async (id: string) => {
                       )}
                     >
                     {(m.tipo_mensaje === 'audio' || isAudioMessage(m.contenido_texto)) ? (
-  <div className="relative w-[285px] max-w-full rounded-2xl border border-cyan-300/40 bg-gradient-to-br from-cyan-50 to-white px-3 py-2 shadow-[0_0_18px_rgba(34,211,238,.16)]">
-    <button
-      type="button"
-      onClick={() =>
-        setMenuMensajeId(menuMensajeId === m.id ? null : m.id)
-      }
-      className="absolute top-1/2 right-2 -translate-y-1/2 w-6 h-6 rounded-full text-cyan-900/70 hover:bg-cyan-100 flex items-center justify-center z-10"
-      title="Opciones"
-    >
-      <MoreVertical className="w-4 h-4" />
-    </button>
-
-    {menuMensajeId === m.id && (
-      <div className="absolute top-8 right-2 z-20 w-36 rounded-xl border border-cyan-200 bg-white shadow-xl overflow-hidden">
-        <button
-          type="button"
-          onClick={() => eliminarMensaje(m.id)}
-          className="w-full px-3 py-2 text-left text-xs text-red-600 hover:bg-red-50"
-        >
-          Eliminar audio
-        </button>
-      </div>
-    )}
-
-    <audio
-  ref={(el) => {
-    audioRefs.current[m.id] = el;
-  }}
-  preload="metadata"
-  className="hidden"
-  onLoadedMetadata={(e) => {
-    guardarDuracionAudio(m.id, e.currentTarget);
-  }}
-  onDurationChange={(e) => {
-    guardarDuracionAudio(m.id, e.currentTarget);
-  }}
-  onCanPlay={(e) => {
-    guardarDuracionAudio(m.id, e.currentTarget);
-  }}
-  onTimeUpdate={(e) => {
-    setAudioProgress(prev => ({
-      ...prev,
-      [m.id]: e.currentTarget.currentTime
-    }));
-  }}
-  onEnded={() => {
-    setAudioPlayingId(null);
-    setAudioProgress(prev => ({
-      ...prev,
-      [m.id]: 0
-    }));
-  }}
-  onError={(e) => {
-    const audio = e.currentTarget;
-
-    console.error('Error cargando audio del mensaje', {
-      id: m.id,
-      audioSrc,
-      currentSrc: audio.currentSrc,
-      error: audio.error,
-      readyState: audio.readyState,
-      networkState: audio.networkState,
-    });
-  }}
->
-  <source src={audioSrc} type="audio/webm" />
-</audio>
-
-    <div className="flex items-center gap-1.5 pr-6">
-      <div className="w-8 h-8 shrink-0 rounded-full bg-[#03111A] border border-cyan-400/40 flex items-center justify-center overflow-hidden shadow-[0_0_10px_rgba(34,211,238,.22)]">
-        <img
-          src="/m-icon.png"
-          alt="Martina"
-          className="w-5 h-5 object-contain"
-        />
-      </div>
-
-      <button
-        type="button"
-        onClick={() => toggleAudioMessage(m.id)}
-        className="w-5 h-6 shrink-0 text-black flex items-center justify-center"
-        title={audioPlayingId === m.id ? 'Pausar audio' : 'Reproducir audio'}
-      >
-        {audioPlayingId === m.id ? (
-          <Pause className="w-5 h-5 fill-black" />
-        ) : (
-          <Play className="w-5 h-5 fill-black" />
-        )}
-      </button>
-
-    <div className="relative flex-1 min-w-0 ml-[2px] h-10">
-  <div className="absolute left-[7px] right-0 top-[18px] h-[1.5px] rounded-full bg-[#7CCFDC]">
-  <div
-    className="absolute left-0 top-0 h-full rounded-full bg-[#0E8FA0]"
-      style={{
-        width: `${
-          audioDurations[m.id]
-            ? Math.min(100, ((audioProgress[m.id] || 0) / audioDurations[m.id]) * 100)
-            : 0
-        }%`
-      }}
-    />
-
-    <div
-      className="absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[#0E8FA0] shadow-[0_0_4px_rgba(14,143,160,.18)]"
-      style={{
-        left: `calc(${
-          audioDurations[m.id]
-            ? Math.min(100, ((audioProgress[m.id] || 0) / audioDurations[m.id]) * 100)
-            : 0
-        }% - 4px)`
-      }}
-    />
-  </div>
-
-  <div className="absolute left-[7px] right-0 top-[29px] flex items-center justify-between text-[10px] leading-none text-[#0E8FA0]">
-    <span>{formatAudioTime(audioProgress[m.id])}</span>
-    <span>{formatAudioTime(audioDurations[m.id])}</span>
-  </div>
-</div>
-    </div>
-  </div>
+                      <AudioBubble
+  src={audioSrc}
+  onDelete={() => eliminarMensaje(m.id)}
+/>
 ) : (
   <div className="whitespace-pre-wrap break-words leading-relaxed">
     {m.contenido_texto || ''}
