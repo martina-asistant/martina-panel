@@ -602,6 +602,7 @@ const toggleAudioMessage = async (id: string) => {
 
   return (
     <div className="h-full flex bg-[#02141B] text-white overflow-hidden">
+      <div className="hidden lg:flex h-full">
       <div className="w-[28%] min-w-[280px] max-w-[340px] border-r border-cyan-500/15 bg-[#03111A] flex flex-col shrink-0 min-h-0">
         <div className="px-6 pt-6 pb-4">
           <h1 className="text-2xl font-semibold tracking-[-0.015em] scale-x-[0.97] origin-left bg-gradient-to-r from-white to-cyan-300 bg-clip-text text-transparent mb-1">
@@ -1062,6 +1063,523 @@ const toggleAudioMessage = async (id: string) => {
         )}
       </div>
     </div>
+      
+      <div className="lg:hidden h-full">
+    <div className="h-full flex flex-col bg-[#F8FBFC] text-[#06111A]">
+  {/* OVERLAY LISTA */}
+  {mostrarListaMovil && (
+    <div
+      className="fixed inset-0 z-40 bg-black/45"
+      onClick={() => setMostrarListaMovil(false)}
+    />
+  )}
+
+  {/* OVERLAY FICHA */}
+  {mostrarFichaMovil && (
+    <div
+      className="fixed inset-0 z-40 bg-black/45"
+      onClick={() => setMostrarFichaMovil(false)}
+    />
+  )}
+
+  {/* DRAWER LISTA CONVERSACIONES */}
+  <div
+    className={cn(
+      'fixed inset-y-0 left-0 z-50 w-[88%] max-w-[340px] bg-[#03111A] text-white border-r border-cyan-500/15 flex flex-col transition-transform duration-300',
+      mostrarListaMovil ? 'translate-x-0' : '-translate-x-full'
+    )}
+  >
+    <div className="px-5 pt-5 pb-4 border-b border-cyan-500/15">
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h2 className="text-xl font-semibold tracking-[-0.015em] bg-gradient-to-r from-white to-cyan-300 bg-clip-text text-transparent">
+            Conversaciones
+          </h2>
+          <p className="text-xs text-cyan-100/55">WhatsApp</p>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setMostrarListaMovil(false)}
+          className="w-8 h-8 rounded-xl bg-white/5 border border-cyan-400/20 text-cyan-50 flex items-center justify-center"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+
+      <div className="space-y-3">
+        <div className="relative">
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-cyan-300/70" />
+          <Input
+            placeholder="Buscar paciente, teléfono..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="pl-9 h-11 rounded-xl bg-white/5 border-cyan-500/20 text-white placeholder:text-cyan-100/45 focus-visible:ring-cyan-400"
+          />
+        </div>
+
+        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+          {filtros.map(f => (
+            <button
+              key={f.key}
+              onClick={() => setFilter(f.key)}
+              className={cn(
+                'text-[12px] px-2.5 py-[6px] rounded-full border transition-colors whitespace-nowrap shrink-0',
+                filter === f.key
+                  ? 'bg-cyan-500/20 text-cyan-200 border-cyan-300/50 shadow-[0_0_18px_rgba(34,211,238,.22)]'
+                  : 'bg-white/5 text-cyan-100/65 border-cyan-500/20 hover:bg-cyan-500/10 hover:text-white'
+              )}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <div className="flex-1 overflow-y-auto">
+      {filtered.length === 0 && (
+        <div className="p-6 text-center text-sm text-cyan-100/50">
+          Sin conversaciones
+        </div>
+      )}
+
+      {filtered.map(c => {
+        const lbl = c.estado_visual ? conversacionLabel[c.estado_visual] : null;
+        const last = lastActivity(c);
+        const isSel = c.id === selectedId;
+
+        return (
+          <button
+            key={c.id}
+            onClick={() => {
+              setSelectedId(c.id);
+              setMostrarListaMovil(false);
+            }}
+            className={cn(
+              'w-full text-left px-4 py-4 border-b border-cyan-500/10 transition-all',
+              isSel
+                ? 'bg-cyan-500/15 shadow-[inset_3px_0_0_rgba(34,211,238,.9)]'
+                : 'hover:bg-white/5'
+            )}
+          >
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-cyan-300 shadow-[0_0_12px_rgba(34,211,238,.9)]" />
+                  <span className="text-sm font-semibold truncate text-white">
+                    {c.nombre_paciente || formatTelefono(c.telefono_e164) || 'Sin nombre'}
+                  </span>
+                </div>
+
+                <div className="text-xs text-cyan-100/60 truncate mt-1 ml-4">
+                  {c.motivo || formatTelefono(c.telefono_e164)}
+                </div>
+              </div>
+
+              <div className="text-[11px] text-cyan-100/60 shrink-0">
+                {formatRelativeOrTime(last)}
+              </div>
+            </div>
+
+            {lbl && (
+              <div className="mt-2 ml-4">
+                <span className="inline-flex items-center text-[11px] px-2.5 py-1 rounded-full bg-cyan-500/15 text-cyan-100 border border-cyan-400/20">
+                  {lbl.label}
+                </span>
+              </div>
+            )}
+          </button>
+        );
+      })}
+    </div>
+  </div>
+
+  {/* DRAWER FICHA PACIENTE */}
+  <div
+    className={cn(
+      'fixed inset-y-0 right-0 z-50 w-[88%] max-w-[360px] bg-[#03111A] text-white border-l border-cyan-500/15 overflow-y-auto transition-transform duration-300',
+      mostrarFichaMovil ? 'translate-x-0' : 'translate-x-full'
+    )}
+  >
+    <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-4 border-b border-cyan-500/15 bg-[#03111A]">
+      <div className="text-sm font-semibold text-white">Ficha paciente</div>
+
+      <button
+        type="button"
+        onClick={() => setMostrarFichaMovil(false)}
+        className="w-8 h-8 rounded-xl bg-white/5 border border-cyan-400/20 text-cyan-50 flex items-center justify-center"
+      >
+        <X className="w-4 h-4" />
+      </button>
+    </div>
+
+    {selected && (
+      <div className="p-5 space-y-5">
+        <div className="flex items-center gap-3">
+          <div className="w-16 h-16 rounded-full bg-[radial-gradient(circle_at_35%_30%,#1A6C78_0%,#0D4450_45%,#072B34_100%)] border-2 border-cyan-200/80 flex items-center justify-center text-lg font-semibold text-white shadow-[0_0_12px_rgba(34,211,238,.65),0_0_28px_rgba(34,211,238,.30),inset_0_0_12px_rgba(255,255,255,.18)]">
+            {(paciente?.nombre_completo || selected.nombre_paciente || '?')
+              .split(' ')
+              .map(s => s[0])
+              .slice(0, 2)
+              .join('')}
+          </div>
+
+          <div className="min-w-0">
+            <div className="font-semibold truncate text-white">
+              {paciente?.nombre_completo || selected.nombre_paciente || 'Sin nombre registrado'}
+            </div>
+
+            <div className="text-xs text-cyan-100/60">
+              {formatTelefono(paciente?.telefono || selected.telefono_e164) || 'Sin teléfono registrado'}
+            </div>
+          </div>
+        </div>
+
+        {paciente?.alerta_urgencia && (
+          <div className="text-xs px-3 py-2 rounded-xl bg-red-500/10 text-red-100 border border-red-400/25">
+            Posible urgencia
+          </div>
+        )}
+
+        <div className="grid grid-cols-2 gap-3 text-xs">
+          <div>
+            <div className="text-cyan-100/50 mb-1">Última cita</div>
+            <div className="font-medium text-white">
+              {formatDate(paciente?.ultima_cita_fecha)}
+            </div>
+            <div className="text-cyan-100/50">
+              {paciente?.ultima_cita_motivo || '—'}
+            </div>
+          </div>
+
+          <div>
+            <div className="text-cyan-100/50 mb-1">Próxima cita</div>
+            <div className="font-medium text-white">
+              {formatDate(paciente?.proxima_cita_fecha)}
+            </div>
+            <div className="text-cyan-100/50">
+              {paciente?.proxima_cita_motivo || '—'}
+            </div>
+          </div>
+        </div>
+
+        {Array.isArray(paciente?.etiquetas) && paciente.etiquetas.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {paciente?.etiquetas.map(t => (
+              <span
+                key={t}
+                className="text-[10px] px-2.5 py-1 rounded-full bg-cyan-500/10 text-cyan-100 border border-cyan-400/20"
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+        )}
+
+        <div className="space-y-2">
+          <div className="text-xs font-medium text-cyan-100/60 uppercase tracking-wide">
+            Notas del paciente
+          </div>
+
+          <Textarea
+            value={notasPaciente}
+            onChange={e => setNotasPaciente(e.target.value)}
+            rows={4}
+            className="text-sm bg-white/5 border-cyan-500/20 text-white placeholder:text-cyan-100/35"
+            placeholder="Añade notas…"
+          />
+
+          <Button
+            size="sm"
+            onClick={saveNotasPaciente}
+            className="w-full bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-400/30 text-white"
+          >
+            <Save className="w-4 h-4 mr-2" />
+            Guardar notas
+          </Button>
+        </div>
+
+        <div className="space-y-2 pt-4 border-t border-cyan-500/15">
+          <div className="text-xs font-medium text-cyan-100/60 uppercase tracking-wide">
+            Notas de esta conversación
+          </div>
+
+          <Textarea
+            value={notasConv}
+            onChange={e => setNotasConv(e.target.value)}
+            rows={3}
+            className="text-sm bg-white/5 border-cyan-500/20 text-white placeholder:text-cyan-100/35"
+            placeholder="Recado, contexto…"
+          />
+
+          <Button
+            size="sm"
+            onClick={saveNotasConv}
+            className="w-full bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-400/30 text-white"
+          >
+            <Save className="w-4 h-4 mr-2" />
+            Guardar recado
+          </Button>
+        </div>
+      </div>
+    )}
+  </div>
+
+  {/* CHAT MÓVIL */}
+  {!selected ? (
+    <div className="flex-1 flex items-center justify-center text-slate-400 text-sm px-6 text-center">
+      Selecciona una conversación
+    </div>
+  ) : (
+    <>
+      <div className="relative z-10 bg-[#F8FBFC] px-3 py-3 border-b border-cyan-100 shadow-[0_12px_30px_rgba(14,124,139,.08)] shrink-0">
+        <button
+          onClick={doCerrar}
+          className="absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center text-white bg-[linear-gradient(180deg,#214955_0%,#163C46_100%)] border border-cyan-300/15 shadow-[0_0_0_3px_rgba(34,211,238,.10),0_0_18px_rgba(34,211,238,.25)] hover:scale-105 transition-all z-20"
+        >
+          <span className="text-[12px] leading-[1] flex items-center justify-center translate-y-[-1px]">✕</span>
+        </button>
+
+        <div className="w-full rounded-3xl border border-[#6FD7E2]/35 bg-[linear-gradient(180deg,#0F2C35_0%,#163C46_100%)] px-4 py-4 shadow-[0_0_34px_rgba(34,211,238,.18),0_16px_32px_rgba(14,124,139,.14),inset_0_1px_0_rgba(255,255,255,.06)]">
+          <div className="flex items-start gap-3">
+            <button
+              type="button"
+              onClick={() => setMostrarListaMovil(true)}
+              className="mt-[2px] w-9 h-9 rounded-xl bg-white/10 border border-cyan-200/20 text-cyan-50 flex items-center justify-center shrink-0"
+              title="Abrir conversaciones"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="font-semibold text-white truncate">
+                  {selected.nombre_paciente || formatTelefono(selected.telefono_e164)}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setMostrarFichaMovil(true)}
+                  className="w-8 h-8 rounded-xl bg-white/10 border border-cyan-200/20 text-cyan-50 flex items-center justify-center shrink-0"
+                  title="Ver ficha paciente"
+                >
+                  <Menu className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="text-xs text-cyan-100/75 truncate mt-1">
+                {formatTelefono(selected.telefono_e164)} · {selected.motivo || 'Sin motivo'}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 mt-4">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={doTomar}
+              className="bg-cyan-50 border-cyan-300/35 text-cyan-700 hover:bg-cyan-100 whitespace-nowrap text-xs"
+            >
+              Tomar conversación
+            </Button>
+
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={doDevolver}
+              className="bg-cyan-50 border-cyan-300/35 text-cyan-700 hover:bg-cyan-100 whitespace-nowrap text-xs"
+            >
+              Devolver a Martina
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex-1 min-h-0 overflow-y-auto px-3 py-4 space-y-4 bg-[radial-gradient(circle_at_top,rgba(34,211,238,.04),#F8FBFC_45%)]">
+        {mensajes.map(m => {
+          const isPaciente =
+            m.tipo_emisor === 'paciente' ||
+            m.direccion === 'entrante';
+
+          const audioSrc = m.url_archivo || getAudioUrl(m.contenido_texto);
+
+          return (
+            <div
+              key={m.id}
+              className={cn(
+                'flex',
+                isPaciente ? 'justify-start' : 'justify-end'
+              )}
+            >
+              <div
+                className={cn(
+                  'max-w-[88%] rounded-2xl px-4 py-3 text-sm shadow-sm',
+                  isPaciente
+                    ? 'bg-white border border-slate-200 text-[#06111A] rounded-bl-sm'
+                    : 'bg-[#D9F7FA] border border-[#B6EAEF] text-[#184B53] rounded-br-sm shadow-[0_0_12px_rgba(34,211,238,.08)]'
+                )}
+              >
+                {(m.tipo_mensaje === 'audio' || isAudioMessage(m.contenido_texto)) ? (
+                  <AudioBubble
+                    src={audioSrc}
+                    onDelete={() => eliminarMensaje(m.id)}
+                  />
+                ) : (
+                  <div className="whitespace-pre-wrap break-words leading-relaxed">
+                    {m.contenido_texto || ''}
+                  </div>
+                )}
+
+                <div
+                  className={cn(
+                    'text-[10px] mt-2 text-right',
+                    isPaciente
+                      ? 'text-slate-400'
+                      : 'text-cyan-900/60'
+                  )}
+                >
+                  {!isPaciente && m.tipo_emisor && (
+                    <span className="mr-2 uppercase tracking-wide">
+                      {m.tipo_emisor}
+                    </span>
+                  )}
+
+                  {formatTime(m.created_at)}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+
+        {mensajes.length === 0 && (
+          <div className="text-center text-sm text-slate-400 py-8">
+            Sin mensajes
+          </div>
+        )}
+      </div>
+
+      <div className="px-3 py-3 border-t border-[#6FD7E2]/20 bg-[#F8FBFC] shadow-[0_-6px_20px_rgba(14,124,139,.08)] shrink-0">
+        <div className="flex items-center gap-2 rounded-2xl border border-[#6FD7E2]/35 bg-[linear-gradient(180deg,#0F2C35_0%,#163C46_100%)] p-2.5 shadow-[0_-10px_35px_rgba(34,211,238,.14),0_14px_30px_rgba(34,211,238,.10),inset_0_1px_0_rgba(255,255,255,.05)]">
+          <input
+            ref={fileInputRef}
+            type="file"
+            className="hidden"
+            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) enviarAdjunto(file);
+            }}
+          />
+
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={grabandoAudio || enviandoAudio}
+            className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] shadow-[0_0_20px_rgba(14,124,139,.35)] text-white flex items-center justify-center transition-all disabled:opacity-40 shrink-0"
+            title="Adjuntar archivo"
+          >
+            <Paperclip className="w-4 h-4" />
+          </button>
+
+          {audioPreviewUrl ? (
+            <div className="flex-1 h-10 rounded-xl bg-white border border-cyan-100 px-2 flex items-center gap-2 min-w-0">
+              <audio
+                ref={audioPreviewRef}
+                src={audioPreviewUrl}
+                onEnded={() => setReproduciendoPreview(false)}
+                className="hidden"
+              />
+
+              <button
+                type="button"
+                onClick={limpiarPreviewAudio}
+                disabled={enviandoAudio}
+                className="h-8 w-8 rounded-lg text-red-500 hover:bg-red-50 flex items-center justify-center disabled:opacity-40"
+                title="Borrar audio"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+
+              <button
+                type="button"
+                onClick={togglePreviewAudio}
+                disabled={enviandoAudio}
+                className="h-8 w-8 rounded-lg text-cyan-800 hover:bg-cyan-50 flex items-center justify-center disabled:opacity-40"
+                title={reproduciendoPreview ? 'Pausar audio' : 'Escuchar audio'}
+              >
+                {reproduciendoPreview ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+              </button>
+
+              <div className="min-w-0 flex-1 truncate text-sm text-slate-700">
+                Audio listo para enviar
+              </div>
+
+              <button
+                type="button"
+                onClick={enviarAudioPreview}
+                disabled={enviandoAudio}
+                className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] text-white flex items-center justify-center disabled:opacity-40"
+                title="Enviar audio"
+              >
+                <Send className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <>
+              <Input
+                placeholder={
+                  grabandoAudio
+                    ? `Grabando audio... ${formatAudioTime(segundosGrabacion)}`
+                    : 'Escribe un mensaje...'
+                }
+                value={nuevoMensaje}
+                onChange={(e) => setNuevoMensaje(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    if (!grabandoAudio) enviarMensaje();
+                  }
+                }}
+                disabled={grabandoAudio}
+                className="flex-1 h-10 rounded-xl bg-white border border-cyan-100 px-4 text-sm text-slate-700 placeholder:text-slate-400 focus-visible:ring-cyan-400 disabled:opacity-60"
+              />
+
+              <button
+                type="button"
+                onClick={enviarMensaje}
+                disabled={!nuevoMensaje.trim() || grabandoAudio}
+                className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_24px_rgba(14,124,139,.45)] text-white flex items-center justify-center shrink-0"
+                title="Enviar"
+              >
+                <Send className="w-4 h-4" />
+              </button>
+            </>
+          )}
+
+          {!audioPreviewUrl && (
+            <button
+              type="button"
+              onClick={grabandoAudio ? pararGrabacionAudio : iniciarGrabacionAudio}
+              disabled={enviandoAudio}
+              className={cn(
+                'w-10 h-10 rounded-xl text-white flex items-center justify-center transition-all shrink-0',
+                grabandoAudio
+                  ? 'bg-red-500 hover:bg-red-600 shadow-[0_0_20px_rgba(239,68,68,.35)]'
+                  : 'bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] shadow-[0_0_20px_rgba(14,124,139,.35)]'
+              )}
+              title={grabandoAudio ? 'Parar grabación' : 'Grabar audio'}
+            >
+              {grabandoAudio ? <Square className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+            </button>
+          )}
+        </div>
+      </div>
+    </>
+  )}
+</div>
+  </div>
+</div>
   );
 };
 
