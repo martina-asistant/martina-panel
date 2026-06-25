@@ -2,7 +2,6 @@ import { createClient as createBrowserSupa } from '@/lib/supabase/client';
 import { mockMensajes } from '@/lib/mock/data';
 import type { MensajeWhatsapp } from '@/lib/types/db.types';
 
-const AUDIO_BUCKET = 'whatsapp-audios';
 const ATTACHMENTS_BUCKET = 'whatsapp-adjuntos';
 
 function getStoragePathFromUrl(url?: string | null): string | null {
@@ -41,9 +40,6 @@ async function signMensajeUrl(
 ): Promise<MensajeWhatsapp> {
   if (!supa || !mensaje.url_archivo) return mensaje;
 
-  const path = getStoragePathFromUrl(mensaje.url_archivo);
-  if (!path) return mensaje;
-
   const tipo = String(mensaje.tipo_mensaje || '').toLowerCase();
   const mime = String((mensaje as any).mime_type || '').toLowerCase();
   const contenido = String(mensaje.contenido_texto || '').toLowerCase();
@@ -54,17 +50,20 @@ async function signMensajeUrl(
     contenido.endsWith('.webm') ||
     contenido.endsWith('.ogg') ||
     contenido.endsWith('.mp3') ||
-    contenido.endsWith('.wav') ||
-    path.includes('audio');
+    contenido.endsWith('.wav');
 
-  const bucket = esAudio ? AUDIO_BUCKET : ATTACHMENTS_BUCKET;
+  // El audio NO lo tocamos: ya funcionaba antes
+  if (esAudio) return mensaje;
+
+  const path = getStoragePathFromUrl(mensaje.url_archivo);
+  if (!path) return mensaje;
 
   const { data, error } = await supa.storage
-    .from(bucket)
-    .createSignedUrl(path, 60 * 60 * 24); // 24h
+    .from(ATTACHMENTS_BUCKET)
+    .createSignedUrl(path, 60 * 60 * 24);
 
   if (error || !data?.signedUrl) {
-    console.error(`Error firmando URL (${bucket}):`, error);
+    console.error(`Error firmando URL adjunto (${ATTACHMENTS_BUCKET}):`, error);
     return mensaje;
   }
 
