@@ -1540,29 +1540,17 @@ return (
       )}
     >
       {(m.tipo_mensaje === 'audio' || isAudioMessage(m.contenido_texto)) ? (
-        <>
-          <AudioBubble
-            src={audioSrc}
-            onDelete={() => eliminarMensaje(m.id)}
-          />
-
-          <div className="text-[10px] mt-2 text-right whitespace-nowrap text-cyan-900/60">
-            {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
-          </div>
-        </>
+        <AudioBubble
+          src={audioSrc}
+          onDelete={() => eliminarMensaje(m.id)}
+        />
       ) : isAttachment ? (
-        <>
-          <AttachmentBubble
-            fileName={attachmentName}
-            url={(m as any).url_archivo || null}
-            mimeType={(m as any).mime_type || null}
-            onDelete={() => eliminarMensaje(m.id)}
-          />
-
-          <div className="text-[10px] mt-2 text-right whitespace-nowrap text-cyan-900/60">
-            {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
-          </div>
-        </>
+        <AttachmentBubble
+          fileName={attachmentName}
+          url={(m as any).url_archivo || null}
+          mimeType={(m as any).mime_type || null}
+          onDelete={() => eliminarMensaje(m.id)}
+        />
       ) : (
         <div className="relative pr-7">
           <button
@@ -1592,6 +1580,17 @@ return (
               {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
             </span>
           </div>
+        </div>
+      )}
+
+      {((m.tipo_mensaje === 'audio' || isAudioMessage(m.contenido_texto)) || isAttachment) && (
+        <div
+          className={cn(
+            'text-[10px] mt-2 text-right',
+            isPaciente ? 'text-slate-400' : 'text-cyan-900/60'
+          )}
+        >
+          {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
         </div>
       )}
     </div>
