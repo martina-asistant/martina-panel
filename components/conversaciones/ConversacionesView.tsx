@@ -1336,17 +1336,17 @@ const toggleAudioMessage = async (id: string) => {
             <div className="relative z-10 bg-[#F8FBFC] px-3 py-3 border-b border-cyan-100 shadow-[0_12px_30px_rgba(14,124,139,.08)] shrink-0">
         <button
           onClick={doCerrar}
-          className="absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center text-white bg-[linear-gradient(180deg,#214955_0%,#163C46_100%)] border border-cyan-300/15 shadow-[0_0_0_3px_rgba(34,211,238,.10),0_0_18px_rgba(34,211,238,.25)] hover:scale-105 transition-all z-20"
+          className="absolute -top-2 right-1 w-6 h-6 rounded-full flex items-center justify-center text-white bg-[linear-gradient(180deg,#214955_0%,#163C46_100%)] border border-cyan-300/20 shadow-[0_0_0_3px_rgba(34,211,238,.10),0_0_14px_rgba(34,211,238,.22)] hover:scale-105 transition-all z-30"
         >
           <span className="text-[12px] leading-[1] flex items-center justify-center translate-y-[-1px]">✕</span>
         </button>
 
-        <div className="w-full rounded-3xl border border-[#6FD7E2]/45 bg-[linear-gradient(180deg,#0F2C35_0%,#163C46_100%)] px-3 py-3 shadow-[0_0_28px_rgba(34,211,238,.16),0_12px_26px_rgba(14,124,139,.12),inset_0_1px_0_rgba(255,255,255,.06)]">
+        <div className="w-[97%] mx-auto rounded-3xl border border-[#6FD7E2]/45 bg-[linear-gradient(180deg,#0F2C35_0%,#163C46_100%)] px-3 py-3 shadow-[0_0_28px_rgba(34,211,238,.16),0_12px_26px_rgba(14,124,139,.12),inset_0_1px_0_rgba(255,255,255,.06)]"
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => setMostrarListaMovil(true)}
-              className="w-8 h-8 rounded-xl bg-white/5 border border-[#6FD7E2]/55 text-cyan-100 flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(34,211,238,.12)]"
+              className="w-8 h-8 rounded-xl bg-white/5 border border-[#6FD7E2]/55 text-cyan-100 flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(34,211,238,.12)] mr-1"
               title="Abrir conversaciones"
             >
               <span className="text-2xl leading-none -translate-y-[1px]">›</span>
@@ -1385,7 +1385,7 @@ const toggleAudioMessage = async (id: string) => {
             <button
               type="button"
               onClick={() => setMostrarFichaMovil(true)}
-              className="w-8 h-8 rounded-xl bg-white/5 border border-[#6FD7E2]/55 text-cyan-100 flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(34,211,238,.12)]"
+              className="w-8 h-8 rounded-xl bg-white/5 border border-[#6FD7E2]/55 text-cyan-100 flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(34,211,238,.12)] ml-1"
               title="Ver ficha paciente"
             >
               <span className="text-2xl leading-none -translate-y-[1px]">‹</span>
