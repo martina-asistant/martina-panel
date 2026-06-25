@@ -859,83 +859,83 @@ const toggleAudioMessage = async (id: string) => {
                   m.direccion === 'entrante';
             
             const audioSrc = m.url_archivo || getAudioUrl(m.contenido_texto);
-  const isAttachment = isAttachmentMessage(m);
+const isAttachment = isAttachmentMessage(m);
 const attachmentName = getAttachmentFileName(m);
 
-                return (
-                  <div
-                    key={m.id}
-                    className={cn(
-                      'flex',
-                      isPaciente ? 'justify-start' : 'justify-end'
-                    )}
-                  >
-                    <div
-                      className={cn(
-                        'w-fit max-w-[72%] rounded-2xl pl-4 pr-2 py-2 text-sm shadow-sm',
-                        isPaciente
-                          ? 'bg-white border border-slate-200 text-[#06111A] rounded-bl-sm'
-                          : 'bg-[#D9F7FA] border border-[#B6EAEF] text-[#184B53] rounded-br-sm shadow-[0_0_12px_rgba(34,211,238,.08)]'
-                      )}
-                    >
-                    {(m.tipo_mensaje === 'audio' || isAudioMessage(m.contenido_texto)) ? (
-  <>
-    <AudioBubble
-      src={audioSrc}
-      onDelete={() => eliminarMensaje(m.id)}
-    />
-
-    <div className="text-[10px] mt-2 text-right whitespace-nowrap text-cyan-900/60">
-      {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
-    </div>
-  </>
-) : isAttachment ? (
-  <>
-    <AttachmentBubble
-      fileName={attachmentName}
-      url={(m as any).url_archivo || null}
-      mimeType={(m as any).mime_type || null}
-      onDelete={() => eliminarMensaje(m.id)}
-    />
-
-    <div className="text-[10px] mt-2 text-right whitespace-nowrap text-cyan-900/60">
-      {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
-    </div>
-  </>
-) : (
-  <div className="relative pr-7">
-    <button
-      type="button"
-      onClick={() => setMenuMensajeId(menuMensajeId === m.id ? null : m.id)}
-      className="absolute top-[2px] right-1 w-4 h-4 rounded-full text-cyan-900/45 hover:text-cyan-900 hover:bg-cyan-100 flex items-center justify-center z-20"
-      title="Opciones mensaje"
-    >
-      <MoreVertical className="w-4 h-4" />
-    </button>
-
-    {menuMensajeId === m.id && (
-      <div className="absolute top-5 right-0 z-50 w-36 rounded-xl border border-cyan-200 bg-white shadow-xl overflow-hidden">
-        <button
-          type="button"
-          onClick={() => eliminarMensaje(m.id)}
-          className="w-full px-3 py-2 text-left text-xs text-red-600 hover:bg-red-50"
-        >
-          Eliminar mensaje
-        </button>
-      </div>
+return (
+  <div
+    key={m.id}
+    className={cn(
+      'flex',
+      isPaciente ? 'justify-start' : 'justify-end'
     )}
+  >
+    <div
+      className={cn(
+        'w-fit max-w-[88%] rounded-2xl pl-4 pr-2 py-2 text-sm shadow-sm',
+        isPaciente
+          ? 'bg-white border border-slate-200 text-[#06111A] rounded-bl-sm'
+          : 'bg-[#D9F7FA] border border-[#B6EAEF] text-[#184B53] rounded-br-sm shadow-[0_0_12px_rgba(34,211,238,.08)]'
+      )}
+    >
+      {(m.tipo_mensaje === 'audio' || isAudioMessage(m.contenido_texto)) ? (
+        <>
+          <AudioBubble
+            src={audioSrc}
+            onDelete={() => eliminarMensaje(m.id)}
+          />
 
-    <div className="max-w-full whitespace-pre-wrap break-words leading-snug">
-      {m.contenido_texto || ''}
-      <span className="float-right ml-2 mt-[3px] text-[10px] whitespace-nowrap text-cyan-900/45">
-        {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
-      </span>
+          <div className="text-[10px] mt-2 text-right whitespace-nowrap text-cyan-900/60">
+            {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
+          </div>
+        </>
+      ) : isAttachment ? (
+        <>
+          <AttachmentBubble
+            fileName={attachmentName}
+            url={(m as any).url_archivo || null}
+            mimeType={(m as any).mime_type || null}
+            onDelete={() => eliminarMensaje(m.id)}
+          />
+
+          <div className="text-[10px] mt-2 text-right whitespace-nowrap text-cyan-900/60">
+            {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
+          </div>
+        </>
+      ) : (
+        <div className="relative pr-7">
+          <button
+            type="button"
+            onClick={() => setMenuMensajeId(menuMensajeId === m.id ? null : m.id)}
+            className="absolute top-[2px] right-1 w-4 h-4 rounded-full text-cyan-900/45 hover:text-cyan-900 hover:bg-cyan-100 flex items-center justify-center z-20"
+            title="Opciones mensaje"
+          >
+            <MoreVertical className="w-4 h-4" />
+          </button>
+
+          {menuMensajeId === m.id && (
+            <div className="absolute top-5 right-0 z-50 w-36 rounded-xl border border-cyan-200 bg-white shadow-xl overflow-hidden">
+              <button
+                type="button"
+                onClick={() => eliminarMensaje(m.id)}
+                className="w-full px-3 py-2 text-left text-xs text-red-600 hover:bg-red-50"
+              >
+                Eliminar mensaje
+              </button>
+            </div>
+          )}
+
+          <div className="max-w-full whitespace-pre-wrap break-words leading-snug">
+            {m.contenido_texto || ''}
+            <span className="float-right ml-2 mt-[3px] text-[10px] whitespace-nowrap text-cyan-900/45">
+              {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   </div>
-)}
-                    </div>
-                  </div>
-                );
+);
               })}
 
               {mensajes.length === 0 && (
@@ -1521,84 +1521,83 @@ const attachmentName = getAttachmentFileName(m);
             m.direccion === 'entrante';
 
           const audioSrc = m.url_archivo || getAudioUrl(m.contenido_texto);
-  const isAttachment = isAttachmentMessage(m);
+const isAttachment = isAttachmentMessage(m);
 const attachmentName = getAttachmentFileName(m);
 
-          return (
-            <div
-              key={m.id}
-              className={cn(
-                'flex',
-                isPaciente ? 'justify-start' : 'justify-end'
-              )}
-            >
-              <div
-                className={cn(
-                  'w-fit max-w-[88%] rounded-2xl pl-4 pr-2 py-2 text-sm shadow-sm',
-                  isPaciente
-                    ? 'bg-white border border-slate-200 text-[#06111A] rounded-bl-sm'
-                    : 'bg-[#D9F7FA] border border-[#B6EAEF] text-[#184B53] rounded-br-sm shadow-[0_0_12px_rgba(34,211,238,.08)]'
-                )}
-              >
-                
-{(m.tipo_mensaje === 'audio' || isAudioMessage(m.contenido_texto)) ? (
-  <>
-    <AudioBubble
-      src={audioSrc}
-      onDelete={() => eliminarMensaje(m.id)}
-    />
-
-    <div className="text-[10px] mt-2 text-right whitespace-nowrap text-cyan-900/60">
-      {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
-    </div>
-  </>
-) : isAttachment ? (
-  <>
-    <AttachmentBubble
-      fileName={attachmentName}
-      url={(m as any).url_archivo || null}
-      mimeType={(m as any).mime_type || null}
-      onDelete={() => eliminarMensaje(m.id)}
-    />
-
-    <div className="text-[10px] mt-2 text-right whitespace-nowrap text-cyan-900/60">
-      {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
-    </div>
-  </>
-) : (
-  <div className="relative pr-7">
-    <button
-      type="button"
-      onClick={() => setMenuMensajeId(menuMensajeId === m.id ? null : m.id)}
-      className="absolute top-[2px] right-1 w-4 h-4 rounded-full text-cyan-900/45 hover:text-cyan-900 hover:bg-cyan-100 flex items-center justify-center z-20"
-      title="Opciones mensaje"
-    >
-      <MoreVertical className="w-4 h-4" />
-    </button>
-
-    {menuMensajeId === m.id && (
-      <div className="absolute top-5 right-0 z-50 w-36 rounded-xl border border-cyan-200 bg-white shadow-xl overflow-hidden">
-        <button
-          type="button"
-          onClick={() => eliminarMensaje(m.id)}
-          className="w-full px-3 py-2 text-left text-xs text-red-600 hover:bg-red-50"
-        >
-          Eliminar mensaje
-        </button>
-      </div>
+return (
+  <div
+    key={m.id}
+    className={cn(
+      'flex',
+      isPaciente ? 'justify-start' : 'justify-end'
     )}
+  >
+    <div
+      className={cn(
+        'w-fit max-w-[88%] rounded-2xl pl-4 pr-2 py-2 text-sm shadow-sm',
+        isPaciente
+          ? 'bg-white border border-slate-200 text-[#06111A] rounded-bl-sm'
+          : 'bg-[#D9F7FA] border border-[#B6EAEF] text-[#184B53] rounded-br-sm shadow-[0_0_12px_rgba(34,211,238,.08)]'
+      )}
+    >
+      {(m.tipo_mensaje === 'audio' || isAudioMessage(m.contenido_texto)) ? (
+        <>
+          <AudioBubble
+            src={audioSrc}
+            onDelete={() => eliminarMensaje(m.id)}
+          />
 
-    <div className="max-w-full whitespace-pre-wrap break-words leading-snug">
-      {m.contenido_texto || ''}
-      <span className="float-right ml-2 mt-[3px] text-[10px] whitespace-nowrap text-cyan-900/45">
-        {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
-      </span>
+          <div className="text-[10px] mt-2 text-right whitespace-nowrap text-cyan-900/60">
+            {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
+          </div>
+        </>
+      ) : isAttachment ? (
+        <>
+          <AttachmentBubble
+            fileName={attachmentName}
+            url={(m as any).url_archivo || null}
+            mimeType={(m as any).mime_type || null}
+            onDelete={() => eliminarMensaje(m.id)}
+          />
+
+          <div className="text-[10px] mt-2 text-right whitespace-nowrap text-cyan-900/60">
+            {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
+          </div>
+        </>
+      ) : (
+        <div className="relative pr-7">
+          <button
+            type="button"
+            onClick={() => setMenuMensajeId(menuMensajeId === m.id ? null : m.id)}
+            className="absolute top-[2px] right-1 w-4 h-4 rounded-full text-cyan-900/45 hover:text-cyan-900 hover:bg-cyan-100 flex items-center justify-center z-20"
+            title="Opciones mensaje"
+          >
+            <MoreVertical className="w-4 h-4" />
+          </button>
+
+          {menuMensajeId === m.id && (
+            <div className="absolute top-5 right-0 z-50 w-36 rounded-xl border border-cyan-200 bg-white shadow-xl overflow-hidden">
+              <button
+                type="button"
+                onClick={() => eliminarMensaje(m.id)}
+                className="w-full px-3 py-2 text-left text-xs text-red-600 hover:bg-red-50"
+              >
+                Eliminar mensaje
+              </button>
+            </div>
+          )}
+
+          <div className="max-w-full whitespace-pre-wrap break-words leading-snug">
+            {m.contenido_texto || ''}
+            <span className="float-right ml-2 mt-[3px] text-[10px] whitespace-nowrap text-cyan-900/45">
+              {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   </div>
-)}
-              </div>
-            </div>
-          );
+);      
         })}
 
         {mensajes.length === 0 && (
