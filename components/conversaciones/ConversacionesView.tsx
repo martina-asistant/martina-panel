@@ -233,12 +233,14 @@ const [segundosGrabacion, setSegundosGrabacion] = useState(0);
   }, [selectedId]);
 
   useEffect(() => {
-    return () => {
-      if (audioPreviewUrl) {
-        URL.revokeObjectURL(audioPreviewUrl);
-      }
-    };
-  }, [audioPreviewUrl]);
+  return () => {
+    if (audioPreviewRef.current) {
+      audioPreviewRef.current.pause();
+      audioPreviewRef.current.removeAttribute('src');
+      audioPreviewRef.current.load();
+    }
+  };
+}, []);
 
   useEffect(() => {
   if (!grabandoAudio) {
@@ -375,19 +377,24 @@ const [segundosGrabacion, setSegundosGrabacion] = useState(0);
   };
 
   const limpiarPreviewAudio = () => {
-    if (audioPreviewRef.current) {
-      audioPreviewRef.current.pause();
-      audioPreviewRef.current.currentTime = 0;
-    }
+  const urlToRevoke = audioPreviewUrl;
 
-    if (audioPreviewUrl) {
-      URL.revokeObjectURL(audioPreviewUrl);
-    }
+  if (audioPreviewRef.current) {
+    audioPreviewRef.current.pause();
+    audioPreviewRef.current.removeAttribute('src');
+    audioPreviewRef.current.load();
+  }
 
-    setAudioPreviewFile(null);
-    setAudioPreviewUrl(null);
-    setReproduciendoPreview(false);
-  };
+  setAudioPreviewFile(null);
+  setAudioPreviewUrl(null);
+  setReproduciendoPreview(false);
+
+  if (urlToRevoke) {
+    window.setTimeout(() => {
+      URL.revokeObjectURL(urlToRevoke);
+    }, 500);
+  }
+};
 
   const enviarAudio = async (audioFile: File) => {
     if (!selected || !audioFile) return;
