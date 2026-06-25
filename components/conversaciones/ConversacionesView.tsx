@@ -828,8 +828,31 @@ const toggleAudioMessage = async (id: string) => {
   onDelete={() => eliminarMensaje(m.id)}
 />
 ) : (
-  <div className="whitespace-pre-wrap break-words leading-relaxed">
-    {m.contenido_texto || ''}
+  <div className="relative pr-7">
+    <button
+      type="button"
+      onClick={() => setMenuMensajeId(menuMensajeId === m.id ? null : m.id)}
+      className="absolute -top-1 right-0 w-5 h-5 rounded-full text-cyan-900/50 hover:text-cyan-900 hover:bg-cyan-100 flex items-center justify-center z-20"
+      title="Opciones mensaje"
+    >
+      <MoreVertical className="w-4 h-4" />
+    </button>
+
+    {menuMensajeId === m.id && (
+      <div className="absolute top-5 right-0 z-50 w-36 rounded-xl border border-cyan-200 bg-white shadow-xl overflow-hidden">
+        <button
+          type="button"
+          onClick={() => eliminarMensaje(m.id)}
+          className="w-full px-3 py-2 text-left text-xs text-red-600 hover:bg-red-50"
+        >
+          Eliminar mensaje
+        </button>
+      </div>
+    )}
+
+    <div className="whitespace-pre-wrap break-words leading-relaxed">
+      {m.contenido_texto || ''}
+    </div>
   </div>
 )}
                       <div
