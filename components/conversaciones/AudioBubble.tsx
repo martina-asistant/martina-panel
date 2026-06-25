@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Play, Pause, MoreVertical } from 'lucide-react';
-import { cn } from '@/lib/utils/cn';
 
 type AudioBubbleProps = {
   src: string;
@@ -21,21 +20,72 @@ const formatAudioTime = (seconds?: number) => {
 export default function AudioBubble({ src, onDelete }: AudioBubbleProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  const [audioUrl, setAudioUrl] = useState('');
   const [playing, setPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
+    let objectUrl = '';
+    let cancelled = false;
+
     setPlaying(false);
     setDuration(0);
     setCurrentTime(0);
     setMenuOpen(false);
+    setAudioUrl('');
+
+    if (!src) return;
+
+    const cargarAudio = async () => {
+      try {
+        const res = await fetch(src);
+
+        if (!res.ok) {
+          throw new Error(`Error descargando audio: ${res.status}`);
+        }
+
+        const blobOriginal = await res.blob();
+
+        const blob = new Blob([blobOriginal], {
+          type: 'audio/webm'
+        });
+
+        objectUrl = URL.createObjectURL(blob);
+
+        if (!cancelled) {
+          setAudioUrl(objectUrl);
+        }
+      } catch (error) {
+        console.error('Error preparando audio:', {
+          src,
+          error
+        });
+      }
+    };
+
+    cargarAudio();
+
+    return () => {
+      cancelled = true;
+
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.removeAttribute('src');
+        audioRef.current.load();
+      }
+
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
+    };
   }, [src]);
 
   const togglePlay = async () => {
     const audio = audioRef.current;
-    if (!audio || !src) return;
+
+    if (!audio || !audioUrl) return;
 
     try {
       if (audio.paused) {
@@ -50,13 +100,14 @@ export default function AudioBubble({ src, onDelete }: AudioBubbleProps) {
     }
   };
 
-  const progress = duration > 0 ? Math.min(100, (currentTime / duration) * 100) : 0;
+  const progress =
+    duration > 0 ? Math.min(100, (currentTime / duration) * 100) : 0;
 
   return (
     <div className="relative w-[285px] max-w-full rounded-2xl border border-cyan-300/40 bg-gradient-to-br from-cyan-50 to-white px-3 py-2 shadow-[0_0_18px_rgba(34,211,238,.16)]">
       <audio
         ref={audioRef}
-        src={src}
+        src={audioUrl}
         preload="metadata"
         onLoadedMetadata={(e) => {
           const d = e.currentTarget.duration;
@@ -74,9 +125,10 @@ export default function AudioBubble({ src, onDelete }: AudioBubbleProps) {
           setCurrentTime(0);
         }}
         onError={(e) => {
-          console.error('Error cargando audio:', {
+          console.error('Error cargando audio local:', {
             src,
-            error: e.currentTarget.error,
+            audioUrl,
+            error: e.currentTarget.error
           });
         }}
         className="hidden"
@@ -118,7 +170,8 @@ export default function AudioBubble({ src, onDelete }: AudioBubbleProps) {
         <button
           type="button"
           onClick={togglePlay}
-          className="w-5 h-6 shrink-0 text-black flex items-center justify-center"
+          disabled={!audioUrl}
+          className="w-5 h-6 shrink-0 text-black flex items-center justify-center disabled:opacity-40"
           title={playing ? 'Pausar audio' : 'Reproducir audio'}
         >
           {playing ? (
