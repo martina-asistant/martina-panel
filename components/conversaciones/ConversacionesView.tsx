@@ -764,6 +764,8 @@ const toggleAudioMessage = async (id: string) => {
                 const isPaciente =
                   m.tipo_emisor === 'paciente' ||
                   m.direccion === 'entrante';
+            
+            const audioSrc = m.url_archivo || getAudioUrl(m.contenido_texto);
 
                 return (
                   <div
@@ -809,14 +811,18 @@ const toggleAudioMessage = async (id: string) => {
     <audio
   ref={(el) => {
     audioRefs.current[m.id] = el;
+
+    if (el && audioSrc) {
+      el.load();
+    }
   }}
-  src={m.url_archivo || ''}
-  preload="metadata"
+  src={audioSrc}
+  preload="auto"
   className="hidden"
   onLoadedMetadata={(e) => {
     guardarDuracionAudio(m.id, e.currentTarget);
   }}
-  onCanPlay={(e) => {
+  onCanPlayThrough={(e) => {
     guardarDuracionAudio(m.id, e.currentTarget);
   }}
   onTimeUpdate={(e) => {
@@ -835,7 +841,7 @@ const toggleAudioMessage = async (id: string) => {
   onError={(e) => {
     console.error('Error cargando audio del mensaje', {
       id: m.id,
-      src: (e.currentTarget as HTMLAudioElement).currentSrc || m.url_archivo,
+      src: audioSrc,
       error: e.currentTarget.error
     });
   }}
