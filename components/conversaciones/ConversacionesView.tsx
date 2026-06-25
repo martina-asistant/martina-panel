@@ -125,6 +125,7 @@ const ConversacionesView = () => {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const audioPreviewRef = useRef<HTMLAudioElement | null>(null);
+  const mensajesEndRef = useRef<HTMLDivElement | null>(null);
 
   const [grabandoAudio, setGrabandoAudio] = useState(false);
 const [enviandoAudio, setEnviandoAudio] = useState(false);
@@ -271,6 +272,15 @@ const [segundosGrabacion, setSegundosGrabacion] = useState(0);
     return true;
   });
 
+useEffect(() => {
+  if (!mensajesEndRef.current) return;
+
+  mensajesEndRef.current.scrollIntoView({
+    behavior: 'auto',
+    block: 'end'
+  });
+}, [mensajes, selectedId]);
+  
   const doTomar = async () => {
     if (!selected) return;
     await tomarConversacion(selected.id, userEmail);
@@ -828,6 +838,8 @@ const toggleAudioMessage = async (id: string) => {
                   Sin mensajes
                 </div>
               )}
+              
+              <div ref={mensajesEndRef} />
             </div>
 
             <div className="px-6 py-4 border-t border-[#6FD7E2]/20 bg-[#F8FBFC] shadow-[0_-6px_20px_rgba(14,124,139,.08)] shrink-0">
@@ -1424,10 +1436,33 @@ const toggleAudioMessage = async (id: string) => {
                     onDelete={() => eliminarMensaje(m.id)}
                   />
                 ) : (
-                  <div className="whitespace-pre-wrap break-words leading-relaxed">
-                    {m.contenido_texto || ''}
-                  </div>
-                )}
+  <div className="relative group pr-6">
+    <button
+      type="button"
+      onClick={() => setMenuMensajeId(menuMensajeId === m.id ? null : m.id)}
+      className="absolute -top-1 right-0 w-5 h-5 rounded-full text-cyan-900/50 hover:text-cyan-900 hover:bg-cyan-100 flex items-center justify-center"
+      title="Opciones mensaje"
+    >
+      <MoreVertical className="w-4 h-4" />
+    </button>
+
+    {menuMensajeId === m.id && (
+      <div className="absolute top-5 right-0 z-20 w-36 rounded-xl border border-cyan-200 bg-white shadow-xl overflow-hidden">
+        <button
+          type="button"
+          onClick={() => eliminarMensaje(m.id)}
+          className="w-full px-3 py-2 text-left text-xs text-red-600 hover:bg-red-50"
+        >
+          Eliminar mensaje
+        </button>
+      </div>
+    )}
+
+    <div className="whitespace-pre-wrap break-words leading-relaxed">
+      {m.contenido_texto || ''}
+    </div>
+  </div>
+)}
 
                 <div
                   className={cn(
@@ -1455,6 +1490,8 @@ const toggleAudioMessage = async (id: string) => {
             Sin mensajes
           </div>
         )}
+
+        <div ref={mensajesEndRef} />
       </div>
 
       <div className="px-3 py-3 border-t border-[#6FD7E2]/20 bg-[#F8FBFC] shadow-[0_-6px_20px_rgba(14,124,139,.08)] shrink-0">
