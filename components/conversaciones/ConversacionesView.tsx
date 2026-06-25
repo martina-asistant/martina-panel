@@ -256,6 +256,17 @@ const [segundosGrabacion, setSegundosGrabacion] = useState(0);
   return () => window.clearInterval(interval);
 }, [grabandoAudio]);
 
+  useEffect(() => {
+  const timeout = window.setTimeout(() => {
+    mensajesEndRef.current?.scrollIntoView({
+      behavior: 'auto',
+      block: 'end'
+    });
+  }, 100);
+
+  return () => window.clearTimeout(timeout);
+}, [mensajes.length, selectedId]);
+
   const filtered = convs.filter(c => {
     if (filter !== 'todas' && c.estado_visual !== filter) return false;
 
@@ -271,15 +282,6 @@ const [segundosGrabacion, setSegundosGrabacion] = useState(0);
 
     return true;
   });
-
-useEffect(() => {
-  if (!mensajesEndRef.current) return;
-
-  mensajesEndRef.current.scrollIntoView({
-    behavior: 'auto',
-    block: 'end'
-  });
-}, [mensajes, selectedId]);
   
   const doTomar = async () => {
     if (!selected) return;
