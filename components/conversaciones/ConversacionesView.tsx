@@ -870,7 +870,7 @@ const toggleAudioMessage = async (id: string) => {
     )}
 
     <div className="inline-block max-w-full align-bottom">
-      <span className="whitespace-pre-wrap break-words leading-relaxed inline">
+      <span className="whitespace-pre-wrap break-words leading-snug inline">
         {m.contenido_texto || ''}
       </span>
 
@@ -1520,7 +1520,7 @@ const toggleAudioMessage = async (id: string) => {
     )}
 
     <div className="inline-block max-w-full align-bottom">
-      <span className="whitespace-pre-wrap break-words leading-relaxed inline">
+      <span className="whitespace-pre-wrap break-words leading-snug inline">
         {m.contenido_texto || ''}
       </span>
 
