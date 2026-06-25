@@ -858,10 +858,8 @@ const toggleAudioMessage = async (id: string) => {
                   m.tipo_emisor === 'paciente' ||
                   m.direccion === 'entrante';
             
-            const esAudio = m.tipo_mensaje === 'audio' || isAudioMessage(m.contenido_texto);
-const audioSrc = esAudio
-  ? getAudioUrl(m.contenido_texto) || m.url_archivo || ''
-  : '';
+           const esAudio = m.tipo_mensaje === 'audio' || isAudioMessage(m.contenido_texto);
+const audioSrc = m.url_archivo || getAudioUrl(m.contenido_texto);
 
 const isAttachment = isAttachmentMessage(m);
 const attachmentName = getAttachmentFileName(m);
@@ -1523,10 +1521,8 @@ return (
             m.tipo_emisor === 'paciente' ||
             m.direccion === 'entrante';
 
-          const esAudio = m.tipo_mensaje === 'audio' || isAudioMessage(m.contenido_texto);
-const audioSrc = esAudio
-  ? getAudioUrl(m.contenido_texto) || m.url_archivo || ''
-  : '';
+         const esAudio = m.tipo_mensaje === 'audio' || isAudioMessage(m.contenido_texto);
+const audioSrc = m.url_archivo || getAudioUrl(m.contenido_texto);
 
 const isAttachment = isAttachmentMessage(m);
 const attachmentName = getAttachmentFileName(m);
