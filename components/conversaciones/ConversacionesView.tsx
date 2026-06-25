@@ -126,6 +126,7 @@ const ConversacionesView = () => {
   const audioChunksRef = useRef<Blob[]>([]);
   const audioPreviewRef = useRef<HTMLAudioElement | null>(null);
   const mensajesEndRef = useRef<HTMLDivElement | null>(null);
+  const mensajesScrollRef = useRef<HTMLDivElement | null>(null);
 
   const [grabandoAudio, setGrabandoAudio] = useState(false);
 const [enviandoAudio, setEnviandoAudio] = useState(false);
@@ -258,11 +259,12 @@ const [segundosGrabacion, setSegundosGrabacion] = useState(0);
 
   useEffect(() => {
   const timeout = window.setTimeout(() => {
-    mensajesEndRef.current?.scrollIntoView({
-      behavior: 'auto',
-      block: 'end'
-    });
-  }, 100);
+    const el = mensajesScrollRef.current;
+
+    if (!el) return;
+
+    el.scrollTop = el.scrollHeight;
+  }, 150);
 
   return () => window.clearTimeout(timeout);
 }, [mensajes.length, selectedId]);
@@ -780,7 +782,10 @@ const toggleAudioMessage = async (id: string) => {
               </div>
             </div>
 
-            <div className="flex-1 min-h-0 overflow-y-auto px-8 py-7 space-y-4 bg-[radial-gradient(circle_at_top,rgba(34,211,238,.04),#F8FBFC_45%)]">
+            <div
+  ref={mensajesScrollRef}
+  className="flex-1 min-h-0 overflow-y-auto px-8 py-7 space-y-4 bg-[radial-gradient(circle_at_top,rgba(34,211,238,.04),#F8FBFC_45%)]"
+>
               {mensajes.map(m => {
                 const isPaciente =
                   m.tipo_emisor === 'paciente' ||
@@ -1408,7 +1413,10 @@ const toggleAudioMessage = async (id: string) => {
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto px-3 py-4 space-y-4 bg-[radial-gradient(circle_at_top,rgba(34,211,238,.04),#F8FBFC_45%)]">
+      <div
+  ref={mensajesScrollRef}
+  className="flex-1 min-h-0 overflow-y-auto px-3 py-4 space-y-4 bg-[radial-gradient(circle_at_top,rgba(34,211,238,.04),#F8FBFC_45%)]"
+>
         {mensajes.map(m => {
           const isPaciente =
             m.tipo_emisor === 'paciente' ||
