@@ -1341,7 +1341,7 @@ const toggleAudioMessage = async (id: string) => {
           <span className="text-[12px] leading-[1] flex items-center justify-center translate-y-[-1px]">✕</span>
         </button>
 
-        <div className="w-[97%] mx-auto rounded-3xl border border-[#6FD7E2]/45 bg-[linear-gradient(180deg,#0F2C35_0%,#163C46_100%)] px-3 py-3 shadow-[0_0_28px_rgba(34,211,238,.16),0_12px_26px_rgba(14,124,139,.12),inset_0_1px_0_rgba(255,255,255,.06)]"
+        <div className="w-[97%] mx-auto rounded-3xl border border-[#6FD7E2]/45 bg-[linear-gradient(180deg,#0F2C35_0%,#163C46_100%)] px-3 py-3 shadow-[0_0_28px_rgba(34,211,238,.16),0_12px_26px_rgba(14,124,139,.12),inset_0_1px_0_rgba(255,255,255,.06)]">
           <div className="flex items-center gap-2">
             <button
               type="button"
