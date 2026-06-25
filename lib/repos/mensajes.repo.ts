@@ -53,23 +53,6 @@ async function signAdjuntoUrl(
 
   if (esAudio) return mensaje;
 
-  const esAdjunto =
-  tipo === 'archivo' ||
-  tipo === 'imagen' ||
-  tipo === 'documento' ||
-  mime.startsWith('image/') ||
-  mime.includes('pdf') ||
-  mime.includes('word') ||
-  contenido.endsWith('.pdf') ||
-  contenido.endsWith('.doc') ||
-  contenido.endsWith('.docx') ||
-  contenido.endsWith('.jpg') ||
-  contenido.endsWith('.jpeg') ||
-  contenido.endsWith('.png') ||
-  contenido.endsWith('.webp');
-
-if (!esAdjunto) return mensaje;
-
   const path = getStoragePathFromUrl(mensaje.url_archivo);
   if (!path) return mensaje;
 
