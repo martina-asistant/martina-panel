@@ -82,7 +82,7 @@ export default function AttachmentBubble({
         </button>
       )}
 
-      {kind === 'image' && hasUrl ? (
+      {kind === 'image' && hasUrl && url?.startsWith('http') ? (
         <a href={url || '#'} target="_blank" rel="noreferrer" className="block">
           <div className="bg-cyan-50">
             <img
