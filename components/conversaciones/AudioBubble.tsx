@@ -27,7 +27,6 @@ export default function AudioBubble({ src, onDelete }: AudioBubbleProps) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    let objectUrl = '';
     let cancelled = false;
 
     setPlaying(false);
@@ -40,22 +39,18 @@ export default function AudioBubble({ src, onDelete }: AudioBubbleProps) {
 
     const cargarAudio = async () => {
       try {
-        const res = await fetch(src);
+        const res = await fetch(
+          `/api/audio-signed-url?path=${encodeURIComponent(src)}`
+        );
 
-        if (!res.ok) {
-          throw new Error(`Error descargando audio: ${res.status}`);
+        const data = await res.json();
+
+        if (!res.ok || !data?.signedUrl) {
+          throw new Error(data?.error || 'No se pudo obtener signed URL');
         }
 
-        const blobOriginal = await res.blob();
-
-        const blob = new Blob([blobOriginal], {
-          type: 'audio/webm'
-        });
-
-        objectUrl = URL.createObjectURL(blob);
-
         if (!cancelled) {
-          setAudioUrl(objectUrl);
+          setAudioUrl(data.signedUrl);
         }
       } catch (error) {
         console.error('Error preparando audio:', {
@@ -74,10 +69,6 @@ export default function AudioBubble({ src, onDelete }: AudioBubbleProps) {
         audioRef.current.pause();
         audioRef.current.removeAttribute('src');
         audioRef.current.load();
-      }
-
-      if (objectUrl) {
-        URL.revokeObjectURL(objectUrl);
       }
     };
   }, [src]);
@@ -125,7 +116,7 @@ export default function AudioBubble({ src, onDelete }: AudioBubbleProps) {
           setCurrentTime(0);
         }}
         onError={(e) => {
-          console.error('Error cargando audio local:', {
+          console.error('Error cargando audio signed:', {
             src,
             audioUrl,
             error: e.currentTarget.error
