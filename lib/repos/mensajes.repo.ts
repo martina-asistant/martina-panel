@@ -2,77 +2,6 @@ import { createClient as createBrowserSupa } from '@/lib/supabase/client';
 import { mockMensajes } from '@/lib/mock/data';
 import type { MensajeWhatsapp } from '@/lib/types/db.types';
 
-const ATTACHMENTS_BUCKET = 'whatsapp-adjuntos';
-
-function getStoragePathFromUrl(url?: string | null): string | null {
-  if (!url) return null;
-
-  const raw = String(url).trim();
-  if (!raw) return null;
-
-  // Si ya viene como path interno del bucket (sin http), lo devolvemos tal cual
-  if (!raw.startsWith('http')) {
-    return raw.replace(/^\/+/, '');
-  }
-
-  try {
-    const parsed = new URL(raw);
-    const marker = '/storage/v1/object/public/';
-    const idx = parsed.pathname.indexOf(marker);
-
-    if (idx === -1) return null;
-
-    const after = parsed.pathname.slice(idx + marker.length); // bucket/path/to/file
-    const parts = after.split('/').filter(Boolean);
-
-    if (parts.length < 2) return null;
-
-    // quitamos el bucket y devolvemos solo el path interno
-    return parts.slice(1).join('/');
-  } catch {
-    return null;
-  }
-}
-
-async function signMensajeUrl(
-  supa: ReturnType<typeof createBrowserSupa>,
-  mensaje: MensajeWhatsapp
-): Promise<MensajeWhatsapp> {
-  if (!supa || !mensaje.url_archivo) return mensaje;
-
-  const tipo = String(mensaje.tipo_mensaje || '').toLowerCase();
-  const mime = String((mensaje as any).mime_type || '').toLowerCase();
-  const contenido = String(mensaje.contenido_texto || '').toLowerCase();
-
-  const esAudio =
-    tipo === 'audio' ||
-    mime.startsWith('audio/') ||
-    contenido.endsWith('.webm') ||
-    contenido.endsWith('.ogg') ||
-    contenido.endsWith('.mp3') ||
-    contenido.endsWith('.wav');
-
-  // El audio NO lo tocamos: ya funcionaba antes
-  if (esAudio) return mensaje;
-
-  const path = getStoragePathFromUrl(mensaje.url_archivo);
-  if (!path) return mensaje;
-
-  const { data, error } = await supa.storage
-    .from(ATTACHMENTS_BUCKET)
-    .createSignedUrl(path, 60 * 60 * 24);
-
-  if (error || !data?.signedUrl) {
-    console.error(`Error firmando URL adjunto (${ATTACHMENTS_BUCKET}):`, error);
-    return mensaje;
-  }
-
-  return {
-    ...mensaje,
-    url_archivo: data.signedUrl
-  };
-}
-
 export async function listMensajesByConversation(conversationId: string): Promise<MensajeWhatsapp[]> {
   const supa = createBrowserSupa();
 
@@ -93,13 +22,7 @@ export async function listMensajesByConversation(conversationId: string): Promis
     return [];
   }
 
-  const mensajes = (data || []) as MensajeWhatsapp[];
-
-  const mensajesConSignedUrl = await Promise.all(
-    mensajes.map(m => signMensajeUrl(supa, m))
-  );
-
-  return mensajesConSignedUrl;
+  return (data || []) as MensajeWhatsapp[];
 }
 
 export async function crearMensajeSaliente(
