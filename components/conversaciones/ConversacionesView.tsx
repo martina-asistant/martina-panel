@@ -76,6 +76,19 @@ const formatTelefono = (telefono?: string | null) => {
   return sinPrefijo.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
 };
 
+const getInicialEmisor = (m: MensajeWhatsapp) => {
+  const emisor = String(m.tipo_emisor || m.direccion || '').toLowerCase();
+
+  if (
+    emisor.includes('recepcion') ||
+    emisor.includes('recepción')
+  ) {
+    return 'R';
+  }
+
+  return 'M';
+};
+
 const isAudioMessage = (contenido?: string | null) => {
   if (!contenido) return false;
 
@@ -823,10 +836,16 @@ const toggleAudioMessage = async (id: string) => {
                       )}
                     >
                     {(m.tipo_mensaje === 'audio' || isAudioMessage(m.contenido_texto)) ? (
-                      <AudioBubble
-  src={audioSrc}
-  onDelete={() => eliminarMensaje(m.id)}
-/>
+  <>
+    <AudioBubble
+      src={audioSrc}
+      onDelete={() => eliminarMensaje(m.id)}
+    />
+
+    <div className="text-[10px] mt-2 text-right whitespace-nowrap text-cyan-900/60">
+      {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
+    </div>
+  </>
 ) : (
   <div className="relative pr-7">
     <button
@@ -850,27 +869,18 @@ const toggleAudioMessage = async (id: string) => {
       </div>
     )}
 
-    <div className="whitespace-pre-wrap break-words leading-relaxed">
-      {m.contenido_texto || ''}
+    <div className="inline-block max-w-full align-bottom">
+      <span className="whitespace-pre-wrap break-words leading-relaxed inline">
+        {m.contenido_texto || ''}
+      </span>
+
+      <span className="ml-2 text-[10px] whitespace-nowrap text-cyan-900/45 inline-block align-bottom">
+        {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
+      </span>
     </div>
   </div>
 )}
-                      <div
-                        className={cn(
-                          'text-[10px] mt-2 text-right',
-                          isPaciente
-                            ? 'text-slate-400'
-                            : 'text-cyan-900/60'
-                        )}
-                      >
-                        {!isPaciente && m.tipo_emisor && (
-                          <span className="mr-2 uppercase tracking-wide">
-                            {m.tipo_emisor}
-                          </span>
-                        )}
-
-                        {formatTime(m.created_at)}
-                      </div>
+</div>
                     </div>
                   </div>
                 );
@@ -1477,23 +1487,29 @@ const toggleAudioMessage = async (id: string) => {
                 )}
               >
                 {(m.tipo_mensaje === 'audio' || isAudioMessage(m.contenido_texto)) ? (
-                  <AudioBubble
-                    src={audioSrc}
-                    onDelete={() => eliminarMensaje(m.id)}
-                  />
-                ) : (
-  <div className="relative group pr-6">
+  <>
+    <AudioBubble
+      src={audioSrc}
+      onDelete={() => eliminarMensaje(m.id)}
+    />
+
+    <div className="text-[10px] mt-2 text-right whitespace-nowrap text-cyan-900/60">
+      {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
+    </div>
+  </>
+) : (
+  <div className="relative pr-7">
     <button
       type="button"
       onClick={() => setMenuMensajeId(menuMensajeId === m.id ? null : m.id)}
-      className="absolute -top-1 right-0 w-5 h-5 rounded-full text-cyan-900/50 hover:text-cyan-900 hover:bg-cyan-100 flex items-center justify-center"
+      className="absolute -top-1 right-0 w-5 h-5 rounded-full text-cyan-900/50 hover:text-cyan-900 hover:bg-cyan-100 flex items-center justify-center z-20"
       title="Opciones mensaje"
     >
       <MoreVertical className="w-4 h-4" />
     </button>
 
     {menuMensajeId === m.id && (
-      <div className="absolute top-5 right-0 z-20 w-36 rounded-xl border border-cyan-200 bg-white shadow-xl overflow-hidden">
+      <div className="absolute top-5 right-0 z-50 w-36 rounded-xl border border-cyan-200 bg-white shadow-xl overflow-hidden">
         <button
           type="button"
           onClick={() => eliminarMensaje(m.id)}
@@ -1504,28 +1520,18 @@ const toggleAudioMessage = async (id: string) => {
       </div>
     )}
 
-    <div className="whitespace-pre-wrap break-words leading-relaxed">
-      {m.contenido_texto || ''}
+    <div className="inline-block max-w-full align-bottom">
+      <span className="whitespace-pre-wrap break-words leading-relaxed inline">
+        {m.contenido_texto || ''}
+      </span>
+
+      <span className="ml-2 text-[10px] whitespace-nowrap text-cyan-900/45 inline-block align-bottom">
+        {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
+      </span>
     </div>
   </div>
 )}
-
-                <div
-                  className={cn(
-                    'text-[10px] mt-2 text-right',
-                    isPaciente
-                      ? 'text-slate-400'
-                      : 'text-cyan-900/60'
-                  )}
-                >
-                  {!isPaciente && m.tipo_emisor && (
-                    <span className="mr-2 uppercase tracking-wide">
-                      {m.tipo_emisor}
-                    </span>
-                  )}
-
-                  {formatTime(m.created_at)}
-                </div>
+</div>
               </div>
             </div>
           );
