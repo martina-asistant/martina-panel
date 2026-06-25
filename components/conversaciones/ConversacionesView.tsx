@@ -829,7 +829,7 @@ const toggleAudioMessage = async (id: string) => {
                   >
                     <div
                       className={cn(
-                        'w-fit max-w-[72%] rounded-2xl pl-4 pr-2 py-3 text-sm shadow-sm',
+                        'w-fit max-w-[72%] rounded-2xl pl-4 pr-2 py-2 text-sm shadow-sm',
                         isPaciente
                           ? 'bg-white border border-slate-200 text-[#06111A] rounded-bl-sm'
                           : 'bg-[#D9F7FA] border border-[#B6EAEF] text-[#184B53] rounded-br-sm shadow-[0_0_12px_rgba(34,211,238,.08)]'
@@ -1476,7 +1476,7 @@ const toggleAudioMessage = async (id: string) => {
             >
               <div
                 className={cn(
-                  'w-fit max-w-[88%] rounded-2xl pl-4 pr-2 py-3 text-sm shadow-sm',
+                  'w-fit max-w-[88%] rounded-2xl pl-4 pr-2 py-2 text-sm shadow-sm',
                   isPaciente
                     ? 'bg-white border border-slate-200 text-[#06111A] rounded-bl-sm'
                     : 'bg-[#D9F7FA] border border-[#B6EAEF] text-[#184B53] rounded-br-sm shadow-[0_0_12px_rgba(34,211,238,.08)]'
