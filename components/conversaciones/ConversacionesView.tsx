@@ -1540,17 +1540,7 @@ const attachmentName = getAttachmentFileName(m);
                     : 'bg-[#D9F7FA] border border-[#B6EAEF] text-[#184B53] rounded-br-sm shadow-[0_0_12px_rgba(34,211,238,.08)]'
                 )}
               >
-                {(m.tipo_mensaje === 'audio' || isAudioMessage(m.contenido_texto)) ? (
-  <>
-    <AudioBubble
-      src={audioSrc}
-      onDelete={() => eliminarMensaje(m.id)}
-    />
-
-    <div className="text-[10px] mt-2 text-right whitespace-nowrap text-cyan-900/60">
-      {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
-    </div>
-  </>
+                
 {(m.tipo_mensaje === 'audio' || isAudioMessage(m.contenido_texto)) ? (
   <>
     <AudioBubble
