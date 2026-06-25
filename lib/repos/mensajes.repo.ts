@@ -2,75 +2,6 @@ import { createClient as createBrowserSupa } from '@/lib/supabase/client';
 import { mockMensajes } from '@/lib/mock/data';
 import type { MensajeWhatsapp } from '@/lib/types/db.types';
 
-const ATTACHMENTS_BUCKET = 'whatsapp-adjuntos';
-
-function getStoragePathFromUrl(url?: string | null): string | null {
-  if (!url) return null;
-
-  const raw = String(url).trim();
-  if (!raw) return null;
-
-  if (!raw.startsWith('http')) {
-    return raw.replace(/^\/+/, '');
-  }
-
-  try {
-    const parsed = new URL(raw);
-    const marker = '/storage/v1/object/public/';
-    const idx = parsed.pathname.indexOf(marker);
-
-    if (idx === -1) return null;
-
-    const after = parsed.pathname.slice(idx + marker.length);
-    const parts = after.split('/').filter(Boolean);
-
-    if (parts.length < 2) return null;
-
-    return parts.slice(1).join('/');
-  } catch {
-    return null;
-  }
-}
-
-async function signAdjuntoUrl(
-  supa: ReturnType<typeof createBrowserSupa>,
-  mensaje: MensajeWhatsapp
-): Promise<MensajeWhatsapp> {
-  if (!supa || !mensaje.url_archivo) return mensaje;
-
-  const tipo = String(mensaje.tipo_mensaje || '').toLowerCase();
-  const mime = String((mensaje as any).mime_type || '').toLowerCase();
-  const contenido = String(mensaje.contenido_texto || '').toLowerCase();
-
-  const esAudio =
-    tipo === 'audio' ||
-    mime.startsWith('audio/') ||
-    contenido.endsWith('.webm') ||
-    contenido.endsWith('.ogg') ||
-    contenido.endsWith('.mp3') ||
-    contenido.endsWith('.m4a') ||
-    contenido.endsWith('.wav');
-
-  if (esAudio) return mensaje;
-
-  const path = getStoragePathFromUrl(mensaje.url_archivo);
-  if (!path) return mensaje;
-
-  const { data, error } = await supa.storage
-    .from(ATTACHMENTS_BUCKET)
-    .createSignedUrl(path, 60 * 60 * 24);
-
-  if (error || !data?.signedUrl) {
-    console.error('Error firmando adjunto:', error);
-    return mensaje;
-  }
-
-  return {
-    ...mensaje,
-    url_archivo: data.signedUrl
-  };
-}
-
 export async function listMensajesByConversation(conversationId: string): Promise<MensajeWhatsapp[]> {
   const supa = createBrowserSupa();
 
@@ -91,13 +22,7 @@ export async function listMensajesByConversation(conversationId: string): Promis
     return [];
   }
 
- const mensajes = (data || []) as MensajeWhatsapp[];
-
-const mensajesConAdjuntosFirmados = await Promise.all(
-  mensajes.map(m => signAdjuntoUrl(supa, m))
-);
-
-return mensajesConAdjuntosFirmados;
+  return (data || []) as MensajeWhatsapp[];
 }
 
 export async function crearMensajeSaliente(
