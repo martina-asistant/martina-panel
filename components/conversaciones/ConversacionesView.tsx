@@ -858,7 +858,11 @@ const toggleAudioMessage = async (id: string) => {
                   m.tipo_emisor === 'paciente' ||
                   m.direccion === 'entrante';
             
-            const audioSrc = m.url_archivo || getAudioUrl(m.contenido_texto);
+            const esAudio = m.tipo_mensaje === 'audio' || isAudioMessage(m.contenido_texto);
+const audioSrc = esAudio
+  ? getAudioUrl(m.contenido_texto) || m.url_archivo || ''
+  : '';
+
 const isAttachment = isAttachmentMessage(m);
 const attachmentName = getAttachmentFileName(m);
 
@@ -878,7 +882,7 @@ return (
           : 'bg-[#D9F7FA] border border-[#B6EAEF] text-[#184B53] rounded-br-sm shadow-[0_0_12px_rgba(34,211,238,.08)]'
       )}
     >
-      {(m.tipo_mensaje === 'audio' || isAudioMessage(m.contenido_texto)) ? (
+      {esAudio ? (
   <AudioBubble
     src={audioSrc}
     onDelete={() => eliminarMensaje(m.id)}
@@ -922,7 +926,7 @@ return (
   </div>
 )}
 
-{((m.tipo_mensaje === 'audio' || isAudioMessage(m.contenido_texto)) || isAttachment) && (
+{(esAudio || isAttachment) && (
   <div
     className={cn(
       'text-[10px] mt-2 text-right',
@@ -1519,7 +1523,11 @@ return (
             m.tipo_emisor === 'paciente' ||
             m.direccion === 'entrante';
 
-          const audioSrc = m.url_archivo || getAudioUrl(m.contenido_texto);
+          const esAudio = m.tipo_mensaje === 'audio' || isAudioMessage(m.contenido_texto);
+const audioSrc = esAudio
+  ? getAudioUrl(m.contenido_texto) || m.url_archivo || ''
+  : '';
+
 const isAttachment = isAttachmentMessage(m);
 const attachmentName = getAttachmentFileName(m);
 
@@ -1539,7 +1547,7 @@ return (
           : 'bg-[#D9F7FA] border border-[#B6EAEF] text-[#184B53] rounded-br-sm shadow-[0_0_12px_rgba(34,211,238,.08)]'
       )}
     >
-      {(m.tipo_mensaje === 'audio' || isAudioMessage(m.contenido_texto)) ? (
+      {esAudio ? (
         <AudioBubble
           src={audioSrc}
           onDelete={() => eliminarMensaje(m.id)}
@@ -1583,7 +1591,7 @@ return (
         </div>
       )}
 
-      {((m.tipo_mensaje === 'audio' || isAudioMessage(m.contenido_texto)) || isAttachment) && (
+      {(esAudio || isAttachment) && (
         <div
           className={cn(
             'text-[10px] mt-2 text-right',
