@@ -127,6 +127,7 @@ const ConversacionesView = () => {
   const audioPreviewRef = useRef<HTMLAudioElement | null>(null);
   const mensajesEndRef = useRef<HTMLDivElement | null>(null);
   const mensajesScrollRef = useRef<HTMLDivElement | null>(null);
+  const mensajesScrollDesktopRef = useRef<HTMLDivElement | null>(null); // nuevo para desktop
 
   const [grabandoAudio, setGrabandoAudio] = useState(false);
 const [enviandoAudio, setEnviandoAudio] = useState(false);
@@ -265,6 +266,18 @@ const [segundosGrabacion, setSegundosGrabacion] = useState(0);
 
     el.scrollTop = el.scrollHeight;
   }, 150);
+
+  return () => window.clearTimeout(timeout);
+}, [mensajes.length, selectedId]);
+
+  useEffect(() => {
+  const timeout = window.setTimeout(() => {
+    const el = mensajesScrollDesktopRef.current;
+
+    if (!el) return;
+
+    el.scrollTop = el.scrollHeight;
+  }, 200);
 
   return () => window.clearTimeout(timeout);
 }, [mensajes.length, selectedId]);
@@ -783,7 +796,7 @@ const toggleAudioMessage = async (id: string) => {
             </div>
 
             <div
-  ref={mensajesScrollRef}
+  ref={mensajesScrollDesktopRef}
   className="flex-1 min-h-0 overflow-y-auto px-8 py-7 space-y-4 bg-[radial-gradient(circle_at_top,rgba(34,211,238,.04),#F8FBFC_45%)] flex flex-col"
 >
               {mensajes.map(m => {
