@@ -37,7 +37,12 @@ export default function AudioBubble({ src, onDelete }: AudioBubbleProps) {
 
     if (!src) return;
 
-    const cargarAudio = async () => {
+if (src.startsWith('http://') || src.startsWith('https://')) {
+  setAudioUrl(src);
+  return;
+}
+
+const cargarAudio = async () => {
       try {
         const res = await fetch(
           `/api/audio-signed-url?path=${encodeURIComponent(src)}`
