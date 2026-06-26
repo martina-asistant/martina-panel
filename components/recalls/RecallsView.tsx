@@ -370,9 +370,9 @@ const RecallsView = () => {
 
       setMostrarInsertarRecall(true);
     }}
-    className="inline-flex shrink-0 items-center gap-2 rounded-full border border-cyan-300/45 bg-cyan-400/10 px-3.5 py-[7px] text-[10px] font-semibold uppercase tracking-[0.15em] text-cyan-100 shadow-[0_0_16px_rgba(34,211,238,.14)] transition-all hover:bg-cyan-400/18 hover:border-cyan-200/70 whitespace-nowrap"
+    className="inline-flex shrink-0 items-center gap-1 sm:gap-2 rounded-full border border-cyan-300/45 bg-cyan-400/10 px-2.5 sm:px-3.5 py-[5px] sm:py-[7px] text-[8px] sm:text-[10px] font-semibold uppercase tracking-[0.10em] sm:tracking-[0.15em] text-cyan-100 shadow-[0_0_16px_rgba(34,211,238,.14)] transition-all hover:bg-cyan-400/18 hover:border-cyan-200/70 whitespace-nowrap"
   >
-    <Plus className="h-3.5 w-3.5" />
+    <Plus className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5" />
     Insertar recall
   </button>
 </div>
