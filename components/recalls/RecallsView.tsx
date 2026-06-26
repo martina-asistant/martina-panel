@@ -338,16 +338,44 @@ const RecallsView = () => {
 
   return (
     <div className="min-h-full overflow-y-auto px-2 py-4 sm:p-8 bg-[#02141B] text-white">
-      <div className="mb-8 px-2 sm:px-0">
-        <h1 className="text-2xl font-semibold tracking-[-0.015em] origin-left inline-block bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent">
-          Recalls
-        </h1>
+      <div className="mb-8 px-2 sm:px-0 flex items-end justify-between gap-4">
+  <div>
+    <h1 className="text-2xl font-semibold tracking-[-0.015em] origin-left inline-block bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent">
+      Recalls
+    </h1>
 
-        <p className="text-sm text-cyan-100/55">
-          Reactivación de pacientes
-        </p>
-      </div>
+    <p className="text-sm text-cyan-100/55">
+      Reactivación de pacientes
+    </p>
+  </div>
 
+  <button
+    type="button"
+    onClick={() => {
+      setRecallSeleccionado(null);
+      setModoEdicionRecall(false);
+      setBusquedaPaciente('');
+      setMostrarResultadosPaciente(false);
+
+      setNuevoRecall({
+        paciente_id: '',
+        nombre_paciente: '',
+        telefono: '',
+        motivo_recall: 'Limpieza',
+        tipo_recall: 'MTO Periodontal',
+        detalle_recall: '',
+        fecha_recall: '',
+        profesional: 'fede',
+      });
+
+      setMostrarInsertarRecall(true);
+    }}
+    className="inline-flex shrink-0 items-center gap-2 rounded-full border border-cyan-300/45 bg-cyan-400/10 px-3.5 py-[7px] text-[10px] font-semibold uppercase tracking-[0.15em] text-cyan-100 shadow-[0_0_16px_rgba(34,211,238,.14)] transition-all hover:bg-cyan-400/18 hover:border-cyan-200/70 whitespace-nowrap"
+  >
+    <Plus className="h-3.5 w-3.5" />
+    Insertar recall
+  </button>
+</div>
       <div className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
         <div className="flex gap-2 overflow-x-auto pb-2 xl:flex-wrap xl:overflow-visible [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-300/35">
           {filtros.map((f) => (
@@ -382,32 +410,6 @@ const RecallsView = () => {
             </button>
           ))}
         </div>
-
-        <button
-          type="button"
-          onClick={() => {
-            setRecallSeleccionado(null);
-            setModoEdicionRecall(false);
-            setBusquedaPaciente('');
-            setMostrarResultadosPaciente(false);
-            setNuevoRecall({
-              paciente_id: '',
-              nombre_paciente: '',
-              telefono: '',
-              motivo_recall: 'Limpieza',
-              tipo_recall: 'MTO Periodontal',
-              detalle_recall: '',
-              fecha_recall: '',
-              profesional: 'fede',
-            });
-            setMostrarInsertarRecall(true);
-          }}
-          className="ml-2 sm:ml-0 inline-flex w-fit items-center gap-2 rounded-full border border-cyan-300/45 bg-cyan-400/10 px-3.5 py-[7px] text-[10px] font-semibold uppercase tracking-[0.15em] text-cyan-100 shadow-[0_0_16px_rgba(34,211,238,.14)] transition-all hover:bg-cyan-400/18 hover:border-cyan-200/70 whitespace-nowrap"
-        >
-          <Plus className="h-3.5 w-3.5" />
-          Insertar recall
-        </button>
-      </div>
 
       {/* MOBILE */}
       <div className="lg:hidden rounded-3xl border border-cyan-500/20 bg-[rgba(5,18,24,.78)] overflow-hidden shadow-[0_0_35px_rgba(34,211,238,.10)]">
