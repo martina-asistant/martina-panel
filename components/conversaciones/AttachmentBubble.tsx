@@ -72,10 +72,28 @@ useEffect(() => {
 
   if (!url) return;
 
+  let attachmentPath = url;
+
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    try {
+      const parsed = new URL(url);
+      const marker = '/storage/v1/object/public/whatsapp-adjuntos/';
+      const idx = parsed.pathname.indexOf(marker);
+
+      if (idx !== -1) {
+        attachmentPath = decodeURIComponent(
+          parsed.pathname.slice(idx + marker.length)
+        );
+      }
+    } catch {
+      attachmentPath = url;
+    }
+  }
+
   const cargarAdjunto = async () => {
     try {
       const res = await fetch(
-        `/api/adjunto-signed-url?path=${encodeURIComponent(url)}`
+        `/api/adjunto-signed-url?path=${encodeURIComponent(attachmentPath)}`
       );
 
       const data = await res.json();
@@ -88,7 +106,11 @@ useEffect(() => {
         setSignedUrl(data.signedUrl);
       }
     } catch (error) {
-      console.error('Error preparando adjunto:', { url, error });
+      console.error('Error preparando adjunto:', {
+        url,
+        attachmentPath,
+        error
+      });
     }
   };
 
@@ -99,11 +121,8 @@ useEffect(() => {
   };
 }, [url]);
 
-const finalUrl = url?.includes('/storage/v1/object/public/')
-  ? url
-  : signedUrl;
-
-const hasFinalUrl = Boolean(finalUrl);
+const finalUrl = signedUrl;
+const hasFinalUrl = Boolean(signedUrl);
 
   const Icon =
     kind === 'image'
