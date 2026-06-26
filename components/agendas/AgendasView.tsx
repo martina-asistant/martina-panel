@@ -1057,149 +1057,149 @@ const guardarInsertarCita = async () => {
       )}
     </div>
 
-    <div className="flex gap-2 overflow-x-auto px-3 py-3 border-b border-cyan-500/10 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-300/35">
-      {diasSemana.map((dia) => {
-        const activo = toDateKey(dia) === toDateKey(diaMovilSeleccionado);
+    <div className="flex justify-between gap-1 overflow-x-auto px-2 py-2 border-b border-cyan-500/10 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden">
+  {diasSemana.map((dia) => {
+    const activo = toDateKey(dia) === toDateKey(diaMovilSeleccionado);
 
-        return (
-          <button
-            key={dia.toISOString()}
-            type="button"
-            onClick={() => setDiaMovilSeleccionado(dia)}
-            className={`shrink-0 rounded-2xl border px-4 py-2 text-left transition-all ${
-              activo
-                ? 'bg-cyan-500/20 border-cyan-300/50 text-white shadow-[0_0_18px_rgba(34,211,238,.18)]'
-                : 'bg-white/5 border-cyan-500/20 text-cyan-100/65'
-            }`}
-          >
-            <div className="text-[11px] uppercase tracking-[0.12em]">
-              {dia.toLocaleDateString('es-ES', { weekday: 'short' })}
-            </div>
-            <div className="text-lg font-semibold leading-none mt-1">
-              {dia.getDate()}
-            </div>
-          </button>
-        );
-      })}
-    </div>
-
-    <div className="flex gap-2 overflow-x-auto px-3 py-3 border-b border-cyan-500/10 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-300/35">
-      {acciones.map((accion) => (
-        <button
-          key={accion}
-          onClick={() => {
-            if (accion === 'MODIFICAR CITA' && eventoActivo) {
-              setEventoSeleccionado(eventoActivo);
-              setModoEdicion(true);
-              setModalCitaAbierto(true);
-            }
-
-            if (accion === 'CANCELAR CITA' && eventoActivo) {
-              setMostrarCancelar(true);
-            }
-
-            if (accion === 'INSERTAR CITA') {
-              abrirInsertarCita();
-            }
-
-            if (accion === 'INSERTAR RECALL') {
-              abrirInsertarRecall();
-            }
-          }}
-          className="shrink-0 rounded-full border border-cyan-400/30 bg-cyan-500/10 px-3.5 py-1.5 text-[10px] tracking-[0.12em] text-cyan-100"
-        >
-          {accion}
-        </button>
-      ))}
-
+    return (
       <button
-        onClick={gestionarBloqueo}
-        disabled={!slotInicio || loading}
-        className="shrink-0 w-8 h-8 rounded-full border border-cyan-400/30 bg-cyan-500/10 flex items-center justify-center disabled:opacity-45"
+        key={dia.toISOString()}
+        type="button"
+        onClick={() => setDiaMovilSeleccionado(dia)}
+        className={`snap-start shrink-0 w-[19%] min-w-[58px] rounded-2xl border px-1.5 py-2 text-center transition-all ${
+          activo
+            ? 'bg-cyan-500/20 border-cyan-300/50 text-white shadow-[0_0_18px_rgba(34,211,238,.18)]'
+            : 'bg-white/5 border-cyan-500/20 text-cyan-100/65'
+        }`}
       >
-        <Lock className="w-4 h-4 text-cyan-200" />
+        <div className="text-[10px] uppercase tracking-[0.10em]">
+          {dia.toLocaleDateString('es-ES', { weekday: 'short' })}
+        </div>
+        <div className="text-xl font-semibold leading-none mt-1">
+          {dia.getDate()}
+        </div>
       </button>
-    </div>
+    );
+  })}
+</div>
 
-    <div className="p-3 space-y-1">
-      {slots.map((hora) => {
-        const slotKey = `${toDateKey(diaMovilSeleccionado)}|${hora}`;
-        const slotInicioDate = crearFechaDesdeSlot(slotKey);
-        const slotFinDate = new Date(slotInicioDate);
-        slotFinDate.setMinutes(slotFinDate.getMinutes() + 15);
+<div className="flex gap-2 overflow-x-auto px-3 py-3 border-b border-cyan-500/10 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-300/35">
+  {acciones.map((accion) => (
+    <button
+      key={accion}
+      onClick={() => {
+        if (accion === 'MODIFICAR CITA' && eventoActivo) {
+          setEventoSeleccionado(eventoActivo);
+          setModoEdicion(true);
+          setModalCitaAbierto(true);
+        }
 
-        const eventosDia = eventos.filter(e => e.fecha_inicio && sameDay(e.fecha_inicio, diaMovilSeleccionado));
+        if (accion === 'CANCELAR CITA' && eventoActivo) {
+          setMostrarCancelar(true);
+        }
 
-        const eventoSlot = eventosDia.find((evento) => {
-          const inicioEvento = new Date(evento.fecha_inicio);
-          const finEvento = new Date(evento.fecha_fin);
+        if (accion === 'INSERTAR CITA') {
+          abrirInsertarCita();
+        }
 
-          return inicioEvento < slotFinDate && finEvento > slotInicioDate;
-        });
+        if (accion === 'INSERTAR RECALL') {
+          abrirInsertarRecall();
+        }
+      }}
+      className="shrink-0 rounded-full border border-cyan-400/30 bg-cyan-500/10 px-3.5 py-1.5 text-[10px] tracking-[0.12em] text-cyan-100"
+    >
+      {accion}
+    </button>
+  ))}
 
-        const esBloqueoEvento = esBloqueoAgenda(eventoSlot);
-        const esInicioEvento = eventoSlot
-          ? new Date(eventoSlot.fecha_inicio).getTime() === slotInicioDate.getTime()
-          : false;
+  <button
+    onClick={gestionarBloqueo}
+    disabled={!slotInicio || loading}
+    className="shrink-0 w-8 h-8 rounded-full border border-cyan-400/30 bg-cyan-500/10 flex items-center justify-center disabled:opacity-45"
+  >
+    <Lock className="w-4 h-4 text-cyan-200" />
+  </button>
+</div>
 
-        const color = eventoSlot && !esBloqueoEvento ? getColorTratamiento(eventoSlot) : null;
-        const bloqueadoAutomatico = isHorarioNoDisponible(hora, diaMovilSeleccionado, agendaActiva);
-        const bloqueado = bloqueadoAutomatico || esBloqueoEvento;
+<div className="p-2 space-y-1">
+  {slots.map((hora) => {
+    const slotKey = `${toDateKey(diaMovilSeleccionado)}|${hora}`;
+    const slotInicioDate = crearFechaDesdeSlot(slotKey);
+    const slotFinDate = new Date(slotInicioDate);
+    slotFinDate.setMinutes(slotFinDate.getMinutes() + 15);
 
-        return (
-          <button
-            key={slotKey}
-            type="button"
-            onClick={() => manejarSeleccion(slotKey, eventoSlot)}
-            onDoubleClick={() => {
-              if (eventoSlot && !esBloqueoEvento) {
-                setEventoSeleccionado(eventoSlot);
-                setModoEdicion(false);
-                setModalCitaAbierto(true);
-              }
-            }}
-            className={`w-full min-h-[36px] rounded-xl border border-cyan-500/10 px-3 py-2 text-left transition-all ${
-              bloqueado ? 'bg-cyan-500/15' : 'bg-[#03111A]/70 hover:bg-cyan-500/10'
-            }`}
-            style={{
-              backgroundColor:
-                eventoSlot && !esBloqueoEvento && esInicioEvento
-                  ? color?.bg
-                  : undefined,
-            }}
-          >
-            <div className="flex items-center gap-3">
-              <span className={`w-12 text-xs font-semibold ${
-                eventoSlot && !esBloqueoEvento && esInicioEvento
-                  ? color?.text || 'text-white'
-                  : 'text-cyan-100/70'
-              }`}>
-                {hora}
-              </span>
+    const eventosDia = eventos.filter(e => e.fecha_inicio && sameDay(e.fecha_inicio, diaMovilSeleccionado));
 
-              {eventoSlot && !esBloqueoEvento && esInicioEvento ? (
-                <div className={`min-w-0 flex-1 ${color?.text || 'text-white'}`}>
-                  <div className="truncate text-sm font-semibold">
-                    {eventoSlot.titulo || eventoSlot.nombre_paciente || 'Cita'}
-                  </div>
-                  <div className="truncate text-xs opacity-80">
-                    {eventoSlot.motivo || '—'} · {toInputTime(eventoSlot.fecha_inicio)} - {toInputTime(eventoSlot.fecha_fin)}
-                  </div>
-                </div>
-              ) : bloqueado ? (
-                <span className="text-xs text-cyan-100/45">
-                  No disponible
-                </span>
-              ) : (
-                <span className="text-xs text-cyan-100/25">
-                  Libre
-                </span>
-              )}
+    const eventoSlot = eventosDia.find((evento) => {
+      const inicioEvento = new Date(evento.fecha_inicio);
+      const finEvento = new Date(evento.fecha_fin);
+
+      return inicioEvento < slotFinDate && finEvento > slotInicioDate;
+    });
+
+    const esBloqueoEvento = esBloqueoAgenda(eventoSlot);
+    const esInicioEvento = eventoSlot
+      ? new Date(eventoSlot.fecha_inicio).getTime() === slotInicioDate.getTime()
+      : false;
+
+    const color = eventoSlot && !esBloqueoEvento ? getColorTratamiento(eventoSlot) : null;
+    const bloqueadoAutomatico = isHorarioNoDisponible(hora, diaMovilSeleccionado, agendaActiva);
+    const bloqueado = bloqueadoAutomatico || esBloqueoEvento;
+
+    return (
+      <button
+        key={slotKey}
+        type="button"
+        onClick={() => manejarSeleccion(slotKey, eventoSlot)}
+        onDoubleClick={() => {
+          if (eventoSlot && !esBloqueoEvento) {
+            setEventoSeleccionado(eventoSlot);
+            setModoEdicion(false);
+            setModalCitaAbierto(true);
+          }
+        }}
+        className={`w-full min-h-[29px] rounded-xl border border-cyan-500/10 px-3 py-1 text-left transition-all ${
+          bloqueado ? 'bg-cyan-500/15' : 'bg-[#03111A]/70 hover:bg-cyan-500/10'
+        }`}
+        style={{
+          backgroundColor:
+            eventoSlot && !esBloqueoEvento && esInicioEvento
+              ? color?.bg
+              : undefined,
+        }}
+      >
+        <div className="flex items-center gap-3">
+          <span className={`w-12 text-xs font-semibold ${
+            eventoSlot && !esBloqueoEvento && esInicioEvento
+              ? color?.text || 'text-white'
+              : 'text-cyan-100/70'
+          }`}>
+            {hora}
+          </span>
+
+          {eventoSlot && !esBloqueoEvento && esInicioEvento ? (
+            <div className={`min-w-0 flex-1 ${color?.text || 'text-white'}`}>
+              <div className="truncate text-sm font-semibold">
+                {eventoSlot.titulo || eventoSlot.nombre_paciente || 'Cita'}
+              </div>
+              <div className="truncate text-xs opacity-80">
+                {eventoSlot.motivo || '—'} · {toInputTime(eventoSlot.fecha_inicio)} - {toInputTime(eventoSlot.fecha_fin)}
+              </div>
             </div>
-          </button>
-        );
-      })}
-    </div>
+          ) : bloqueado ? (
+            <span className="text-xs text-cyan-100/45">
+              No disponible
+            </span>
+          ) : (
+            <span className="text-xs text-cyan-100/25">
+              Libre
+            </span>
+          )}
+        </div>
+      </button>
+    );
+  })}
+</div>
   </div>
 </div>
 
