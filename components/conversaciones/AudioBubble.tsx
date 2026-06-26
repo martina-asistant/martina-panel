@@ -37,46 +37,59 @@ export default function AudioBubble({ src, onDelete }: AudioBubbleProps) {
 
     if (!src) return;
 
+let audioPath = src;
+
 if (src.startsWith('http://') || src.startsWith('https://')) {
-  setAudioUrl(src);
-  return;
+  try {
+    const parsed = new URL(src);
+    const marker = '/storage/v1/object/public/whatsapp-audios/';
+    const idx = parsed.pathname.indexOf(marker);
+
+    if (idx !== -1) {
+      audioPath = decodeURIComponent(
+        parsed.pathname.slice(idx + marker.length)
+      );
+    }
+  } catch {
+    audioPath = src;
+  }
 }
 
 const cargarAudio = async () => {
-      try {
-        const res = await fetch(
-          `/api/audio-signed-url?path=${encodeURIComponent(src)}`
-        );
+  try {
+    const res = await fetch(
+      `/api/audio-signed-url?path=${encodeURIComponent(audioPath)}`
+    );
 
-        const data = await res.json();
+    const data = await res.json();
 
-        if (!res.ok || !data?.signedUrl) {
-          throw new Error(data?.error || 'No se pudo obtener signed URL');
-        }
+    if (!res.ok || !data?.signedUrl) {
+      throw new Error(data?.error || 'No se pudo obtener signed URL');
+    }
 
-        if (!cancelled) {
-          setAudioUrl(data.signedUrl);
-        }
-      } catch (error) {
-        console.error('Error preparando audio:', {
-          src,
-          error
-        });
-      }
-    };
+    if (!cancelled) {
+      setAudioUrl(data.signedUrl);
+    }
+  } catch (error) {
+    console.error('Error preparando audio:', {
+      src,
+      audioPath,
+      error
+    });
+  }
+};
 
-    cargarAudio();
+cargarAudio();
 
-    return () => {
-      cancelled = true;
+return () => {
+  cancelled = true;
 
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.removeAttribute('src');
-        audioRef.current.load();
-      }
-    };
-  }, [src]);
+  if (audioRef.current) {
+    audioRef.current.pause();
+    audioRef.current.removeAttribute('src');
+    audioRef.current.load();
+  }
+};
 
   const togglePlay = async () => {
     const audio = audioRef.current;
