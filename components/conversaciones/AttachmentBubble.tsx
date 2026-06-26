@@ -98,7 +98,7 @@ useEffect(() => {
   };
 }, [url]);
 
-const finalUrl = signedUrl || url || '';
+const finalUrl = signedUrl;
 const hasFinalUrl = Boolean(finalUrl);
 
   const Icon =
