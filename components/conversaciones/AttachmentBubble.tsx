@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { FileText, ImageIcon, File, ExternalLink, MoreVertical } from 'lucide-react';
+import { FileText, ImageIcon, File, ExternalLink, MoreVertical, X } from 'lucide-react';
 
 type AttachmentBubbleProps = {
   fileName?: string | null;
@@ -61,9 +61,9 @@ export default function AttachmentBubble({
   const cleanName = getCleanFileName(fileName, url);
   const kind = getFileKind(mimeType, cleanName);
   const label = getFileLabel(kind);
-  const hasUrl = Boolean(url);
   const [signedUrl, setSignedUrl] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
 
 useEffect(() => {
   let cancelled = false;
@@ -162,8 +162,12 @@ const hasFinalUrl = Boolean(signedUrl);
 )}
 
       {kind === 'image' && hasFinalUrl ? (
-        <a href={finalUrl || '#'} target="_blank" rel="noreferrer" className="block">
-          <div className="bg-cyan-50">
+        <button
+  type="button"
+  onClick={() => setPreviewOpen(true)}
+  className="block w-full text-left"
+>
+          <div className="overflow-hidden rounded-t-2xl bg-cyan-50">
             <img src={finalUrl || ''}
               alt={cleanName}
               className="w-full max-h-[190px] object-cover"
@@ -173,7 +177,7 @@ const hasFinalUrl = Boolean(signedUrl);
           <div className="py-2 text-center text-[10px] text-cyan-900/50">
   Tocar para abrir
 </div>
-        </a>
+        </button>
       ) : (
         <a
           href={finalUrl || '#'}
@@ -206,6 +210,31 @@ const hasFinalUrl = Boolean(signedUrl);
           </div>
         </a>
       )}
+      {previewOpen && (
+  <div
+    className="fixed inset-0 z-[9999] bg-black/70 flex items-center justify-center p-4"
+    onClick={() => setPreviewOpen(false)}
+  >
+    <div
+      className="relative max-w-[94vw] max-h-[88vh]"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <button
+        type="button"
+        onClick={() => setPreviewOpen(false)}
+        className="absolute -top-10 right-0 w-8 h-8 rounded-full bg-white/15 text-white flex items-center justify-center hover:bg-white/25"
+      >
+        <X className="w-5 h-5" />
+      </button>
+
+      <img
+        src={finalUrl}
+        alt={cleanName}
+        className="max-w-[94vw] max-h-[88vh] rounded-2xl object-contain shadow-2xl"
+      />
+    </div>
+  </div>
+)}
     </div>
   );
 }
