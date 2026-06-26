@@ -63,6 +63,7 @@ export default function AttachmentBubble({
   const label = getFileLabel(kind);
   const hasUrl = Boolean(url);
   const [signedUrl, setSignedUrl] = useState('');
+  const [menuOpen, setMenuOpen] = useState(false);
 
 useEffect(() => {
   let cancelled = false;
@@ -114,15 +115,32 @@ const hasFinalUrl = Boolean(finalUrl);
   return (
     <div className="relative w-[260px] max-w-full rounded-2xl border border-cyan-200/70 bg-white/75 overflow-hidden shadow-[0_0_12px_rgba(34,211,238,.08)]">
       {onDelete && (
+  <>
+    <button
+      type="button"
+      onClick={() => setMenuOpen(prev => !prev)}
+      className="absolute top-2 right-2 z-20 w-6 h-6 rounded-full text-cyan-900/60 hover:bg-cyan-100 flex items-center justify-center"
+      title="Opciones adjunto"
+    >
+      <MoreVertical className="w-4 h-4" />
+    </button>
+
+    {menuOpen && (
+      <div className="absolute top-8 right-2 z-30 w-36 rounded-xl border border-cyan-200 bg-white shadow-xl overflow-hidden">
         <button
           type="button"
-          onClick={onDelete}
-          className="absolute top-2 right-2 z-20 w-6 h-6 rounded-full text-cyan-900/60 hover:bg-cyan-100 flex items-center justify-center"
-          title="Eliminar adjunto"
+          onClick={() => {
+            setMenuOpen(false);
+            onDelete();
+          }}
+          className="w-full px-3 py-2 text-left text-xs text-red-600 hover:bg-red-50"
         >
-          <MoreVertical className="w-4 h-4" />
+          Eliminar adjunto
         </button>
-      )}
+      </div>
+    )}
+  </>
+)}
 
       {kind === 'image' && hasFinalUrl ? (
         <a href={finalUrl || '#'} target="_blank" rel="noreferrer" className="block">
