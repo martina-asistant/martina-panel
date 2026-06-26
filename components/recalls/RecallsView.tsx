@@ -337,8 +337,8 @@ const RecallsView = () => {
   });
 
   return (
-    <div className="min-h-full overflow-y-auto p-4 sm:p-8 bg-[#02141B] text-white">
-      <div className="mb-8">
+    <div className="min-h-full overflow-y-auto px-2 py-4 sm:p-8 bg-[#02141B] text-white">
+      <div className="mb-8 px-2 sm:px-0">
         <h1 className="text-2xl font-semibold tracking-[-0.015em] origin-left inline-block bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent">
           Recalls
         </h1>
@@ -349,7 +349,7 @@ const RecallsView = () => {
       </div>
 
       <div className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-        <div className="flex gap-2 overflow-x-auto pb-2 xl:flex-wrap xl:overflow-visible">
+        <div className="flex gap-2 overflow-x-auto pb-2 xl:flex-wrap xl:overflow-visible [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-300/35">
           {filtros.map((f) => (
             <button
               key={f.key}
@@ -402,7 +402,7 @@ const RecallsView = () => {
             });
             setMostrarInsertarRecall(true);
           }}
-          className="inline-flex w-fit items-center gap-2 rounded-full border border-cyan-300/45 bg-cyan-400/10 px-3.5 py-[7px] text-[10px] font-semibold uppercase tracking-[0.15em] text-cyan-100 shadow-[0_0_16px_rgba(34,211,238,.14)] transition-all hover:bg-cyan-400/18 hover:border-cyan-200/70 whitespace-nowrap"
+          className="ml-2 sm:ml-0 inline-flex w-fit items-center gap-2 rounded-full border border-cyan-300/45 bg-cyan-400/10 px-3.5 py-[7px] text-[10px] font-semibold uppercase tracking-[0.15em] text-cyan-100 shadow-[0_0_16px_rgba(34,211,238,.14)] transition-all hover:bg-cyan-400/18 hover:border-cyan-200/70 whitespace-nowrap"
         >
           <Plus className="h-3.5 w-3.5" />
           Insertar recall
@@ -411,7 +411,7 @@ const RecallsView = () => {
 
       {/* MOBILE */}
       <div className="lg:hidden rounded-3xl border border-cyan-500/20 bg-[rgba(5,18,24,.78)] overflow-hidden shadow-[0_0_35px_rgba(34,211,238,.10)]">
-        <div className="grid grid-cols-[1fr_72px_110px] gap-2 px-4 py-3 bg-cyan-500/10 text-cyan-300/75 text-[11px] uppercase tracking-[0.16em]">
+        <div className="grid grid-cols-[1fr_72px_110px] gap-2 px-3 py-3 bg-cyan-500/10 text-cyan-300/75 text-[11px] uppercase tracking-[0.16em]">
           <div>Paciente</div>
           <div>Fecha</div>
           <div>Estado</div>
@@ -425,7 +425,7 @@ const RecallsView = () => {
               key={r.id}
               type="button"
               onClick={() => abrirEditarRecall(r)}
-              className="w-full grid grid-cols-[1fr_72px_110px] gap-2 items-center px-4 py-4 border-t border-cyan-500/10 text-left hover:bg-cyan-500/5"
+              className="w-full grid grid-cols-[1fr_72px_110px] gap-2 items-center px-3 py-4 border-t border-cyan-500/10 text-left hover:bg-cyan-500/5"
             >
               <div className="min-w-0 font-medium text-white truncate">
                 {r.nombre_paciente || r.nombre_completo || '—'}
@@ -546,9 +546,9 @@ const RecallsView = () => {
       </div>
 
       {mostrarInsertarRecall && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm px-4 py-6">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm px-3 sm:px-4 py-6">
           <div className="mx-auto w-full max-w-2xl rounded-3xl border border-cyan-300/45 bg-[#03111A]/95 overflow-visible shadow-[0_0_46px_rgba(34,211,238,.24)]">
-            <div className="px-6 py-5 border-b border-cyan-300/20 flex items-start justify-between">
+            <div className="px-5 sm:px-6 py-5 border-b border-cyan-300/20 flex items-start justify-between">
               <div>
                 <h2 className="text-xl font-semibold text-white">
                   {modoEdicionRecall ? 'Editar recall' : 'Insertar recall'}
@@ -585,7 +585,7 @@ const RecallsView = () => {
               </div>
             </div>
 
-            <div className="p-6 space-y-5">
+            <div className="p-5 sm:p-6 space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
@@ -609,7 +609,7 @@ const RecallsView = () => {
                         fecha_recall: buildISOFromDateTime(e.target.value, hora),
                       });
                     }}
-                    className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
+                    className="w-full rounded-xl border border-cyan-400/25 bg-[#020F15] px-3 py-2 text-cyan-50 outline-none [color-scheme:dark] focus:border-cyan-300/60 focus:ring-2 focus:ring-cyan-400/15"
                   />
                 </div>
 
@@ -636,7 +636,7 @@ const RecallsView = () => {
                         fecha_recall: buildISOFromDateTime(fecha, e.target.value),
                       });
                     }}
-                    className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
+                    className="w-full rounded-xl border border-cyan-400/25 bg-[#020F15] px-3 py-2 text-cyan-50 outline-none [color-scheme:dark] focus:border-cyan-300/60 focus:ring-2 focus:ring-cyan-400/15"
                   />
                 </div>
               </div>
