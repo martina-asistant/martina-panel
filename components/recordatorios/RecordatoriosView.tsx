@@ -70,8 +70,8 @@ const RecordatoriosView = () => {
   );
 
   return (
-    <div className="min-h-full overflow-y-auto p-4 lg:p-8 bg-[#02141B] text-white">
-      <div className="mb-6 lg:mb-8">
+    <div className="min-h-full overflow-y-auto px-2 py-4 lg:p-8 bg-[#02141B] text-white">
+      <div className="mb-6 lg:mb-8 px-2 lg:px-0">
         <h1 className="inline-block text-3xl lg:text-2xl font-semibold tracking-[-0.015em] bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent mb-1">
           Recordatorios
         </h1>
@@ -81,7 +81,7 @@ const RecordatoriosView = () => {
         </p>
       </div>
 
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-2 lg:flex-wrap lg:overflow-visible">
+      <div className="flex gap-2 mb-6 overflow-x-auto pb-2 lg:flex-wrap lg:overflow-visible [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-300/35">
         {filtros.map(f => (
           <button
             key={f.key}
@@ -105,7 +105,7 @@ const RecordatoriosView = () => {
 
       {/* MOBILE */}
       <div className="lg:hidden rounded-3xl border border-cyan-500/20 bg-[rgba(5,18,24,.78)] overflow-hidden shadow-[0_0_35px_rgba(34,211,238,.10)]">
-        <div className="grid grid-cols-[1fr_72px_110px] gap-2 px-4 py-3 bg-cyan-500/10 text-cyan-300/75 text-[11px] uppercase tracking-[0.16em]">
+        <div className="grid grid-cols-[1fr_72px_110px] gap-2 px-3 py-3 bg-cyan-500/10 text-cyan-300/75 text-[11px] uppercase tracking-[0.16em]">
           <div>Paciente</div>
           <div>Fecha</div>
           <div>Estado</div>
@@ -119,7 +119,7 @@ const RecordatoriosView = () => {
               key={recordatorio.id}
               type="button"
               onClick={() => setSelected(recordatorio)}
-              className="w-full grid grid-cols-[1fr_72px_110px] gap-2 items-center px-4 py-4 border-t border-cyan-500/10 text-left hover:bg-cyan-500/5"
+              className="w-full grid grid-cols-[1fr_72px_110px] gap-2 items-center px-3 py-4 border-t border-cyan-500/10 text-left hover:bg-cyan-500/5"
             >
               <div className="min-w-0 font-medium text-white truncate">
                 {recordatorio.nombre_paciente || '—'}
