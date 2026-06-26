@@ -90,8 +90,9 @@ return () => {
     audioRef.current.load();
   }
 };
+  }, [src]);
 
-  const togglePlay = async () => {
+const togglePlay = async () => {
     const audio = audioRef.current;
 
     if (!audio || !audioUrl) return;
