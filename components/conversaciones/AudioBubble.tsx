@@ -113,6 +113,11 @@ const togglePlay = async () => {
   const progress =
     duration > 0 ? Math.min(100, (currentTime / duration) * 100) : 0;
 
+  console.log({
+  src,
+  audioUrl
+});
+
   return (
     <div className="relative w-[285px] max-w-full rounded-2xl border border-cyan-300/40 bg-gradient-to-br from-cyan-50 to-white px-3 py-2 shadow-[0_0_18px_rgba(34,211,238,.16)]">
       <audio
