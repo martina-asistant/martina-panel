@@ -1236,7 +1236,7 @@ return (
           />
         </div>
 
-        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+        <div className="flex gap-2 overflow-x-auto pb-2 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-300/35">
           {filtros.map(f => (
             <button
               key={f.key}
