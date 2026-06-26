@@ -98,7 +98,10 @@ useEffect(() => {
   };
 }, [url]);
 
-const finalUrl = signedUrl;
+const finalUrl = url?.includes('/storage/v1/object/public/')
+  ? url
+  : signedUrl;
+
 const hasFinalUrl = Boolean(finalUrl);
 
   const Icon =
