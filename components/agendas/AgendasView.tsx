@@ -194,8 +194,23 @@ const formatSemana = (inicio: Date) => {
 const formatMes = (date: Date) =>
   date.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }).toUpperCase();
 
+const getDiasMes = (fecha: Date) => {
+  const inicio = new Date(fecha.getFullYear(), fecha.getMonth(), 1);
+  const fin = new Date(fecha.getFullYear(), fecha.getMonth() + 1, 0);
+
+  const dias = [];
+
+  for (let i = 1; i <= fin.getDate(); i++) {
+    dias.push(new Date(fecha.getFullYear(), fecha.getMonth(), i));
+  }
+
+  return dias;
+};
+
 const formatDia = (date: Date) =>
   date.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric' });
+
+const diasMesMovil = getDiasMes(semanaInicio);
 
 const sameDay = (iso: string, date: Date) => {
   const d = new Date(iso);
@@ -362,14 +377,27 @@ const [nuevoRecall, setNuevoRecall] = useState({
 });
   const [mostrarTiposRecall, setMostrarTiposRecall] = useState(false);
 const [mostrarAgendaRecall, setMostrarAgendaRecall] = useState(false);
+  
+  const [diaMovilSeleccionado, setDiaMovilSeleccionado] = useState(new Date());
+const [mostrarCalendarioMovil, setMostrarCalendarioMovil] = useState(false);
     
 
   const agenda = agendas.find(a => a.key === agendaActiva);
 
   const diasSemana = useMemo(
-    () => [0, 1, 2, 3, 4].map(d => addDays(semanaInicio, d)),
-    [semanaInicio]
-  );
+  () => [0, 1, 2, 3, 4].map(d => addDays(semanaInicio, d)),
+  [semanaInicio]
+);
+
+const diasMesMovil = useMemo(
+  () => getDiasMes(diaMovilSeleccionado),
+  [diaMovilSeleccionado]
+);
+
+useEffect(() => {
+  setDiaMovilSeleccionado(semanaInicio);
+}, [semanaInicio]);
+  
 
   const crearFechaDesdeSlot = (slotKey: string) => {
     const [fechaKey, hora] = slotKey.split('|');
@@ -857,8 +885,8 @@ const guardarInsertarCita = async () => {
 });
 
   return (
-    <div className="h-full overflow-y-auto overflow-x-hidden p-8 bg-[#02141B] text-white pb-20">
-      <div className="flex items-start justify-between gap-6 mb-8">
+    <div className="h-full overflow-y-auto overflow-x-hidden px-2 py-4 lg:p-8 bg-[#02141B] text-white pb-20">
+      <div className="hidden lg:flex items-start justify-between gap-6 mb-8">
         <div>
           <h1 className="inline-block text-2xl font-semibold tracking-[-0.015em] bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent mb-1">
             Agendas
@@ -919,6 +947,265 @@ const guardarInsertarCita = async () => {
         </div>
       </div>
 
+      {/* MOBILE */}
+<div className="lg:hidden">
+  <div className="mb-5 px-2 flex items-start justify-between gap-3">
+    <div>
+      <h1 className="inline-block text-3xl font-semibold tracking-[-0.015em] bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent mb-1">
+        Agendas
+      </h1>
+      <p className="text-sm text-cyan-100/55">Gestión de citas</p>
+    </div>
+
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setMostrarAgendas(!mostrarAgendas)}
+        className="flex items-center gap-2 rounded-2xl border border-cyan-400/25 bg-cyan-500/10 px-3 py-2 text-sm font-medium text-white"
+      >
+        <CalendarDays className="w-4 h-4 text-cyan-300" />
+        <span>{agenda?.nombre}</span>
+      </button>
+
+      {mostrarAgendas && (
+        <div className="absolute right-0 top-[calc(100%+8px)] z-[120] min-w-[170px] overflow-hidden rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
+          {agendas.map((a) => (
+            <button
+              key={a.key}
+              type="button"
+              onClick={() => {
+                setAgendaActiva(a.key);
+                setMostrarAgendas(false);
+              }}
+              className={`block w-full px-4 py-2.5 text-left text-sm hover:bg-cyan-500/15 ${
+                agendaActiva === a.key ? 'bg-cyan-500/20 text-cyan-100' : 'text-white'
+              }`}
+            >
+              {a.nombre}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
+
+  <div className="hidden lg:block rounded-3xl border border-cyan-500/20 bg-[rgba(5,18,24,.78)] backdrop-blur-xl overflow-hidden shadow-[0_0_35px_rgba(34,211,238,.10)]">
+    <div className="px-3 py-3 border-b border-cyan-500/10 bg-cyan-500/10">
+      <div className="flex items-center justify-between">
+        <button
+          type="button"
+          onClick={() => setDiaMovilSeleccionado(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))}
+          className="w-8 h-8 rounded-full border border-cyan-400/25 bg-cyan-500/10 flex items-center justify-center"
+        >
+          <ChevronLeft className="w-4 h-4 text-cyan-200" />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setMostrarCalendarioMovil(prev => !prev)}
+          className="text-[13px] tracking-[0.26em] text-cyan-300 font-semibold"
+        >
+          {formatMes(diaMovilSeleccionado)}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setDiaMovilSeleccionado(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))}
+          className="w-8 h-8 rounded-full border border-cyan-400/25 bg-cyan-500/10 flex items-center justify-center"
+        >
+          <ChevronRight className="w-4 h-4 text-cyan-200" />
+        </button>
+      </div>
+
+      {mostrarCalendarioMovil && (
+        <div className="mt-4 rounded-2xl border border-cyan-400/20 bg-[#03111A]/95 p-3">
+          <div className="grid grid-cols-7 gap-1 text-center text-[10px] uppercase tracking-[0.12em] text-cyan-300/70 mb-2">
+            {['L', 'M', 'X', 'J', 'V', 'S', 'D'].map(d => (
+              <div key={d}>{d}</div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-7 gap-1">
+            {Array.from({
+              length: (new Date(diaMovilSeleccionado.getFullYear(), diaMovilSeleccionado.getMonth(), 1).getDay() + 6) % 7,
+            }).map((_, i) => (
+              <div key={`empty-${i}`} />
+            ))}
+
+            {diasMesMovil.map((dia) => {
+              const activo = toDateKey(dia) === toDateKey(diaMovilSeleccionado);
+
+              return (
+                <button
+                  key={dia.toISOString()}
+                  type="button"
+                  onClick={() => {
+                    setDiaMovilSeleccionado(dia);
+                    setSemanaInicio(getMonday(dia));
+                    setMostrarCalendarioMovil(false);
+                  }}
+                  className={`h-9 rounded-xl text-sm transition-all ${
+                    activo
+                      ? 'bg-cyan-400/25 text-white border border-cyan-300/50 shadow-[0_0_14px_rgba(34,211,238,.20)]'
+                      : 'text-cyan-100/70 hover:bg-cyan-500/10'
+                  }`}
+                >
+                  {dia.getDate()}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+
+    <div className="flex gap-2 overflow-x-auto px-3 py-3 border-b border-cyan-500/10 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-300/35">
+      {diasSemana.map((dia) => {
+        const activo = toDateKey(dia) === toDateKey(diaMovilSeleccionado);
+
+        return (
+          <button
+            key={dia.toISOString()}
+            type="button"
+            onClick={() => setDiaMovilSeleccionado(dia)}
+            className={`shrink-0 rounded-2xl border px-4 py-2 text-left transition-all ${
+              activo
+                ? 'bg-cyan-500/20 border-cyan-300/50 text-white shadow-[0_0_18px_rgba(34,211,238,.18)]'
+                : 'bg-white/5 border-cyan-500/20 text-cyan-100/65'
+            }`}
+          >
+            <div className="text-[11px] uppercase tracking-[0.12em]">
+              {dia.toLocaleDateString('es-ES', { weekday: 'short' })}
+            </div>
+            <div className="text-lg font-semibold leading-none mt-1">
+              {dia.getDate()}
+            </div>
+          </button>
+        );
+      })}
+    </div>
+
+    <div className="flex gap-2 overflow-x-auto px-3 py-3 border-b border-cyan-500/10 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-300/35">
+      {acciones.map((accion) => (
+        <button
+          key={accion}
+          onClick={() => {
+            if (accion === 'MODIFICAR CITA' && eventoActivo) {
+              setEventoSeleccionado(eventoActivo);
+              setModoEdicion(true);
+              setModalCitaAbierto(true);
+            }
+
+            if (accion === 'CANCELAR CITA' && eventoActivo) {
+              setMostrarCancelar(true);
+            }
+
+            if (accion === 'INSERTAR CITA') {
+              abrirInsertarCita();
+            }
+
+            if (accion === 'INSERTAR RECALL') {
+              abrirInsertarRecall();
+            }
+          }}
+          className="shrink-0 rounded-full border border-cyan-400/30 bg-cyan-500/10 px-3.5 py-1.5 text-[10px] tracking-[0.12em] text-cyan-100"
+        >
+          {accion}
+        </button>
+      ))}
+
+      <button
+        onClick={gestionarBloqueo}
+        disabled={!slotInicio || loading}
+        className="shrink-0 w-8 h-8 rounded-full border border-cyan-400/30 bg-cyan-500/10 flex items-center justify-center disabled:opacity-45"
+      >
+        <Lock className="w-4 h-4 text-cyan-200" />
+      </button>
+    </div>
+
+    <div className="p-3 space-y-1">
+      {slots.map((hora) => {
+        const slotKey = `${toDateKey(diaMovilSeleccionado)}|${hora}`;
+        const slotInicioDate = crearFechaDesdeSlot(slotKey);
+        const slotFinDate = new Date(slotInicioDate);
+        slotFinDate.setMinutes(slotFinDate.getMinutes() + 15);
+
+        const eventosDia = eventos.filter(e => e.fecha_inicio && sameDay(e.fecha_inicio, diaMovilSeleccionado));
+
+        const eventoSlot = eventosDia.find((evento) => {
+          const inicioEvento = new Date(evento.fecha_inicio);
+          const finEvento = new Date(evento.fecha_fin);
+
+          return inicioEvento < slotFinDate && finEvento > slotInicioDate;
+        });
+
+        const esBloqueoEvento = esBloqueoAgenda(eventoSlot);
+        const esInicioEvento = eventoSlot
+          ? new Date(eventoSlot.fecha_inicio).getTime() === slotInicioDate.getTime()
+          : false;
+
+        const color = eventoSlot && !esBloqueoEvento ? getColorTratamiento(eventoSlot) : null;
+        const bloqueadoAutomatico = isHorarioNoDisponible(hora, diaMovilSeleccionado, agendaActiva);
+        const bloqueado = bloqueadoAutomatico || esBloqueoEvento;
+
+        return (
+          <button
+            key={slotKey}
+            type="button"
+            onClick={() => manejarSeleccion(slotKey, eventoSlot)}
+            onDoubleClick={() => {
+              if (eventoSlot && !esBloqueoEvento) {
+                setEventoSeleccionado(eventoSlot);
+                setModoEdicion(false);
+                setModalCitaAbierto(true);
+              }
+            }}
+            className={`w-full min-h-[36px] rounded-xl border border-cyan-500/10 px-3 py-2 text-left transition-all ${
+              bloqueado ? 'bg-cyan-500/15' : 'bg-[#03111A]/70 hover:bg-cyan-500/10'
+            }`}
+            style={{
+              backgroundColor:
+                eventoSlot && !esBloqueoEvento && esInicioEvento
+                  ? color?.bg
+                  : undefined,
+            }}
+          >
+            <div className="flex items-center gap-3">
+              <span className={`w-12 text-xs font-semibold ${
+                eventoSlot && !esBloqueoEvento && esInicioEvento
+                  ? color?.text || 'text-white'
+                  : 'text-cyan-100/70'
+              }`}>
+                {hora}
+              </span>
+
+              {eventoSlot && !esBloqueoEvento && esInicioEvento ? (
+                <div className={`min-w-0 flex-1 ${color?.text || 'text-white'}`}>
+                  <div className="truncate text-sm font-semibold">
+                    {eventoSlot.titulo || eventoSlot.nombre_paciente || 'Cita'}
+                  </div>
+                  <div className="truncate text-xs opacity-80">
+                    {eventoSlot.motivo || '—'} · {toInputTime(eventoSlot.fecha_inicio)} - {toInputTime(eventoSlot.fecha_fin)}
+                  </div>
+                </div>
+              ) : bloqueado ? (
+                <span className="text-xs text-cyan-100/45">
+                  No disponible
+                </span>
+              ) : (
+                <span className="text-xs text-cyan-100/25">
+                  Libre
+                </span>
+              )}
+            </div>
+          </button>
+        );
+      })}
+    </div>
+  </div>
+</div>
+
+      
       <div className="rounded-3xl border border-cyan-500/20 bg-[rgba(5,18,24,.78)] backdrop-blur-xl overflow-hidden shadow-[0_0_35px_rgba(34,211,238,.10)]">
         <div className="bg-cyan-500/10 border-b border-cyan-500/10 px-6 py-3">
           <div className="flex items-center justify-between gap-6">
