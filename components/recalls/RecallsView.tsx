@@ -218,6 +218,33 @@ const RecallsView = () => {
     cargarPatients();
   }, []);
 
+  const abrirEditarRecall = (r: Recall) => {
+    setRecallSeleccionado(r);
+    setModoEdicionRecall(true);
+
+    setNuevoRecall({
+      paciente_id: r.paciente_id || '',
+      nombre_paciente: r.nombre_paciente || r.nombre_completo || '',
+      telefono: r.telefono || '',
+      motivo_recall: r.motivo_recall || 'Limpieza',
+      tipo_recall:
+        r.tipo_recall ||
+        tipoRecallLabel(r.motivo_recall || r.tipo),
+      detalle_recall: r.detalle_recall || '',
+      fecha_recall: r.fecha_recall || '',
+      profesional: r.profesional || 'fede',
+    });
+
+    setBusquedaPaciente(
+      r.nombre_paciente ||
+        r.nombre_completo ||
+        ''
+    );
+
+    setMostrarResultadosPaciente(false);
+    setMostrarInsertarRecall(true);
+  };
+
   const guardarInsertarRecall = async () => {
     if (loadingGuardar) return;
 
@@ -322,13 +349,13 @@ const RecallsView = () => {
       </div>
 
       <div className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-        <div className="flex flex-wrap gap-2">
+        <div className="flex gap-2 overflow-x-auto pb-2 xl:flex-wrap xl:overflow-visible">
           {filtros.map((f) => (
             <button
               key={f.key}
               onClick={() => setFilter(f.key)}
               className={cn(
-                'text-[12px] px-3.5 py-[7px] rounded-full border transition-all whitespace-nowrap',
+                'text-[12px] px-3.5 py-[7px] rounded-full border transition-all whitespace-nowrap shrink-0',
                 filter === f.key
                   ? 'bg-cyan-500/20 text-cyan-100 border-cyan-300/50 shadow-[0_0_18px_rgba(34,211,238,.22)]'
                   : 'bg-white/5 text-cyan-100/65 border-cyan-500/20 hover:bg-cyan-500/10 hover:text-white'
@@ -382,7 +409,51 @@ const RecallsView = () => {
         </button>
       </div>
 
-      <div className="rounded-3xl border border-cyan-500/20 bg-[rgba(5,18,24,.78)] backdrop-blur-xl overflow-hidden shadow-[0_0_35px_rgba(34,211,238,.10)]">
+      {/* MOBILE */}
+      <div className="lg:hidden rounded-3xl border border-cyan-500/20 bg-[rgba(5,18,24,.78)] overflow-hidden shadow-[0_0_35px_rgba(34,211,238,.10)]">
+        <div className="grid grid-cols-[1fr_72px_110px] gap-2 px-4 py-3 bg-cyan-500/10 text-cyan-300/75 text-[11px] uppercase tracking-[0.16em]">
+          <div>Paciente</div>
+          <div>Fecha</div>
+          <div>Estado</div>
+        </div>
+
+        {filtered.map((r) => {
+          const lbl = recallEstadoVisual(r.estado);
+
+          return (
+            <button
+              key={r.id}
+              type="button"
+              onClick={() => abrirEditarRecall(r)}
+              className="w-full grid grid-cols-[1fr_72px_110px] gap-2 items-center px-4 py-4 border-t border-cyan-500/10 text-left hover:bg-cyan-500/5"
+            >
+              <div className="min-w-0 font-medium text-white truncate">
+                {r.nombre_paciente || r.nombre_completo || '—'}
+              </div>
+
+              <div className="text-xs text-cyan-100/70 whitespace-nowrap">
+                {r.fecha_recall ? formatDate(r.fecha_recall) : '—'}
+              </div>
+
+              <div className="min-w-0">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border border-cyan-500/20 bg-cyan-500/5 text-[11px] text-cyan-100 max-w-full">
+                  <span className={cn('w-2 h-2 rounded-full shrink-0 shadow-[0_0_10px_currentColor]', lbl.color)} />
+                  <span className="truncate">{lbl.label}</span>
+                </span>
+              </div>
+            </button>
+          );
+        })}
+
+        {filtered.length === 0 && (
+          <div className="px-6 py-10 text-center text-cyan-100/45">
+            Sin resultados
+          </div>
+        )}
+      </div>
+
+      {/* DESKTOP */}
+      <div className="hidden lg:block rounded-3xl border border-cyan-500/20 bg-[rgba(5,18,24,.78)] backdrop-blur-xl overflow-hidden shadow-[0_0_35px_rgba(34,211,238,.10)]">
         <div className="w-full overflow-hidden">
           <table className="w-full table-fixed text-sm">
             <colgroup>
@@ -414,32 +485,7 @@ const RecallsView = () => {
                 return (
                   <tr
                     key={r.id}
-                    onDoubleClick={() => {
-                      setRecallSeleccionado(r);
-                      setModoEdicionRecall(true);
-
-                      setNuevoRecall({
-                        paciente_id: r.paciente_id || '',
-                        nombre_paciente: r.nombre_paciente || r.nombre_completo || '',
-                        telefono: r.telefono || '',
-                        motivo_recall: r.motivo_recall || 'Limpieza',
-                        tipo_recall:
-                          r.tipo_recall ||
-                          tipoRecallLabel(r.motivo_recall || r.tipo),
-                        detalle_recall: r.detalle_recall || '',
-                        fecha_recall: r.fecha_recall || '',
-                        profesional: r.profesional || 'fede',
-                      });
-
-                      setBusquedaPaciente(
-                        r.nombre_paciente ||
-                          r.nombre_completo ||
-                          ''
-                      );
-
-                      setMostrarResultadosPaciente(false);
-                      setMostrarInsertarRecall(true);
-                    }}
+                    onDoubleClick={() => abrirEditarRecall(r)}
                     className="border-t border-cyan-500/10 hover:bg-cyan-500/5 transition-colors cursor-pointer"
                   >
                     <td className="px-5 py-4 font-medium text-white truncate">
