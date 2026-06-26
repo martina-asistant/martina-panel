@@ -113,7 +113,7 @@ const hasFinalUrl = Boolean(finalUrl);
         : FileText;
 
   return (
-    <div className="relative w-[260px] max-w-full rounded-2xl border border-cyan-200/70 bg-white/75 overflow-hidden shadow-[0_0_12px_rgba(34,211,238,.08)]">
+    <div className="relative w-[260px] max-w-full rounded-2xl border border-cyan-200/70 bg-white/75 overflow-visible shadow-[0_0_12px_rgba(34,211,238,.08)]">
       {onDelete && (
   <>
     <button
