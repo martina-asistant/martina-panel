@@ -987,7 +987,7 @@ const guardarInsertarCita = async () => {
     </div>
   </div>
 
-  <div className="rounded-3xl border border-cyan-500/20 bg-[rgba(5,18,24,.78)] overflow-hidden shadow-[0_0_35px_rgba(34,211,238,.10)]">
+  <div className="hidden lg:block rounded-3xl border border-cyan-500/20 bg-[rgba(5,18,24,.78)] backdrop-blur-xl overflow-hidden shadow-[0_0_35px_rgba(34,211,238,.10)]">
     <div className="px-3 py-3 border-b border-cyan-500/10 bg-cyan-500/10">
       <div className="flex items-center justify-between">
         <button
