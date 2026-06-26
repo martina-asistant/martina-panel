@@ -130,19 +130,9 @@ const hasFinalUrl = Boolean(finalUrl);
             />
           </div>
 
-          <div className="flex items-center gap-2 px-3 py-2 pr-9">
-            <ImageIcon className="w-4 h-4 text-cyan-800 shrink-0" />
-
-            <div className="min-w-0 flex-1">
-              <div className="text-xs font-medium text-[#184B53] truncate">
-                {cleanName}
-              </div>
-
-              <div className="text-[10px] text-cyan-900/50">
-                Tocar para abrir
-              </div>
-            </div>
-          </div>
+          <div className="py-2 text-center text-[10px] text-cyan-900/50">
+  Tocar para abrir
+</div>
         </a>
       ) : (
         <a
