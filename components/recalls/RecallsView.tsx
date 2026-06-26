@@ -410,6 +410,7 @@ const RecallsView = () => {
             </button>
           ))}
         </div>
+        </div>
 
       {/* MOBILE */}
       <div className="lg:hidden rounded-3xl border border-cyan-500/20 bg-[rgba(5,18,24,.78)] overflow-hidden shadow-[0_0_35px_rgba(34,211,238,.10)]">
