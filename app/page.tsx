@@ -49,13 +49,15 @@ const Home = () => {
             className="w-[255px] rounded-full drop-shadow-[0_0_38px_rgba(34,211,238,.75)]"
           />
 
-          <h1 className="mt-6 text-[2.55rem] font-bold leading-tight">
-            Hola, soy{' '}
-            <span className="text-cyan-300 drop-shadow-[0_0_18px_rgba(34,211,238,.9)]">
-              Martina
-            </span>
-            <span className="inline-block ml-2 animate-wave">👋</span>
-          </h1>
+          <h1 className="mt-6 flex items-center justify-center gap-2 whitespace-nowrap text-[2.18rem] font-bold leading-tight">
+  <span>
+    Hola, soy{' '}
+    <span className="text-cyan-300 drop-shadow-[0_0_18px_rgba(34,211,238,.9)]">
+      Martina
+    </span>
+  </span>
+  <span className="inline-block shrink-0 text-[2rem] animate-wave">👋</span>
+</h1>
 
           <p className="mt-3 text-[0.82rem] uppercase tracking-[0.28em] text-cyan-300">
             Tu asistente virtual inteligente
@@ -77,7 +79,7 @@ const Home = () => {
             ACCEDER
           </button>
 
-          <div className="mt-5 flex items-center gap-2 text-[1rem] text-white/95">
+          <div className="mt-7 grid w-full grid-cols-2 gap-3">
             <span className="h-3 w-3 rounded-full bg-cyan-300 animate-pulse shadow-[0_0_16px_rgba(34,211,238,1)]" />
             Martina activa
           </div>
@@ -92,13 +94,13 @@ const Home = () => {
               <div
                 key={text}
                 className="
-                  min-h-[145px] rounded-2xl border border-cyan-400/25
-                  bg-[#03111A]/55 px-3 py-6 backdrop-blur-xl
-                  shadow-[0_0_22px_rgba(34,211,238,.10)]
-                "
+  min-h-[108px] rounded-2xl border border-cyan-400/25
+  bg-[#03111A]/55 px-3 py-4 backdrop-blur-xl
+  shadow-[0_0_18px_rgba(34,211,238,.09)]
+"
               >
-                <Icon className="mx-auto mb-4 h-11 w-11 text-cyan-300 drop-shadow-[0_0_18px_rgba(34,211,238,.9)]" />
-                <p className="text-[1.05rem] leading-snug">{text}</p>
+                <Icon className="mx-auto mb-2.5 h-8 w-8 text-cyan-300 drop-shadow-[0_0_14px_rgba(34,211,238,.85)]" />
+                <p className="text-[0.88rem] leading-snug">{text}</p>
               </div>
             ))}
           </div>
