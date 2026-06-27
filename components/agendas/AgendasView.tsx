@@ -1878,7 +1878,7 @@ const guardarInsertarCita = async () => {
   </div>
 </div>
 
-        <div className="grid grid-cols-[1fr_auto] gap-3 items-start">
+        <div className="grid grid-cols-[1fr_auto_1fr] gap-3 items-start">
   <div className="relative">
     <input
       placeholder="Buscar paciente"
@@ -1927,7 +1927,7 @@ const guardarInsertarCita = async () => {
   onClick={() => setMostrarNuevoPaciente(true)}
   className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-cyan-300/60 bg-cyan-500/15 text-cyan-100 shadow-[0_0_14px_rgba(34,211,238,.32)] hover:bg-cyan-500/25 hover:shadow-[0_0_22px_rgba(34,211,238,.5)] transition-all"
 >
-  <span className="text-[18px] leading-none translate-y-[1px]">+</span>
+  <span className="text-[18px] leading-none -translate-y-[1px]">+</span>
 </button>
 
 <input
