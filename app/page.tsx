@@ -37,7 +37,7 @@ const Home = () => {
         <img
           src="/fondo.png"
           alt=""
-          className="absolute inset-0 h-full w-full object-cover object-[center_12%]"
+          className="absolute inset-0 h-full w-full object-cover object-[center_10%]"
         />
 
         <div className="absolute inset-0 bg-[#020f14]/20" />
