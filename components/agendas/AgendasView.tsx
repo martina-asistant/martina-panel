@@ -389,8 +389,8 @@ const [mostrarCalendarioMovil, setMostrarCalendarioMovil] = useState(false);
 );
 
   const diasMovilScroll = useMemo(
-  () => Array.from({ length: 28 }, (_, i) => addDays(diaMovilSeleccionado, i)),
-  [diaMovilSeleccionado]
+  () => Array.from({ length: 35 }, (_, i) => addDays(semanaInicio, i - 7)),
+  [semanaInicio]
 );
 
 const diasMesMovil = useMemo(
@@ -1078,7 +1078,6 @@ const guardarInsertarCita = async () => {
         type="button"
         onClick={() => {
           setDiaMovilSeleccionado(dia);
-          setSemanaInicio(getMonday(dia));
         }}
         className={`shrink-0 w-[54px] h-[50px] rounded-xl border px-1 py-1 text-center transition-all ${
           activo
