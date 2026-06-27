@@ -37,18 +37,11 @@ const Home = () => {
         <img
   src="/fondo.png"
   alt=""
-  className="absolute inset-0 h-full w-full object-cover object-center"
+  className="absolute inset-0 h-full w-full object-cover object-[center_10%]"
 />
 
         <div className="absolute inset-0 bg-[#020f14]/20" />
-        <div className="pointer-events-none absolute left-1/2 top-[7.5rem] h-[260px] w-[520px] -translate-x-1/2 rounded-full bg-cyan-400/20 blur-[70px]" />
-
-<div className="pointer-events-none absolute left-1/2 top-[11.5rem] h-[1px] w-[120vw] -translate-x-1/2 bg-gradient-to-r from-transparent via-cyan-300/70 to-transparent shadow-[0_0_28px_rgba(34,211,238,.9)]" />
-
-<div className="pointer-events-none absolute left-1/2 top-[10rem] h-[180px] w-[120vw] -translate-x-1/2 opacity-70">
-  <div className="h-full w-full bg-[radial-gradient(circle_at_20%_50%,rgba(34,211,238,.75)_0,transparent_2.5%),radial-gradient(circle_at_45%_35%,rgba(34,211,238,.65)_0,transparent_2%),radial-gradient(circle_at_70%_55%,rgba(34,211,238,.65)_0,transparent_2.2%),radial-gradient(circle_at_88%_40%,rgba(34,211,238,.55)_0,transparent_2%)]" />
-</div>
-
+        
         <section className="relative z-10 flex min-h-screen flex-col items-center px-6 pt-10 pb-10 text-center">
           <img
             src="/martina-avatarpanel.png"
