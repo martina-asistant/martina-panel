@@ -79,10 +79,10 @@ const Home = () => {
             ACCEDER
           </button>
 
-          <div className="mt-7 grid w-full grid-cols-2 gap-3">
-            <span className="h-3 w-3 rounded-full bg-cyan-300 animate-pulse shadow-[0_0_16px_rgba(34,211,238,1)]" />
-            Martina activa
-          </div>
+          <div className="mt-5 flex items-center justify-center gap-2.5 text-[1rem] text-white/95">
+  <span className="h-3 w-3 rounded-full bg-cyan-300 animate-pulse shadow-[0_0_16px_rgba(34,211,238,1)]" />
+  <span>Martina activa</span>
+</div>
 
           <div className="mt-8 grid w-full grid-cols-2 gap-3.5">
             {[
