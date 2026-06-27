@@ -387,6 +387,11 @@ const [mostrarCalendarioMovil, setMostrarCalendarioMovil] = useState(false);
   [semanaInicio]
 );
 
+  const diasMovilScroll = useMemo(
+  () => Array.from({ length: 28 }, (_, i) => addDays(diaMovilSeleccionado, i)),
+  [diaMovilSeleccionado]
+);
+
 const diasMesMovil = useMemo(
   () => getDiasMes(diaMovilSeleccionado),
   [diaMovilSeleccionado]
@@ -892,7 +897,7 @@ const guardarInsertarCita = async () => {
           <p className="text-sm text-cyan-100/55">Gestión de citas</p>
         </div>
 
-        <div className="flex items-center gap-3 rounded-2xl border border-cyan-400/25 bg-cyan-500/10 px-4 py-3">
+        <div className="flex items-center gap-3 rounded-2xl border border-cyan-400/25 bg-cyan-500/10 px-4 py-3 min-w-[230px]">
           <CalendarDays className="w-5 h-5 text-cyan-300" />
 
           <div className="relative">
@@ -921,7 +926,7 @@ const guardarInsertarCita = async () => {
   </button>
 
   {mostrarAgendas && (
-    <div className="absolute left-0 top-[calc(100%+8px)] z-[120] w-full max-h-56 overflow-y-auto rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
+    <div className="absolute right-0 top-[calc(100%+8px)] z-[120] min-w-[190px] max-h-56 overflow-y-auto rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
       {agendas.map((a) => (
         <button
           key={a.key}
@@ -1016,14 +1021,14 @@ const guardarInsertarCita = async () => {
       </div>
 
       {mostrarCalendarioMovil && (
-        <div className="mt-4 rounded-2xl border border-cyan-400/20 bg-[#03111A]/95 p-3">
-          <div className="grid grid-cols-7 gap-1 text-center text-[10px] uppercase tracking-[0.12em] text-cyan-300/70 mb-2">
+        <div className="mt-3 rounded-2xl border border-cyan-400/20 bg-[#03111A]/95 px-3 py-2">
+          <div className="grid grid-cols-7 gap-0.5 text-center text-[10px] uppercase tracking-[0.10em] text-cyan-300/70 mb-1">
             {['L', 'M', 'X', 'J', 'V', 'S', 'D'].map(d => (
               <div key={d}>{d}</div>
             ))}
           </div>
 
-          <div className="grid grid-cols-7 gap-1">
+          <div className="grid grid-cols-7 gap-0.5">
             {Array.from({
               length: (new Date(diaMovilSeleccionado.getFullYear(), diaMovilSeleccionado.getMonth(), 1).getDay() + 6) % 7,
             }).map((_, i) => (
@@ -1042,7 +1047,7 @@ const guardarInsertarCita = async () => {
                     setSemanaInicio(getMonday(dia));
                     setMostrarCalendarioMovil(false);
                   }}
-                  className={`h-9 rounded-xl text-sm transition-all ${
+                  className={`h-7 rounded-lg text-xs transition-all ${
                     activo
                       ? 'bg-cyan-400/25 text-white border border-cyan-300/50 shadow-[0_0_14px_rgba(34,211,238,.20)]'
                       : 'text-cyan-100/70 hover:bg-cyan-500/10'
@@ -1058,24 +1063,27 @@ const guardarInsertarCita = async () => {
     </div>
 
     <div className="flex gap-1.5 overflow-x-auto px-2 py-2 border-b border-cyan-500/10 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-300/35">
-  {diasSemana.map((dia) => {
+  {diasMovilScroll.map((dia) => {
     const activo = toDateKey(dia) === toDateKey(diaMovilSeleccionado);
 
     return (
       <button
         key={dia.toISOString()}
         type="button"
-        onClick={() => setDiaMovilSeleccionado(dia)}
-        className={`shrink-0 w-[50px] h-[58px] rounded-xl border px-1 py-1 text-center transition-all ${
+        onClick={() => {
+          setDiaMovilSeleccionado(dia);
+          setSemanaInicio(getMonday(dia));
+        }}
+        className={`shrink-0 w-[54px] h-[50px] rounded-xl border px-1 py-1 text-center transition-all ${
           activo
             ? 'bg-cyan-500/20 border-cyan-300/50 text-white shadow-[0_0_14px_rgba(34,211,238,.16)]'
             : 'bg-white/5 border-cyan-500/20 text-cyan-100/65'
         }`}
       >
-        <div className="text-[9px] uppercase tracking-[0.08em]">
+        <div className="text-[9px] uppercase tracking-[0.08em] leading-none">
           {dia.toLocaleDateString('es-ES', { weekday: 'short' })}
         </div>
-        <div className="text-base font-semibold leading-none mt-1">
+        <div className="text-[15px] font-semibold leading-none mt-1">
           {dia.getDate()}
         </div>
       </button>
@@ -1219,9 +1227,13 @@ const guardarInsertarCita = async () => {
                 <ChevronLeft className="w-4 h-4 text-cyan-200" />
               </button>
 
-              <div className="text-sm text-cyan-100/70 min-w-[145px] text-center">
-                {formatSemana(semanaInicio)}
-              </div>
+              <button
+  type="button"
+  onClick={() => setMostrarCalendarioMovil(prev => !prev)}
+  className="text-sm text-cyan-100/70 min-w-[145px] text-center hover:text-cyan-200 transition-colors"
+>
+  {formatSemana(semanaInicio)}
+</button>
 
               <button
                 onClick={() => setSemanaInicio(prev => addWeeks(prev, 1))}
@@ -2171,7 +2183,7 @@ const guardarInsertarCita = async () => {
                       });
                       setMostrarAgendaRecall(false);
                     }}
-                    className="block w-full px-4 py-2 text-left text-sm whitespace-nowrap text-white hover:bg-cyan-500/15"
+                    className="block w-full px-4 py-2.5 text-left text-sm whitespace-nowrap text-white hover:bg-cyan-500/15"
                   >
                     {a.nombre}
                   </button>
