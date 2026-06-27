@@ -399,7 +399,12 @@ const diasMesMovil = useMemo(
 );
 
 useEffect(() => {
-  setDiaMovilSeleccionado(semanaInicio);
+  setDiaMovilSeleccionado(prev => {
+    const mismaSemana =
+      getMonday(prev).getTime() === semanaInicio.getTime();
+
+    return mismaSemana ? prev : semanaInicio;
+  });
 }, [semanaInicio]);
   
 
