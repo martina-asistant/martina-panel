@@ -378,6 +378,7 @@ const [mostrarAgendaRecall, setMostrarAgendaRecall] = useState(false);
   
   const [diaMovilSeleccionado, setDiaMovilSeleccionado] = useState(new Date());
 const [mostrarCalendarioMovil, setMostrarCalendarioMovil] = useState(false);
+  const [mostrarCalendarioDesktop, setMostrarCalendarioDesktop] = useState(false);
     
 
   const agenda = agendas.find(a => a.key === agendaActiva);
@@ -1215,7 +1216,7 @@ const guardarInsertarCita = async () => {
       <div className="hidden lg:block rounded-3xl border border-cyan-500/20 bg-[rgba(5,18,24,.78)] backdrop-blur-xl overflow-hidden shadow-[0_0_35px_rgba(34,211,238,.10)]">
         <div className="bg-cyan-500/10 border-b border-cyan-500/10 px-6 py-3">
           <div className="flex items-center justify-between gap-6">
-            <div className="flex items-center gap-5">
+            <div className="relative flex items-center gap-5">
               <h2 className="text-[13px] tracking-[0.32em] text-cyan-300 font-semibold">
                 {agenda?.nombre.toUpperCase()}
               </h2>
@@ -1229,11 +1230,51 @@ const guardarInsertarCita = async () => {
 
               <button
   type="button"
-  onClick={() => setMostrarCalendarioMovil(prev => !prev)}
+  onClick={() => setMostrarCalendarioDesktop(prev => !prev)}
   className="text-sm text-cyan-100/70 min-w-[145px] text-center hover:text-cyan-200 transition-colors"
 >
   {formatSemana(semanaInicio)}
 </button>
+
+{mostrarCalendarioDesktop && (
+  <div className="absolute top-[44px] left-1/2 z-[130] w-[310px] -translate-x-1/2 rounded-2xl border border-cyan-400/20 bg-[#03111A] px-4 py-3 shadow-[0_0_28px_rgba(34,211,238,.25)]">
+    <div className="mb-2 grid grid-cols-7 gap-0.5 text-center text-[10px] uppercase tracking-[0.10em] text-cyan-300/70">
+      {['L', 'M', 'X', 'J', 'V', 'S', 'D'].map(d => (
+        <div key={d}>{d}</div>
+      ))}
+    </div>
+
+    <div className="grid grid-cols-7 gap-0.5">
+      {Array.from({
+        length: (new Date(semanaInicio.getFullYear(), semanaInicio.getMonth(), 1).getDay() + 6) % 7,
+      }).map((_, i) => (
+        <div key={`empty-desktop-${i}`} />
+      ))}
+
+      {getDiasMes(semanaInicio).map((dia) => {
+        const activo = toDateKey(dia) === toDateKey(semanaInicio);
+
+        return (
+          <button
+            key={dia.toISOString()}
+            type="button"
+            onClick={() => {
+              setSemanaInicio(getMonday(dia));
+              setMostrarCalendarioDesktop(false);
+            }}
+            className={`h-7 rounded-lg text-xs transition-all ${
+              activo
+                ? 'bg-cyan-400/25 text-white border border-cyan-300/50 shadow-[0_0_14px_rgba(34,211,238,.20)]'
+                : 'text-cyan-100/70 hover:bg-cyan-500/10'
+            }`}
+          >
+            {dia.getDate()}
+          </button>
+        );
+      })}
+    </div>
+  </div>
+)}
 
               <button
                 onClick={() => setSemanaInicio(prev => addWeeks(prev, 1))}
@@ -1722,60 +1763,120 @@ const guardarInsertarCita = async () => {
       </div>
 
       <div className="p-6 space-y-5">
-        <div className="grid grid-cols-3 gap-4">
-          <input
-            type="date"
-            value={toInputDate(nuevaCita.fecha_inicio)}
-            onChange={(e) => {
-              const fecha = e.target.value;
-              const inicio = toInputTime(nuevaCita.fecha_inicio);
-              const fin = toInputTime(nuevaCita.fecha_fin);
+        
+        {/* DESKTOP - fecha y horas */}
+<div className="hidden lg:grid grid-cols-3 gap-4">
+  <input
+    type="date"
+    value={toInputDate(nuevaCita.fecha_inicio)}
+    onChange={(e) => {
+      const fecha = e.target.value;
+      const inicio = toInputTime(nuevaCita.fecha_inicio);
+      const fin = toInputTime(nuevaCita.fecha_fin);
 
-              setNuevaCita({
-                ...nuevaCita,
-                fecha_inicio: buildISOFromDateTime(fecha, inicio),
-                fecha_fin: buildISOFromDateTime(fecha, fin),
-              });
-            }}
-            className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
-          />
+      setNuevaCita({
+        ...nuevaCita,
+        fecha_inicio: buildISOFromDateTime(fecha, inicio),
+        fecha_fin: buildISOFromDateTime(fecha, fin),
+      });
+    }}
+    className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
+  />
 
-          <input
-            type="time"
-            step={300}
-            value={toInputTime(nuevaCita.fecha_inicio)}
-            onChange={(e) => {
-              const fecha = toInputDate(nuevaCita.fecha_inicio);
-              const nuevaFechaInicio = buildISOFromDateTime(fecha, e.target.value);
-              const nuevaFechaFin = sumarMinutosISO(
-                nuevaFechaInicio,
-                getDuracionPorMotivo(nuevaCita.motivo)
-              );
+  <input
+    type="time"
+    step={300}
+    value={toInputTime(nuevaCita.fecha_inicio)}
+    onChange={(e) => {
+      const fecha = toInputDate(nuevaCita.fecha_inicio);
+      const nuevaFechaInicio = buildISOFromDateTime(fecha, e.target.value);
+      const nuevaFechaFin = sumarMinutosISO(
+        nuevaFechaInicio,
+        getDuracionPorMotivo(nuevaCita.motivo)
+      );
 
-              setNuevaCita({
-                ...nuevaCita,
-                fecha_inicio: nuevaFechaInicio,
-                fecha_fin: nuevaFechaFin,
-              });
-            }}
-            className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
-          />
+      setNuevaCita({
+        ...nuevaCita,
+        fecha_inicio: nuevaFechaInicio,
+        fecha_fin: nuevaFechaFin,
+      });
+    }}
+    className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
+  />
 
-          <input
-            type="time"
-            step={300}
-            value={toInputTime(nuevaCita.fecha_fin)}
-            onChange={(e) => {
-              const fecha = toInputDate(nuevaCita.fecha_inicio);
+  <input
+    type="time"
+    step={300}
+    value={toInputTime(nuevaCita.fecha_fin)}
+    onChange={(e) => {
+      const fecha = toInputDate(nuevaCita.fecha_inicio);
 
-              setNuevaCita({
-                ...nuevaCita,
-                fecha_fin: buildISOFromDateTime(fecha, e.target.value),
-              });
-            }}
-            className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
-          />
-        </div>
+      setNuevaCita({
+        ...nuevaCita,
+        fecha_fin: buildISOFromDateTime(fecha, e.target.value),
+      });
+    }}
+    className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
+  />
+</div>
+
+{/* MOBILE - fecha arriba, horas debajo */}
+<div className="lg:hidden space-y-3">
+  <input
+    type="date"
+    value={toInputDate(nuevaCita.fecha_inicio)}
+    onChange={(e) => {
+      const fecha = e.target.value;
+      const inicio = toInputTime(nuevaCita.fecha_inicio);
+      const fin = toInputTime(nuevaCita.fecha_fin);
+
+      setNuevaCita({
+        ...nuevaCita,
+        fecha_inicio: buildISOFromDateTime(fecha, inicio),
+        fecha_fin: buildISOFromDateTime(fecha, fin),
+      });
+    }}
+    className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
+  />
+
+  <div className="grid grid-cols-2 gap-3">
+    <input
+      type="time"
+      step={300}
+      value={toInputTime(nuevaCita.fecha_inicio)}
+      onChange={(e) => {
+        const fecha = toInputDate(nuevaCita.fecha_inicio);
+        const nuevaFechaInicio = buildISOFromDateTime(fecha, e.target.value);
+        const nuevaFechaFin = sumarMinutosISO(
+          nuevaFechaInicio,
+          getDuracionPorMotivo(nuevaCita.motivo)
+        );
+
+        setNuevaCita({
+          ...nuevaCita,
+          fecha_inicio: nuevaFechaInicio,
+          fecha_fin: nuevaFechaFin,
+        });
+      }}
+      className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
+    />
+
+    <input
+      type="time"
+      step={300}
+      value={toInputTime(nuevaCita.fecha_fin)}
+      onChange={(e) => {
+        const fecha = toInputDate(nuevaCita.fecha_inicio);
+
+        setNuevaCita({
+          ...nuevaCita,
+          fecha_fin: buildISOFromDateTime(fecha, e.target.value),
+        });
+      }}
+      className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
+    />
+  </div>
+</div>
 
         <div className="grid grid-cols-[1fr_auto] gap-3 items-start">
   <div className="relative">
@@ -1826,7 +1927,7 @@ const guardarInsertarCita = async () => {
   onClick={() => setMostrarNuevoPaciente(true)}
   className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-cyan-300/60 bg-cyan-500/15 text-cyan-100 shadow-[0_0_14px_rgba(34,211,238,.32)] hover:bg-cyan-500/25 hover:shadow-[0_0_22px_rgba(34,211,238,.5)] transition-all"
 >
-  <span className="text-[18px] leading-none -translate-y-[1px]">+</span>
+  <span className="text-[18px] leading-none translate-y-[1px]">+</span>
 </button>
 
 <input
