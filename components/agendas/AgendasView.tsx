@@ -1882,7 +1882,7 @@ const guardarInsertarCita = async () => {
   </div>
 </div>
 
-        <div className="grid grid-cols-[1fr_auto_1fr] gap-3 items-start">
+        <div className="hidden lg:grid grid-cols-[1fr_auto_1fr] gap-3 items-start">
   <div className="relative">
     <input
       placeholder="Buscar paciente"
@@ -1941,7 +1941,67 @@ const guardarInsertarCita = async () => {
   className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
 />
 </div>
+{/* MOBILE - buscar paciente + / teléfono debajo */}
+<div className="lg:hidden space-y-3">
+  <div className="grid grid-cols-[1fr_auto] gap-3 items-start">
+    <div className="relative">
+      <input
+        placeholder="Buscar paciente"
+        value={busquedaPaciente}
+        onChange={(e) => {
+          setBusquedaPaciente(e.target.value);
+          setMostrarResultadosPaciente(true);
+          setNuevaCita({
+            ...nuevaCita,
+            nombre_paciente: e.target.value,
+          });
+        }}
+        className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+      />
 
+      {mostrarResultadosPaciente && busquedaPaciente && pacientesFiltrados.length > 0 && (
+        <div className="absolute left-0 top-[calc(100%+8px)] z-[100] max-h-44 w-full overflow-y-auto rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.18)]">
+          {pacientesFiltrados.slice(0, 8).map((patient) => (
+            <button
+              key={patient.id}
+              type="button"
+              onClick={() => {
+                const nombreCompleto = patient.nombre_completo || `${patient.nombre || ''} ${patient.apellidos || ''}`.trim();
+                setMostrarResultadosPaciente(false);
+                setNuevaCita({
+                  ...nuevaCita,
+                  nombre_paciente: nombreCompleto,
+                  telefono: patient.telefono || '',
+                });
+                setBusquedaPaciente(nombreCompleto);
+              }}
+              className="block w-full px-4 py-2 text-left text-sm text-white hover:bg-cyan-500/15"
+            >
+              <div>{patient.nombre_completo}</div>
+              <div className="text-xs text-cyan-100/60">{patient.telefono}</div>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+
+    <button
+      type="button"
+      onClick={() => setMostrarNuevoPaciente(true)}
+      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-cyan-300/60 bg-cyan-500/15 text-cyan-100 shadow-[0_0_14px_rgba(34,211,238,.32)] hover:bg-cyan-500/25 transition-all"
+    >
+      <span className="text-[20px] leading-none translate-y-[1px]">+</span>
+    </button>
+  </div>
+
+  <input
+    placeholder="Teléfono"
+    value={nuevaCita.telefono}
+    onChange={(e) => setNuevaCita({ ...nuevaCita, telefono: e.target.value })}
+    className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+  />
+</div>
+        
 <div className="relative overflow-visible">
   <button
     type="button"
