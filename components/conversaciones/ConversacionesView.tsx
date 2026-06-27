@@ -160,6 +160,46 @@ const getAttachmentFileName = (m: MensajeWhatsapp) => {
   }
 };
 
+const renderWhatsappText = (text: string) => {
+  const lines = text.split('\n');
+
+  return lines.map((line, lineIndex) => {
+    const parts = line.split(/(\*[^*]+\*|_[^_]+_|~[^~]+~)/g);
+
+    return (
+      <div key={lineIndex}>
+        {parts.map((part, index) => {
+          if (/^\*[^*]+\*$/.test(part)) {
+            return (
+              <strong key={index}>
+                {part.slice(1, -1)}
+              </strong>
+            );
+          }
+
+          if (/^_[^_]+_$/.test(part)) {
+            return (
+              <em key={index}>
+                {part.slice(1, -1)}
+              </em>
+            );
+          }
+
+          if (/^~[^~]+~$/.test(part)) {
+            return (
+              <del key={index}>
+                {part.slice(1, -1)}
+              </del>
+            );
+          }
+
+          return <span key={index}>{part}</span>;
+        })}
+      </div>
+    );
+  });
+};
+
 const ConversacionesView = () => {
   const [convs, setConvs] = useState<ConversacionWhatsapp[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -916,7 +956,7 @@ return (
     )}
 
     <div className="max-w-full whitespace-pre-wrap break-words leading-snug">
-      {m.contenido_texto || ''}
+  {renderWhatsappText(m.contenido_texto || '')}
       <span className="float-right ml-2 mt-[3px] text-[10px] whitespace-nowrap text-cyan-900/45">
         {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
       </span>
@@ -1579,7 +1619,7 @@ return (
           )}
 
           <div className="max-w-full whitespace-pre-wrap break-words leading-snug">
-            {m.contenido_texto || ''}
+            {renderWhatsappText(m.contenido_texto || '')}
             <span className="float-right ml-2 mt-[3px] text-[10px] whitespace-nowrap text-cyan-900/45">
               {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
             </span>
