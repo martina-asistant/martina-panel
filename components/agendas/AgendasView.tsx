@@ -1187,61 +1187,50 @@ setMostrarAgendas(false);
     const bloqueado = bloqueadoAutomatico || esBloqueoEvento;
 
     return (
-      <button
-        key={slotKey}
-        type="button"
-        onClick={() => manejarSeleccion(slotKey, eventoSlot)}
-        onDoubleClick={() => {
-          if (eventoSlot && !esBloqueoEvento) {
-            setEventoSeleccionado(eventoSlot);
-            setModoEdicion(false);
-            setModalCitaAbierto(true);
-          }
-        }}
-        className={`w-full min-h-[24px] rounded-xl border border-cyan-500/10 px-2 py-0.5 text-left transition-all ${
-          bloqueado ? 'bg-cyan-500/15' : 'bg-[#03111A]/70 hover:bg-cyan-500/10'
-        }`}
-        style={{
-  backgroundColor: esBloqueoEvento
-    ? 'rgba(6,182,212,.25)'
-    : eventoSlot && !esBloqueoEvento
-      ? color?.bg
-      : undefined,
-}}
-      >
-        <div className="flex items-center gap-3">
-          <span className={`w-11 text-xs font-semibold ${
-            eventoSlot && !esBloqueoEvento && esInicioEvento
-              ? color?.text || 'text-white'
-              : 'text-cyan-100/70'
-          }`}>
-            {hora}
-          </span>
+  <button
+    key={slotKey}
+    type="button"
+    onClick={() => manejarSeleccion(slotKey, eventoSlot)}
+    onDoubleClick={() => {
+      if (eventoSlot && !esBloqueoEvento) {
+        setEventoSeleccionado(eventoSlot);
+        setModoEdicion(false);
+        setModalCitaAbierto(true);
+      }
+    }}
+    style={{
+      height: SLOT_HEIGHT,
+      backgroundColor: esBloqueoEvento
+        ? 'rgba(6,182,212,.25)'
+        : eventoSlot && !esBloqueoEvento
+          ? color?.bg
+          : undefined,
+    }}
+    className={`
+      w-full block border-b border-cyan-400/5 text-left px-2 text-[10px] transition-all
+      ${bloqueadoAutomatico ? 'bg-cyan-500/25 hover:bg-cyan-500/30' : ''}
+      ${!bloqueado && !eventoSlot ? 'hover:bg-cyan-500/10' : ''}
+    `}
+  >
+    <span
+      className={
+        eventoSlot && !esBloqueoEvento
+          ? `${color?.text || 'text-white'} font-semibold`
+          : bloqueado
+            ? 'text-white/90'
+            : 'text-white'
+      }
+    >
+      {hora}
+    </span>
 
-          {eventoSlot && !esBloqueoEvento && esInicioEvento ? (
-  <div className={`min-w-0 flex-1 ${color?.text || 'text-white'}`}>
-    <div className="truncate text-sm font-semibold">
-  {eventoSlot.titulo || eventoSlot.nombre_paciente || 'Cita'}
-</div>
-
-<div className="truncate text-xs opacity-80">
-  {toInputTime(eventoSlot.fecha_inicio)} - {toInputTime(eventoSlot.fecha_fin)}
-</div>
-  </div>
-) : eventoSlot && !esBloqueoEvento ? (
-  <div className="min-w-0 flex-1" />
-) : bloqueado ? (
-  <span className="text-xs text-cyan-100/45">
-    No disponible
-  </span>
-) : (
-  <span className="text-xs text-cyan-100/25">
-    Libre
-  </span>
-)}
-        </div>
-      </button>
-    );
+    {eventoSlot && !esBloqueoEvento && esInicioEvento && (
+      <span className={`ml-3 text-[11px] font-semibold truncate ${color?.text || 'text-white'}`}>
+        {eventoSlot.titulo || eventoSlot.nombre_paciente || 'Cita'}
+      </span>
+    )}
+  </button>
+);
   })}
 </div>
   </div>
