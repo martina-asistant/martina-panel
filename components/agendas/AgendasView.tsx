@@ -1161,7 +1161,7 @@ setMostrarAgendas(false);
   </button>
 </div>
 
-<div className="p-2 space-y-1">
+<div className="p-2">
   {slots.map((hora) => {
     const slotKey = `${toDateKey(diaMovilSeleccionado)}|${hora}`;
     const slotInicioDate = crearFechaDesdeSlot(slotKey);
