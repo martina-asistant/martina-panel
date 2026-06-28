@@ -376,7 +376,7 @@ const [nuevoRecall, setNuevoRecall] = useState({
   const [mostrarTiposRecall, setMostrarTiposRecall] = useState(false);
 const [mostrarAgendaRecall, setMostrarAgendaRecall] = useState(false);
   
-  const [diaMovilSeleccionado, setDiaMovilSeleccionado] = useState(new Date());
+  const [diaMovilSeleccionado, setDiaMovilSeleccionado] = useState(() => new Date());
 const [mostrarCalendarioMovil, setMostrarCalendarioMovil] = useState(false);
   const [mostrarCalendarioDesktop, setMostrarCalendarioDesktop] = useState(false);
     
@@ -388,25 +388,14 @@ const [mostrarCalendarioMovil, setMostrarCalendarioMovil] = useState(false);
   [semanaInicio]
 );
 
-  const diasMovilScroll = useMemo(
-  () => Array.from({ length: 35 }, (_, i) => addDays(semanaInicio, i - 7)),
-  [semanaInicio]
-);
-
+  const diasMovilScroll = useMemo(() => {
+  const lunes = getMonday(diaMovilSeleccionado);
+  return Array.from({ length: 35 }, (_, i) => addDays(lunes, i));
+}, [diaMovilSeleccionado]);
 const diasMesMovil = useMemo(
   () => getDiasMes(diaMovilSeleccionado),
   [diaMovilSeleccionado]
-);
-
-useEffect(() => {
-  setDiaMovilSeleccionado(prev => {
-    const mismaSemana =
-      getMonday(prev).getTime() === semanaInicio.getTime();
-
-    return mismaSemana ? prev : semanaInicio;
-  });
-}, [semanaInicio]);
-  
+);  
 
   const crearFechaDesdeSlot = (slotKey: string) => {
     const [fechaKey, hora] = slotKey.split('|');
@@ -490,19 +479,21 @@ useEffect(() => {
 
   const cargarAgenda = async () => {
   setLoading(true);
+    const rangoInicio = getMonday(diaMovilSeleccionado);
+const rangoFin = addDays(rangoInicio, 42);
 
   let data: EventoAgenda[] = [];
 
   if (agendaActiva === 'fede') {
-    data = await getAgendaFede(toISO(semanaInicio), toISO(addDays(semanaInicio, 7)));
+    data = await getAgendaFede(toISO(rangoInicio), toISO(rangoFin));
   }
 
   if (agendaActiva === 'celia') {
-    data = await getAgendaCelia(toISO(semanaInicio), toISO(addDays(semanaInicio, 7)));
+    data = await getAgendaCelia(toISO(rangoInicio), toISO(rangoFin));
   }
 
   if (agendaActiva === 'ana') {
-    data = await getAgendaAna(toISO(semanaInicio), toISO(addDays(semanaInicio, 7)));
+    data = await getAgendaAna(toISO(rangoInicio), toISO(rangoFin));
   }
 
   setEventos(data);
@@ -839,8 +830,8 @@ const guardarInsertarCita = async () => {
 };
   
   useEffect(() => {
-    cargarAgenda();
-  }, [agendaActiva, semanaInicio]);
+  cargarAgenda();
+}, [agendaActiva, semanaInicio, diaMovilSeleccionado]);
 
   useEffect(() => {
   const cargarUsuarioPanel = async () => {
@@ -999,32 +990,50 @@ const guardarInsertarCita = async () => {
   </div>
 
   <div className="rounded-3xl border border-cyan-500/20 bg-[rgba(5,18,24,.78)] backdrop-blur-xl overflow-hidden shadow-[0_0_35px_rgba(34,211,238,.10)]">
-    <div className="px-3 py-3 border-b border-cyan-500/10 bg-cyan-500/10">
-      <div className="flex items-center justify-between">
-        <button
-          type="button"
-          onClick={() => setDiaMovilSeleccionado(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))}
-          className="w-8 h-8 rounded-full border border-cyan-400/25 bg-cyan-500/10 flex items-center justify-center"
-        >
-          <ChevronLeft className="w-4 h-4 text-cyan-200" />
-        </button>
+  <div className="px-3 py-3 border-b border-cyan-500/10 bg-cyan-500/10">
+    <div className="flex items-center justify-between">
+      <button
+        type="button"
+        onClick={() => {
+          const nuevoDia = new Date(
+            diaMovilSeleccionado.getFullYear(),
+            diaMovilSeleccionado.getMonth() - 1,
+            1
+          );
 
-        <button
-          type="button"
-          onClick={() => setMostrarCalendarioMovil(prev => !prev)}
-          className="text-[13px] tracking-[0.26em] text-cyan-300 font-semibold"
-        >
-          {formatMes(diaMovilSeleccionado)}
-        </button>
+          setDiaMovilSeleccionado(nuevoDia);
+          setSemanaInicio(getMonday(nuevoDia));
+        }}
+        className="w-8 h-8 rounded-full border border-cyan-400/25 bg-cyan-500/10 flex items-center justify-center"
+      >
+        <ChevronLeft className="w-4 h-4 text-cyan-200" />
+      </button>
 
-        <button
-          type="button"
-          onClick={() => setDiaMovilSeleccionado(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))}
-          className="w-8 h-8 rounded-full border border-cyan-400/25 bg-cyan-500/10 flex items-center justify-center"
-        >
-          <ChevronRight className="w-4 h-4 text-cyan-200" />
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={() => setMostrarCalendarioMovil(prev => !prev)}
+        className="text-[13px] tracking-[0.26em] text-cyan-300 font-semibold"
+      >
+        {formatMes(diaMovilSeleccionado)}
+      </button>
+
+      <button
+        type="button"
+        onClick={() => {
+          const nuevoDia = new Date(
+            diaMovilSeleccionado.getFullYear(),
+            diaMovilSeleccionado.getMonth() + 1,
+            1
+          );
+
+          setDiaMovilSeleccionado(nuevoDia);
+          setSemanaInicio(getMonday(nuevoDia));
+        }}
+        className="w-8 h-8 rounded-full border border-cyan-400/25 bg-cyan-500/10 flex items-center justify-center"
+      >
+        <ChevronRight className="w-4 h-4 text-cyan-200" />
+      </button>
+    </div>
 
       {mostrarCalendarioMovil && (
         <div className="mt-3 rounded-2xl border border-cyan-400/20 bg-[#03111A]/95 px-3 py-2">
@@ -1068,7 +1077,12 @@ const guardarInsertarCita = async () => {
       )}
     </div>
 
-    <div className="flex gap-1.5 overflow-x-auto px-2 py-2 border-b border-cyan-500/10 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-300/35">
+    <div className="flex gap-1.5 overflow-x-auto px-2 py-2 border-b border-cyan-500/10 [&::-webkit-scrollbar]:hidden"
+  style={{
+    scrollbarWidth: 'none',
+    msOverflowStyle: 'none',
+  }}
+>
   {diasMovilScroll.map((dia) => {
     const activo = toDateKey(dia) === toDateKey(diaMovilSeleccionado);
 
