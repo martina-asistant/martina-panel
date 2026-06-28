@@ -1189,11 +1189,12 @@ const guardarInsertarCita = async () => {
           bloqueado ? 'bg-cyan-500/15' : 'bg-[#03111A]/70 hover:bg-cyan-500/10'
         }`}
         style={{
-          backgroundColor:
-            eventoSlot && !esBloqueoEvento && esInicioEvento
-              ? color?.bg
-              : undefined,
-        }}
+  backgroundColor: esBloqueoEvento
+    ? 'rgba(6,182,212,.25)'
+    : eventoSlot && !esBloqueoEvento
+      ? color?.bg
+      : undefined,
+}}
       >
         <div className="flex items-center gap-3">
           <span className={`w-11 text-xs font-semibold ${
@@ -1205,23 +1206,25 @@ const guardarInsertarCita = async () => {
           </span>
 
           {eventoSlot && !esBloqueoEvento && esInicioEvento ? (
-            <div className={`min-w-0 flex-1 ${color?.text || 'text-white'}`}>
-              <div className="truncate text-sm font-semibold">
-                {eventoSlot.titulo || eventoSlot.nombre_paciente || 'Cita'}
-              </div>
-              <div className="truncate text-xs opacity-80">
-                {eventoSlot.motivo || '—'} · {toInputTime(eventoSlot.fecha_inicio)} - {toInputTime(eventoSlot.fecha_fin)}
-              </div>
-            </div>
-          ) : bloqueado ? (
-            <span className="text-xs text-cyan-100/45">
-              No disponible
-            </span>
-          ) : (
-            <span className="text-xs text-cyan-100/25">
-              Libre
-            </span>
-          )}
+  <div className={`min-w-0 flex-1 ${color?.text || 'text-white'}`}>
+    <div className="truncate text-sm font-semibold">
+      {eventoSlot.titulo || eventoSlot.nombre_paciente || 'Cita'}
+    </div>
+    <div className="truncate text-xs opacity-80">
+      {eventoSlot.motivo || '—'} · {toInputTime(eventoSlot.fecha_inicio)} - {toInputTime(eventoSlot.fecha_fin)}
+    </div>
+  </div>
+) : eventoSlot && !esBloqueoEvento ? (
+  <div className="min-w-0 flex-1" />
+) : bloqueado ? (
+  <span className="text-xs text-cyan-100/45">
+    No disponible
+  </span>
+) : (
+  <span className="text-xs text-cyan-100/25">
+    Libre
+  </span>
+)}
         </div>
       </button>
     );
@@ -1528,7 +1531,9 @@ const guardarInsertarCita = async () => {
 
             <div className="p-6 space-y-5">
               {modoEdicion && (
-  <div className="grid grid-cols-3 gap-4">
+  <>
+    {/* DESKTOP - fecha y horas */}
+    <div className="hidden lg:grid grid-cols-3 gap-4">
   <div className="relative">
     <input
       type="date"
@@ -1595,9 +1600,74 @@ const guardarInsertarCita = async () => {
     />
     </div>
 </div>
-            )}
+           
+        {/* MOBILE - fecha arriba, horas debajo */}
+    <div className="lg:hidden space-y-3">
+      <input
+        type="date"
+        value={toInputDate(eventoSeleccionado.fecha_inicio)}
+        onChange={(e) => {
+          const fecha = e.target.value;
+          const inicio = toInputTime(eventoSeleccionado.fecha_inicio);
+          const fin = toInputTime(eventoSeleccionado.fecha_fin);
 
-              <div className="grid grid-cols-[minmax(0,1fr)_260px] gap-10 items-start">
+          setEventoSeleccionado({
+            ...eventoSeleccionado,
+            fecha_inicio: buildISOFromDateTime(fecha, inicio),
+            fecha_fin: buildISOFromDateTime(fecha, fin),
+          });
+        }}
+        className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
+      />
+
+      <div className="grid grid-cols-2 gap-3">
+        <input
+          type="time"
+          step={300}
+          value={toInputTime(eventoSeleccionado.fecha_inicio)}
+          onChange={(e) => {
+            const fecha = toInputDate(eventoSeleccionado.fecha_inicio);
+            const nuevaHoraInicio = e.target.value;
+            const nuevaFechaInicio = buildISOFromDateTime(fecha, nuevaHoraInicio);
+
+            const duracion = getDuracionPorMotivo(
+              getTratamientoValue(eventoSeleccionado.motivo) ||
+              eventoSeleccionado.motivo ||
+              eventoSeleccionado.titulo ||
+              ''
+            );
+
+            const nuevaFechaFin = sumarMinutosISO(nuevaFechaInicio, duracion);
+
+            setEventoSeleccionado({
+              ...eventoSeleccionado,
+              fecha_inicio: nuevaFechaInicio,
+              fecha_fin: nuevaFechaFin,
+            });
+          }}
+          className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
+        />
+
+        <input
+          type="time"
+          step={300}
+          value={toInputTime(eventoSeleccionado.fecha_fin)}
+          onChange={(e) => {
+            const fecha = toInputDate(eventoSeleccionado.fecha_inicio);
+
+            setEventoSeleccionado({
+              ...eventoSeleccionado,
+              fecha_fin: buildISOFromDateTime(fecha, e.target.value),
+            });
+          }}
+          className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
+        />
+      </div>
+    </div>
+  </>
+)}
+
+              <div className="grid grid-cols-[2fr_1fr] gap-5 items-start">
   <div className="min-w-0">
     <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
       Motivo
