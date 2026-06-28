@@ -1435,14 +1435,7 @@ setMostrarAgendas(false);
                               : undefined,
                         }}
                         className={`
-  w-full block text-left px-2 text-[10px] transition-all border-b border-cyan-400/5
-  ${
-    eventoSlot && !esBloqueoEvento
-      ? esInicioEvento
-        ? 'rounded-t-xl'
-        : 'rounded-b-xl border-t-0'
-      : 'rounded-xl'
-  }
+  w-full block border-b border-cyan-400/5 text-left px-2 text-[10px] transition-all
   ${bloqueadoAutomatico ? 'bg-cyan-500/25 hover:bg-cyan-500/30' : ''}
   ${!bloqueado && !eventoSlot ? 'hover:bg-cyan-500/10' : ''}
 `}
