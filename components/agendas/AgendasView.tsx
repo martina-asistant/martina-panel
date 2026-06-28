@@ -1435,7 +1435,6 @@ setMostrarAgendas(false);
                               : undefined,
                         }}
                         className={`
-                          className={`
   w-full block text-left px-2 text-[10px] transition-all border-b border-cyan-400/5
   ${
     eventoSlot && !esBloqueoEvento
