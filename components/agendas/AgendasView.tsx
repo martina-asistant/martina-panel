@@ -223,6 +223,11 @@ const isHorarioNoDisponible = (hora: string, dia: Date, agenda: string) => {
   const diaSemana = dia.getDay();
   const mes = dia.getMonth(); // agosto = 7
 
+  // Sábado y domingo siempre bloqueados
+  if (diaSemana === 0 || diaSemana === 6) {
+    return true;
+  }
+
   // Horario verano: agosto abierto solo hasta las 15:00
   if (mes === 7) {
     return hora >= '15:00';
@@ -929,8 +934,12 @@ const guardarInsertarCita = async () => {
           key={a.key}
           type="button"
           onClick={() => {
-            setAgendaActiva(a.key);
-            setMostrarAgendas(false);
+            const hoy = new Date();
+
+setAgendaActiva(a.key);
+setDiaMovilSeleccionado(hoy);
+setSemanaInicio(getMonday(hoy));
+setMostrarAgendas(false);
           }}
           className={`block w-full px-4 py-2.5 text-left text-sm hover:bg-cyan-500/15 ${
             agendaActiva === a.key
@@ -974,8 +983,12 @@ const guardarInsertarCita = async () => {
               key={a.key}
               type="button"
               onClick={() => {
-                setAgendaActiva(a.key);
-                setMostrarAgendas(false);
+                const hoy = new Date();
+
+setAgendaActiva(a.key);
+setDiaMovilSeleccionado(hoy);
+setSemanaInicio(getMonday(hoy));
+setMostrarAgendas(false);
               }}
               className={`block w-full px-4 py-2.5 text-left text-sm hover:bg-cyan-500/15 ${
                 agendaActiva === a.key ? 'bg-cyan-500/20 text-cyan-100' : 'text-white'
@@ -1208,11 +1221,12 @@ const guardarInsertarCita = async () => {
           {eventoSlot && !esBloqueoEvento && esInicioEvento ? (
   <div className={`min-w-0 flex-1 ${color?.text || 'text-white'}`}>
     <div className="truncate text-sm font-semibold">
-      {eventoSlot.titulo || eventoSlot.nombre_paciente || 'Cita'}
-    </div>
-    <div className="truncate text-xs opacity-80">
-      {eventoSlot.motivo || '—'} · {toInputTime(eventoSlot.fecha_inicio)} - {toInputTime(eventoSlot.fecha_fin)}
-    </div>
+  {eventoSlot.titulo || eventoSlot.nombre_paciente || 'Cita'}
+</div>
+
+<div className="truncate text-xs opacity-80">
+  {toInputTime(eventoSlot.fecha_inicio)} - {toInputTime(eventoSlot.fecha_fin)}
+</div>
   </div>
 ) : eventoSlot && !esBloqueoEvento ? (
   <div className="min-w-0 flex-1" />
