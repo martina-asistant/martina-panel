@@ -899,70 +899,73 @@ const guardarInsertarCita = async () => {
 });
 
   return (
-    <div className="h-full overflow-y-auto overflow-x-hidden px-2 py-4 lg:p-8 bg-[#02141B] text-white pb-20">
-      <div className="hidden lg:flex items-start justify-between gap-6 mb-8">
-          <h1 className="inline-block text-2xl font-semibold tracking-[-0.015em] bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent mb-1">
-            Agendas
-          </h1>
-          <p className="text-sm text-cyan-100/55">Gestión de citas</p>
-        </div>
+    return (
+  <div className="h-full overflow-y-auto overflow-x-hidden px-2 py-4 lg:p-8 bg-[#02141B] text-white pb-20">
+    {/* DESKTOP - cabecera */}
+    <div className="hidden lg:flex items-start justify-between gap-6 mb-8">
+      <div>
+        <h1 className="inline-block text-2xl font-semibold tracking-[-0.015em] bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent mb-1">
+          Agendas
+        </h1>
+        <p className="text-sm text-cyan-100/55">Gestión de citas</p>
+      </div>
 
-        <div className="flex items-center gap-3 rounded-2xl border border-cyan-400/25 bg-cyan-500/10 px-4 py-3 min-w-[230px]">
-          <CalendarDays className="w-5 h-5 text-cyan-300" />
+      <div className="flex items-center gap-3 rounded-2xl border border-cyan-400/25 bg-cyan-500/10 px-4 py-3 min-w-[230px]">
+        <CalendarDays className="w-5 h-5 text-cyan-300" />
 
-          <div className="relative">
-  <button
-    type="button"
-    onClick={() => setMostrarAgendas(!mostrarAgendas)}
-    className="flex items-center gap-2 bg-transparent text-white text-sm font-medium outline-none"
-  >
-    <span>{agenda?.nombre}</span>
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setMostrarAgendas(!mostrarAgendas)}
+            className="flex items-center gap-2 bg-transparent text-white text-sm font-medium outline-none"
+          >
+            <span>{agenda?.nombre}</span>
 
-    <svg
-      className={`w-4 h-4 text-cyan-200 transition-transform ${
-        mostrarAgendas ? 'rotate-180' : ''
-      }`}
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M19 9l-7 7-7-7"
-      />
-    </svg>
-  </button>
+            <svg
+              className={`w-4 h-4 text-cyan-200 transition-transform ${
+                mostrarAgendas ? 'rotate-180' : ''
+              }`}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
 
-  {mostrarAgendas && (
-    <div className="absolute right-0 top-[calc(100%+8px)] z-[120] min-w-[190px] max-h-56 overflow-y-auto rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
-      {agendas.map((a) => (
-        <button
-          key={a.key}
-          type="button"
-          onClick={() => {
-            const hoy = new Date();
+          {mostrarAgendas && (
+            <div className="absolute right-0 top-[calc(100%+8px)] z-[120] min-w-[190px] max-h-56 overflow-y-auto rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
+              {agendas.map((a) => (
+                <button
+                  key={a.key}
+                  type="button"
+                  onClick={() => {
+                    const hoy = new Date();
 
-setAgendaActiva(a.key);
-setDiaMovilSeleccionado(hoy);
-setSemanaInicio(getMonday(hoy));
-setMostrarAgendas(false);
-          }}
-          className={`block w-full px-4 py-2.5 text-left text-sm hover:bg-cyan-500/15 ${
-            agendaActiva === a.key
-              ? 'bg-cyan-500/20 text-cyan-100'
-              : 'text-white'
-          }`}
-        >
-          {a.nombre}
-        </button>
-      ))}
-    </div>
-  )}
-</div>
+                    setAgendaActiva(a.key);
+                    setDiaMovilSeleccionado(hoy);
+                    setSemanaInicio(getMonday(hoy));
+                    setMostrarAgendas(false);
+                  }}
+                  className={`block w-full px-4 py-2.5 text-left text-sm hover:bg-cyan-500/15 ${
+                    agendaActiva === a.key
+                      ? 'bg-cyan-500/20 text-cyan-100'
+                      : 'text-white'
+                  }`}
+                >
+                  {a.nombre}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
+    </div>
 
       {/* MOBILE */}
 <div className="lg:hidden">
