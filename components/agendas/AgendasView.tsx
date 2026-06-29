@@ -901,7 +901,6 @@ const guardarInsertarCita = async () => {
   return (
     <div className="h-full overflow-y-auto overflow-x-hidden px-2 py-4 lg:p-8 bg-[#02141B] text-white pb-20">
       <div className="hidden lg:flex items-start justify-between gap-6 mb-8">
-        <div>
           <h1 className="inline-block text-2xl font-semibold tracking-[-0.015em] bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent mb-1">
             Agendas
           </h1>
