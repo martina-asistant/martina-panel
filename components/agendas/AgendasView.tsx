@@ -967,7 +967,6 @@ setMostrarAgendas(false);
       {/* MOBILE */}
 <div className="lg:hidden">
   <div className="mb-5 px-2 flex items-start justify-between gap-3">
-    <div>
       <h1 className="inline-block text-3xl font-semibold tracking-[-0.015em] bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent mb-1">
         Agendas
       </h1>
