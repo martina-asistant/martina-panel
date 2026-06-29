@@ -898,7 +898,6 @@ const guardarInsertarCita = async () => {
   return texto.includes(busquedaPaciente.toLowerCase());
 });
 
-  return (
     return (
   <div className="h-full overflow-y-auto overflow-x-hidden px-2 py-4 lg:p-8 bg-[#02141B] text-white pb-20">
     {/* DESKTOP - cabecera */}
