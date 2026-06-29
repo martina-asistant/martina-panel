@@ -1277,7 +1277,6 @@ setMostrarAgendas(false);
         <div key={d}>{d}</div>
       ))}
     </div>
-    </div>
 
     <div className="grid grid-cols-7 gap-0.5">
       {Array.from({
