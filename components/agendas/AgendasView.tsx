@@ -484,8 +484,17 @@ const diasMesMovil = useMemo(
 
   const cargarAgenda = async () => {
   setLoading(true);
-    const rangoInicio = getMonday(diaMovilSeleccionado);
-const rangoFin = addDays(rangoInicio, 42);
+    const inicioDesktop = getMonday(semanaInicio);
+const inicioMovil = getMonday(diaMovilSeleccionado);
+
+const rangoInicio = new Date(
+  Math.min(inicioDesktop.getTime(), inicioMovil.getTime())
+);
+
+const rangoFin = addDays(
+  new Date(Math.max(inicioDesktop.getTime(), inicioMovil.getTime())),
+  42
+);
 
   let data: EventoAgenda[] = [];
 
