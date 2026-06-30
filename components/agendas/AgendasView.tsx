@@ -1675,7 +1675,7 @@ setMostrarAgendas(false);
       </div>
 
       <div className="p-6 space-y-5">
-        <div className="grid grid-cols-[1.4fr_0.9fr_auto] gap-3 items-end">
+        <div className="relative z-[160] grid grid-cols-[1.4fr_0.9fr_auto] gap-3 items-end">
           <div className="relative">
             <input
               placeholder="Nombre y apellidos"
@@ -1696,7 +1696,7 @@ setMostrarAgendas(false);
             />
 
             {mostrarResultadosPacienteAgenda && pacientesFiltradosBusquedaAgenda.length > 0 && (
-              <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-[140] max-h-52 overflow-y-auto rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
+              <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-[999] max-h-52 overflow-y-auto rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
                 {pacientesFiltradosBusquedaAgenda.map((patient) => {
                   const nombreCompleto =
                     patient.nombre_completo ||
@@ -1742,7 +1742,7 @@ setMostrarAgendas(false);
           </button>
         </div>
 
-        <div className="rounded-2xl border border-cyan-400/20 bg-black/15 overflow-hidden max-h-[48vh] overflow-y-auto">
+        <div className="relative z-[10] rounded-2xl border border-cyan-400/20 bg-black/15 overflow-hidden max-h-[48vh] overflow-y-auto">
           <div className="grid grid-cols-[1.4fr_0.8fr_1fr_0.8fr_0.6fr_0.7fr_auto] gap-3 px-4 py-3 text-[10px] tracking-[0.14em] uppercase text-cyan-300 border-b border-cyan-400/15">
   <div>Paciente</div>
   <div>Teléfono</div>
