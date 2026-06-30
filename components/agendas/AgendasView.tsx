@@ -1000,7 +1000,7 @@ const irACitaResultado = (resultado: any) => {
           <p className="text-sm text-cyan-100/55">Gestión de citas</p>
         </div>
 
-        <div className="flex items-center gap-3 rounded-2xl border border-cyan-400/25 bg-cyan-500/10 px-4 py-3 min-w-[230px]">
+        <div className="flex items-center justify-between gap-3 rounded-2xl border border-cyan-400/25 bg-cyan-500/10 px-4 py-3 min-w-[230px]">
           <CalendarDays className="w-5 h-5 text-cyan-300" />
 
           <div className="relative">
