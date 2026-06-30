@@ -2488,7 +2488,7 @@ setMostrarAgendas(false);
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <div>
                 <div className="text-cyan-300 text-[10px] uppercase tracking-wider mb-1 font-bold">Cambios</div>
                 <div className="text-white/95 text-xs">0</div>
