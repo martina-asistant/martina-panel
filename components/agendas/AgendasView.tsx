@@ -794,10 +794,10 @@ const guardarInsertarCita = async () => {
   const buscarPacienteEnAgenda = async () => {
   if (buscandoPacienteAgenda) return;
 
-  if (
-    !busquedaAgendaPaciente.nombre_paciente.trim() &&
-    !busquedaAgendaPaciente.telefono.trim()
-  ) {
+  const nombreBuscado = busquedaAgendaPaciente.nombre_paciente.trim();
+  const telefonoBuscado = normalizarTelefonoBusquedaAgenda(busquedaAgendaPaciente.telefono);
+
+  if (!nombreBuscado && !telefonoBuscado) {
     console.error('Falta nombre o teléfono para buscar paciente');
     return;
   }
@@ -813,8 +813,8 @@ const guardarInsertarCita = async () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          nombre_paciente: busquedaAgendaPaciente.nombre_paciente.trim(),
-          telefono: busquedaAgendaPaciente.telefono.trim(),
+          nombre_paciente: nombreBuscado,
+          telefono: telefonoBuscado,
           motivo: 'busqueda_panel',
           detalle_motivo: 'busqueda_panel',
         }),
@@ -829,7 +829,20 @@ const guardarInsertarCita = async () => {
       return;
     }
 
-    setResultadosBusquedaAgenda(respuesta.resultados || []);
+    const nombreNormalizado = normalizarTexto(nombreBuscado);
+
+    const resultadosFiltrados = (respuesta.resultados || []).filter((resultado: any) => {
+      const telefonoResultado = normalizarTelefonoBusquedaAgenda(resultado.telefono);
+      const nombreResultado = normalizarTexto(resultado.nombre_paciente || '');
+
+      if (telefonoBuscado) {
+        return telefonoResultado === telefonoBuscado || telefonoResultado.endsWith(telefonoBuscado);
+      }
+
+      return nombreNormalizado && nombreResultado === nombreNormalizado;
+    });
+
+    setResultadosBusquedaAgenda(resultadosFiltrados);
   } catch (error) {
     console.error('Error buscando paciente en agenda:', error);
     setResultadosBusquedaAgenda([]);
@@ -1640,7 +1653,7 @@ setMostrarAgendas(false);
       </div>
 
       {mostrarBuscarPacienteAgenda && (
-  <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm pt-[9vh]">
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-6 py-10">
     <div className="w-full max-w-4xl rounded-3xl border border-cyan-300/45 bg-[#03111A]/95 overflow-hidden shadow-[0_0_46px_rgba(34,211,238,.24)]">
       <div className="px-6 py-5 border-b border-cyan-300/20 flex items-center justify-between">
         <h2 className="text-xl font-semibold text-white">Buscar paciente</h2>
@@ -1722,14 +1735,15 @@ setMostrarAgendas(false);
         </div>
 
         <div className="rounded-2xl border border-cyan-400/20 bg-black/15 overflow-hidden max-h-[48vh] overflow-y-auto">
-          <div className="grid grid-cols-[1.3fr_0.8fr_1fr_1fr_0.7fr_auto] gap-3 px-4 py-3 text-[10px] tracking-[0.14em] uppercase text-cyan-300 border-b border-cyan-400/15">
-            <div>Paciente</div>
-            <div>Teléfono</div>
-            <div>Motivo</div>
-            <div>Fecha cita</div>
-            <div>Agenda</div>
-            <div />
-          </div>
+          <div className="grid grid-cols-[1.4fr_0.8fr_1fr_0.8fr_0.6fr_0.7fr_auto] gap-3 px-4 py-3 text-[10px] tracking-[0.14em] uppercase text-cyan-300 border-b border-cyan-400/15">
+  <div>Paciente</div>
+  <div>Teléfono</div>
+  <div>Motivo</div>
+  <div>Fecha</div>
+  <div>Hora</div>
+  <div>Agenda</div>
+  <div />
+</div>
 
           {resultadosBusquedaAgenda.length === 0 ? (
             <div className="px-4 py-6 text-sm text-cyan-100/55 text-center">
@@ -1739,12 +1753,21 @@ setMostrarAgendas(false);
             resultadosBusquedaAgenda.map((resultado, index) => (
               <div
                 key={`${resultado.event_id}-${index}`}
-                className="grid grid-cols-[1.3fr_0.8fr_1fr_1fr_0.7fr_auto] gap-3 px-4 py-3 items-center border-b border-cyan-400/10 last:border-b-0 text-sm text-white"
+                className="grid grid-cols-[1.4fr_0.8fr_1fr_0.8fr_0.6fr_0.7fr_auto] gap-3 px-4 py-3 items-center border-b border-cyan-400/10 last:border-b-0 text-sm text-white"
               >
                 <div className="truncate">{resultado.nombre_paciente}</div>
                 <div className="text-cyan-100/75">{resultado.telefono}</div>
                 <div className="truncate text-cyan-100/85">{resultado.motivo}</div>
-                <div className="text-cyan-100/75">{resultado.fecha_texto}</div>
+                <div className="text-cyan-100/75">
+  {new Date(resultado.fecha_inicio).toLocaleDateString('es-ES')}
+</div>
+
+<div className="text-cyan-100/75">
+  {new Date(resultado.fecha_inicio).toLocaleTimeString('es-ES', {
+    hour: '2-digit',
+    minute: '2-digit',
+  })}
+</div>
                 <div className="text-cyan-100/75">{resultado.profesional}</div>
 
                 <button
