@@ -2513,7 +2513,7 @@ setMostrarAgendas(false);
                 </button>
 
                 {mostrarAgendaRecall && (
-                  <div className="absolute right-0 top-[calc(100%+8px)] z-[120] min-w-[160px] overflow-hidden rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
+                  <div className="absolute right-0 bottom-[calc(100%+8px)] z-[999] min-w-[180px] max-h-40 overflow-y-auto rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
                     {agendas.map((a) => (
                       <button
                         key={a.key}
