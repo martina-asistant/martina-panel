@@ -379,6 +379,8 @@ const [busquedaAgendaPaciente, setBusquedaAgendaPaciente] = useState({
 
 const [resultadosBusquedaAgenda, setResultadosBusquedaAgenda] = useState<any[]>([]);
 const [buscandoPacienteAgenda, setBuscandoPacienteAgenda] = useState(false);
+const [mostrarResultadosPacienteAgenda, setMostrarResultadosPacienteAgenda] = useState(false);
+const [pacienteAgendaSeleccionado, setPacienteAgendaSeleccionado] = useState<PatientOption | null>(null);
 
 const [nuevoRecall, setNuevoRecall] = useState({
   paciente_id: '',
@@ -835,6 +837,55 @@ const guardarInsertarCita = async () => {
   }
 };
 
+  const normalizarTelefonoBusquedaAgenda = (telefono?: string | null) =>
+  String(telefono || '').replace(/\D/g, '');
+
+const pacientesFiltradosBusquedaAgenda = patients.filter((patient) => {
+  const texto = `${patient.nombre_completo || ''} ${patient.nombre || ''} ${patient.apellidos || ''} ${patient.telefono || ''}`.toLowerCase();
+  const busqueda = busquedaAgendaPaciente.nombre_paciente.toLowerCase().trim();
+
+  return busqueda.length >= 2 && texto.includes(busqueda);
+});
+
+const seleccionarPacienteBusquedaAgenda = (patient: PatientOption) => {
+  const nombreCompleto =
+    patient.nombre_completo ||
+    `${patient.nombre || ''} ${patient.apellidos || ''}`.trim();
+
+  setBusquedaAgendaPaciente({
+    nombre_paciente: nombreCompleto,
+    telefono: patient.telefono || '',
+    motivo: '',
+    detalle_motivo: '',
+  });
+
+  setPacienteAgendaSeleccionado(patient);
+  setMostrarResultadosPacienteAgenda(false);
+  setResultadosBusquedaAgenda([]);
+};
+
+const actualizarTelefonoBusquedaAgenda = (telefono: string) => {
+  const limpio = normalizarTelefonoBusquedaAgenda(telefono);
+
+  const encontrado = patients.find((patient) => {
+    const telPatient = normalizarTelefonoBusquedaAgenda(patient.telefono);
+    return telPatient === limpio || telPatient.endsWith(limpio);
+  });
+
+  setBusquedaAgendaPaciente({
+    nombre_paciente: encontrado
+      ? encontrado.nombre_completo ||
+        `${encontrado.nombre || ''} ${encontrado.apellidos || ''}`.trim()
+      : busquedaAgendaPaciente.nombre_paciente,
+    telefono,
+    motivo: '',
+    detalle_motivo: '',
+  });
+
+  setPacienteAgendaSeleccionado(encontrado || null);
+  setResultadosBusquedaAgenda([]);
+};
+  
 const irACitaResultado = (resultado: any) => {
   const profesional = (resultado.profesional || '').toLowerCase();
 
@@ -1592,9 +1643,7 @@ setMostrarAgendas(false);
   <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm pt-[9vh]">
     <div className="w-full max-w-4xl rounded-3xl border border-cyan-300/45 bg-[#03111A]/95 overflow-hidden shadow-[0_0_46px_rgba(34,211,238,.24)]">
       <div className="px-6 py-5 border-b border-cyan-300/20 flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-white">
-          Buscar paciente
-        </h2>
+        <h2 className="text-xl font-semibold text-white">Buscar paciente</h2>
 
         <button
           onClick={() => setMostrarBuscarPacienteAgenda(false)}
@@ -1606,31 +1655,54 @@ setMostrarAgendas(false);
 
       <div className="p-6 space-y-5">
         <div className="grid grid-cols-[1.4fr_0.9fr_auto] gap-3 items-end">
-          <input
-            placeholder="Nombre y apellidos"
-            value={busquedaAgendaPaciente.nombre_paciente}
-            onChange={(e) =>
-              setBusquedaAgendaPaciente({
-                ...busquedaAgendaPaciente,
-                nombre_paciente: e.target.value,
-                motivo: '',
-                detalle_motivo: '',
-              })
-            }
-            className="rounded-xl border border-cyan-400/20 bg-black/20 px-3 py-2 text-white outline-none placeholder:text-white/30 focus:border-cyan-300/50"
-          />
+          <div className="relative">
+            <input
+              placeholder="Nombre y apellidos"
+              value={busquedaAgendaPaciente.nombre_paciente}
+              onFocus={() => setMostrarResultadosPacienteAgenda(true)}
+              onChange={(e) => {
+                setBusquedaAgendaPaciente({
+                  ...busquedaAgendaPaciente,
+                  nombre_paciente: e.target.value,
+                  motivo: '',
+                  detalle_motivo: '',
+                });
+                setPacienteAgendaSeleccionado(null);
+                setMostrarResultadosPacienteAgenda(true);
+                setResultadosBusquedaAgenda([]);
+              }}
+              className="w-full rounded-xl border border-cyan-400/20 bg-black/20 px-3 py-2 text-white outline-none placeholder:text-white/30 focus:border-cyan-300/50"
+            />
+
+            {mostrarResultadosPacienteAgenda && pacientesFiltradosBusquedaAgenda.length > 0 && (
+              <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-[140] max-h-52 overflow-y-auto rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
+                {pacientesFiltradosBusquedaAgenda.map((patient) => {
+                  const nombreCompleto =
+                    patient.nombre_completo ||
+                    `${patient.nombre || ''} ${patient.apellidos || ''}`.trim();
+
+                  return (
+                    <button
+                      key={patient.id}
+                      type="button"
+                      onClick={() => seleccionarPacienteBusquedaAgenda(patient)}
+                      className="block w-full px-4 py-2.5 text-left text-sm text-white hover:bg-cyan-500/15"
+                    >
+                      <div className="font-medium">{nombreCompleto}</div>
+                      <div className="text-xs text-cyan-100/55">
+                        {patient.telefono || 'Sin teléfono'}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
 
           <input
             placeholder="Teléfono"
             value={busquedaAgendaPaciente.telefono}
-            onChange={(e) =>
-              setBusquedaAgendaPaciente({
-                ...busquedaAgendaPaciente,
-                telefono: e.target.value,
-                motivo: '',
-                detalle_motivo: '',
-              })
-            }
+            onChange={(e) => actualizarTelefonoBusquedaAgenda(e.target.value)}
             className="rounded-xl border border-cyan-400/20 bg-black/20 px-3 py-2 text-white outline-none placeholder:text-white/30 focus:border-cyan-300/50"
           />
 
@@ -1639,7 +1711,7 @@ setMostrarAgendas(false);
             onClick={buscarPacienteEnAgenda}
             disabled={buscandoPacienteAgenda}
             className="h-[42px] w-[48px] flex items-center justify-center rounded-xl border border-cyan-400/30 bg-cyan-500/10 text-cyan-100 hover:bg-cyan-500/20 hover:border-cyan-300/50 transition-all disabled:opacity-50"
-            title="Buscar paciente"
+            title="Buscar cita"
           >
             {buscandoPacienteAgenda ? (
               <span className="text-xs">...</span>
@@ -1649,7 +1721,7 @@ setMostrarAgendas(false);
           </button>
         </div>
 
-        <div className="rounded-2xl border border-cyan-400/20 bg-black/15 overflow-hidden">
+        <div className="rounded-2xl border border-cyan-400/20 bg-black/15 overflow-hidden max-h-[48vh] overflow-y-auto">
           <div className="grid grid-cols-[1.3fr_0.8fr_1fr_1fr_0.7fr_auto] gap-3 px-4 py-3 text-[10px] tracking-[0.14em] uppercase text-cyan-300 border-b border-cyan-400/15">
             <div>Paciente</div>
             <div>Teléfono</div>
@@ -1669,25 +1741,11 @@ setMostrarAgendas(false);
                 key={`${resultado.event_id}-${index}`}
                 className="grid grid-cols-[1.3fr_0.8fr_1fr_1fr_0.7fr_auto] gap-3 px-4 py-3 items-center border-b border-cyan-400/10 last:border-b-0 text-sm text-white"
               >
-                <div className="truncate">
-                  {resultado.nombre_paciente}
-                </div>
-
-                <div className="text-cyan-100/75">
-                  {resultado.telefono}
-                </div>
-
-                <div className="truncate text-cyan-100/85">
-                  {resultado.motivo}
-                </div>
-
-                <div className="text-cyan-100/75">
-                  {resultado.fecha_texto}
-                </div>
-
-                <div className="text-cyan-100/75">
-                  {resultado.profesional}
-                </div>
+                <div className="truncate">{resultado.nombre_paciente}</div>
+                <div className="text-cyan-100/75">{resultado.telefono}</div>
+                <div className="truncate text-cyan-100/85">{resultado.motivo}</div>
+                <div className="text-cyan-100/75">{resultado.fecha_texto}</div>
+                <div className="text-cyan-100/75">{resultado.profesional}</div>
 
                 <button
                   type="button"
