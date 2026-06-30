@@ -1547,6 +1547,142 @@ setMostrarAgendas(false);
         </div>
       </div>
 
+      {mostrarBuscarPacienteAgenda && (
+  <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm pt-[4vh]">
+    <div className="w-full max-w-4xl rounded-3xl border border-cyan-300/45 bg-[#03111A]/95 overflow-hidden shadow-[0_0_46px_rgba(34,211,238,.24)]">
+      <div className="px-6 py-5 border-b border-cyan-300/20 flex items-start justify-between">
+        <div>
+          <h2 className="text-xl font-semibold text-white">
+            Buscar paciente
+          </h2>
+          <p className="text-cyan-200 text-sm mt-1">
+            Consulta citas futuras en las agendas de Fede, Celia y Ana
+          </p>
+        </div>
+
+        <button
+          onClick={() => setMostrarBuscarPacienteAgenda(false)}
+          className="text-white/80 hover:text-white text-xl"
+        >
+          ✕
+        </button>
+      </div>
+
+      <div className="p-6 space-y-5">
+        <div className="grid grid-cols-[1.3fr_0.8fr_1fr_1fr_auto] gap-3 items-end">
+          <input
+            placeholder="Nombre y apellidos"
+            value={busquedaAgendaPaciente.nombre_paciente}
+            onChange={(e) =>
+              setBusquedaAgendaPaciente({
+                ...busquedaAgendaPaciente,
+                nombre_paciente: e.target.value,
+              })
+            }
+            className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none placeholder:text-white/40"
+          />
+
+          <input
+            placeholder="Teléfono"
+            value={busquedaAgendaPaciente.telefono}
+            onChange={(e) =>
+              setBusquedaAgendaPaciente({
+                ...busquedaAgendaPaciente,
+                telefono: e.target.value,
+              })
+            }
+            className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none placeholder:text-white/40"
+          />
+
+          <input
+            placeholder="Motivo"
+            value={busquedaAgendaPaciente.motivo}
+            onChange={(e) =>
+              setBusquedaAgendaPaciente({
+                ...busquedaAgendaPaciente,
+                motivo: e.target.value,
+              })
+            }
+            className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none placeholder:text-white/40"
+          />
+
+          <input
+            placeholder="Detalle"
+            value={busquedaAgendaPaciente.detalle_motivo}
+            onChange={(e) =>
+              setBusquedaAgendaPaciente({
+                ...busquedaAgendaPaciente,
+                detalle_motivo: e.target.value,
+              })
+            }
+            className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none placeholder:text-white/40"
+          />
+
+          <button
+            type="button"
+            onClick={buscarPacienteEnAgenda}
+            disabled={buscandoPacienteAgenda}
+            className="rounded-xl border border-cyan-400/30 bg-cyan-500/10 px-4 py-2 text-[11px] tracking-[0.12em] text-cyan-100 hover:bg-cyan-500/20 hover:border-cyan-300/50 transition-all whitespace-nowrap disabled:opacity-50"
+          >
+            {buscandoPacienteAgenda ? 'BUSCANDO…' : 'BUSCAR'}
+          </button>
+        </div>
+
+        <div className="rounded-2xl border border-cyan-400/20 bg-black/15 overflow-hidden">
+          <div className="grid grid-cols-[1.3fr_0.8fr_1fr_1fr_0.7fr_auto] gap-3 px-4 py-3 text-[10px] tracking-[0.14em] uppercase text-cyan-300 border-b border-cyan-400/15">
+            <div>Paciente</div>
+            <div>Teléfono</div>
+            <div>Motivo</div>
+            <div>Fecha cita</div>
+            <div>Agenda</div>
+            <div />
+          </div>
+
+          {resultadosBusquedaAgenda.length === 0 ? (
+            <div className="px-4 py-6 text-sm text-cyan-100/55 text-center">
+              Sin resultados
+            </div>
+          ) : (
+            resultadosBusquedaAgenda.map((resultado, index) => (
+              <div
+                key={`${resultado.event_id}-${index}`}
+                className="grid grid-cols-[1.3fr_0.8fr_1fr_1fr_0.7fr_auto] gap-3 px-4 py-3 items-center border-b border-cyan-400/10 last:border-b-0 text-sm text-white"
+              >
+                <div className="truncate">
+                  {resultado.nombre_paciente}
+                </div>
+
+                <div className="text-cyan-100/75">
+                  {resultado.telefono}
+                </div>
+
+                <div className="truncate text-cyan-100/85">
+                  {resultado.motivo}
+                </div>
+
+                <div className="text-cyan-100/75">
+                  {resultado.fecha_texto}
+                </div>
+
+                <div className="text-cyan-100/75">
+                  {resultado.profesional}
+                </div>
+
+                <button
+                  type="button"
+                  className="rounded-full border border-cyan-400/30 bg-cyan-500/10 px-3 py-1.5 text-[10px] tracking-[0.12em] text-cyan-100 hover:bg-cyan-500/20 hover:border-cyan-300/50 transition-all whitespace-nowrap"
+                >
+                  IR A LA CITA
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+      
       {modalCitaAbierto && eventoSeleccionado && (
         <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm pt-[4vh]">
           <div
