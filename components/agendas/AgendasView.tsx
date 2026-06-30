@@ -1373,6 +1373,22 @@ setMostrarAgendas(false);
             </div>
 
             <div className="flex flex-wrap items-center justify-end gap-2">
+              <button
+  type="button"
+  onClick={() => {
+    setBusquedaAgendaPaciente({
+      nombre_paciente: '',
+      telefono: '',
+      motivo: '',
+      detalle_motivo: '',
+    });
+    setResultadosBusquedaAgenda([]);
+    setMostrarBuscarPacienteAgenda(true);
+  }}
+  className="rounded-full border border-cyan-400/30 bg-cyan-500/10 px-3.5 py-1.5 text-[10px] tracking-[0.12em] text-cyan-100 hover:bg-cyan-500/20 hover:border-cyan-300/50 transition-all whitespace-nowrap"
+>
+  BUSCAR PACIENTE
+</button>
               {acciones.map((accion) => (
                 <button
                   key={accion}
