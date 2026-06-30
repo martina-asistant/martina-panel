@@ -788,6 +788,49 @@ const guardarInsertarCita = async () => {
   }
 };
 
+  const buscarPacienteEnAgenda = async () => {
+  if (buscandoPacienteAgenda) return;
+
+  if (
+    !busquedaAgendaPaciente.nombre_paciente.trim() &&
+    !busquedaAgendaPaciente.telefono.trim()
+  ) {
+    console.error('Falta nombre o teléfono para buscar paciente');
+    return;
+  }
+
+  setBuscandoPacienteAgenda(true);
+
+  try {
+    const response = await fetch('/webhook/buscar-cita-paciente-martina-panel', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        nombre_paciente: busquedaAgendaPaciente.nombre_paciente.trim(),
+        telefono: busquedaAgendaPaciente.telefono.trim(),
+        motivo: busquedaAgendaPaciente.motivo.trim(),
+        detalle_motivo: busquedaAgendaPaciente.detalle_motivo.trim(),
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!data?.encontrado) {
+      setResultadosBusquedaAgenda([]);
+      return;
+    }
+
+    setResultadosBusquedaAgenda(data.resultados || []);
+  } catch (error) {
+    console.error('Error buscando paciente en agenda:', error);
+    setResultadosBusquedaAgenda([]);
+  } finally {
+    setBuscandoPacienteAgenda(false);
+  }
+};
+
   const guardarInsertarRecall = async () => {
   if (loading) return;
 
