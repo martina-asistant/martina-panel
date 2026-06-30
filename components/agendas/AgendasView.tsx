@@ -367,6 +367,18 @@ const [nuevoPaciente, setNuevoPaciente] = useState({
   const [mostrarMotivosEditar, setMostrarMotivosEditar] = useState(false);
   const [mostrarAgendas, setMostrarAgendas] = useState(false);
   const [mostrarInsertarRecall, setMostrarInsertarRecall] = useState(false);
+  // DESKTOP - Buscar paciente en agenda
+const [mostrarBuscarPacienteAgenda, setMostrarBuscarPacienteAgenda] = useState(false);
+
+const [busquedaAgendaPaciente, setBusquedaAgendaPaciente] = useState({
+  nombre_paciente: '',
+  telefono: '',
+  motivo: '',
+  detalle_motivo: '',
+});
+
+const [resultadosBusquedaAgenda, setResultadosBusquedaAgenda] = useState<any[]>([]);
+const [buscandoPacienteAgenda, setBuscandoPacienteAgenda] = useState(false);
 
 const [nuevoRecall, setNuevoRecall] = useState({
   paciente_id: '',
