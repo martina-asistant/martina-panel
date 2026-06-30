@@ -381,6 +381,7 @@ const [resultadosBusquedaAgenda, setResultadosBusquedaAgenda] = useState<any[]>(
 const [buscandoPacienteAgenda, setBuscandoPacienteAgenda] = useState(false);
 const [mostrarResultadosPacienteAgenda, setMostrarResultadosPacienteAgenda] = useState(false);
 const [pacienteAgendaSeleccionado, setPacienteAgendaSeleccionado] = useState<PatientOption | null>(null);
+const [resultadoPendienteIrCita, setResultadoPendienteIrCita] = useState<any | null>(null);
 
 const [nuevoRecall, setNuevoRecall] = useState({
   paciente_id: '',
@@ -896,28 +897,10 @@ const irACitaResultado = (resultado: any) => {
 
   const fecha = new Date(resultado.fecha_inicio);
 
-  const evento: EventoAgenda = {
-    event_id: resultado.event_id,
-    calendar_id: resultado.calendar_id,
-    titulo: `${resultado.nombre_paciente} - ${resultado.motivo}`,
-    nombre_paciente: resultado.nombre_paciente,
-    telefono: resultado.telefono,
-    motivo: resultado.motivo,
-    detalle_motivo: resultado.detalle_motivo,
-    fecha_inicio: resultado.fecha_inicio,
-    fecha_fin: resultado.fecha_fin,
-    profesional: resultado.profesional,
-  } as EventoAgenda;
-
+  setResultadoPendienteIrCita(resultado);
   setAgendaActiva(agendaDestino);
   setSemanaInicio(getMonday(fecha));
   setDiaMovilSeleccionado(fecha);
-
-  setEventoActivo(evento);
-  setEventoSeleccionado(evento);
-  setModoEdicion(false);
-  setModalCitaAbierto(true);
-
   setMostrarBuscarPacienteAgenda(false);
   setSlotInicio(null);
   setSlotFin(null);
@@ -1040,6 +1023,23 @@ const irACitaResultado = (resultado: any) => {
   cargarPatients();
 }, []);
 
+useEffect(() => {
+  if (!resultadoPendienteIrCita) return;
+  if (!eventos.length) return;
+
+  const eventoReal = eventos.find(
+    (evento) => evento.event_id === resultadoPendienteIrCita.event_id
+  );
+
+  if (!eventoReal) return;
+
+  setEventoActivo(eventoReal);
+  setEventoSeleccionado(eventoReal);
+  setModoEdicion(false);
+  setModalCitaAbierto(true);
+  setResultadoPendienteIrCita(null);
+}, [eventos, resultadoPendienteIrCita]);
+  
   const pacientesFiltrados = patients.filter((patient) => {
   const texto = `${patient.nombre_completo || ''} ${patient.telefono || ''}`.toLowerCase();
   return texto.includes(busquedaPaciente.toLowerCase());
@@ -1965,7 +1965,7 @@ setMostrarAgendas(false);
   </>
 )}
 
-              <div className="grid grid-cols-[2fr_1fr] gap-5 items-start">
+              <div className="grid grid-cols-[2fr_1fr] gap-8 items-start">
   <div className="min-w-0">
     <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
       Motivo
@@ -2057,6 +2057,7 @@ setMostrarAgendas(false);
     )}
   </div>
 </div>
+              
 
               <div>
                 <div className="text-cyan-300 text-xs uppercase tracking-wider mb-2 font-bold">
