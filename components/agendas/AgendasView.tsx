@@ -855,10 +855,18 @@ const guardarInsertarCita = async () => {
   String(telefono || '').replace(/\D/g, '');
 
 const pacientesFiltradosBusquedaAgenda = patients.filter((patient) => {
-  const texto = `${patient.nombre_completo || ''} ${patient.nombre || ''} ${patient.apellidos || ''} ${patient.telefono || ''}`.toLowerCase();
-  const busqueda = busquedaAgendaPaciente.nombre_paciente.toLowerCase().trim();
+  const busqueda = normalizarTexto(busquedaAgendaPaciente.nombre_paciente || '');
 
-  return busqueda.length >= 2 && texto.includes(busqueda);
+  if (busqueda.length < 2) return false;
+
+  const nombreCompleto = normalizarTexto(
+    patient.nombre_completo ||
+    `${patient.nombre || ''} ${patient.apellidos || ''}`
+  );
+
+  const telefono = normalizarTelefonoBusquedaAgenda(patient.telefono);
+
+  return nombreCompleto.includes(busqueda) || telefono.includes(busqueda);
 });
 
 const seleccionarPacienteBusquedaAgenda = (patient: PatientOption) => {
