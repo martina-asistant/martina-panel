@@ -819,9 +819,6 @@ const guardarInsertarCita = async () => {
     );
 
     const data = await response.json();
-
-    console.log('Respuesta buscar paciente panel:', data);
-
     const respuesta = Array.isArray(data) ? data[0] : data;
 
     if (!respuesta?.encontrado) {
@@ -830,22 +827,6 @@ const guardarInsertarCita = async () => {
     }
 
     setResultadosBusquedaAgenda(respuesta.resultados || []);
-  } catch (error) {
-    console.error('Error buscando paciente en agenda:', error);
-    setResultadosBusquedaAgenda([]);
-  } finally {
-    setBuscandoPacienteAgenda(false);
-  }
-};
-
-    const data = await response.json();
-
-    if (!data?.encontrado) {
-      setResultadosBusquedaAgenda([]);
-      return;
-    }
-
-    setResultadosBusquedaAgenda(data.resultados || []);
   } catch (error) {
     console.error('Error buscando paciente en agenda:', error);
     setResultadosBusquedaAgenda([]);
