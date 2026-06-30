@@ -831,6 +831,43 @@ const guardarInsertarCita = async () => {
   }
 };
 
+const irACitaResultado = (resultado: any) => {
+  const profesional = (resultado.profesional || '').toLowerCase();
+
+  const agendaDestino =
+    profesional.includes('celia') ? 'celia' :
+    profesional.includes('ana') ? 'ana' :
+    'fede';
+
+  const fecha = new Date(resultado.fecha_inicio);
+
+  const evento: EventoAgenda = {
+    event_id: resultado.event_id,
+    calendar_id: resultado.calendar_id,
+    titulo: `${resultado.nombre_paciente} - ${resultado.motivo}`,
+    nombre_paciente: resultado.nombre_paciente,
+    telefono: resultado.telefono,
+    motivo: resultado.motivo,
+    detalle_motivo: resultado.detalle_motivo,
+    fecha_inicio: resultado.fecha_inicio,
+    fecha_fin: resultado.fecha_fin,
+    profesional: resultado.profesional,
+  } as EventoAgenda;
+
+  setAgendaActiva(agendaDestino);
+  setSemanaInicio(getMonday(fecha));
+  setDiaMovilSeleccionado(fecha);
+
+  setEventoActivo(evento);
+  setEventoSeleccionado(evento);
+  setModoEdicion(false);
+  setModalCitaAbierto(true);
+
+  setMostrarBuscarPacienteAgenda(false);
+  setSlotInicio(null);
+  setSlotFin(null);
+};
+  
   const guardarInsertarRecall = async () => {
   if (loading) return;
 
@@ -1670,6 +1707,7 @@ setMostrarAgendas(false);
 
                 <button
                   type="button"
+                  onClick={() => irACitaResultado(resultado)}
                   className="rounded-full border border-cyan-400/30 bg-cyan-500/10 px-3 py-1.5 text-[10px] tracking-[0.12em] text-cyan-100 hover:bg-cyan-500/20 hover:border-cyan-300/50 transition-all whitespace-nowrap"
                 >
                   IR A LA CITA
