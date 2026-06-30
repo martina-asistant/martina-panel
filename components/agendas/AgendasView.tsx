@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { CalendarDays, ChevronLeft, ChevronRight, Lock } from 'lucide-react';
+import { CalendarDays, ChevronLeft, ChevronRight, Lock, Search } from 'lucide-react';
 import { getAgendaFede, getAgendaCelia, getAgendaAna, type EventoAgenda } from '@/lib/repos/agendas.repo';
 import { createClient } from '@/lib/supabase/client';
 import { createRecall } from '@/lib/repos/recalls.repo';
@@ -1585,17 +1585,12 @@ setMostrarAgendas(false);
       </div>
 
       {mostrarBuscarPacienteAgenda && (
-  <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm pt-[4vh]">
+  <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm pt-[9vh]">
     <div className="w-full max-w-4xl rounded-3xl border border-cyan-300/45 bg-[#03111A]/95 overflow-hidden shadow-[0_0_46px_rgba(34,211,238,.24)]">
-      <div className="px-6 py-5 border-b border-cyan-300/20 flex items-start justify-between">
-        <div>
-          <h2 className="text-xl font-semibold text-white">
-            Buscar paciente
-          </h2>
-          <p className="text-cyan-200 text-sm mt-1">
-            Consulta citas futuras en las agendas de Fede, Celia y Ana
-          </p>
-        </div>
+      <div className="px-6 py-5 border-b border-cyan-300/20 flex items-center justify-between">
+        <h2 className="text-xl font-semibold text-white">
+          Buscar paciente
+        </h2>
 
         <button
           onClick={() => setMostrarBuscarPacienteAgenda(false)}
@@ -1606,7 +1601,7 @@ setMostrarAgendas(false);
       </div>
 
       <div className="p-6 space-y-5">
-        <div className="grid grid-cols-[1.3fr_0.8fr_1fr_1fr_auto] gap-3 items-end">
+        <div className="grid grid-cols-[1.4fr_0.9fr_auto] gap-3 items-end">
           <input
             placeholder="Nombre y apellidos"
             value={busquedaAgendaPaciente.nombre_paciente}
@@ -1614,9 +1609,11 @@ setMostrarAgendas(false);
               setBusquedaAgendaPaciente({
                 ...busquedaAgendaPaciente,
                 nombre_paciente: e.target.value,
+                motivo: '',
+                detalle_motivo: '',
               })
             }
-            className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none placeholder:text-white/40"
+            className="rounded-xl border border-cyan-400/20 bg-black/20 px-3 py-2 text-white outline-none placeholder:text-white/30 focus:border-cyan-300/50"
           />
 
           <input
@@ -1626,42 +1623,25 @@ setMostrarAgendas(false);
               setBusquedaAgendaPaciente({
                 ...busquedaAgendaPaciente,
                 telefono: e.target.value,
+                motivo: '',
+                detalle_motivo: '',
               })
             }
-            className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none placeholder:text-white/40"
-          />
-
-          <input
-            placeholder="Motivo"
-            value={busquedaAgendaPaciente.motivo}
-            onChange={(e) =>
-              setBusquedaAgendaPaciente({
-                ...busquedaAgendaPaciente,
-                motivo: e.target.value,
-              })
-            }
-            className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none placeholder:text-white/40"
-          />
-
-          <input
-            placeholder="Detalle"
-            value={busquedaAgendaPaciente.detalle_motivo}
-            onChange={(e) =>
-              setBusquedaAgendaPaciente({
-                ...busquedaAgendaPaciente,
-                detalle_motivo: e.target.value,
-              })
-            }
-            className="rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none placeholder:text-white/40"
+            className="rounded-xl border border-cyan-400/20 bg-black/20 px-3 py-2 text-white outline-none placeholder:text-white/30 focus:border-cyan-300/50"
           />
 
           <button
             type="button"
             onClick={buscarPacienteEnAgenda}
             disabled={buscandoPacienteAgenda}
-            className="rounded-xl border border-cyan-400/30 bg-cyan-500/10 px-4 py-2 text-[11px] tracking-[0.12em] text-cyan-100 hover:bg-cyan-500/20 hover:border-cyan-300/50 transition-all whitespace-nowrap disabled:opacity-50"
+            className="h-[42px] w-[48px] flex items-center justify-center rounded-xl border border-cyan-400/30 bg-cyan-500/10 text-cyan-100 hover:bg-cyan-500/20 hover:border-cyan-300/50 transition-all disabled:opacity-50"
+            title="Buscar paciente"
           >
-            {buscandoPacienteAgenda ? 'BUSCANDO…' : 'BUSCAR'}
+            {buscandoPacienteAgenda ? (
+              <span className="text-xs">...</span>
+            ) : (
+              <Search className="h-5 w-5" />
+            )}
           </button>
         </div>
 
