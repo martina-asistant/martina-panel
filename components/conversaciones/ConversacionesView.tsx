@@ -1141,20 +1141,20 @@ return (
               <div>
                 <div className="text-cyan-100/50 mb-1">Última cita</div>
                 <div className="font-medium text-white">
-                  {formatDate(paciente?.ultima_cita_fecha)}
+                  {formatDate(paciente?.ultima_cita_fecha || selected?.ultima_cita_fecha)}
                 </div>
                 <div className="text-cyan-100/50">
-                  {paciente?.ultima_cita_motivo || '—'}
+                  {paciente?.ultima_cita_motivo || selected?.ultima_cita_motivo || '—'}
                 </div>
               </div>
 
               <div>
                 <div className="text-cyan-100/50 mb-1">Próxima cita</div>
                 <div className="font-medium text-white">
-                  {formatDate(paciente?.proxima_cita_fecha)}
+                  {formatDate(paciente?.proxima_cita_fecha || selected?.proxima_cita_fecha)}
                 </div>
                 <div className="text-cyan-100/50">
-                  {paciente?.proxima_cita_motivo || '—'}
+                  {paciente?.proxima_cita_motivo || selected?.proxima_cita_motivo || '—'}
                 </div>
               </div>
             </div>
@@ -1404,20 +1404,20 @@ return (
           <div>
             <div className="text-cyan-100/50 mb-1">Última cita</div>
             <div className="font-medium text-white">
-              {formatDate(paciente?.ultima_cita_fecha)}
+              {formatDate(paciente?.ultima_cita_fecha || selected?.ultima_cita_fecha)}
             </div>
             <div className="text-cyan-100/50">
-              {paciente?.ultima_cita_motivo || '—'}
+              {paciente?.ultima_cita_motivo || selected?.ultima_cita_motivo || '—'}
             </div>
           </div>
 
           <div>
             <div className="text-cyan-100/50 mb-1">Próxima cita</div>
             <div className="font-medium text-white">
-              {formatDate(paciente?.proxima_cita_fecha)}
+              {formatDate(paciente?.proxima_cita_fecha || selected?.proxima_cita_fecha)}
             </div>
             <div className="text-cyan-100/50">
-              {paciente?.proxima_cita_motivo || '—'}
+              {paciente?.proxima_cita_motivo || selected?.proxima_cita_motivo || '—'}
             </div>
           </div>
         </div>
