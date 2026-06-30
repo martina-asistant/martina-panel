@@ -69,11 +69,11 @@ export interface ConversacionWhatsapp {
   fecha_inicio: string | null;
   fecha_fin: string | null;
   estado_visual: EstadoVisualConv | null;
-  proxima_cita_fecha: string | null;
-  proxima_cita_motivo: string | null;
-  ultima_cita_fecha: string | null;
-  ultima_cita_motivo: string | null;
-  total_citas: number | null;
+  proxima_cita_fecha?: string | null;
+  proxima_cita_motivo?: string | null;
+  ultima_cita_fecha?: string | null;
+  ultima_cita_motivo?: string | null;
+  total_citas?: number | null;
 }
 
 export interface MensajeWhatsapp {
