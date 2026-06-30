@@ -1372,7 +1372,7 @@ setMostrarAgendas(false);
               </button>
             </div>
 
-            <div className="flex flex-wrap items-center justify-end gap-2 ml-auto">
+            <div className="flex flex-wrap items-center justify-end gap-2">
               <button
   type="button"
   onClick={() => {
