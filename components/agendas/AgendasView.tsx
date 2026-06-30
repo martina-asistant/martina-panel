@@ -802,18 +802,41 @@ const guardarInsertarCita = async () => {
   setBuscandoPacienteAgenda(true);
 
   try {
-    const response = await fetch('/webhook/buscar-cita-paciente-martina-panel', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        nombre_paciente: busquedaAgendaPaciente.nombre_paciente.trim(),
-        telefono: busquedaAgendaPaciente.telefono.trim(),
-        motivo: busquedaAgendaPaciente.motivo.trim(),
-        detalle_motivo: busquedaAgendaPaciente.detalle_motivo.trim(),
-      }),
-    });
+    const response = await fetch(
+      'https://sheilacg.app.n8n.cloud/webhook/buscar-cita-paciente-martina-panel',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          nombre_paciente: busquedaAgendaPaciente.nombre_paciente.trim(),
+          telefono: busquedaAgendaPaciente.telefono.trim(),
+          motivo: 'busqueda_panel',
+          detalle_motivo: 'busqueda_panel',
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    console.log('Respuesta buscar paciente panel:', data);
+
+    const respuesta = Array.isArray(data) ? data[0] : data;
+
+    if (!respuesta?.encontrado) {
+      setResultadosBusquedaAgenda([]);
+      return;
+    }
+
+    setResultadosBusquedaAgenda(respuesta.resultados || []);
+  } catch (error) {
+    console.error('Error buscando paciente en agenda:', error);
+    setResultadosBusquedaAgenda([]);
+  } finally {
+    setBuscandoPacienteAgenda(false);
+  }
+};
 
     const data = await response.json();
 
