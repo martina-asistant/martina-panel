@@ -1303,8 +1303,8 @@ setMostrarAgendas(false);
       
       <div className="hidden lg:block rounded-3xl border border-cyan-500/20 bg-[rgba(5,18,24,.78)] backdrop-blur-xl overflow-hidden shadow-[0_0_35px_rgba(34,211,238,.10)]">
         <div className="bg-cyan-500/10 border-b border-cyan-500/10 px-6 py-3">
-          <div className="flex items-center justify-between gap-6">
-            <div className="relative flex items-center gap-5">
+          <div className="flex items-center justify-between gap-8">
+            <div className="relative flex items-center gap-4 shrink-0">
               <h2 className="text-[13px] tracking-[0.32em] text-cyan-300 font-semibold">
                 {agenda?.nombre.toUpperCase()}
               </h2>
@@ -1372,7 +1372,7 @@ setMostrarAgendas(false);
               </button>
             </div>
 
-            <div className="flex flex-wrap items-center justify-end gap-2">
+            <div className="flex flex-wrap items-center justify-end gap-2 ml-auto">
               <button
   type="button"
   onClick={() => {
