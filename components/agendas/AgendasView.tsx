@@ -1000,15 +1000,15 @@ const irACitaResultado = (resultado: any) => {
           <p className="text-sm text-cyan-100/55">Gestión de citas</p>
         </div>
 
-        <div className="flex items-center justify-between gap-3 rounded-2xl border border-cyan-400/25 bg-cyan-500/10 px-4 py-3 min-w-[230px]">
+        <div className="flex items-center gap-3 rounded-2xl border border-cyan-400/25 bg-cyan-500/10 px-4 py-3 min-w-[230px]">las 
           <CalendarDays className="w-5 h-5 text-cyan-300" />
 
           <div className="relative">
-  <button
-    type="button"
-    onClick={() => setMostrarAgendas(!mostrarAgendas)}
-    className="flex items-center gap-2 bg-transparent text-white text-sm font-medium outline-none"
-  >
+ <button
+  type="button"
+  onClick={() => setMostrarAgendas(!mostrarAgendas)}
+  className="flex flex-1 items-center justify-between gap-2 bg-transparent text-white text-sm font-medium outline-none"
+>
     <span>{agenda?.nombre}</span>
 
     <svg
@@ -1341,7 +1341,7 @@ setMostrarAgendas(false);
       <div className="hidden lg:block rounded-3xl border border-cyan-500/20 bg-[rgba(5,18,24,.78)] backdrop-blur-xl overflow-hidden shadow-[0_0_35px_rgba(34,211,238,.10)]">
         <div className="bg-cyan-500/10 border-b border-cyan-500/10 px-6 py-3">
           <div className="flex items-center justify-between gap-6">
-            <div className="relative flex items-center gap-5">
+            <div className="relative flex items-center gap-3">
               <h2 className="text-[13px] tracking-[0.32em] text-cyan-300 font-semibold">
                 {agenda?.nombre.toUpperCase()}
               </h2>
