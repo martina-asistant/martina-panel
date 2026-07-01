@@ -9,7 +9,8 @@ import {
   PhoneCall,
   BellRing,
   LogOut,
-  CalendarDays
+  CalendarDays,
+  FlaskConical
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils/cn';
