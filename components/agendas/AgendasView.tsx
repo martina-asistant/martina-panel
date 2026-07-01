@@ -1046,7 +1046,40 @@ const irACitaResultado = (resultado: any) => {
       }
     }
 
-    const guardarInsertarLaboratorio = async () => {
+    const recallCreado = await createRecall({
+      paciente_id: nuevoRecall.paciente_id || null,
+      nombre_paciente: nuevoRecall.nombre_paciente,
+      telefono: telefonoNuevo,
+      motivo_recall: nuevoRecall.motivo_recall,
+      detalle_recall: nuevoRecall.detalle_recall,
+      tipo_recall: nuevoRecall.tipo_recall,
+      duracion_minutos: getDuracionPorMotivo(nuevoRecall.motivo_recall),
+      fecha_recall: nuevoRecall.fecha_recall,
+      fecha_registro: new Date().toISOString(),
+      fecha_envio: null,
+      profesional: nuevoRecall.profesional,
+      origen: usuarioPanel,
+      numero_cambios: 0,
+      estado: 'pendiente_envio',
+    });
+
+    if (!recallCreado) {
+      console.error('Error creando recall');
+      return;
+    }
+
+    setMostrarInsertarRecall(false);
+    setEventoActivo(null);
+    setSlotInicio(null);
+    setSlotFin(null);
+  } catch (error) {
+    console.error('Error guardando recall:', error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+const guardarInsertarLaboratorio = async () => {
   if (loading) return;
 
   if (!nuevoTrabajoLaboratorio.nombre_paciente.trim()) {
@@ -1088,39 +1121,6 @@ const irACitaResultado = (resultado: any) => {
     setSlotFin(null);
   } catch (error) {
     console.error('Error guardando trabajo laboratorio:', error);
-  } finally {
-    setLoading(false);
-  }
-};
-
-    const recallCreado = await createRecall({
-      paciente_id: nuevoRecall.paciente_id || null,
-      nombre_paciente: nuevoRecall.nombre_paciente,
-      telefono: telefonoNuevo,
-      motivo_recall: nuevoRecall.motivo_recall,
-      detalle_recall: nuevoRecall.detalle_recall,
-      tipo_recall: nuevoRecall.tipo_recall,
-      duracion_minutos: getDuracionPorMotivo(nuevoRecall.motivo_recall),
-      fecha_recall: nuevoRecall.fecha_recall,
-      fecha_registro: new Date().toISOString(),
-      fecha_envio: null,
-      profesional: nuevoRecall.profesional,
-      origen: usuarioPanel,
-      numero_cambios: 0,
-      estado: 'pendiente_envio',
-    });
-
-    if (!recallCreado) {
-      console.error('Error creando recall');
-      return;
-    }
-
-    setMostrarInsertarRecall(false);
-    setEventoActivo(null);
-    setSlotInicio(null);
-    setSlotFin(null);
-  } catch (error) {
-    console.error('Error guardando recall:', error);
   } finally {
     setLoading(false);
   }
