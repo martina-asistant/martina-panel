@@ -470,6 +470,78 @@ const filtered = convs.filter(c => {
     toast.success('Conversación cerrada');
   };
 
+  const crearNuevaConversacion = async () => {
+  if (creandoConversacion) return;
+
+  const nombreCompleto = nuevoContactoConversacion.nombre_completo.trim();
+  const telefono = telefonoLimpioConversacion(nuevoContactoConversacion.telefono);
+
+  if (!nombreCompleto || !telefono) {
+    toast.error('Falta nombre o teléfono');
+    return;
+  }
+
+  setCreandoConversacion(true);
+
+  try {
+    const nombreNormalizado = normalizarNombreConversacion(nombreCompleto);
+
+    let patient = pacienteSeleccionadoNuevaConv;
+
+    if (!patient) {
+      patient =
+        patients.find((p) =>
+          normalizarNombreConversacion(
+            p.nombre_completo ||
+              `${p.nombre || ''} ${p.apellidos || ''}`
+          ) === nombreNormalizado
+        ) || null;
+    }
+
+    if (!patient) {
+      patient = await crearPatientDesdeConversacion({
+        nombre_completo: nombreCompleto,
+        telefono,
+      });
+    }
+
+    if (!patient) {
+      toast.error('No se ha podido crear el paciente');
+      return;
+    }
+
+    const nuevaConv = await crearConversacionRecepcion({
+      nombre_paciente:
+        patient.nombre_completo ||
+        `${patient.nombre || ''} ${patient.apellidos || ''}`.trim(),
+      telefono: patient.telefono || telefono,
+      paciente_id: patient.paciente_id || patient.id,
+    });
+
+    if (!nuevaConv) {
+      toast.error('No se ha podido crear la conversación');
+      return;
+    }
+
+    const updated = await listConversaciones();
+
+    setConvs(updated);
+    setSelectedId(nuevaConv.id);
+    setMostrarCrearConversacion(false);
+    setMostrarListaMovil(false);
+
+    setNuevoContactoConversacion({
+      nombre_completo: '',
+      telefono: '',
+    });
+    setPacienteSeleccionadoNuevaConv(null);
+
+    toast.success('Conversación creada');
+  } finally {
+    setCreandoConversacion(false);
+  }
+};
+
   const saveNotasConv = async () => {
     if (!selected) return;
     await actualizarNotasConversacion(selected.id, notasConv);
