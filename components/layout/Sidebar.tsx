@@ -21,6 +21,7 @@ const nav = [
   { href: '/recordatorios', label: 'Recordatorios', icon: BellRing },
   { href: '/recalls', label: 'Recalls', icon: PhoneCall },
   { href: '/agendas', label: 'Agendas', icon: CalendarDays },
+  { href: '/laboratorio', label: 'Laboratorio', icon: FlaskConical },
 ];
 
 const Sidebar = () => {
