@@ -384,6 +384,17 @@ const [segundosGrabacion, setSegundosGrabacion] = useState(0);
   return () => window.clearTimeout(timeout);
 }, [mensajes.length, selectedId]);
 
+  const normalizarNombreConversacion = (texto?: string | null) =>
+  String(texto || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+const telefonoLimpioConversacion = (telefono?: string | null) =>
+  String(telefono || '').replace(/\D/g, '');
+
   const filtered = convs.filter(c => {
     if (filter !== 'todas' && c.estado_visual !== filter) return false;
 
