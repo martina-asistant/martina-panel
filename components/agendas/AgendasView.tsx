@@ -369,6 +369,21 @@ const [nuevoPaciente, setNuevoPaciente] = useState({
   const [mostrarMotivosEditar, setMostrarMotivosEditar] = useState(false);
   const [mostrarAgendas, setMostrarAgendas] = useState(false);
   const [mostrarInsertarRecall, setMostrarInsertarRecall] = useState(false);
+  const [trabajosLaboratorio, setTrabajosLaboratorio] = useState<LaboratorioTrabajo[]>([]);
+const [mostrarInsertarLaboratorio, setMostrarInsertarLaboratorio] = useState(false);
+
+const [nuevoTrabajoLaboratorio, setNuevoTrabajoLaboratorio] = useState({
+  paciente_id: '',
+  nombre_paciente: '',
+  telefono: '',
+  laboratorio: 'Fede' as LaboratorioNombre,
+  trabajo: 'Incrustación' as TipoTrabajoLaboratorio,
+  estado: 'pte_gestionar' as EstadoLaboratorio,
+  anotaciones: '',
+  fecha_cita: '',
+  event_id_origen: '',
+  calendar_id_origen: '',
+});
   // DESKTOP - Buscar paciente en agenda
 const [mostrarBuscarPacienteAgenda, setMostrarBuscarPacienteAgenda] = useState(false);
 
