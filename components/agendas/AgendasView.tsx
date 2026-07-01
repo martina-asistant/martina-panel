@@ -1744,15 +1744,15 @@ setMostrarAgendas(false);
 
         <div className="relative z-[10] rounded-2xl border border-cyan-400/20 bg-black/15 overflow-hidden max-h-[48vh] overflow-y-auto">
 
-  <div className="grid grid-cols-[1.4fr_0.8fr_1fr_0.8fr_0.6fr_0.7fr_auto] gap-3 px-4 py-3 text-[10px] tracking-[0.14em] uppercase text-cyan-300 border-b border-cyan-400/15">
-    <div className="text-left">Paciente</div>
-<div className="text-left">Teléfono</div>
-<div className="text-left">Motivo</div>
-<div className="text-left">Fecha</div>
-<div className="text-left">Hora</div>
-<div className="text-left">Agenda</div>
-<div />
-  </div>
+  <div className="grid grid-cols-[250px_150px_180px_130px_100px_110px_140px] gap-3 px-4 py-3 text-[10px] tracking-[0.14em] uppercase text-cyan-300 border-b border-cyan-400/15">
+  <div>Paciente</div>
+  <div>Teléfono</div>
+  <div>Motivo</div>
+  <div>Fecha</div>
+  <div>Hora</div>
+  <div>Agenda</div>
+  <div />
+</div>
 
   {resultadosBusquedaAgenda.length === 0 ? (
     <div className="px-4 py-6 text-sm text-cyan-100/55 text-center">
@@ -1762,7 +1762,7 @@ setMostrarAgendas(false);
     resultadosBusquedaAgenda.map((resultado, index) => (
       <div
         key={`${resultado.event_id}-${index}`}
-        className="grid grid-cols-[1.4fr_0.8fr_1fr_0.8fr_0.6fr_0.7fr_auto] gap-3 px-4 py-3 items-center border-b border-cyan-400/10 last:border-b-0 text-sm text-white"
+        className="grid grid-cols-[250px_150px_180px_130px_100px_110px_140px] gap-3 px-4 py-3 items-center border-b border-cyan-400/10 last:border-b-0 text-sm text-white"
       >
         <div className="truncate">
           {resultado.nombre_paciente}
@@ -1792,12 +1792,12 @@ setMostrarAgendas(false);
         </div>
 
         <button
-          type="button"
-          onClick={() => irACitaResultado(resultado)}
-          className="justify-self-end rounded-full border border-cyan-400/30 bg-cyan-500/10 px-3 py-1.5 text-[10px] tracking-[0.12em] text-cyan-100 hover:bg-cyan-500/20 hover:border-cyan-300/50 transition-all whitespace-nowrap"
-        >
-          IR A LA CITA
-        </button>
+  type="button"
+  onClick={() => irACitaResultado(resultado)}
+  className="justify-self-end rounded-full border border-cyan-400/30 bg-cyan-500/10 px-3 py-1.5 text-[10px] tracking-[0.12em] text-cyan-100 hover:bg-cyan-500/20 hover:border-cyan-300/50 transition-all whitespace-nowrap"
+>
+  IR A LA CITA
+</button>
       </div>
     ))
   )}
