@@ -1923,36 +1923,49 @@ setMostrarAgendas(false);
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div>
-                    <div className="text-[10px] uppercase tracking-[0.14em] text-cyan-300 mb-1">
-                      Motivo
-                    </div>
-                    <div className="text-cyan-100/85">
-                      {resultado.motivo}
-                    </div>
-                  </div>
+  <div>
+    <div className="text-[10px] uppercase tracking-[0.14em] text-cyan-300 mb-1">
+      Motivo
+    </div>
+    <div className="text-cyan-100/85">
+      {resultado.motivo}
+    </div>
+  </div>
 
-                  <div>
-                    <div className="text-[10px] uppercase tracking-[0.14em] text-cyan-300 mb-1">
-                      Agenda
-                    </div>
-                    <div className="text-cyan-100/85">
-                      {resultado.profesional}
-                    </div>
-                  </div>
-                </div>
+  <div>
+    <div className="text-[10px] uppercase tracking-[0.14em] text-cyan-300 mb-1">
+      Agenda
+    </div>
+    <div className="text-cyan-100/85">
+      {resultado.profesional}
+    </div>
+  </div>
 
-                <div className="text-sm text-cyan-100/75">
-                  {new Date(resultado.fecha_inicio).toLocaleDateString('es-ES', {
-                    day: 'numeric',
-                    month: 'short',
-                    year: 'numeric',
-                  })}
-                  {' · '}
-                  {new Date(resultado.fecha_inicio).toLocaleTimeString('es-ES', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
+  <div>
+    <div className="text-[10px] uppercase tracking-[0.14em] text-cyan-300 mb-1">
+      Fecha
+    </div>
+    <div className="text-cyan-100/85">
+      {new Date(resultado.fecha_inicio).toLocaleDateString('es-ES', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      })}
+    </div>
+  </div>
+
+  <div>
+    <div className="text-[10px] uppercase tracking-[0.14em] text-cyan-300 mb-1">
+      Hora
+    </div>
+    <div className="text-cyan-100/85">
+      {new Date(resultado.fecha_inicio).toLocaleTimeString('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit',
+      })}
+    </div>
+  </div>
+</div>
                 </div>
 
                 <button
