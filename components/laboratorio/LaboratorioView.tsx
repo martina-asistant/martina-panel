@@ -33,7 +33,7 @@ const filtros: { key: FiltroLab; label: string; color: string }[] = [
   { key: 'disenado', label: 'Diseñado', color: 'bg-violet-300' },
   { key: 'impreso', label: 'Impreso', color: 'bg-pink-400' },
   { key: 'fresado', label: 'Fresado', color: 'bg-cyan-300' },
-  { key: 'horneado', label: 'Horneado', color: 'bg-blue-700' },
+  { key: 'horneado', label: 'Horneado', color: 'bg-orange-400' },
   { key: 'en_clinica', label: 'En clínica', color: 'bg-green-400' },
   { key: 'finalizado', label: 'Finalizado', color: 'bg-slate-300' },
 ];
