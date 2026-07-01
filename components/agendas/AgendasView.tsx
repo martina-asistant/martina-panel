@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { CalendarDays, ChevronLeft, ChevronRight, Lock, Search } from 'lucide-react';
+import { CalendarDays, ChevronDown, ChevronLeft, ChevronRight, Lock, Search, } from 'lucide-react';
 import { getAgendaFede, getAgendaCelia, getAgendaAna, type EventoAgenda } from '@/lib/repos/agendas.repo';
 import { createClient } from '@/lib/supabase/client';
 import { createRecall } from '@/lib/repos/recalls.repo';
+import { listTrabajosLaboratorio, crearTrabajoLaboratorio } from '@/lib/repos/laboratorio.repo';
+import type { LaboratorioTrabajo, EstadoLaboratorio, LaboratorioNombre, TipoTrabajoLaboratorio } from '@/lib/types/db.types';
 
 const agendas = [
   { key: 'fede', nombre: 'Agenda Fede' },
