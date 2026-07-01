@@ -10,7 +10,7 @@ import {
   BellRing,
   LogOut,
   CalendarDays,
-  Tooth
+  FlaskConical
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils/cn';
@@ -22,7 +22,7 @@ const nav = [
   { href: '/recordatorios', label: 'Recordatorios', icon: BellRing },
   { href: '/recalls', label: 'Recalls', icon: PhoneCall },
   { href: '/agendas', label: 'Agendas', icon: CalendarDays },
-  { href: '/laboratorio', label: 'Laboratorio', icon: Tooth },
+  { href: '/laboratorio', label: 'Laboratorio', icon: FlaskConical },
 ];
 
 const Sidebar = () => {
