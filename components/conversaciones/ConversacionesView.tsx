@@ -1928,6 +1928,124 @@ return (
   )}
 </div>
   </div>
+
+{/* MODAL CREAR CONVERSACIÓN */}
+{mostrarCrearConversacion && (
+  <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+    <div className="w-full max-w-md rounded-3xl border border-cyan-300/45 bg-[#03111A]/95 overflow-hidden shadow-[0_0_46px_rgba(34,211,238,.24)]">
+      <div className="px-6 py-5 border-b border-cyan-300/20 flex items-center justify-between">
+        <h2 className="text-xl font-semibold text-white">
+          Crear conversación
+        </h2>
+
+        <button
+          type="button"
+          onClick={() => {
+            setMostrarCrearConversacion(false);
+            setPacienteSeleccionadoNuevaConv(null);
+          }}
+          className="text-white/80 hover:text-white text-xl"
+        >
+          ✕
+        </button>
+      </div>
+
+      <div className="p-6 space-y-5">
+        <div className="relative">
+          <label className="block text-[10px] uppercase tracking-[0.14em] text-cyan-300 mb-2">
+            Nombre y apellidos
+          </label>
+
+          <Input
+            value={nuevoContactoConversacion.nombre_completo}
+            onChange={(e) => {
+              setNuevoContactoConversacion({
+                ...nuevoContactoConversacion,
+                nombre_completo: e.target.value,
+              });
+              setPacienteSeleccionadoNuevaConv(null);
+            }}
+            placeholder="Nombre y apellidos"
+            className="h-11 rounded-xl bg-black/20 border-cyan-400/20 text-white placeholder:text-white/30 focus-visible:ring-cyan-400"
+          />
+
+          {!pacienteSeleccionadoNuevaConv &&
+            pacientesFiltradosNuevaConv.length > 0 && (
+              <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-[120] max-h-52 overflow-y-auto rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
+                {pacientesFiltradosNuevaConv.map((p) => {
+                  const nombreCompleto =
+                    p.nombre_completo ||
+                    `${p.nombre || ''} ${p.apellidos || ''}`.trim();
+
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => {
+                        setPacienteSeleccionadoNuevaConv(p);
+                        setNuevoContactoConversacion({
+                          nombre_completo: nombreCompleto,
+                          telefono: p.telefono || '',
+                        });
+                      }}
+                      className="block w-full px-4 py-2.5 text-left text-sm text-white hover:bg-cyan-500/15"
+                    >
+                      <div className="font-medium">{nombreCompleto}</div>
+                      <div className="text-xs text-cyan-100/55">
+                        {formatTelefono(p.telefono)}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+        </div>
+
+        <div>
+          <label className="block text-[10px] uppercase tracking-[0.14em] text-cyan-300 mb-2">
+            Teléfono
+          </label>
+
+          <Input
+            value={nuevoContactoConversacion.telefono}
+            disabled={Boolean(pacienteSeleccionadoNuevaConv)}
+            onChange={(e) =>
+              setNuevoContactoConversacion({
+                ...nuevoContactoConversacion,
+                telefono: e.target.value,
+              })
+            }
+            placeholder="Teléfono"
+            className="h-11 rounded-xl bg-black/20 border-cyan-400/20 text-white placeholder:text-white/30 focus-visible:ring-cyan-400 disabled:opacity-60"
+          />
+        </div>
+
+        <div className="flex justify-end gap-3 pt-2">
+          <button
+            type="button"
+            onClick={() => {
+              setMostrarCrearConversacion(false);
+              setPacienteSeleccionadoNuevaConv(null);
+            }}
+            className="rounded-full border border-cyan-400/20 bg-white/5 px-4 py-2 text-xs tracking-[0.12em] text-cyan-100 hover:bg-white/10 transition-all"
+          >
+            CANCELAR
+          </button>
+
+          <button
+            type="button"
+            onClick={crearNuevaConversacion}
+            disabled={creandoConversacion}
+            className="rounded-full border border-cyan-400/30 bg-cyan-500/10 px-4 py-2 text-xs tracking-[0.12em] text-cyan-100 hover:bg-cyan-500/20 hover:border-cyan-300/50 transition-all disabled:opacity-50"
+          >
+            {creandoConversacion ? 'CREANDO…' : '✓ CREAR'}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+      
 </div>
   );
 };
