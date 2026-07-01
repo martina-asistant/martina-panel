@@ -6,7 +6,7 @@ export type EstadoVisualConv = 'nueva' | 'en_curso' | 'recepcion' | 'gestionada'
 export type EstadoRecordatorio = 'sin_respuesta' | 'confirmada' | 'no_podra_asistir' | 'cita_modificada' | 'cancelada_recado';
 export type EstadoRecall = 'pendiente_envio' | 'enviado' | 'quiere_cita' | 'confirmada' | 'pospuesta';
 export type EstadoLaboratorio = 'pte_gestionar' | 'disenado' | 'impreso' | 'fresado' | 'horneado' | 'en_clinica' | 'finalizado';
-export type LaboratorioNombre = 'Fede' | 'Juanjo' | 'Alex' | 'Ana' | 'Otro';
+export type LaboratorioNombre = 'Julio' | 'Alex' | 'Juanjo' | 'Claudia' | 'Otro';
 export type TipoTrabajoLaboratorio = 'Incrustación' | 'Corona' | 'Puente' | 'Implante' | 'Férula' | 'Otro';
 export type RolMensaje = 'paciente' | 'martina' | 'recepcion' | 'sistema';
 
