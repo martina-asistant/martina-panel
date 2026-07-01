@@ -44,7 +44,7 @@ type PatientOption = {
   telefono: string | null;
 };
 
-const LABORATORIOS = ['Fede', 'Juanjo', 'Alex', 'Ana', 'Otro'];
+const LABORATORIOS = ['Julio', 'Alex', 'Juanjo', 'Claudia', 'Otro'];
 
 const TIPOS_TRABAJO_LABORATORIO = [
   'Incrustación',
@@ -56,7 +56,7 @@ const TIPOS_TRABAJO_LABORATORIO = [
 ];
 
 const ESTADOS_LABORATORIO = [
-  { value: 'pte_gestionar', label: 'Pte gestionar', dot: 'bg-yellow-400' },
+  { value: 'pte_gestionar', label: 'Pte gestionar', dot: 'bg-red-600' },
   { value: 'disenado', label: 'Diseñado', dot: 'bg-violet-300' },
   { value: 'impreso', label: 'Impreso', dot: 'bg-pink-400' },
   { value: 'fresado', label: 'Fresado', dot: 'bg-blue-300' },
@@ -69,7 +69,7 @@ const getEstadoLaboratorioLabel = (estado?: string | null) =>
   ESTADOS_LABORATORIO.find(e => e.value === estado)?.label || 'Pte gestionar';
 
 const getEstadoLaboratorioDot = (estado?: string | null) =>
-  ESTADOS_LABORATORIO.find(e => e.value === estado)?.dot || 'bg-yellow-400';
+  ESTADOS_LABORATORIO.find(e => e.value === estado)?.dot || 'bg-red-600';
 
 const formatFechaLaboratorioLista = (iso?: string | null) => {
   if (!iso) return '-';
@@ -423,7 +423,7 @@ const [nuevoTrabajoLaboratorio, setNuevoTrabajoLaboratorio] = useState({
   paciente_id: '',
   nombre_paciente: '',
   telefono: '',
-  laboratorio: 'Fede' as LaboratorioNombre,
+  laboratorio: 'Julio' as LaboratorioNombre,
   trabajo: 'Incrustación' as TipoTrabajoLaboratorio,
   estado: 'pte_gestionar' as EstadoLaboratorio,
   anotaciones: '',
@@ -817,7 +817,7 @@ const guardarCambiosCita = async () => {
     paciente_id: (eventoActivo as any).paciente_id || '',
     nombre_paciente: eventoActivo.nombre_paciente || '',
     telefono: eventoActivo.telefono || '',
-    laboratorio: 'Fede',
+    laboratorio: 'Julio',
     trabajo: 'Incrustación',
     estado: 'pte_gestionar',
     anotaciones: '',
