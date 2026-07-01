@@ -14,7 +14,7 @@ const agendas = [
   { key: 'ana', nombre: 'Agenda Ana' },
 ];
 
-const acciones = ['INSERTAR CITA', 'MODIFICAR CITA', 'CANCELAR CITA', 'INSERTAR RECALL'];
+const acciones = ['INSERTAR CITA', 'MODIFICAR CITA', 'CANCELAR CITA', 'INSERTAR RECALL', 'INSERTAR TRABAJO'];
 
 const TRATAMIENTOS = [
   'Primera visita',
@@ -760,6 +760,25 @@ const guardarCambiosCita = async () => {
   setMostrarInsertarRecall(true);
 };
 
+  const abrirInsertarLaboratorio = () => {
+  if (!eventoActivo) return;
+
+  setNuevoTrabajoLaboratorio({
+    paciente_id: (eventoActivo as any).paciente_id || '',
+    nombre_paciente: eventoActivo.nombre_paciente || '',
+    telefono: eventoActivo.telefono || '',
+    laboratorio: 'Fede',
+    trabajo: 'Incrustación',
+    estado: 'pte_gestionar',
+    anotaciones: '',
+    fecha_cita: '',
+    event_id_origen: eventoActivo.event_id || '',
+    calendar_id_origen: eventoActivo.calendar_id || '',
+  });
+
+  setMostrarInsertarLaboratorio(true);
+};
+
 const guardarInsertarCita = async () => {
   if (loading) return;
 
@@ -1362,6 +1381,10 @@ setMostrarAgendas(false);
         if (accion === 'INSERTAR RECALL') {
           abrirInsertarRecall();
         }
+
+        if (accion === 'INSERTAR TRABAJO') {
+  abrirInsertarLaboratorio();
+}
       }}
       className="shrink-0 rounded-full border border-cyan-400/30 bg-cyan-500/10 px-3.5 py-1.5 text-[10px] tracking-[0.12em] text-cyan-100"
     >
@@ -1563,6 +1586,10 @@ setMostrarAgendas(false);
                     if (accion === 'INSERTAR RECALL') {
                     abrirInsertarRecall();
                     }
+
+                    if (accion === 'INSERTAR TRABAJO') {
+  abrirInsertarLaboratorio();
+}
                     
                   }}
                   className="rounded-full border border-cyan-400/30 bg-cyan-500/10 px-3.5 py-1.5 text-[10px] tracking-[0.12em] text-cyan-100 hover:bg-cyan-500/20 hover:border-cyan-300/50 transition-all whitespace-nowrap"
