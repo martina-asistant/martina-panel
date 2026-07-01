@@ -1759,6 +1759,11 @@ setMostrarAgendas(false);
     Sin resultados
   </div>
 ) : (
+  {resultadosBusquedaAgenda.length === 0 ? (
+  <div className="px-4 py-6 text-sm text-cyan-100/55 text-center">
+    Sin resultados
+  </div>
+) : (
   resultadosBusquedaAgenda.map((resultado, index) => (
     <div
       key={`${resultado.event_id}-${index}`}
