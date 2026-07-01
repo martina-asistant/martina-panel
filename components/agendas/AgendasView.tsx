@@ -1058,7 +1058,13 @@ const irACitaResultado = (resultado: any) => {
     setPatients(data || []);
   };
 
+  const cargarLaboratorio = async () => {
+    const data = await listTrabajosLaboratorio();
+    setTrabajosLaboratorio(data);
+  };
+
   cargarPatients();
+  cargarLaboratorio();
 }, []);
 
 useEffect(() => {
