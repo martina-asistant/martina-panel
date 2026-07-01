@@ -178,3 +178,56 @@ export function activarCanalMartina(canal: CanalMartina, email?: string) {
 export function pausarCanalMartina(canal: CanalMartina, email?: string) {
   return actualizarEstadoCanalMartina(canal, false, email);
 }
+
+export async function crearConversacionRecepcion({
+  nombre_paciente,
+  telefono,
+  paciente_id,
+}: {
+  nombre_paciente: string;
+  telefono: string;
+  paciente_id?: string | null;
+}): Promise<ConversacionWhatsapp | null> {
+  const supa = createBrowserSupa();
+
+  const telefonoLimpio = String(telefono || '').replace(/\D/g, '');
+  const telefonoE164 = telefonoLimpio.startsWith('34')
+    ? telefonoLimpio
+    : `34${telefonoLimpio}`;
+
+  const nueva = {
+    nombre_paciente,
+    telefono: telefonoLimpio,
+    telefono_e164: telefonoE164,
+    paciente_id: paciente_id || null,
+    modo_atencion: 'recepcion' as ModoAtencion,
+    estado_visual: 'recepcion' as EstadoVisualConv,
+    estado_cita: 'recepcion',
+    canal: 'whatsapp',
+    updated_at: new Date().toISOString(),
+  };
+
+  if (!supa) {
+    const mock = {
+      ...nueva,
+      id: crypto.randomUUID(),
+      created_at: new Date().toISOString(),
+    } as ConversacionWhatsapp;
+
+    mockConversaciones.unshift(mock);
+    return mock;
+  }
+
+  const { data, error } = await supa
+    .from('conversaciones_whatsapp')
+    .insert(nueva)
+    .select('*')
+    .single();
+
+  if (error) {
+    console.error('Error creando conversación recepción:', error);
+    return null;
+  }
+
+  return data as ConversacionWhatsapp;
+}
