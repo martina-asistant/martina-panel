@@ -24,7 +24,8 @@ import {
   tomarConversacion,
   devolverAMartina,
   cerrarGestion,
-  actualizarNotasConversacion
+  actualizarNotasConversacion,
+  crearConversacionRecepcion
 } from '@/lib/repos/conversaciones.repo';
 import {
   listMensajesByConversation,
@@ -207,6 +208,13 @@ const ConversacionesView = () => {
   const [paciente, setPaciente] = useState<Patient | null>(null);
   const [filter, setFilter] = useState<Filtro>('todas');
   const [search, setSearch] = useState('');
+  const [mostrarCrearConversacion, setMostrarCrearConversacion] = useState(false);
+const [nuevoContactoConversacion, setNuevoContactoConversacion] = useState({
+  nombre_completo: '',
+  telefono: '',
+});
+const [pacienteSeleccionadoNuevaConv, setPacienteSeleccionadoNuevaConv] = useState<Patient | null>(null);
+const [creandoConversacion, setCreandoConversacion] = useState(false);
   const [notasPaciente, setNotasPaciente] = useState('');
   const [notasConv, setNotasConv] = useState('');
   const [nuevoMensaje, setNuevoMensaje] = useState('');
