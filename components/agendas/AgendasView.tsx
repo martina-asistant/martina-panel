@@ -44,6 +44,52 @@ type PatientOption = {
   telefono: string | null;
 };
 
+const LABORATORIOS = ['Fede', 'Juanjo', 'Alex', 'Ana', 'Otro'];
+
+const TIPOS_TRABAJO_LABORATORIO = [
+  'Incrustación',
+  'Corona',
+  'Puente',
+  'Implante',
+  'Férula',
+  'Otro',
+];
+
+const ESTADOS_LABORATORIO = [
+  { value: 'pte_gestionar', label: 'Pte gestionar', dot: 'bg-yellow-400' },
+  { value: 'disenado', label: 'Diseñado', dot: 'bg-violet-300' },
+  { value: 'impreso', label: 'Impreso', dot: 'bg-pink-400' },
+  { value: 'fresado', label: 'Fresado', dot: 'bg-blue-300' },
+  { value: 'horneado', label: 'Horneado', dot: 'bg-orange-400' },
+  { value: 'en_clinica', label: 'En clínica', dot: 'bg-emerald-400' },
+  { value: 'finalizado', label: 'Finalizado', dot: 'bg-slate-300' },
+];
+
+const getEstadoLaboratorioLabel = (estado?: string | null) =>
+  ESTADOS_LABORATORIO.find(e => e.value === estado)?.label || 'Pte gestionar';
+
+const getEstadoLaboratorioDot = (estado?: string | null) =>
+  ESTADOS_LABORATORIO.find(e => e.value === estado)?.dot || 'bg-yellow-400';
+
+const formatFechaLaboratorioLista = (iso?: string | null) => {
+  if (!iso) return '-';
+
+  return new Date(iso).toLocaleDateString('es-ES', {
+    day: 'numeric',
+    month: 'short',
+  });
+};
+
+const formatFechaLaboratorioDetalle = (iso?: string | null) => {
+  if (!iso) return '-';
+
+  return new Date(iso).toLocaleDateString('es-ES', {
+    day: 'numeric',
+    month: 'short',
+    year: '2-digit',
+  });
+};
+
 const TIPOS_RECALL = [
   { label: 'MTO Periodontal 4 meses', value: 'Limpieza', meses: 4 },
   { label: 'MTO Periodontal 6 meses', value: 'Limpieza', meses: 6 },
