@@ -2038,7 +2038,7 @@ return (
             disabled={creandoConversacion}
             className="rounded-full border border-cyan-400/30 bg-cyan-500/10 px-4 py-2 text-xs tracking-[0.12em] text-cyan-100 hover:bg-cyan-500/20 hover:border-cyan-300/50 transition-all disabled:opacity-50"
           >
-  CREAR
+  {creandoConversacion ? 'CREANDO…' : '✓ CREAR'}
 </button>
         </div>
       </div>
