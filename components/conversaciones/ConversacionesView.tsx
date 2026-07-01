@@ -53,7 +53,9 @@ import AudioBubble from '@/components/conversaciones/AudioBubble';
 import AttachmentBubble from '@/components/conversaciones/AttachmentBubble';
 import {
   getPatientByPacienteId,
-  updatePatientNotas
+  updatePatientNotas,
+  listPatients,
+  crearPatientDesdeConversacion
 } from '@/lib/repos/patients.repo';
 
 type Filtro = 'todas' | EstadoVisualConv;
@@ -215,6 +217,7 @@ const [nuevoContactoConversacion, setNuevoContactoConversacion] = useState({
 });
 const [pacienteSeleccionadoNuevaConv, setPacienteSeleccionadoNuevaConv] = useState<Patient | null>(null);
 const [creandoConversacion, setCreandoConversacion] = useState(false);
+  const [patients, setPatients] = useState<Patient[]>([]);
   const [notasPaciente, setNotasPaciente] = useState('');
   const [notasConv, setNotasConv] = useState('');
   const [nuevoMensaje, setNuevoMensaje] = useState('');
@@ -384,6 +387,15 @@ const [segundosGrabacion, setSegundosGrabacion] = useState(0);
   return () => window.clearTimeout(timeout);
 }, [mensajes.length, selectedId]);
 
+  useEffect(() => {
+  const cargarPatients = async () => {
+    const data = await listPatients();
+    setPatients(data);
+  };
+
+  cargarPatients();
+}, []);
+
   const normalizarNombreConversacion = (texto?: string | null) =>
   String(texto || '')
     .toLowerCase()
@@ -395,21 +407,38 @@ const [segundosGrabacion, setSegundosGrabacion] = useState(0);
 const telefonoLimpioConversacion = (telefono?: string | null) =>
   String(telefono || '').replace(/\D/g, '');
 
-  const filtered = convs.filter(c => {
-    if (filter !== 'todas' && c.estado_visual !== filter) return false;
+const pacientesFiltradosNuevaConv = useMemo(() => {
+  const texto = normalizarNombreConversacion(
+    nuevoContactoConversacion.nombre_completo
+  );
 
-    if (search.trim()) {
-      const q = search.toLowerCase();
+  if (texto.length < 2) return [];
 
-      return (
-        (c.nombre_paciente || '').toLowerCase().includes(q) ||
-        (c.telefono_e164 || '').includes(q) ||
-        (c.motivo || '').toLowerCase().includes(q)
-      );
-    }
+  return patients
+    .filter((p) =>
+      normalizarNombreConversacion(
+        p.nombre_completo ||
+          `${p.nombre || ''} ${p.apellidos || ''}`
+      ).includes(texto)
+    )
+    .slice(0, 6);
+}, [patients, nuevoContactoConversacion.nombre_completo]);
 
-    return true;
-  });
+const filtered = convs.filter(c => {
+  if (filter !== 'todas' && c.estado_visual !== filter) return false;
+
+  if (search.trim()) {
+    const q = search.toLowerCase();
+
+    return (
+      (c.nombre_paciente || '').toLowerCase().includes(q) ||
+      (c.telefono_e164 || '').includes(q) ||
+      (c.motivo || '').toLowerCase().includes(q)
+    );
+  }
+
+  return true;
+});
   
   const doTomar = async () => {
     if (!selected) return;
