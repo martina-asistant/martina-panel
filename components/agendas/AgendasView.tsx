@@ -1660,8 +1660,10 @@ setMostrarAgendas(false);
         </div>
       </div>
 
+      {/* ---------- MODAL BUSCAR PACIENTE DESKTOP ---------- */}
+
       {mostrarBuscarPacienteAgenda && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-6 py-10">
+  <div className="hidden lg:flex fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-6 py-10">
     <div className="w-full max-w-4xl rounded-3xl border border-cyan-300/45 bg-[#03111A]/95 overflow-hidden shadow-[0_0_46px_rgba(34,211,238,.24)]">
       <div className="px-6 py-5 border-b border-cyan-300/20 flex items-center justify-between">
         <h2 className="text-xl font-semibold text-white">Buscar paciente</h2>
@@ -1795,6 +1797,158 @@ setMostrarAgendas(false);
     ))
   )}
 </div>
+      </div>
+    </div>
+  </div>
+)}
+
+      {/* MOBILE - Buscar paciente en agenda */}
+{mostrarBuscarPacienteAgenda && (
+  <div className="lg:hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4 py-6">
+    <div className="w-full max-w-md rounded-3xl border border-cyan-300/45 bg-[#03111A]/95 overflow-hidden shadow-[0_0_46px_rgba(34,211,238,.24)]">
+      <div className="px-5 py-4 border-b border-cyan-300/20 flex items-center justify-between">
+        <h2 className="text-lg font-semibold text-white">Buscar paciente</h2>
+
+        <button
+          onClick={() => setMostrarBuscarPacienteAgenda(false)}
+          className="text-white/80 hover:text-white text-xl"
+        >
+          ✕
+        </button>
+      </div>
+
+      <div className="p-5 space-y-4">
+        <div className="relative">
+          <input
+            placeholder="Nombre y apellidos"
+            value={busquedaAgendaPaciente.nombre_paciente}
+            onFocus={() => setMostrarResultadosPacienteAgenda(true)}
+            onChange={(e) => {
+              setBusquedaAgendaPaciente({
+                ...busquedaAgendaPaciente,
+                nombre_paciente: e.target.value,
+                motivo: '',
+                detalle_motivo: '',
+              });
+              setPacienteAgendaSeleccionado(null);
+              setMostrarResultadosPacienteAgenda(true);
+              setResultadosBusquedaAgenda([]);
+            }}
+            className="w-full rounded-xl border border-cyan-400/20 bg-black/20 px-3 py-2 text-white outline-none placeholder:text-white/30 focus:border-cyan-300/50"
+          />
+
+          {mostrarResultadosPacienteAgenda && pacientesFiltradosBusquedaAgenda.length > 0 && (
+            <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-[999] max-h-52 overflow-y-auto rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
+              {pacientesFiltradosBusquedaAgenda.map((patient) => {
+                const nombreCompleto =
+                  patient.nombre_completo ||
+                  `${patient.nombre || ''} ${patient.apellidos || ''}`.trim();
+
+                return (
+                  <button
+                    key={patient.id}
+                    type="button"
+                    onClick={() => seleccionarPacienteBusquedaAgenda(patient)}
+                    className="block w-full px-4 py-2.5 text-left text-sm text-white hover:bg-cyan-500/15"
+                  >
+                    <div className="font-medium">{nombreCompleto}</div>
+                    <div className="text-xs text-cyan-100/55">
+                      {patient.telefono || 'Sin teléfono'}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        <input
+          placeholder="Teléfono"
+          value={busquedaAgendaPaciente.telefono}
+          onChange={(e) => actualizarTelefonoBusquedaAgenda(e.target.value)}
+          className="w-full rounded-xl border border-cyan-400/20 bg-black/20 px-3 py-2 text-white outline-none placeholder:text-white/30 focus:border-cyan-300/50"
+        />
+
+        <button
+          type="button"
+          onClick={buscarPacienteEnAgenda}
+          disabled={buscandoPacienteAgenda}
+          className="w-full h-[42px] flex items-center justify-center gap-2 rounded-xl border border-cyan-400/30 bg-cyan-500/10 text-cyan-100 hover:bg-cyan-500/20 hover:border-cyan-300/50 transition-all disabled:opacity-50"
+        >
+          {buscandoPacienteAgenda ? (
+            <span className="text-xs tracking-[0.12em]">BUSCANDO…</span>
+          ) : (
+            <>
+              <Search className="h-5 w-5" />
+              <span className="text-xs tracking-[0.12em]">BUSCAR CITA</span>
+            </>
+          )}
+        </button>
+
+        <div className="space-y-3 max-h-[45vh] overflow-y-auto pr-1">
+          {resultadosBusquedaAgenda.length === 0 ? (
+            <div className="rounded-2xl border border-cyan-400/20 bg-black/15 px-4 py-6 text-sm text-cyan-100/55 text-center">
+              Sin resultados
+            </div>
+          ) : (
+            resultadosBusquedaAgenda.map((resultado, index) => (
+              <div
+                key={`${resultado.event_id}-${index}`}
+                className="rounded-2xl border border-cyan-400/20 bg-black/15 p-4 space-y-3"
+              >
+                <div>
+                  <div className="text-white font-semibold">
+                    {resultado.nombre_paciente}
+                  </div>
+                  <div className="text-sm text-cyan-100/65">
+                    {resultado.telefono}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <div className="text-[10px] uppercase tracking-[0.14em] text-cyan-300 mb-1">
+                      Motivo
+                    </div>
+                    <div className="text-cyan-100/85">
+                      {resultado.motivo}
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="text-[10px] uppercase tracking-[0.14em] text-cyan-300 mb-1">
+                      Agenda
+                    </div>
+                    <div className="text-cyan-100/85">
+                      {resultado.profesional}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-sm text-cyan-100/75">
+                  {new Date(resultado.fecha_inicio).toLocaleDateString('es-ES', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                  })}
+                  {' · '}
+                  {new Date(resultado.fecha_inicio).toLocaleTimeString('es-ES', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => irACitaResultado(resultado)}
+                  className="w-full rounded-full border border-cyan-400/30 bg-cyan-500/10 px-3 py-2 text-[10px] tracking-[0.12em] text-cyan-100 hover:bg-cyan-500/20 hover:border-cyan-300/50 transition-all"
+                >
+                  IR A LA CITA
+                </button>
+              </div>
+            ))
+          )}
+        </div>
       </div>
     </div>
   </div>
