@@ -417,6 +417,7 @@ const [nuevoPaciente, setNuevoPaciente] = useState({
   const [mostrarInsertarRecall, setMostrarInsertarRecall] = useState(false);
   const [trabajosLaboratorio, setTrabajosLaboratorio] = useState<LaboratorioTrabajo[]>([]);
 const [mostrarInsertarLaboratorio, setMostrarInsertarLaboratorio] = useState(false);
+  const [trabajoLaboratorioAbiertoId, setTrabajoLaboratorioAbiertoId] = useState<string | null>(null);
 
 const [nuevoTrabajoLaboratorio, setNuevoTrabajoLaboratorio] = useState({
   paciente_id: '',
@@ -1575,8 +1576,8 @@ setMostrarAgendas(false);
       
       <div className="hidden lg:block rounded-3xl border border-cyan-500/20 bg-[rgba(5,18,24,.78)] backdrop-blur-xl overflow-hidden shadow-[0_0_35px_rgba(34,211,238,.10)]">
         <div className="bg-cyan-500/10 border-b border-cyan-500/10 px-6 py-3">
-          <div className="flex items-center justify-between gap-6">
-            <div className="relative flex items-center gap-3">
+          <div className="flex items-center justify-between gap-4">
+            <div className="relative flex items-center gap-2 shrink-0">
               <h2 className="text-[13px] tracking-[0.32em] text-cyan-300 font-semibold">
                 {agenda?.nombre.toUpperCase()}
               </h2>
@@ -1591,7 +1592,7 @@ setMostrarAgendas(false);
               <button
   type="button"
   onClick={() => setMostrarCalendarioDesktop(prev => !prev)}
-  className="text-sm text-cyan-100/70 min-w-[145px] text-center hover:text-cyan-200 transition-colors"
+  className="text-sm text-cyan-100/70 min-w-[105px] text-center hover:text-cyan-200 transition-colors"
 >
   {formatSemana(semanaInicio)}
 </button>
@@ -1644,7 +1645,7 @@ setMostrarAgendas(false);
               </button>
             </div>
 
-            <div className="flex flex-wrap items-center justify-end gap-2">
+            <div className="flex flex-wrap items-center justify-end gap-2 flex-1">
               <button
   type="button"
   onClick={() => {
@@ -1823,6 +1824,282 @@ setMostrarAgendas(false);
         </div>
       </div>
 
+{/* ---------- PANEL LABORATORIO ---------- */}
+<div className="mt-6 rounded-3xl border border-cyan-500/20 bg-[rgba(5,18,24,.78)] backdrop-blur-xl overflow-hidden shadow-[0_0_35px_rgba(34,211,238,.10)]">
+  <div className="px-5 py-4 border-b border-cyan-500/10 flex items-center justify-between">
+    <div>
+      <h2 className="text-[13px] tracking-[0.26em] text-cyan-300 font-semibold uppercase">
+        Laboratorio
+      </h2>
+      <p className="text-xs text-cyan-100/45 mt-1">
+        Trabajos asociados a pacientes
+      </p>
+    </div>
+
+    <div className="text-xs text-cyan-100/55">
+      {trabajosLaboratorio.length} trabajos
+    </div>
+  </div>
+
+  {/* DESKTOP */}
+  <div className="hidden lg:block">
+    <div className="grid grid-cols-[190px_90px_120px_280px_130px_110px_42px] gap-0 px-5 py-3 text-[10px] tracking-[0.14em] uppercase text-cyan-300 border-b border-cyan-400/15">
+      <div>Paciente</div>
+      <div>Lab.</div>
+      <div>Trabajo</div>
+      <div>Anotaciones</div>
+      <div>Estado</div>
+      <div>Fecha cita</div>
+      <div />
+    </div>
+
+    {trabajosLaboratorio.length === 0 ? (
+      <div className="px-5 py-8 text-sm text-cyan-100/50 text-center">
+        Sin trabajos de laboratorio
+      </div>
+    ) : (
+      trabajosLaboratorio.map((trabajo) => {
+        const historial = trabajo.historial || [];
+        const ultimo = historial[historial.length - 1];
+
+        return (
+          <div key={trabajo.id}>
+            <div className="grid grid-cols-[190px_90px_120px_280px_130px_110px_42px] gap-0 px-5 py-3 items-center border-b border-cyan-400/10 text-sm text-white">
+              <div className="truncate">{trabajo.nombre_paciente || '-'}</div>
+              <div className="truncate text-cyan-100/75">{trabajo.laboratorio || '-'}</div>
+              <div className="truncate text-cyan-100/85">{trabajo.trabajo || '-'}</div>
+              <div className="truncate text-cyan-100/75">{trabajo.anotaciones || '-'}</div>
+
+              <div className="flex items-center gap-2 min-w-0">
+                <span className={`h-2.5 w-2.5 rounded-full shrink-0 ${getEstadoLaboratorioDot(trabajo.estado)}`} />
+                <span className="truncate text-cyan-100/85">
+                  {getEstadoLaboratorioLabel(trabajo.estado)}
+                </span>
+              </div>
+
+              <div className="text-cyan-100/75">
+                {formatFechaLaboratorioLista(trabajo.fecha_cita)}
+              </div>
+
+              <button
+                type="button"
+                title="Consultar historial"
+                onClick={() =>
+                  setTrabajoLaboratorioAbiertoId(
+                    trabajoLaboratorioAbiertoId === trabajo.id ? null : trabajo.id
+                  )
+                }
+                className="w-8 h-8 rounded-full border border-cyan-400/25 bg-cyan-500/10 flex items-center justify-center hover:bg-cyan-500/20"
+              >
+                <ChevronDown
+                  className={`w-4 h-4 text-cyan-200 transition-transform ${
+                    trabajoLaboratorioAbiertoId === trabajo.id ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
+            </div>
+
+            {trabajoLaboratorioAbiertoId === trabajo.id && (
+              <div className="px-5 py-4 border-b border-cyan-400/10 bg-black/20">
+                <div className="grid grid-cols-[auto_auto_auto_1fr] gap-x-10 gap-y-3 text-sm">
+                  <div>
+                    <div className="text-cyan-300 text-[10px] uppercase tracking-wider mb-1 font-bold">
+                      Origen
+                    </div>
+                    <div className="text-white/90">{ultimo?.usuario || usuarioPanel}</div>
+                  </div>
+
+                  <div>
+                    <div className="text-cyan-300 text-[10px] uppercase tracking-wider mb-1 font-bold">
+                      Cambio
+                    </div>
+                    <div className="text-white/90">{ultimo?.tipo || 'Creación'}</div>
+                  </div>
+
+                  <div>
+                    <div className="text-cyan-300 text-[10px] uppercase tracking-wider mb-1 font-bold">
+                      Actualizado
+                    </div>
+                    <div className="text-white/90">
+                      {ultimo?.fecha
+                        ? `${formatFechaLaboratorioDetalle(ultimo.fecha)} · ${toInputTime(ultimo.fecha)}`
+                        : '-'}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-4 space-y-2">
+                  {historial.length === 0 ? (
+                    <div className="text-sm text-cyan-100/45">Sin historial</div>
+                  ) : (
+                    historial.map((h, index) => (
+                      <div
+                        key={`${trabajo.id}-hist-${index}`}
+                        className="rounded-2xl border border-cyan-400/15 bg-black/20 px-4 py-3 text-sm"
+                      >
+                        <div className="text-cyan-300 text-xs mb-1">
+                          {formatFechaLaboratorioDetalle(h.fecha)} · {toInputTime(h.fecha)}
+                        </div>
+                        <div className="text-white/90 font-medium">{h.tipo}</div>
+                        <div className="text-cyan-100/70 mt-1">{h.texto}</div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })
+    )}
+  </div>
+
+  {/* MÓVIL */}
+  <div className="lg:hidden">
+    <div className="grid grid-cols-[1.35fr_0.55fr_0.65fr_0.85fr] gap-2 px-4 py-3 text-[10px] tracking-[0.14em] uppercase text-cyan-300 border-b border-cyan-400/15">
+      <div>Paciente</div>
+      <div>Lab.</div>
+      <div>Fecha</div>
+      <div>Estado</div>
+    </div>
+
+    {trabajosLaboratorio.length === 0 ? (
+      <div className="px-4 py-8 text-sm text-cyan-100/50 text-center">
+        Sin trabajos
+      </div>
+    ) : (
+      trabajosLaboratorio.map((trabajo) => {
+        const historial = trabajo.historial || [];
+        const ultimo = historial[historial.length - 1];
+        const abierto = trabajoLaboratorioAbiertoId === trabajo.id;
+
+        return (
+          <div key={trabajo.id} className="border-b border-cyan-400/10 last:border-b-0">
+            <button
+              type="button"
+              onClick={() =>
+                setTrabajoLaboratorioAbiertoId(abierto ? null : trabajo.id)
+              }
+              className="w-full grid grid-cols-[1.35fr_0.55fr_0.65fr_0.85fr] gap-2 px-4 py-4 items-center text-left"
+            >
+              <div className="truncate text-white text-sm">
+                {trabajo.nombre_paciente || '-'}
+              </div>
+
+              <div className="truncate text-cyan-100/70 text-sm">
+                {trabajo.laboratorio || '-'}
+              </div>
+
+              <div className="truncate text-cyan-100/70 text-sm">
+                {formatFechaLaboratorioLista(trabajo.fecha_cita)}
+              </div>
+
+              <div className="min-w-0 flex items-center gap-1.5 rounded-full border border-cyan-400/20 bg-cyan-500/10 px-2 py-1">
+                <span className={`h-2 w-2 rounded-full shrink-0 ${getEstadoLaboratorioDot(trabajo.estado)}`} />
+                <span className="truncate text-xs text-cyan-100">
+                  {getEstadoLaboratorioLabel(trabajo.estado)}
+                </span>
+              </div>
+            </button>
+
+            {abierto && (
+              <div className="px-4 pb-4 space-y-4">
+                <div className="rounded-2xl border border-cyan-400/20 bg-black/15 p-4 space-y-4">
+                  <div>
+                    <div className="text-[10px] uppercase tracking-[0.14em] text-cyan-300 mb-1">
+                      Paciente
+                    </div>
+                    <div className="text-white font-semibold">
+                      {trabajo.nombre_paciente || '-'}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <div className="text-[10px] uppercase tracking-[0.14em] text-cyan-300 mb-1">
+                        Laboratorio
+                      </div>
+                      <div className="text-cyan-100/85">{trabajo.laboratorio || '-'}</div>
+                    </div>
+
+                    <div>
+                      <div className="text-[10px] uppercase tracking-[0.14em] text-cyan-300 mb-1">
+                        Trabajo
+                      </div>
+                      <div className="text-cyan-100/85">{trabajo.trabajo || '-'}</div>
+                    </div>
+
+                    <div>
+                      <div className="text-[10px] uppercase tracking-[0.14em] text-cyan-300 mb-1">
+                        Estado
+                      </div>
+                      <div className="flex items-center gap-2 text-cyan-100/85">
+                        <span className={`h-2.5 w-2.5 rounded-full ${getEstadoLaboratorioDot(trabajo.estado)}`} />
+                        {getEstadoLaboratorioLabel(trabajo.estado)}
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="text-[10px] uppercase tracking-[0.14em] text-cyan-300 mb-1">
+                        Fecha cita
+                      </div>
+                      <div className="text-cyan-100/85">
+                        {formatFechaLaboratorioLista(trabajo.fecha_cita)}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="text-[10px] uppercase tracking-[0.14em] text-cyan-300 mb-1">
+                      Anotaciones
+                    </div>
+                    <div className="text-cyan-100/80 whitespace-pre-wrap">
+                      {trabajo.anotaciones || '-'}
+                    </div>
+                  </div>
+
+                  <div className="border-t border-cyan-400/20 pt-3 grid grid-cols-[1fr_1fr_1fr_auto] gap-3 items-end">
+                    <div>
+                      <div className="text-cyan-300 text-[10px] uppercase tracking-wider mb-1 font-bold">
+                        Origen
+                      </div>
+                      <div className="text-white/90 text-xs">
+                        {ultimo?.usuario || usuarioPanel}
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="text-cyan-300 text-[10px] uppercase tracking-wider mb-1 font-bold">
+                        Cambio
+                      </div>
+                      <div className="text-white/90 text-xs">
+                        {ultimo?.tipo || 'Creación'}
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="text-cyan-300 text-[10px] uppercase tracking-wider mb-1 font-bold">
+                        Actualizado
+                      </div>
+                      <div className="text-white/90 text-xs">
+                        {ultimo?.fecha
+                          ? formatFechaLaboratorioDetalle(ultimo.fecha)
+                          : '-'}
+                      </div>
+                    </div>
+
+                    <ChevronDown className="w-4 h-4 text-cyan-200 opacity-70 mb-0.5" />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })
+    )}
+  </div>
+</div>
+      
       {/* ---------- MODAL BUSCAR PACIENTE DESKTOP ---------- */}
 
       {mostrarBuscarPacienteAgenda && (
