@@ -471,7 +471,7 @@ const filtered = convs.filter(c => {
     toast.success('Conversación cerrada');
   };
 
-  const crearNuevaConversacion = async () => {
+ const crearNuevaConversacion = async () => {
   if (creandoConversacion) return;
 
   const nombreCompleto = nuevoContactoConversacion.nombre_completo.trim();
@@ -491,12 +491,14 @@ const filtered = convs.filter(c => {
 
     if (!patient) {
       patient =
-        patients.find((p) =>
-          normalizarNombreConversacion(
+        patients.find((p) => {
+          const nombrePatient = normalizarNombreConversacion(
             p.nombre_completo ||
-              `${p.nombre || ''} ${p.apellidos || ''}`
-          ) === nombreNormalizado
-        ) || null;
+              `${p.nombre || ''} ${p.apellidos || ''}`.trim()
+          );
+
+          return nombrePatient === nombreNormalizado;
+        }) || null;
     }
 
     if (!patient) {
@@ -511,10 +513,13 @@ const filtered = convs.filter(c => {
       return;
     }
 
+    const nombreFinal =
+      patient.nombre_completo ||
+      `${patient.nombre || ''} ${patient.apellidos || ''}`.trim() ||
+      nombreCompleto;
+
     const nuevaConv = await crearConversacionRecepcion({
-      nombre_paciente:
-        patient.nombre_completo ||
-        `${patient.nombre || ''} ${patient.apellidos || ''}`.trim(),
+      nombre_paciente: nombreFinal,
       telefono: patient.telefono || telefono,
       paciente_id: patient.paciente_id || patient.id,
     });
@@ -528,6 +533,10 @@ const filtered = convs.filter(c => {
 
     setConvs(updated);
     setSelectedId(nuevaConv.id);
+    setPaciente(patient);
+    setNotasPaciente(patient.notas_internas || '');
+    setNotasConv('');
+
     setMostrarCrearConversacion(false);
     setMostrarListaMovil(false);
 
@@ -535,7 +544,11 @@ const filtered = convs.filter(c => {
       nombre_completo: '',
       telefono: '',
     });
+
     setPacienteSeleccionadoNuevaConv(null);
+
+    const patientsActualizados = await listPatients();
+    setPatients(patientsActualizados);
 
     toast.success('Conversación creada');
   } finally {
