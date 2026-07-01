@@ -458,6 +458,9 @@ const [nuevoRecall, setNuevoRecall] = useState({
 });
   const [mostrarTiposRecall, setMostrarTiposRecall] = useState(false);
 const [mostrarAgendaRecall, setMostrarAgendaRecall] = useState(false);
+  const [mostrarLaboratoriosLab, setMostrarLaboratoriosLab] = useState(false);
+const [mostrarTrabajosLab, setMostrarTrabajosLab] = useState(false);
+const [mostrarEstadosLab, setMostrarEstadosLab] = useState(false);
   
   const [diaMovilSeleccionado, setDiaMovilSeleccionado] = useState(() => new Date());
 const [mostrarCalendarioMovil, setMostrarCalendarioMovil] = useState(false);
@@ -3181,6 +3184,402 @@ setMostrarAgendas(false);
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+      {mostrarInsertarLaboratorio && (
+  <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm pt-[4vh]">
+    <div className="w-full max-w-3xl rounded-3xl border border-cyan-300/45 bg-[#03111A]/95 overflow-visible shadow-[0_0_46px_rgba(34,211,238,.24)]">
+      <div className="px-6 py-5 border-b border-cyan-300/20 flex items-start justify-between">
+        <div>
+          <h2 className="text-xl font-semibold text-white">
+            {nuevoTrabajoLaboratorio.nombre_paciente
+              ? `${nuevoTrabajoLaboratorio.nombre_paciente} - Laboratorio`
+              : 'Insertar trabajo'}
+          </h2>
+
+          <p className="text-cyan-200 text-sm mt-1">
+            Nuevo trabajo de laboratorio
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={guardarInsertarLaboratorio}
+            disabled={loading}
+            className="text-cyan-200 hover:text-white text-2xl disabled:opacity-50"
+          >
+            ✓
+          </button>
+
+          <button
+            onClick={() => setMostrarInsertarLaboratorio(false)}
+            className="text-white/80 hover:text-white text-xl"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <div className="p-6 space-y-5">
+        {/* DESKTOP */}
+        <div className="hidden lg:block space-y-5">
+          <div className="grid grid-cols-[1.2fr_0.8fr_0.8fr_0.8fr] gap-4">
+            <div>
+              <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
+                Paciente
+              </div>
+
+              <input
+                value={nuevoTrabajoLaboratorio.nombre_paciente}
+                readOnly
+                className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none opacity-80"
+              />
+            </div>
+
+            <div className="relative overflow-visible">
+              <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
+                Laboratorio
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setMostrarLaboratoriosLab(!mostrarLaboratoriosLab)}
+                className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-left text-white outline-none flex items-center justify-between"
+              >
+                <span>{nuevoTrabajoLaboratorio.laboratorio}</span>
+                <ChevronDown className={`w-4 h-4 text-cyan-200 transition-transform ${mostrarLaboratoriosLab ? 'rotate-180' : ''}`} />
+              </button>
+
+              {mostrarLaboratoriosLab && (
+                <div className="absolute left-0 top-[calc(100%+8px)] z-[120] w-full overflow-hidden rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
+                  {LABORATORIOS.map((lab) => (
+                    <button
+                      key={lab}
+                      type="button"
+                      onClick={() => {
+                        setNuevoTrabajoLaboratorio({
+                          ...nuevoTrabajoLaboratorio,
+                          laboratorio: lab as LaboratorioNombre,
+                        });
+                        setMostrarLaboratoriosLab(false);
+                      }}
+                      className="block w-full px-4 py-2 text-left text-sm text-white hover:bg-cyan-500/15"
+                    >
+                      {lab}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="relative overflow-visible">
+              <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
+                Trabajo
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setMostrarTrabajosLab(!mostrarTrabajosLab)}
+                className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-left text-white outline-none flex items-center justify-between"
+              >
+                <span>{nuevoTrabajoLaboratorio.trabajo}</span>
+                <ChevronDown className={`w-4 h-4 text-cyan-200 transition-transform ${mostrarTrabajosLab ? 'rotate-180' : ''}`} />
+              </button>
+
+              {mostrarTrabajosLab && (
+                <div className="absolute left-0 top-[calc(100%+8px)] z-[120] w-full overflow-hidden rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
+                  {TIPOS_TRABAJO_LABORATORIO.map((trabajo) => (
+                    <button
+                      key={trabajo}
+                      type="button"
+                      onClick={() => {
+                        setNuevoTrabajoLaboratorio({
+                          ...nuevoTrabajoLaboratorio,
+                          trabajo: trabajo as TipoTrabajoLaboratorio,
+                        });
+                        setMostrarTrabajosLab(false);
+                      }}
+                      className="block w-full px-4 py-2 text-left text-sm text-white hover:bg-cyan-500/15"
+                    >
+                      {trabajo}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="relative overflow-visible">
+              <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
+                Estado
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setMostrarEstadosLab(!mostrarEstadosLab)}
+                className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-left text-white outline-none flex items-center justify-between"
+              >
+                <span>{getEstadoLaboratorioLabel(nuevoTrabajoLaboratorio.estado)}</span>
+                <ChevronDown className={`w-4 h-4 text-cyan-200 transition-transform ${mostrarEstadosLab ? 'rotate-180' : ''}`} />
+              </button>
+
+              {mostrarEstadosLab && (
+                <div className="absolute right-0 top-[calc(100%+8px)] z-[120] w-full overflow-hidden rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
+                  {ESTADOS_LABORATORIO.map((estado) => (
+                    <button
+                      key={estado.value}
+                      type="button"
+                      onClick={() => {
+                        setNuevoTrabajoLaboratorio({
+                          ...nuevoTrabajoLaboratorio,
+                          estado: estado.value as EstadoLaboratorio,
+                        });
+                        setMostrarEstadosLab(false);
+                      }}
+                      className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-white hover:bg-cyan-500/15"
+                    >
+                      <span className={`h-2.5 w-2.5 rounded-full ${estado.dot}`} />
+                      {estado.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <div className="text-cyan-300 text-xs uppercase tracking-wider mb-2 font-bold">
+              Anotaciones
+            </div>
+
+            <textarea
+              value={nuevoTrabajoLaboratorio.anotaciones}
+              onChange={(e) =>
+                setNuevoTrabajoLaboratorio({
+                  ...nuevoTrabajoLaboratorio,
+                  anotaciones: e.target.value,
+                })
+              }
+              rows={3}
+              className="w-full rounded-2xl border border-white/25 bg-black/20 p-4 text-white resize-none outline-none"
+              placeholder="Ej. Corona 37 distal..."
+            />
+          </div>
+
+          <div className="grid grid-cols-[auto_auto_auto_1fr] gap-x-8 gap-y-3 pt-2 border-t border-white/20">
+            <div>
+              <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">
+                Origen
+              </div>
+              <div className="text-white/95 text-sm">{usuarioPanel}</div>
+            </div>
+
+            <div>
+              <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">
+                Cambio
+              </div>
+              <div className="text-white/95 text-sm">Creación</div>
+            </div>
+
+            <div>
+              <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">
+                Actualizado
+              </div>
+              <div className="text-white/95 text-sm">
+                {new Date().toLocaleDateString('es-ES', {
+                  day: 'numeric',
+                  month: 'short',
+                  year: '2-digit',
+                })} · {new Date().toLocaleTimeString('es-ES', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
+              </div>
+            </div>
+
+            <div className="justify-self-end flex items-end">
+              <ChevronDown className="w-4 h-4 text-cyan-200 opacity-50" />
+            </div>
+          </div>
+        </div>
+
+        {/* MOBILE */}
+        <div className="lg:hidden space-y-5">
+          <div>
+            <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
+              Paciente
+            </div>
+
+            <input
+              value={nuevoTrabajoLaboratorio.nombre_paciente}
+              readOnly
+              className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none opacity-80"
+            />
+          </div>
+
+          <div className="relative overflow-visible">
+            <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
+              Laboratorio
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setMostrarLaboratoriosLab(!mostrarLaboratoriosLab)}
+              className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-left text-white outline-none flex items-center justify-between"
+            >
+              <span>{nuevoTrabajoLaboratorio.laboratorio}</span>
+              <ChevronDown className={`w-4 h-4 text-cyan-200 transition-transform ${mostrarLaboratoriosLab ? 'rotate-180' : ''}`} />
+            </button>
+
+            {mostrarLaboratoriosLab && (
+              <div className="absolute left-0 top-[calc(100%+8px)] z-[120] w-full overflow-hidden rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
+                {LABORATORIOS.map((lab) => (
+                  <button
+                    key={lab}
+                    type="button"
+                    onClick={() => {
+                      setNuevoTrabajoLaboratorio({
+                        ...nuevoTrabajoLaboratorio,
+                        laboratorio: lab as LaboratorioNombre,
+                      });
+                      setMostrarLaboratoriosLab(false);
+                    }}
+                    className="block w-full px-4 py-2 text-left text-sm text-white hover:bg-cyan-500/15"
+                  >
+                    {lab}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="relative overflow-visible">
+            <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
+              Trabajo
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setMostrarTrabajosLab(!mostrarTrabajosLab)}
+              className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-left text-white outline-none flex items-center justify-between"
+            >
+              <span>{nuevoTrabajoLaboratorio.trabajo}</span>
+              <ChevronDown className={`w-4 h-4 text-cyan-200 transition-transform ${mostrarTrabajosLab ? 'rotate-180' : ''}`} />
+            </button>
+
+            {mostrarTrabajosLab && (
+              <div className="absolute left-0 top-[calc(100%+8px)] z-[120] w-full overflow-hidden rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
+                {TIPOS_TRABAJO_LABORATORIO.map((trabajo) => (
+                  <button
+                    key={trabajo}
+                    type="button"
+                    onClick={() => {
+                      setNuevoTrabajoLaboratorio({
+                        ...nuevoTrabajoLaboratorio,
+                        trabajo: trabajo as TipoTrabajoLaboratorio,
+                      });
+                      setMostrarTrabajosLab(false);
+                    }}
+                    className="block w-full px-4 py-2 text-left text-sm text-white hover:bg-cyan-500/15"
+                  >
+                    {trabajo}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="relative overflow-visible">
+            <div className="text-cyan-300 text-xs uppercase tracking-wider mb-1 font-bold">
+              Estado
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setMostrarEstadosLab(!mostrarEstadosLab)}
+              className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-left text-white outline-none flex items-center justify-between"
+            >
+              <span>{getEstadoLaboratorioLabel(nuevoTrabajoLaboratorio.estado)}</span>
+              <ChevronDown className={`w-4 h-4 text-cyan-200 transition-transform ${mostrarEstadosLab ? 'rotate-180' : ''}`} />
+            </button>
+
+            {mostrarEstadosLab && (
+              <div className="absolute left-0 top-[calc(100%+8px)] z-[120] w-full overflow-hidden rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
+                {ESTADOS_LABORATORIO.map((estado) => (
+                  <button
+                    key={estado.value}
+                    type="button"
+                    onClick={() => {
+                      setNuevoTrabajoLaboratorio({
+                        ...nuevoTrabajoLaboratorio,
+                        estado: estado.value as EstadoLaboratorio,
+                      });
+                      setMostrarEstadosLab(false);
+                    }}
+                    className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-white hover:bg-cyan-500/15"
+                  >
+                    <span className={`h-2.5 w-2.5 rounded-full ${estado.dot}`} />
+                    {estado.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div>
+            <div className="text-cyan-300 text-xs uppercase tracking-wider mb-2 font-bold">
+              Anotaciones
+            </div>
+
+            <textarea
+              value={nuevoTrabajoLaboratorio.anotaciones}
+              onChange={(e) =>
+                setNuevoTrabajoLaboratorio({
+                  ...nuevoTrabajoLaboratorio,
+                  anotaciones: e.target.value,
+                })
+              }
+              rows={4}
+              className="w-full rounded-2xl border border-white/25 bg-black/20 p-4 text-white resize-none outline-none"
+              placeholder="Ej. Corona 37 distal..."
+            />
+          </div>
+
+          <div className="pt-3 border-t border-white/20">
+            <div className="grid grid-cols-[1fr_1fr_1fr_auto] gap-3 items-end">
+              <div>
+                <div className="text-cyan-300 text-[10px] uppercase tracking-wider mb-1 font-bold">
+                  Origen
+                </div>
+                <div className="text-white/95 text-xs">{usuarioPanel}</div>
+              </div>
+
+              <div>
+                <div className="text-cyan-300 text-[10px] uppercase tracking-wider mb-1 font-bold">
+                  Cambio
+                </div>
+                <div className="text-white/95 text-xs">Creación</div>
+              </div>
+
+              <div>
+                <div className="text-cyan-300 text-[10px] uppercase tracking-wider mb-1 font-bold">
+                  Actualizado
+                </div>
+                <div className="text-white/95 text-xs">
+                  {new Date().toLocaleDateString('es-ES', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: '2-digit',
+                  })}
+                </div>
+              </div>
+
+              <ChevronDown className="w-4 h-4 text-cyan-200 opacity-50 mb-0.5" />
             </div>
           </div>
         </div>
