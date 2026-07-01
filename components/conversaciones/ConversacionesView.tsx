@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
   Search,
+  Plus,
   Save,
   Menu,
   ChevronDown,
@@ -856,15 +857,33 @@ const toggleAudioMessage = async (id: string) => {
         </div>
 
         <div className="p-4 border-b border-cyan-500/15 space-y-3">
-          <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-cyan-300/70" />
-            <Input
-              placeholder="Buscar paciente, teléfono..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="pl-9 h-11 rounded-xl bg-white/5 border-cyan-500/20 text-white placeholder:text-cyan-100/45 focus-visible:ring-cyan-400"
-            />
-          </div>
+          <div className="flex items-center gap-2">
+  <div className="relative flex-1">
+    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-cyan-300/70" />
+    <Input
+      placeholder="Buscar paciente, teléfono..."
+      value={search}
+      onChange={e => setSearch(e.target.value)}
+      className="pl-9 h-11 rounded-xl bg-white/5 border-cyan-500/20 text-white placeholder:text-cyan-100/45 focus-visible:ring-cyan-400"
+    />
+  </div>
+
+  <button
+    type="button"
+    title="Crear conversación"
+    onClick={() => {
+      setNuevoContactoConversacion({
+        nombre_completo: '',
+        telefono: '',
+      });
+      setPacienteSeleccionadoNuevaConv(null);
+      setMostrarCrearConversacion(true);
+    }}
+    className="h-11 w-11 shrink-0 rounded-xl border border-cyan-400/25 bg-cyan-500/10 text-cyan-100 hover:bg-cyan-500/20 hover:border-cyan-300/40 transition-all flex items-center justify-center"
+  >
+    <Plus className="h-5 w-5" />
+  </button>
+</div>
 
           <div className="flex mb-2">
             {filtros
