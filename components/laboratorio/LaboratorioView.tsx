@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { ChevronDown, Plus } from 'lucide-react';
+import { ChevronDown, Plus, Tooth } from 'lucide-react';
 import {
   listTrabajosLaboratorio,
   crearTrabajoLaboratorio,
@@ -29,7 +29,7 @@ type PatientOption = {
 
 const filtros: { key: FiltroLab; label: string; color: string }[] = [
   { key: 'todos', label: 'Todos', color: 'bg-amber-400' },
-  { key: 'pte_gestionar', label: 'Pte gestionar', color: 'bg-red-400' },
+  { key: 'pte_gestionar', label: 'Pte gestionar', color: 'bg-red-600' },
   { key: 'disenado', label: 'Diseñado', color: 'bg-violet-300' },
   { key: 'impreso', label: 'Impreso', color: 'bg-pink-400' },
   { key: 'fresado', label: 'Fresado', color: 'bg-cyan-300' },
@@ -38,7 +38,7 @@ const filtros: { key: FiltroLab; label: string; color: string }[] = [
   { key: 'finalizado', label: 'Finalizado', color: 'bg-green-700' },
 ];
 
-const LABORATORIOS = ['Fede', 'Juanjo', 'Alex', 'Ana', 'Otro'];
+const LABORATORIOS = ['Julio', 'Juanjo', 'Alex', 'Claudia', 'Otro'];
 
 const TIPOS_TRABAJO = [
   'Incrustación',
@@ -51,7 +51,7 @@ const TIPOS_TRABAJO = [
 
 const estadoVisual = (estado?: string | null) =>
   filtros.find((f) => f.key === estado) ||
-  { key: 'pte_gestionar', label: 'Pte gestionar', color: 'bg-red-400' };
+  { key: 'pte_gestionar', label: 'Pte gestionar', color: 'bg-red-600' };
 
 const formatFechaCorta = (iso?: string | null) => {
   if (!iso) return '-';
@@ -105,7 +105,7 @@ const LaboratorioView = () => {
     paciente_id: '',
     nombre_paciente: '',
     telefono: '',
-    laboratorio: 'Fede' as LaboratorioNombre,
+    laboratorio: 'Julio' as LaboratorioNombre,
     trabajo: 'Incrustación' as TipoTrabajoLaboratorio,
     estado: 'pte_gestionar' as EstadoLaboratorio,
     anotaciones: '',
@@ -218,7 +218,7 @@ const LaboratorioView = () => {
       paciente_id: '',
       nombre_paciente: '',
       telefono: '',
-      laboratorio: 'Fede',
+      laboratorio: 'Julio',
       trabajo: 'Incrustación',
       estado: 'pte_gestionar',
       anotaciones: '',
@@ -240,7 +240,7 @@ const LaboratorioView = () => {
       paciente_id: trabajo.paciente_id || '',
       nombre_paciente: trabajo.nombre_paciente || '',
       telefono: trabajo.telefono || '',
-      laboratorio: (trabajo.laboratorio || 'Fede') as LaboratorioNombre,
+      laboratorio: (trabajo.laboratorio || 'Julio') as LaboratorioNombre,
       trabajo: (trabajo.trabajo || 'Incrustación') as TipoTrabajoLaboratorio,
       estado: trabajo.estado || 'pte_gestionar',
       anotaciones: trabajo.anotaciones || '',
@@ -413,14 +413,14 @@ const LaboratorioView = () => {
         <div className="w-full overflow-hidden">
           <table className="w-full table-fixed text-sm">
             <colgroup>
-              <col className="w-[18%]" />
-              <col className="w-[12%]" />
-              <col className="w-[13%]" />
-              <col className="w-[27%]" />
-              <col className="w-[13%]" />
-              <col className="w-[12%]" />
-              <col className="w-[5%]" />
-            </colgroup>
+  <col className="w-[16%]" />
+  <col className="w-[10%]" />
+  <col className="w-[11%]" />
+  <col className="w-[34%]" />
+  <col className="w-[13%]" />
+  <col className="w-[11%]" />
+  <col className="w-[5%]" />
+</colgroup>
 
             <thead className="bg-cyan-500/10 text-cyan-300/75 text-xs uppercase tracking-[0.18em]">
               <tr>
