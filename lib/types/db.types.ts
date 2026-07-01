@@ -5,6 +5,9 @@ export type ModoAtencion = 'ia' | 'martina' | 'recepcion';
 export type EstadoVisualConv = 'nueva' | 'en_curso' | 'recepcion' | 'gestionada';
 export type EstadoRecordatorio = 'sin_respuesta' | 'confirmada' | 'no_podra_asistir' | 'cita_modificada' | 'cancelada_recado';
 export type EstadoRecall = 'pendiente_envio' | 'enviado' | 'quiere_cita' | 'confirmada' | 'pospuesta';
+export type EstadoLaboratorio = 'pte_gestionar' | 'disenado' | 'impreso' | 'fresado' | 'horneado' | 'en_clinica' | 'finalizado';
+export type LaboratorioNombre = 'Fede' | 'Juanjo' | 'Alex' | 'Ana' | 'Otro';
+export type TipoTrabajoLaboratorio = 'Incrustación' | 'Corona' | 'Puente' | 'Implante' | 'Férula' | 'Otro';
 export type RolMensaje = 'paciente' | 'martina' | 'recepcion' | 'sistema';
 
 export type CanalMartina = 'whatsapp' | 'llamadas';
@@ -164,4 +167,33 @@ export interface RecordatorioCita {
   fecha_inicio?: string | null;
   fecha_fin?: string | null;
   duracion_minutos?: string | number | null;
+}
+
+export interface LaboratorioTrabajo {
+  id: string;
+  created_at: string;
+  updated_at?: string | null;
+
+  paciente_id?: string | null;
+  nombre_paciente?: string | null;
+  telefono?: string | null;
+
+  laboratorio?: LaboratorioNombre | string | null;
+  trabajo?: TipoTrabajoLaboratorio | string | null;
+  estado: EstadoLaboratorio;
+
+  anotaciones?: string | null;
+  fecha_cita?: string | null;
+
+  event_id_origen?: string | null;
+  calendar_id_origen?: string | null;
+
+  ultimo_cambio?: string | null;
+
+  historial?: Array<{
+    fecha: string;
+    tipo: string;
+    texto: string;
+    usuario?: string | null;
+  }> | null;
 }
