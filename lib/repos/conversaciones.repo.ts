@@ -212,7 +212,7 @@ export async function crearConversacionRecepcion({
       ...nueva,
       id: crypto.randomUUID(),
       created_at: new Date().toISOString(),
-    } as ConversacionWhatsapp;
+    } as unknown as ConversacionWhatsapp;
 
     mockConversaciones.unshift(mock);
     return mock;
