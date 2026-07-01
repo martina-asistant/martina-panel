@@ -1301,6 +1301,23 @@ setMostrarAgendas(false);
 </div>
 
 <div className="flex gap-2 overflow-x-auto px-3 py-3 border-b border-cyan-500/10 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-300/35">
+  <button
+  type="button"
+  onClick={() => {
+    setBusquedaAgendaPaciente({
+      nombre_paciente: '',
+      telefono: '',
+      motivo: '',
+      detalle_motivo: '',
+    });
+    setResultadosBusquedaAgenda([]);
+    setMostrarBuscarPacienteAgenda(true);
+  }}
+  className="shrink-0 rounded-full border border-cyan-400/30 bg-cyan-500/10 px-3.5 py-1.5 text-[10px] tracking-[0.12em] text-cyan-100"
+>
+  BUSCAR PACIENTE
+</button>
+  
   {acciones.map((accion) => (
     <button
       key={accion}
