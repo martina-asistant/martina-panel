@@ -244,3 +244,61 @@ export async function crearPatientDesdeConversacion({
 
   return data as Patient;
 }
+
+export async function crearPatientDesdeConversacion({
+  nombre_completo,
+  telefono,
+}: {
+  nombre_completo: string;
+  telefono: string;
+}): Promise<Patient | null> {
+  const supa = createBrowserSupa();
+
+  const limpio = telefono.replace(/\D/g, '');
+
+  const partes = nombre_completo.trim().split(/\s+/);
+
+  const nombre = partes.shift() || '';
+  const apellidos = partes.join(' ');
+
+  const nuevo = {
+    nombre,
+    apellidos,
+    nombre_completo,
+    telefono: limpio,
+  };
+
+  if (!supa) {
+    const mock = {
+      ...nuevo,
+      id: crypto.randomUUID(),
+      paciente_id: crypto.randomUUID(),
+      created_at: new Date().toISOString(),
+      notas_internas: null,
+      ultima_cita_fecha: null,
+      ultima_cita_motivo: null,
+      proxima_cita_fecha: null,
+      proxima_cita_motivo: null,
+      total_citas: 0,
+      alerta_urgencia: false,
+      etiquetas: null,
+    } as unknown as Patient;
+
+    mockPatients.push(mock);
+
+    return mock;
+  }
+
+  const { data, error } = await supa
+    .from('patients')
+    .insert(nuevo)
+    .select('*')
+    .single();
+
+  if (error) {
+    console.error(error);
+    return null;
+  }
+
+  return data as Patient;
+}
