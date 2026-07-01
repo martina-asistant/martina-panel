@@ -997,6 +997,53 @@ const irACitaResultado = (resultado: any) => {
       }
     }
 
+    const guardarInsertarLaboratorio = async () => {
+  if (loading) return;
+
+  if (!nuevoTrabajoLaboratorio.nombre_paciente.trim()) {
+    console.error('Falta paciente en trabajo laboratorio');
+    return;
+  }
+
+  if (!nuevoTrabajoLaboratorio.anotaciones.trim()) {
+    console.error('Falta anotación en trabajo laboratorio');
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const trabajoCreado = await crearTrabajoLaboratorio({
+      paciente_id: nuevoTrabajoLaboratorio.paciente_id || null,
+      nombre_paciente: nuevoTrabajoLaboratorio.nombre_paciente,
+      telefono: nuevoTrabajoLaboratorio.telefono || null,
+      laboratorio: nuevoTrabajoLaboratorio.laboratorio,
+      trabajo: nuevoTrabajoLaboratorio.trabajo,
+      estado: nuevoTrabajoLaboratorio.estado,
+      anotaciones: nuevoTrabajoLaboratorio.anotaciones,
+      fecha_cita: null,
+      event_id_origen: nuevoTrabajoLaboratorio.event_id_origen || null,
+      calendar_id_origen: nuevoTrabajoLaboratorio.calendar_id_origen || null,
+      usuario: usuarioPanel,
+    });
+
+    if (!trabajoCreado) {
+      console.error('Error creando trabajo laboratorio');
+      return;
+    }
+
+    setTrabajosLaboratorio(await listTrabajosLaboratorio());
+    setMostrarInsertarLaboratorio(false);
+    setEventoActivo(null);
+    setSlotInicio(null);
+    setSlotFin(null);
+  } catch (error) {
+    console.error('Error guardando trabajo laboratorio:', error);
+  } finally {
+    setLoading(false);
+  }
+};
+
     const recallCreado = await createRecall({
       paciente_id: nuevoRecall.paciente_id || null,
       nombre_paciente: nuevoRecall.nombre_paciente,
