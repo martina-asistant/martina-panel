@@ -176,3 +176,71 @@ export async function updatePatientNotas(
 
   return data as Patient;
 }
+
+export async function listPatients(): Promise<Patient[]> {
+  const supa = createBrowserSupa();
+
+  if (!supa) {
+    return mockPatients as Patient[];
+  }
+
+  const { data, error } = await supa
+    .from('patients')
+    .select('*')
+    .order('nombre_completo', { ascending: true });
+
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  return (data || []) as Patient[];
+}
+
+export async function crearPatientDesdeConversacion({
+  nombre_completo,
+  telefono,
+}: {
+  nombre_completo: string;
+  telefono: string;
+}): Promise<Patient | null> {
+  const supa = createBrowserSupa();
+
+  const limpio = normalizePhone(telefono);
+  const partes = nombre_completo.trim().split(/\s+/);
+  const nombre = partes[0] || '';
+  const apellidos = partes.slice(1).join(' ');
+
+  const nuevo = {
+    nombre,
+    apellidos,
+    nombre_completo: nombre_completo.trim(),
+    telefono: limpio,
+  };
+
+  if (!supa) {
+    const mock = {
+      ...nuevo,
+      id: crypto.randomUUID(),
+      paciente_id: crypto.randomUUID(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    } as unknown as Patient;
+
+    mockPatients.push(mock);
+    return mock;
+  }
+
+  const { data, error } = await supa
+    .from('patients')
+    .insert(nuevo)
+    .select('*')
+    .single();
+
+  if (error) {
+    console.error('Error creando patient desde conversación:', error);
+    return null;
+  }
+
+  return data as Patient;
+}
