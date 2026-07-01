@@ -1745,13 +1745,13 @@ setMostrarAgendas(false);
         <div className="relative z-[10] rounded-2xl border border-cyan-400/20 bg-black/15 overflow-hidden max-h-[48vh] overflow-y-auto">
 
   <div className="grid grid-cols-[1.4fr_0.8fr_1fr_0.8fr_0.6fr_0.7fr_auto] gap-3 px-4 py-3 text-[10px] tracking-[0.14em] uppercase text-cyan-300 border-b border-cyan-400/15">
-    <div>Paciente</div>
-    <div>Teléfono</div>
-    <div>Motivo</div>
-    <div>Fecha</div>
-    <div>Hora</div>
-    <div>Agenda</div>
-    <div />
+    <div className="text-left">Paciente</div>
+<div className="text-left">Teléfono</div>
+<div className="text-left">Motivo</div>
+<div className="text-left">Fecha</div>
+<div className="text-left">Hora</div>
+<div className="text-left">Agenda</div>
+<div />
   </div>
 
   {resultadosBusquedaAgenda.length === 0 ? (
