@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { ChevronDown, Plus, Tooth } from 'lucide-react';
+import { ChevronDown, Plus } from 'lucide-react';
 import {
   listTrabajosLaboratorio,
   crearTrabajoLaboratorio,
