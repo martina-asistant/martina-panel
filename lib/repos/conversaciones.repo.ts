@@ -203,7 +203,6 @@ export async function crearConversacionRecepcion({
     modo_atencion: 'recepcion' as ModoAtencion,
     estado_visual: 'recepcion' as EstadoVisualConv,
     estado_cita: 'recepcion',
-    canal: 'whatsapp',
     updated_at: new Date().toISOString(),
   };
 
