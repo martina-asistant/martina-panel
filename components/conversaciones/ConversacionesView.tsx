@@ -2032,6 +2032,7 @@ return (
           </label>
 
           <Input
+            ref={nuevoNombreRef}
             value={nuevoContactoConversacion.telefono}
             disabled={Boolean(pacienteSeleccionadoNuevaConv)}
             onChange={(e) =>
