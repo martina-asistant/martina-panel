@@ -234,6 +234,7 @@ const [creandoConversacion, setCreandoConversacion] = useState(false);
   const mensajesEndRef = useRef<HTMLDivElement | null>(null);
   const mensajesScrollRef = useRef<HTMLDivElement | null>(null);
   const mensajesScrollDesktopRef = useRef<HTMLDivElement | null>(null); // nuevo para desktop
+  const nuevoNombreRef = useRef<HTMLInputElement>(null);
 
   const [grabandoAudio, setGrabandoAudio] = useState(false);
 const [enviandoAudio, setEnviandoAudio] = useState(false);
@@ -396,6 +397,16 @@ const [segundosGrabacion, setSegundosGrabacion] = useState(0);
 
   cargarPatients();
 }, []);
+
+  useEffect(() => {
+  if (!mostrarCrearConversacion) return;
+
+  const timer = setTimeout(() => {
+    nuevoNombreRef.current?.focus();
+  }, 100);
+
+  return () => clearTimeout(timer);
+}, [mostrarCrearConversacion]);
 
   const normalizarNombreConversacion = (texto?: string | null) =>
   String(texto || '')
@@ -1970,6 +1981,7 @@ return (
           </label>
 
           <Input
+            ref={nuevoNombreRef}
             value={nuevoContactoConversacion.nombre_completo}
             onChange={(e) => {
               setNuevoContactoConversacion({
