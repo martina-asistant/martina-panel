@@ -1743,7 +1743,7 @@ setMostrarAgendas(false);
         </div>
 
        <div className="relative z-[10] rounded-2xl border border-cyan-400/20 bg-black/15 overflow-hidden max-h-[48vh] overflow-y-auto">
-  <div className="grid grid-cols-[190px_110px_110px_110px_90px_110px_160px] gap-0 px-6 py-3 text-[10px] tracking-[0.14em] uppercase text-cyan-300 border-b border-cyan-400/15">
+  <div className="grid grid-cols-[180px_110px_110px_110px_90px_110px_170px] gap-0 px-6 py-3 text-[10px] tracking-[0.14em] uppercase text-cyan-300 border-b border-cyan-400/15">
     <div>Paciente</div>
     <div>Teléfono</div>
     <div>Motivo</div>
@@ -1761,7 +1761,7 @@ setMostrarAgendas(false);
     resultadosBusquedaAgenda.map((resultado, index) => (
       <div
         key={`${resultado.event_id}-${index}`}
-        className="grid grid-cols-[190px_110px_110px_110px_90px_110px_160px] gap-0 px-6 py-3 items-center border-b border-cyan-400/10 last:border-b-0 text-sm text-white"
+        className="grid grid-cols-[180px_110px_110px_110px_90px_110px_170px] gap-0 px-6 py-3 items-center border-b border-cyan-400/10 last:border-b-0 text-sm text-white"
       >
         <div className="truncate">{resultado.nombre_paciente}</div>
         <div className="text-cyan-100/75">{resultado.telefono}</div>
