@@ -35,7 +35,7 @@ const filtros: { key: FiltroLab; label: string; color: string }[] = [
   { key: 'fresado', label: 'Fresado', color: 'bg-cyan-300' },
   { key: 'horneado', label: 'Horneado', color: 'bg-blue-700' },
   { key: 'en_clinica', label: 'En clínica', color: 'bg-green-400' },
-  { key: 'finalizado', label: 'Finalizado', color: 'bg-green-700' },
+  { key: 'finalizado', label: 'Finalizado', color: 'bg-slate-300' },
 ];
 
 const LABORATORIOS = ['Julio', 'Juanjo', 'Alex', 'Claudia', 'Otro'];
