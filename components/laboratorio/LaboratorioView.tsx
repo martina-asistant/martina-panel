@@ -414,11 +414,11 @@ const LaboratorioView = () => {
           <table className="w-full table-fixed text-sm">
             <colgroup>
   <col className="w-[16%]" />
+  <col className="w-[9%]" />
   <col className="w-[10%]" />
-  <col className="w-[11%]" />
-  <col className="w-[34%]" />
-  <col className="w-[13%]" />
-  <col className="w-[11%]" />
+  <col className="w-[36%]" />
+  <col className="w-[14%]" />
+  <col className="w-[10%]" />
   <col className="w-[5%]" />
 </colgroup>
 
