@@ -465,11 +465,16 @@ const LaboratorioView = () => {
                       </td>
 
                       <td className="px-5 py-4">
-                        <span className="inline-flex min-w-[175px] items-center gap-2 px-4 py-2 rounded-full border border-cyan-500/20 bg-cyan-500/5 text-cyan-100 shadow-[0_0_12px_rgba(34,211,238,.10)]">
-                          <span className={cn('w-2.5 h-2.5 shrink-0 rounded-full shadow-[0_0_10px_currentColor]', lbl.color)} />
-                          <span className="truncate">{lbl.label}</span>
-                        </span>
-                      </td>
+  <span className="inline-flex w-[155px] items-center gap-2 px-4 py-2 rounded-full border border-cyan-500/20 bg-cyan-500/5 text-cyan-100 shadow-[0_0_12px_rgba(34,211,238,.10)]">
+    <span
+      className={cn(
+        'w-2.5 h-2.5 shrink-0 rounded-full shadow-[0_0_10px_currentColor]',
+        lbl.color
+      )}
+    />
+    <span>{lbl.label}</span>
+  </span>
+</td>
 
                       <td className="px-5 py-4 text-cyan-100/75 whitespace-nowrap">
                         {formatFechaDetalle(t.fecha_cita)}
