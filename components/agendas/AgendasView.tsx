@@ -393,6 +393,7 @@ export default function AgendasView() {
   const [modoEdicion, setModoEdicion] = useState(false);
   const [mostrarCancelar, setMostrarCancelar] = useState(false);
   const [modalCitaAbierto, setModalCitaAbierto] = useState(false);
+  const [usuarioPanel, setUsuarioPanel] = useState('panel');
   const [usuarioPanel, setUsuarioPanel] = useState<UsuarioPanel | null>(null);
   const [mostrarInsertar, setMostrarInsertar] = useState(false);
   const [nuevaCita, setNuevaCita] = useState({
@@ -1157,6 +1158,7 @@ const guardarInsertarLaboratorio = async () => {
       .single();
 
     setUsuarioPanel(data);
+    setUsuarioPanel(data?.nombre || user.email);
   };
 
   cargarUsuarioPanel();
