@@ -1242,7 +1242,10 @@ useEffect(() => {
           <div className="relative">
  <button
   type="button"
-  onClick={() => setMostrarAgendas(!mostrarAgendas)}
+  onClick={() => {
+  if (esProfesional) return;
+  setMostrarAgendas(!mostrarAgendas);
+}}
   className="flex flex-1 items-center justify-between gap-2 bg-transparent text-white text-sm font-medium outline-none"
 >
     <span>{agenda?.nombre}</span>
@@ -1306,7 +1309,10 @@ setMostrarAgendas(false);
     <div className="relative">
       <button
         type="button"
-        onClick={() => setMostrarAgendas(!mostrarAgendas)}
+        onClick={() => {
+  if (esProfesional) return;
+  setMostrarAgendas(!mostrarAgendas);
+}}
         className="flex items-center gap-2 rounded-2xl border border-cyan-400/25 bg-cyan-500/10 px-3 py-2 text-sm font-medium text-white"
       >
         <CalendarDays className="w-4 h-4 text-cyan-300" />
