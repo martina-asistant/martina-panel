@@ -104,7 +104,7 @@ const Sidebar = () => {
                 MARTINA
               </div>
 
-              <div className="text-[24px] font-semibold scale-y-[1.08] scale-x-[0.96] translate-x-[-5px] text-white leading-tight mt-1 whitespace-nowrap">
+              <div className="text-[18px] font-semibold scale-y-[1.08] scale-x-[0.96] translate-x-[-5px] text-white leading-tight mt-1 whitespace-nowrap">
                 Rambla Vilar Dental
               </div>
             </div>
