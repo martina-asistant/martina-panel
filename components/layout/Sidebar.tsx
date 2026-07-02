@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
@@ -10,11 +11,14 @@ import {
   BellRing,
   LogOut,
   CalendarDays,
-  FlaskConical
+  FlaskConical,
+  Lock
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils/cn';
 import { createClient } from '@/lib/supabase/client';
+import { getUsuarioPanelByEmail } from '@/lib/repos/usuariosPanel';
+import type { UsuarioPanel } from '@/lib/types/db.types';
 
 const nav = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -30,6 +34,39 @@ const Sidebar = () => {
   const router = useRouter();
   const avatarKey = pathname;
 
+  const [usuarioPanel, setUsuarioPanel] = useState<UsuarioPanel | null>(null);
+
+  const esProfesionalRestringido =
+    usuarioPanel?.rol === 'doctor' || usuarioPanel?.rol === 'doctora';
+
+  useEffect(() => {
+    const cargarUsuarioPanel = async () => {
+      const supa = createClient();
+      if (!supa) return;
+
+      const { data } = await supa.auth.getUser();
+      const email = data.user?.email;
+
+      if (!email) return;
+
+      const usuario = await getUsuarioPanelByEmail(email);
+      setUsuarioPanel(usuario);
+
+      if (usuario?.rol === 'doctor' || usuario?.rol === 'doctora') {
+        if (!pathname?.startsWith('/agendas')) {
+          router.replace('/agendas');
+        }
+      }
+    };
+
+    cargarUsuarioPanel();
+  }, [pathname, router]);
+
+  const puedeEntrar = (href: string) => {
+    if (!esProfesionalRestringido) return true;
+    return href === '/agendas';
+  };
+
   const cerrarSesion = async () => {
     const supa = createClient();
     if (!supa) return;
@@ -41,10 +78,10 @@ const Sidebar = () => {
 
   return (
     <header className="w-full bg-[#03111A] border-b border-cyan-500/10 px-4 py-4 lg:px-8">
-      <div className="max-w-[1500px] mx-auto">
+      <div className="max-w-[1600px] mx-auto">
         {/* DESKTOP */}
-        <div className="hidden lg:flex items-center justify-between gap-8">
-          <div className="rounded-3xl border border-cyan-400/25 bg-cyan-500/10 px-9 py-3 flex items-center gap-8 shadow-[0_0_30px_rgba(34,211,238,.10)]">
+        <div className="hidden lg:flex items-center justify-between gap-6">
+          <div className="rounded-3xl border border-cyan-400/25 bg-cyan-500/10 px-8 py-3 flex items-center gap-7 shadow-[0_0_30px_rgba(34,211,238,.10)] min-w-[390px]">
             <div
               key={avatarKey}
               className="
@@ -62,18 +99,18 @@ const Sidebar = () => {
               />
             </div>
 
-            <div>
+            <div className="min-w-[190px]">
               <div className="text-[12px] tracking-[0.38em] text-cyan-300 font-semibold">
                 MARTINA
               </div>
 
-              <div className="text-[19px] font-semibold scale-y-[1.08] scale-x-[0.96] translate-x-[-5px] text-white leading-tight mt-1">
+              <div className="text-[24px] font-semibold scale-y-[1.08] scale-x-[0.96] translate-x-[-5px] text-white leading-tight mt-1 whitespace-nowrap">
                 Rambla Vilar Dental
               </div>
             </div>
           </div>
 
-          <div className="flex flex-col items-end gap-3">
+          <div className="flex flex-col items-end gap-3 flex-1 min-w-0">
             <button
               onClick={cerrarSesion}
               className="
@@ -88,23 +125,30 @@ const Sidebar = () => {
               <span>Cerrar sesión</span>
             </button>
 
-            <nav className="flex items-center gap-3 mt-12">
+            <nav className="flex items-center justify-end gap-2 mt-12 w-full">
               {nav.map(({ href, label, icon: Icon }) => {
                 const active = pathname?.startsWith(href);
+                const permitido = puedeEntrar(href);
 
                 return (
                   <Link
                     key={href}
-                    href={href}
+                    href={permitido ? href : '#'}
+                    onClick={(e) => {
+                      if (!permitido) e.preventDefault();
+                    }}
                     className={cn(
-                      'flex items-center gap-2 px-5 py-3 rounded-2xl text-sm transition-all duration-300 border',
+                      'flex items-center gap-2 px-4 py-3 rounded-2xl text-sm transition-all duration-300 border whitespace-nowrap',
                       active
                         ? 'bg-cyan-500/15 border-cyan-400/25 text-cyan-300 shadow-[0_0_25px_rgba(34,211,238,.10)]'
-                        : 'border-transparent text-gray-400 hover:bg-white/5 hover:text-white'
+                        : 'border-transparent text-gray-400 hover:bg-white/5 hover:text-white',
+                      !permitido &&
+                        'opacity-45 cursor-not-allowed hover:bg-transparent hover:text-gray-400'
                     )}
                   >
                     <Icon className="w-4 h-4" />
                     <span>{label}</span>
+                    {!permitido && <Lock className="w-3 h-3" />}
                   </Link>
                 );
               })}
@@ -159,20 +203,26 @@ const Sidebar = () => {
           <nav className="mt-4 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {nav.map(({ href, label, icon: Icon }) => {
               const active = pathname?.startsWith(href);
+              const permitido = puedeEntrar(href);
 
               return (
                 <Link
                   key={href}
-                  href={href}
+                  href={permitido ? href : '#'}
+                  onClick={(e) => {
+                    if (!permitido) e.preventDefault();
+                  }}
                   className={cn(
                     'shrink-0 flex items-center gap-2 px-4 py-3 rounded-2xl text-sm transition-all duration-300 border',
                     active
                       ? 'bg-cyan-500/15 border-cyan-400/25 text-cyan-300 shadow-[0_0_22px_rgba(34,211,238,.12)]'
-                      : 'border-cyan-500/10 text-gray-400 bg-white/[0.03]'
+                      : 'border-cyan-500/10 text-gray-400 bg-white/[0.03]',
+                    !permitido && 'opacity-45 cursor-not-allowed'
                   )}
                 >
                   <Icon className="w-4 h-4" />
                   <span>{label}</span>
+                  {!permitido && <Lock className="w-3 h-3" />}
                 </Link>
               );
             })}
