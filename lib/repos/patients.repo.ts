@@ -15,13 +15,17 @@ export async function getPatientByPacienteId(
   const supa = createBrowserSupa();
 
   if (!supa) {
-    return mockPatients.find(p => p.paciente_id === paciente_id) || null;
+    return (
+      mockPatients.find(
+        p => p.paciente_id === paciente_id || p.id === paciente_id
+      ) || null
+    );
   }
 
   const { data, error } = await supa
     .from('patients')
     .select('*')
-    .eq('paciente_id', paciente_id)
+    .or(`paciente_id.eq.${paciente_id},id.eq.${paciente_id}`)
     .maybeSingle();
 
   if (error) {
