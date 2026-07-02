@@ -7,11 +7,12 @@ import { createClient } from '@/lib/supabase/client';
 import { createRecall } from '@/lib/repos/recalls.repo';
 import { listTrabajosLaboratorio, crearTrabajoLaboratorio } from '@/lib/repos/laboratorio.repo';
 import type { LaboratorioTrabajo, EstadoLaboratorio, LaboratorioNombre, TipoTrabajoLaboratorio } from '@/lib/types/db.types';
+import type { UsuarioPanel } from '@/lib/types/db.types';
 
 const agendas = [
-  { key: 'fede', nombre: 'Agenda Fede' },
-  { key: 'celia', nombre: 'Agenda Celia' },
-  { key: 'ana', nombre: 'Agenda Ana' },
+  { key: 'fede', nombre: 'Agenda Dr. Federico' },
+  { key: 'celia', nombre: 'Agenda Dra. Celia' },
+  { key: 'ana', nombre: 'Agenda Dra. Ana' },
 ];
 
 const acciones = ['INSERTAR CITA', 'MODIFICAR CITA', 'CANCELAR CITA', 'INSERTAR RECALL', 'INSERTAR TRABAJO'];
@@ -392,7 +393,7 @@ export default function AgendasView() {
   const [modoEdicion, setModoEdicion] = useState(false);
   const [mostrarCancelar, setMostrarCancelar] = useState(false);
   const [modalCitaAbierto, setModalCitaAbierto] = useState(false);
-  const [usuarioPanel, setUsuarioPanel] = useState('panel');
+  const [usuarioPanel, setUsuarioPanel] = useState<UsuarioPanel | null>(null);
   const [mostrarInsertar, setMostrarInsertar] = useState(false);
   const [nuevaCita, setNuevaCita] = useState({
   nombre_paciente: '',
@@ -466,6 +467,12 @@ const [mostrarEstadosLab, setMostrarEstadosLab] = useState(false);
   const [diaMovilSeleccionado, setDiaMovilSeleccionado] = useState(() => new Date());
 const [mostrarCalendarioMovil, setMostrarCalendarioMovil] = useState(false);
   const [mostrarCalendarioDesktop, setMostrarCalendarioDesktop] = useState(false);
+
+  const esProfesional =
+  usuarioPanel?.rol === 'doctor' ||
+  usuarioPanel?.rol === 'doctora';
+
+const agendaPermitida = usuarioPanel?.agenda_permitida;
     
 
   const agenda = agendas.find(a => a.key === agendaActiva);
@@ -1145,11 +1152,11 @@ const guardarInsertarLaboratorio = async () => {
 
     const { data } = await supabase
       .from('usuarios_panel')
-      .select('nombre')
+      .select('*')
       .eq('email', user.email)
       .single();
 
-    setUsuarioPanel(data?.nombre || user.email);
+    setUsuarioPanel(data);
   };
 
   cargarUsuarioPanel();
