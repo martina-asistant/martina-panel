@@ -1750,6 +1750,10 @@ useEffect(() => {
           </div>
         </div>
 
+        <div className="px-6 pt-5 pb-3 text-left text-white text-sm tracking-[0.28em] font-light">
+  {formatMes(semanaInicio).replace(' DE ', ' ')}
+</div>
+
         <div className="px-4 pb-5">
           <div className="grid grid-cols-5 gap-2">
             {diasSemana.map((dia) => (
