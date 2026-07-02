@@ -1470,7 +1470,14 @@ useEffect(() => {
   })}
 </div>
 
-<div className="flex gap-2 overflow-x-auto px-3 py-3 border-b border-cyan-500/10 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-300/35">
+<div
+  title={esProfesional ? 'Sin acceso' : undefined}
+  className={`
+    flex gap-2 overflow-x-auto px-3 py-3 border-b border-cyan-500/10
+    [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-300/35
+    ${esProfesional ? 'pointer-events-none opacity-45 blur-[0.2px] cursor-not-allowed' : ''}
+  `}
+>
   <button
   type="button"
   onClick={() => {
