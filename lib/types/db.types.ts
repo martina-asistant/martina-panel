@@ -199,8 +199,6 @@ export interface LaboratorioTrabajo {
   }> | null;
 }
 
-export type RolUsuarioPanel = 'admin' | 'doctor' |  'doctora' | 'recepcion';
-
 export interface UsuarioPanel {
   id: number;
   created_at: string;
