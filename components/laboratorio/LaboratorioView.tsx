@@ -413,13 +413,13 @@ const LaboratorioView = () => {
         <div className="w-full overflow-hidden">
           <table className="w-full table-fixed text-sm">
             <colgroup>
-  <col className="w-[14%]" />
-  <col className="w-[10%]" />
-  <col className="w-[10%]" />
-  <col className="w-[33%]" />
   <col className="w-[15%]" />
   <col className="w-[10%]" />
-  <col className="w-[8%]" />
+  <col className="w-[10%]" />
+  <col className="w-[32%]" />
+  <col className="w-[15%]" />
+  <col className="w-[10%]" />
+  <col className="w-[10%]" />
 </colgroup>
 
             <thead className="bg-cyan-500/10 text-cyan-300/75 text-xs uppercase tracking-[0.18em]">
