@@ -394,7 +394,7 @@ export default function AgendasView() {
   const [mostrarCancelar, setMostrarCancelar] = useState(false);
   const [modalCitaAbierto, setModalCitaAbierto] = useState(false);
   const [usuarioPanel, setUsuarioPanel] = useState('panel');
-  const [usuarioPanel, setUsuarioPanel] = useState<UsuarioPanel | null>(null);
+  const [datosUsuarioPanel, setDatosUsuarioPanel] = useState<UsuarioPanel | null>(null);
   const [mostrarInsertar, setMostrarInsertar] = useState(false);
   const [nuevaCita, setNuevaCita] = useState({
   nombre_paciente: '',
@@ -470,8 +470,8 @@ const [mostrarCalendarioMovil, setMostrarCalendarioMovil] = useState(false);
   const [mostrarCalendarioDesktop, setMostrarCalendarioDesktop] = useState(false);
 
   const esProfesional =
-  usuarioPanel?.rol === 'doctor' ||
-  usuarioPanel?.rol === 'doctora';
+  datosUsuarioPanel?.rol === 'doctor' ||
+  datosUsuarioPanel?.rol === 'doctora';
 
 const agendaPermitida = usuarioPanel?.agenda_permitida;
     
@@ -1157,8 +1157,8 @@ const guardarInsertarLaboratorio = async () => {
       .eq('email', user.email)
       .single();
 
-    setUsuarioPanel(data);
-    setUsuarioPanel(data?.nombre || user.email);
+    setDatosUsuarioPanel(data);
+    setUsuarioPanel(data?.nombre || user.email || 'panel');
   };
 
   cargarUsuarioPanel();
