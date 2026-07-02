@@ -416,10 +416,10 @@ const LaboratorioView = () => {
   <col className="w-[15%]" />
   <col className="w-[10%]" />
   <col className="w-[10%]" />
-  <col className="w-[32%]" />
+  <col className="w-[33%]" />
   <col className="w-[15%]" />
-  <col className="w-[10%]" />
-  <col className="w-[10%]" />
+  <col className="w-[12%]" />
+  <col className="w-[7%]" />
 </colgroup>
 
             <thead className="bg-cyan-500/10 text-cyan-300/75 text-xs uppercase tracking-[0.18em]">
