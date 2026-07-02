@@ -1628,10 +1628,6 @@ useEffect(() => {
   {formatSemana(semanaInicio)}
 </button>
 
-<div className="absolute left-0 top-[42px] text-white text-sm tracking-[0.28em] font-light">
-  {formatMes(semanaInicio).replace(' DE ', ' ')}
-</div>
-
 {mostrarCalendarioDesktop && (
   <div className="absolute top-[44px] left-1/2 z-[130] w-[310px] -translate-x-1/2 rounded-2xl border border-cyan-400/20 bg-[#03111A] px-4 py-3 shadow-[0_0_28px_rgba(34,211,238,.25)]">
     <div className="mb-2 grid grid-cols-7 gap-0.5 text-center text-[10px] uppercase tracking-[0.10em] text-cyan-300/70">
