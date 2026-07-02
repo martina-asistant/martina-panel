@@ -213,3 +213,27 @@ export interface UsuarioPanel {
   // Compatibilidad con mocks antiguos
   permisos?: string[] | null;
 }
+
+export type EstadoVisita =
+  | 'pendiente'
+  | 'sala_espera'
+  | 'en_gabinete'
+  | 'finalizada'
+  | 'no_ha_venido';
+
+export interface AgendaEstadoVisita {
+  id: string;
+  event_id: string;
+  calendar_id: string;
+
+  paciente_id: string | null;
+  nombre_paciente: string | null;
+  telefono: string | null;
+
+  estado_visita: EstadoVisita;
+
+  observaciones: string | null;
+
+  updated_at: string;
+  updated_by: string | null;
+}
