@@ -1676,7 +1676,13 @@ useEffect(() => {
               </button>
             </div>
 
-            <div className="flex flex-wrap items-center justify-end gap-2 flex-1">
+            <div
+  title={esProfesional ? 'Sin acceso' : undefined}
+  className={`
+    flex flex-wrap items-center justify-end gap-2 flex-1
+    ${esProfesional ? 'pointer-events-none opacity-45 blur-[0.2px] cursor-not-allowed' : ''}
+  `}
+>
               <button
   type="button"
   onClick={() => {
