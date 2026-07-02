@@ -199,12 +199,19 @@ export interface LaboratorioTrabajo {
   }> | null;
 }
 
+export type RolUsuarioPanel = 'admin' | 'doctora' | 'recepcion';
+
 export interface UsuarioPanel {
-  id: string;
+  id: number;
+  created_at: string;
+  nombre: string;
   email: string;
-  nombre: string | null;
-  rol: RolUsuarioPanel | null;
+  rol: RolUsuarioPanel;
+  activo: boolean;
+  avatar: string | null;
+  ultimo_acceso: string | null;
   agenda_permitida: string | null;
-  created_at?: string | null;
-  updated_at?: string | null;
+
+  // Compatibilidad con mocks antiguos
+  permisos?: string[] | null;
 }
