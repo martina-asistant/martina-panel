@@ -473,7 +473,7 @@ const [mostrarCalendarioMovil, setMostrarCalendarioMovil] = useState(false);
   datosUsuarioPanel?.rol === 'doctor' ||
   datosUsuarioPanel?.rol === 'doctora';
 
-const agendaPermitida = usuarioPanel?.agenda_permitida;
+const agendaPermitida = datosUsuarioPanel?.agenda_permitida;
     
 
   const agenda = agendas.find(a => a.key === agendaActiva);
