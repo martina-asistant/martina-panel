@@ -1609,9 +1609,9 @@ useEffect(() => {
         <div className="bg-cyan-500/10 border-b border-cyan-500/10 px-6 py-3">
           <div className="flex items-center justify-between gap-4">
             <div className="relative flex items-center gap-2 shrink-0">
-              <h2 className="text-[13px] tracking-[0.32em] text-cyan-300 font-semibold">
-                {agenda?.nombre.toUpperCase()}
-              </h2>
+              <h2 className="text-[13px] tracking-[0.18em] text-cyan-300 font-semibold whitespace-nowrap">
+  {formatMes(semanaInicio).replace(' DE ', ' ')}
+</h2>
 
               <button
                 onClick={() => setSemanaInicio(prev => addWeeks(prev, -1))}
@@ -1744,10 +1744,6 @@ useEffect(() => {
               </button>
             </div>
           </div>
-        </div>
-
-        <div className="px-6 pt-5 pb-3 text-left text-white text-sm tracking-[0.28em] font-light">
-          {formatMes(semanaInicio)}
         </div>
 
         <div className="px-4 pb-5">
