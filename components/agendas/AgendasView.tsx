@@ -1274,13 +1274,15 @@ useEffect(() => {
           key={a.key}
           type="button"
           onClick={() => {
-            const hoy = new Date();
+  if (esProfesional) return;
 
-setAgendaActiva(a.key);
-setDiaMovilSeleccionado(hoy);
-setSemanaInicio(getMonday(hoy));
-setMostrarAgendas(false);
-          }}
+  const hoy = new Date();
+
+  setAgendaActiva(a.key);
+  setDiaMovilSeleccionado(hoy);
+  setSemanaInicio(getMonday(hoy));
+  setMostrarAgendas(false);
+}}
           className={`block w-full px-4 py-2.5 text-left text-sm hover:bg-cyan-500/15 ${
             agendaActiva === a.key
               ? 'bg-cyan-500/20 text-cyan-100'
@@ -1325,14 +1327,16 @@ setMostrarAgendas(false);
             <button
               key={a.key}
               type="button"
-              onClick={() => {
-                const hoy = new Date();
+             onClick={() => {
+  if (esProfesional) return;
 
-setAgendaActiva(a.key);
-setDiaMovilSeleccionado(hoy);
-setSemanaInicio(getMonday(hoy));
-setMostrarAgendas(false);
-              }}
+  const hoy = new Date();
+
+  setAgendaActiva(a.key);
+  setDiaMovilSeleccionado(hoy);
+  setSemanaInicio(getMonday(hoy));
+  setMostrarAgendas(false);
+}}
               className={`block w-full px-4 py-2.5 text-left text-sm hover:bg-cyan-500/15 ${
                 agendaActiva === a.key ? 'bg-cyan-500/20 text-cyan-100' : 'text-white'
               }`}
