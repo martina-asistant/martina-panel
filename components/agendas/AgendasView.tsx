@@ -1609,8 +1609,8 @@ useEffect(() => {
         <div className="bg-cyan-500/10 border-b border-cyan-500/10 px-6 py-3">
           <div className="flex items-center justify-between gap-4">
             <div className="relative flex items-center gap-2 shrink-0">
-              <h2 className="text-[13px] tracking-[0.18em] text-cyan-300 font-semibold whitespace-nowrap">
-  {formatMes(semanaInicio).replace(' DE ', ' ')}
+              <h2 className="text-[13px] tracking-[0.03em] text-cyan-300 font-semibold whitespace-nowrap">
+  {agenda?.nombre.replace('Agenda ', '').toUpperCase()}
 </h2>
 
               <button
@@ -1627,6 +1627,10 @@ useEffect(() => {
 >
   {formatSemana(semanaInicio)}
 </button>
+
+<div className="absolute left-0 top-[42px] text-white text-sm tracking-[0.28em] font-light">
+  {formatMes(semanaInicio).replace(' DE ', ' ')}
+</div>
 
 {mostrarCalendarioDesktop && (
   <div className="absolute top-[44px] left-1/2 z-[130] w-[310px] -translate-x-1/2 rounded-2xl border border-cyan-400/20 bg-[#03111A] px-4 py-3 shadow-[0_0_28px_rgba(34,211,238,.25)]">
