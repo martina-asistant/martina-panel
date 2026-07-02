@@ -9,7 +9,7 @@ export type EstadoLaboratorio = 'pte_gestionar' | 'disenado' | 'impreso' | 'fres
 export type LaboratorioNombre = 'Julio' | 'Alex' | 'Juanjo' | 'Claudia' | 'Otro';
 export type TipoTrabajoLaboratorio = 'Incrustación' | 'Corona' | 'Puente' | 'Implante' | 'Férula' | 'Otro';
 export type RolMensaje = 'paciente' | 'martina' | 'recepcion' | 'sistema';
-export type RolUsuarioPanel = 'admin' | 'doctor' |'doctora' | 'recepcion';
+export type RolUsuarioPanel = 'admin' | 'doctor' | 'doctora' | 'recepcion';
 
 export type CanalMartina = 'whatsapp' | 'llamadas';
 
