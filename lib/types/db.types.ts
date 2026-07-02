@@ -9,6 +9,7 @@ export type EstadoLaboratorio = 'pte_gestionar' | 'disenado' | 'impreso' | 'fres
 export type LaboratorioNombre = 'Julio' | 'Alex' | 'Juanjo' | 'Claudia' | 'Otro';
 export type TipoTrabajoLaboratorio = 'Incrustación' | 'Corona' | 'Puente' | 'Implante' | 'Férula' | 'Otro';
 export type RolMensaje = 'paciente' | 'martina' | 'recepcion' | 'sistema';
+export type RolUsuarioPanel = 'admin' | 'doctora' | 'recepcion';
 
 export type CanalMartina = 'whatsapp' | 'llamadas';
 
@@ -196,4 +197,14 @@ export interface LaboratorioTrabajo {
     texto: string;
     usuario?: string | null;
   }> | null;
+}
+
+export interface UsuarioPanel {
+  id: string;
+  email: string;
+  nombre: string | null;
+  rol: RolUsuarioPanel | null;
+  agenda_permitida: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
 }
