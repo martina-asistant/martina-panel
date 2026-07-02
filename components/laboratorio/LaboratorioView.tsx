@@ -534,7 +534,11 @@ const LaboratorioView = () => {
                                   {formatFechaDetalle(h.fecha)} · {formatHora(h.fecha)}
                                 </div>
                                 <div className="text-white/90 font-medium">{h.tipo}</div>
-                                <div className="text-cyan-100/70 mt-1">{h.texto}</div>
+                                <div className="text-cyan-100/70 mt-1">
+  {typeof h.texto === 'string' && h.texto.trim().startsWith('{')
+    ? 'Trabajo actualizado'
+    : h.texto}
+</div>
                               </div>
                             ))}
                           </div>
@@ -811,7 +815,11 @@ const LaboratorioView = () => {
                         {formatFechaDetalle(h.fecha)} · {formatHora(h.fecha)}
                       </div>
                       <div className="text-white/90 font-medium">{h.tipo}</div>
-                      <div className="text-cyan-100/70 mt-1">{h.texto}</div>
+                      <div className="text-cyan-100/70 mt-1">
+  {typeof h.texto === 'string' && h.texto.trim().startsWith('{')
+    ? 'Trabajo actualizado'
+    : h.texto}
+</div>
                     </div>
                   ))}
                 </div>
