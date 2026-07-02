@@ -1165,6 +1165,18 @@ const guardarInsertarLaboratorio = async () => {
 }, []);
 
   useEffect(() => {
+  if (!esProfesional || !agendaPermitida) return;
+
+  if (agendaActiva !== agendaPermitida) {
+    const hoy = new Date();
+
+    setAgendaActiva(agendaPermitida);
+    setSemanaInicio(getMonday(hoy));
+    setDiaMovilSeleccionado(hoy);
+  }
+}, [esProfesional, agendaPermitida]);
+
+  useEffect(() => {
   const cargarPatients = async () => {
     const supabase = createClient();
 
