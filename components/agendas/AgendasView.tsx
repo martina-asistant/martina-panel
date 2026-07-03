@@ -1273,16 +1273,16 @@ const renderEstadoVisitaControl = (
           color: colorTexto,
         }}
         className={`
-  h-[18px]
-  w-[18px]
+  h-[16px]
+  w-[16px]
 
-  rounded-[6px]
+  rounded-[5px]
 
   border
-  border-cyan-300/40
+  border-cyan-200/60
 
-  bg-[#0D4956]
-  backdrop-blur-md
+  bg-white/5
+  backdrop-blur-sm
 
   flex
   items-center
@@ -1291,11 +1291,11 @@ const renderEstadoVisitaControl = (
   transition-all
   duration-200
 
-  shadow-[0_0_8px_rgba(34,211,238,.12)]
+  shadow-[0_0_10px_rgba(34,211,238,.20)]
 
-  hover:bg-[#146273]
-  hover:border-cyan-300/70
-  hover:shadow-[0_0_12px_rgba(34,211,238,.20)]
+  hover:bg-cyan-500/15
+  hover:border-cyan-200/80
+  hover:shadow-[0_0_14px_rgba(34,211,238,.28)]
 `}
         
       >
@@ -1308,7 +1308,7 @@ const renderEstadoVisitaControl = (
 
         <ChevronDown
           className={`
-            w-3 h-3 shrink-0
+            w-2.5 h-2.5 shrink-0
             ${meta ? 'absolute right-1' : ''}
             ${abierto ? 'rotate-180' : ''}
             transition-transform
