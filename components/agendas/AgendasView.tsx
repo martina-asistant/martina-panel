@@ -1749,7 +1749,7 @@ useEffect(() => {
     ${!bloqueado && !eventoSlot ? 'hover:bg-cyan-500/10' : ''}
   `}
 >
-  <div className={`flex items-center min-w-0 ${esInicioEvento && esUltimaLineaEvento ? 'pr-[120px]' : 'pr-1'}`}>
+  <div className="flex items-center min-w-0 pr-1">
     <span
       className={
         eventoSlot && !esBloqueoEvento
@@ -2012,7 +2012,7 @@ useEffect(() => {
     ${!bloqueado && !eventoSlot ? 'hover:bg-cyan-500/10' : ''}
   `}
 >
-  <div className={`flex items-center min-w-0 ${esInicioEvento && esUltimaLineaEvento ? 'pr-[120px]' : 'pr-1'}`}>
+  <div className="flex items-center min-w-0 pr-1">
     <span
       className={
         eventoSlot && !esBloqueoEvento
