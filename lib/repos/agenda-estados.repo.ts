@@ -72,8 +72,6 @@ async function aplicarEfectoEstadoVisita(input: UpsertEstadoVisitaInput) {
         proxima_cita_fecha: input.siguiente_cita_fecha || null,
         proxima_cita_fin: input.siguiente_cita_fin || null,
         proxima_cita_motivo: input.siguiente_cita_motivo || null,
-
-        updated_at: new Date().toISOString(),
       })
       .eq('id', patient.id);
 
@@ -87,8 +85,6 @@ async function aplicarEfectoEstadoVisita(input: UpsertEstadoVisitaInput) {
         proxima_cita_fecha: input.siguiente_cita_fecha || null,
         proxima_cita_fin: input.siguiente_cita_fin || null,
         proxima_cita_motivo: input.siguiente_cita_motivo || null,
-
-        updated_at: new Date().toISOString(),
       })
       .eq('id', patient.id);
   }
