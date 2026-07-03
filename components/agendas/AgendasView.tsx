@@ -408,6 +408,7 @@ export default function AgendasView() {
   const [semanaInicio, setSemanaInicio] = useState(() => getMonday(new Date()));
   const [eventos, setEventos] = useState<EventoAgenda[]>([]);
   const [estadosVisita, setEstadosVisita] = useState<Record<string, AgendaEstadoVisita>>({});
+  const [menuEstadoVisitaAbierto, setMenuEstadoVisitaAbierto] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [slotInicio, setSlotInicio] = useState<string | null>(null);
   const [slotFin, setSlotFin] = useState<string | null>(null);
@@ -1206,6 +1207,7 @@ const cambiarEstadoVisita = async (
 
   const key = getEventoEstadoKey(evento);
 
+  setMenuEstadoVisitaAbierto(null);
   setEstadosVisita(prev => ({
     ...prev,
     [key]: guardado,
@@ -1220,60 +1222,68 @@ const renderEstadoVisitaControl = (
   const estadoActual = estadosVisita[key]?.estado_visita || '';
   const meta = getEstadoVisitaMeta(estadoActual);
   const colorTexto = getColorTextoCita(color);
+  const abierto = menuEstadoVisitaAbierto === key;
 
   return (
     <div
-      className="absolute right-1 bottom-[2px] z-30"
+      className="absolute right-1 bottom-[2px] z-[80]"
       onClick={(e) => e.stopPropagation()}
       onDoubleClick={(e) => e.stopPropagation()}
     >
-      <div className={`relative h-[18px] ${meta ? 'min-w-[112px]' : 'w-[24px]'}`}>
-        <div
-          style={{
-            borderColor: colorTexto,
-            color: colorTexto,
-          }}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          setMenuEstadoVisitaAbierto(prev => prev === key ? null : key);
+        }}
+        style={{
+          borderColor: colorTexto,
+          color: colorTexto,
+        }}
+        className={`
+          h-[18px] rounded-full border
+          bg-black/5 backdrop-blur-sm
+          flex items-center justify-center gap-1
+          text-[9px] font-semibold leading-none
+          shadow-[0_0_8px_rgba(0,0,0,.15)]
+          ${meta ? 'min-w-[112px] px-2 pr-4' : 'w-[28px] px-0'}
+        `}
+      >
+        {meta && (
+          <>
+            <span className={`w-1.5 h-1.5 rounded-full ${meta.dot}`} />
+            <span className="truncate">{meta.label}</span>
+          </>
+        )}
+
+        <ChevronDown
           className={`
-            pointer-events-none h-[18px] rounded-full border
-            bg-black/5 backdrop-blur-sm
-            flex items-center justify-end gap-1
-            px-1.5 text-[9px] font-semibold leading-none
-            shadow-[0_0_8px_rgba(0,0,0,.15)]
-            ${meta ? 'pl-2 pr-4' : 'justify-center px-0'}
+            w-3 h-3 shrink-0
+            ${meta ? 'absolute right-1' : ''}
+            ${abierto ? 'rotate-180' : ''}
+            transition-transform
           `}
-        >
-          {meta && (
-            <>
-              <span className={`w-1.5 h-1.5 rounded-full ${meta.dot}`} />
-              <span className="truncate">{meta.label}</span>
-            </>
-          )}
+        />
+      </button>
 
-          <ChevronDown
-            className={`
-              w-3 h-3 shrink-0
-              ${meta ? 'absolute right-1' : ''}
-            `}
-          />
-        </div>
-
-        <select
-          value={estadoActual}
-          onChange={(e) => {
-            const value = e.target.value as EstadoVisita;
-            if (!value) return;
-            cambiarEstadoVisita(evento, value);
-          }}
-          className="absolute inset-0 cursor-pointer opacity-0"
-        >
-          <option value="">Estado</option>
+      {abierto && (
+        <div className="absolute right-0 top-[calc(100%+5px)] z-[200] min-w-[155px] overflow-hidden rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
           {ESTADOS_VISITA.map((estado) => (
-            <option key={estado.value} value={estado.value}>
-              {estado.label}
-            </option>
+            <button
+              key={estado.value}
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                cambiarEstadoVisita(evento, estado.value as EstadoVisita);
+              }}
+              className="flex w-full items-center gap-2 px-3 py-2 text-left text-[11px] text-white hover:bg-cyan-500/15"
+            >
+              <span className={`w-2 h-2 rounded-full ${estado.dot}`} />
+              <span>{estado.label}</span>
+            </button>
           ))}
-        </select>
-      </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -1945,7 +1955,7 @@ useEffect(() => {
               return (
                 <div
                   key={dia.toISOString()}
-                  className="rounded-2xl border border-cyan-400/10 bg-[#03111A]/70 overflow-hidden"
+                  className="rounded-2xl border border-cyan-400/10 bg-[#03111A]/70 overflow-visible"
                 >
                   {slots.map((hora) => {
                     const slotKey = `${toDateKey(dia)}|${hora}`;
