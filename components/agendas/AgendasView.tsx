@@ -6,8 +6,12 @@ import { getAgendaFede, getAgendaCelia, getAgendaAna, type EventoAgenda } from '
 import { createClient } from '@/lib/supabase/client';
 import { createRecall } from '@/lib/repos/recalls.repo';
 import { listTrabajosLaboratorio, crearTrabajoLaboratorio } from '@/lib/repos/laboratorio.repo';
-import type { LaboratorioTrabajo, EstadoLaboratorio, LaboratorioNombre, TipoTrabajoLaboratorio } from '@/lib/types/db.types';
+import type { LaboratorioTrabajo, EstadoLaboratorio, LaboratorioNombre, TipoTrabajoLaboratorio, AgendaEstadoVisita, EstadoVisita } from '@/lib/types/db.types';
 import type { UsuarioPanel } from '@/lib/types/db.types';
+import {
+  listEstadosVisita,
+  upsertEstadoVisita
+} from '@/lib/repos/agenda-estados.repo';
 
 const agendas = [
   { key: 'fede', nombre: 'Agenda Dr. Federico' },
@@ -65,6 +69,24 @@ const ESTADOS_LABORATORIO = [
   { value: 'en_clinica', label: 'En clínica', dot: 'bg-emerald-400' },
   { value: 'finalizado', label: 'Finalizado', dot: 'bg-slate-300' },
 ];
+
+const ESTADOS_VISITA = [
+  { value: 'sala_espera', label: 'Sala de espera', dot: 'bg-yellow-300' },
+  { value: 'en_gabinete', label: 'En gabinete', dot: 'bg-cyan-300' },
+  { value: 'finalizada', label: 'Finalizada', dot: 'bg-emerald-400' },
+  { value: 'no_ha_venido', label: 'No ha venido', dot: 'bg-red-500' },
+] as const;
+
+const getEstadoVisitaMeta = (estado?: string | null) =>
+  ESTADOS_VISITA.find(e => e.value === estado) || null;
+
+const getEventoEstadoKey = (evento?: EventoAgenda | null) => {
+  if (!evento?.event_id || !evento?.calendar_id) return '';
+  return `${evento.calendar_id}::${evento.event_id}`;
+};
+
+const getColorTextoCita = (color?: { text: string } | null) =>
+  color?.text?.includes('#03111A') ? '#03111A' : '#ffffff';
 
 const getEstadoLaboratorioLabel = (estado?: string | null) =>
   ESTADOS_LABORATORIO.find(e => e.value === estado)?.label || 'Pte gestionar';
@@ -385,6 +407,7 @@ export default function AgendasView() {
   const [agendaActiva, setAgendaActiva] = useState('fede');
   const [semanaInicio, setSemanaInicio] = useState(() => getMonday(new Date()));
   const [eventos, setEventos] = useState<EventoAgenda[]>([]);
+  const [estadosVisita, setEstadosVisita] = useState<Record<string, AgendaEstadoVisita>>({});
   const [loading, setLoading] = useState(false);
   const [slotInicio, setSlotInicio] = useState<string | null>(null);
   const [slotFin, setSlotFin] = useState<string | null>(null);
@@ -1134,6 +1157,142 @@ const guardarInsertarLaboratorio = async () => {
     setLoading(false);
   }
 };
+
+const cargarEstadosVisita = async () => {
+  const data = await listEstadosVisita();
+
+  const mapa = data.reduce<Record<string, AgendaEstadoVisita>>((acc, item) => {
+    acc[`${item.calendar_id}::${item.event_id}`] = item;
+    return acc;
+  }, {});
+
+  setEstadosVisita(mapa);
+};
+
+const cambiarEstadoVisita = async (
+  evento: EventoAgenda,
+  estado: EstadoVisita
+) => {
+  if (!evento?.event_id || !evento?.calendar_id || loading) return;
+
+  if (estado === 'finalizada') {
+    const ok = window.confirm(
+      '¿Marcar esta cita como finalizada? Pasará a Última cita del paciente.'
+    );
+
+    if (!ok) return;
+  }
+
+  if (estado === 'no_ha_venido') {
+    const ok = window.confirm(
+      '¿Marcar como No ha venido? Se limpiará la próxima cita, pero no pasará a Última cita.'
+    );
+
+    if (!ok) return;
+  }
+
+  const guardado = await upsertEstadoVisita({
+    event_id: evento.event_id,
+    calendar_id: evento.calendar_id,
+    paciente_id: (evento as any).paciente_id || null,
+    nombre_paciente: evento.nombre_paciente || evento.titulo || null,
+    telefono: evento.telefono || null,
+    estado_visita: estado,
+    observaciones: null,
+    updated_by: usuarioPanel,
+  });
+
+  if (!guardado) return;
+
+  const key = getEventoEstadoKey(evento);
+
+  setEstadosVisita(prev => ({
+    ...prev,
+    [key]: guardado,
+  }));
+};
+
+const renderEstadoVisitaControl = (
+  evento: EventoAgenda,
+  color: { text: string } | null
+) => {
+  const key = getEventoEstadoKey(evento);
+  const estadoActual = estadosVisita[key]?.estado_visita || '';
+  const meta = getEstadoVisitaMeta(estadoActual);
+  const colorTexto = getColorTextoCita(color);
+
+  return (
+    <div
+      className="absolute right-1 bottom-[2px] z-30"
+      onClick={(e) => e.stopPropagation()}
+      onDoubleClick={(e) => e.stopPropagation()}
+    >
+      <div className={`relative h-[18px] ${meta ? 'min-w-[112px]' : 'w-[24px]'}`}>
+        <div
+          style={{
+            borderColor: colorTexto,
+            color: colorTexto,
+          }}
+          className={`
+            pointer-events-none h-[18px] rounded-full border
+            bg-black/5 backdrop-blur-sm
+            flex items-center justify-end gap-1
+            px-1.5 text-[9px] font-semibold leading-none
+            shadow-[0_0_8px_rgba(0,0,0,.15)]
+            ${meta ? 'pl-2 pr-4' : 'justify-center px-0'}
+          `}
+        >
+          {meta && (
+            <>
+              <span className={`w-1.5 h-1.5 rounded-full ${meta.dot}`} />
+              <span className="truncate">{meta.label}</span>
+            </>
+          )}
+
+          <ChevronDown
+            className={`
+              w-3 h-3 shrink-0
+              ${meta ? 'absolute right-1' : ''}
+            `}
+          />
+        </div>
+
+        <select
+          value={estadoActual}
+          onChange={(e) => {
+            const value = e.target.value as EstadoVisita;
+            if (!value) return;
+            cambiarEstadoVisita(evento, value);
+          }}
+          className="absolute inset-0 cursor-pointer opacity-0"
+        >
+          <option value="">Estado</option>
+          {ESTADOS_VISITA.map((estado) => (
+            <option key={estado.value} value={estado.value}>
+              {estado.label}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
+  );
+};
+
+const esUltimaLineaVisibleEvento = (
+  evento: EventoAgenda | null | undefined,
+  slotFinDate: Date
+) => {
+  if (!evento) return false;
+
+  const inicioEvento = new Date(evento.fecha_inicio);
+  const finEvento = new Date(evento.fecha_fin);
+
+  const siguienteInicio = new Date(slotFinDate);
+  const siguienteFin = new Date(slotFinDate);
+  siguienteFin.setMinutes(siguienteFin.getMinutes() + 15);
+
+  return !(inicioEvento < siguienteFin && finEvento > siguienteInicio);
+};
   
   useEffect(() => {
   cargarAgenda();
@@ -1202,6 +1361,7 @@ const guardarInsertarLaboratorio = async () => {
 
   cargarPatients();
   cargarLaboratorio();
+  cargarEstadosVisita();
 }, []);
 
 useEffect(() => {
@@ -1652,7 +1812,7 @@ useEffect(() => {
 
       {getDiasMes(semanaInicio).map((dia) => {
         const activo = toDateKey(dia) === toDateKey(semanaInicio);
-
+  
         return (
           <button
             key={dia.toISOString()}
