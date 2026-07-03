@@ -114,6 +114,38 @@ export async function listEstadosVisita(): Promise<AgendaEstadoVisita[]> {
   return (data || []) as AgendaEstadoVisita[];
 }
 
+export async function deleteEstadoVisita(
+  eventId: string,
+  calendarId: string
+): Promise<boolean> {
+  const supa = createBrowserSupa();
+
+  if (!supa) {
+    const idx = mockEstadosVisita.findIndex(
+      (e) => e.event_id === eventId && e.calendar_id === calendarId
+    );
+
+    if (idx >= 0) {
+      mockEstadosVisita.splice(idx, 1);
+    }
+
+    return true;
+  }
+
+  const { error } = await supa
+    .from('agenda_estados_visita')
+    .delete()
+    .eq('event_id', eventId)
+    .eq('calendar_id', calendarId);
+
+  if (error) {
+    console.error('Error borrando estado visita:', error);
+    return false;
+  }
+
+  return true;
+}
+
 export async function upsertEstadoVisita(
   input: UpsertEstadoVisitaInput
 ): Promise<AgendaEstadoVisita | null> {
