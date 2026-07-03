@@ -1279,7 +1279,7 @@ const renderEstadoVisitaControl = (
   rounded-[5px]
 
   border
-  border-cyan-300/65
+  border-cyan-200/70
 
   bg-[#146273]/80
   backdrop-blur-sm
