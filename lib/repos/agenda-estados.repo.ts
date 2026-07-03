@@ -19,6 +19,7 @@ type UpsertEstadoVisitaInput = {
   fecha_inicio?: string | null;
   fecha_fin?: string | null;
   motivo?: string | null;
+  
   siguiente_cita_fecha?: string | null;
   siguiente_cita_fin?: string | null;
   siguiente_cita_motivo?: string | null;
