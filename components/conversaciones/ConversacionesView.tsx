@@ -1659,7 +1659,7 @@ return (
           <div>
             <div className="text-cyan-100/50 mb-1">Próxima cita</div>
             <div className="font-medium text-white">
-              {formatDate(fichaProximaCita.fecha)})}
+              {formatDate(fichaProximaCita.fecha)}
             </div>
             <div className="text-cyan-100/50">
               {fichaProximaCita.motivo || '—'}
