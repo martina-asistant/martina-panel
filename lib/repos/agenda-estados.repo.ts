@@ -15,6 +15,13 @@ type UpsertEstadoVisitaInput = {
   estado_visita: EstadoVisita;
   observaciones?: string | null;
   updated_by?: string | null;
+  
+  fecha_inicio?: string | null;
+  fecha_fin?: string | null;
+  motivo?: string | null;
+  siguiente_cita_fecha?: string | null;
+  siguiente_cita_fin?: string | null;
+  siguiente_cita_motivo?: string | null;
 };
 
 async function aplicarEfectoEstadoVisita(input: UpsertEstadoVisitaInput) {
@@ -27,77 +34,60 @@ async function aplicarEfectoEstadoVisita(input: UpsertEstadoVisitaInput) {
 
   const telefono = normalizarTelefono(input.telefono);
 
-  let query = supa.from('patients');
+  const buscarPaciente = async () => {
+    if (input.paciente_id) {
+      const { data } = await supa
+        .from('patients')
+        .select('*')
+        .or(`id.eq.${input.paciente_id},paciente_id.eq.${input.paciente_id}`)
+        .maybeSingle();
 
-  if (input.paciente_id) {
-    const { data: patient } = await supa
+      if (data) return data;
+    }
+
+    if (!telefono) return null;
+
+    const { data } = await supa
       .from('patients')
       .select('*')
-      .or(`id.eq.${input.paciente_id},paciente_id.eq.${input.paciente_id}`)
-      .maybeSingle();
+      .order('created_at', { ascending: false });
 
-    if (!patient) return;
+    return (data || []).find((p) => {
+      const t = normalizarTelefono(p.telefono);
+      return t === telefono || t.endsWith(telefono) || telefono.endsWith(t);
+    }) || null;
+  };
 
-    if (input.estado_visita === 'finalizada') {
-      await supa
-        .from('patients')
-        .update({
-          ultima_cita_fecha: patient.proxima_cita_fecha,
-          ultima_cita_motivo: patient.proxima_cita_motivo,
-          proxima_cita_fecha: null,
-          proxima_cita_fin: null,
-          proxima_cita_motivo: null,
-        })
-        .eq('id', patient.id);
-    }
-
-    if (input.estado_visita === 'no_ha_venido') {
-      await supa
-        .from('patients')
-        .update({
-          proxima_cita_fecha: null,
-          proxima_cita_fin: null,
-          proxima_cita_motivo: null,
-        })
-        .eq('id', patient.id);
-    }
-
-    return;
-  }
-
-  if (!telefono) return;
-
-  const { data: patients } = await query
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  const patient = (patients || []).find((p) => {
-    const t = normalizarTelefono(p.telefono);
-    return t === telefono || t.endsWith(telefono) || telefono.endsWith(t);
-  });
-
+  const patient = await buscarPaciente();
   if (!patient) return;
 
   if (input.estado_visita === 'finalizada') {
     await supa
       .from('patients')
       .update({
-        ultima_cita_fecha: patient.proxima_cita_fecha,
-        ultima_cita_motivo: patient.proxima_cita_motivo,
-        proxima_cita_fecha: null,
-        proxima_cita_fin: null,
-        proxima_cita_motivo: null,
+        ultima_cita_fecha: input.fecha_inicio || patient.proxima_cita_fecha || null,
+        ultima_cita_motivo: input.motivo || patient.proxima_cita_motivo || null,
+
+        proxima_cita_fecha: input.siguiente_cita_fecha || null,
+        proxima_cita_fin: input.siguiente_cita_fin || null,
+        proxima_cita_motivo: input.siguiente_cita_motivo || null,
+
+        updated_at: new Date().toISOString(),
       })
       .eq('id', patient.id);
+
+    return;
   }
 
   if (input.estado_visita === 'no_ha_venido') {
     await supa
       .from('patients')
       .update({
-        proxima_cita_fecha: null,
-        proxima_cita_fin: null,
-        proxima_cita_motivo: null,
+        proxima_cita_fecha: input.siguiente_cita_fecha || null,
+        proxima_cita_fin: input.siguiente_cita_fin || null,
+        proxima_cita_motivo: input.siguiente_cita_motivo || null,
+
+        updated_at: new Date().toISOString(),
       })
       .eq('id', patient.id);
   }
