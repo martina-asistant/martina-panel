@@ -1296,6 +1296,7 @@ const renderEstadoVisitaControl = (
   hover:bg-[#1A7B8F]
   hover:border-cyan-200
   hover:shadow-[0_0_18px_rgba(34,211,238,.40)]
+  ${meta ? 'min-w-[104px] px-2 pr-5' : 'w-[16px] px-0'}
 `}
         
       >
