@@ -1192,6 +1192,30 @@ const cambiarEstadoVisita = async (
     if (!ok) return;
   }
 
+  const telefonoEvento = normalizarTelefonoBusquedaAgenda(evento.telefono);
+const fechaEvento = new Date(evento.fecha_inicio);
+
+const siguienteCita = eventos
+  .filter((e) => {
+    if (!e.event_id || e.event_id === evento.event_id) return false;
+    if (esBloqueoAgenda(e)) return false;
+
+    const tel = normalizarTelefonoBusquedaAgenda(e.telefono);
+    if (!telefonoEvento || !tel) return false;
+
+    return (
+      tel === telefonoEvento ||
+      tel.endsWith(telefonoEvento) ||
+      telefonoEvento.endsWith(tel)
+    );
+  })
+  .filter((e) => new Date(e.fecha_inicio) > fechaEvento)
+  .sort(
+    (a, b) =>
+      new Date(a.fecha_inicio).getTime() -
+      new Date(b.fecha_inicio).getTime()
+  )[0] || null;
+
   const guardado = await upsertEstadoVisita({
     event_id: evento.event_id,
     calendar_id: evento.calendar_id,
@@ -1205,6 +1229,10 @@ const cambiarEstadoVisita = async (
     fecha_inicio: evento.fecha_inicio,
     fecha_fin: evento.fecha_fin,
     motivo: evento.motivo || null,
+    
+    siguiente_cita_fecha: siguienteCita?.fecha_inicio || null,
+    siguiente_cita_fin: siguienteCita?.fecha_fin || null,
+    siguiente_cita_motivo: siguienteCita?.motivo || null,
   });
 
   if (!guardado) return;
