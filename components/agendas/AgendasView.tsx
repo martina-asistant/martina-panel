@@ -1193,27 +1193,6 @@ const cambiarEstadoVisita = async (
     if (!ok) return;
   }
 
-  const limpiarEstadoVisita = async (evento: EventoAgenda) => {
-  if (!evento?.event_id || !evento?.calendar_id || loading) return;
-
-  const ok = await deleteEstadoVisita(
-    evento.event_id,
-    evento.calendar_id
-  );
-
-  if (!ok) return;
-
-  const key = getEventoEstadoKey(evento);
-
-  setMenuEstadoVisitaAbierto(null);
-
-  setEstadosVisita(prev => {
-    const copia = { ...prev };
-    delete copia[key];
-    return copia;
-  });
-};
-
   const telefonoEvento = normalizarTelefonoBusquedaAgenda(evento.telefono);
 const fechaEvento = new Date(evento.fecha_inicio);
 
@@ -1266,6 +1245,27 @@ const siguienteCita = eventos
     ...prev,
     [key]: guardado,
   }));
+};
+
+  const limpiarEstadoVisita = async (evento: EventoAgenda) => {
+  if (!evento?.event_id || !evento?.calendar_id || loading) return;
+
+  const ok = await deleteEstadoVisita(
+    evento.event_id,
+    evento.calendar_id
+  );
+
+  if (!ok) return;
+
+  const key = getEventoEstadoKey(evento);
+
+  setMenuEstadoVisitaAbierto(null);
+
+  setEstadosVisita(prev => {
+    const copia = { ...prev };
+    delete copia[key];
+    return copia;
+  });
 };
 
 const renderEstadoVisitaControl = (
