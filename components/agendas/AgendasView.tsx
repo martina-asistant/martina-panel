@@ -1268,10 +1268,7 @@ const renderEstadoVisitaControl = (
           e.stopPropagation();
           setMenuEstadoVisitaAbierto(prev => prev === key ? null : key);
         }}
-        style={{
-          borderColor: colorTexto,
-          color: colorTexto,
-        }}
+        
         className={`
   h-[16px]
   w-[16px]
@@ -1279,30 +1276,36 @@ const renderEstadoVisitaControl = (
   rounded-[5px]
 
   border
-  border-cyan-200/70
+  border-cyan-200/55
 
-  bg-[#146273]/80
+  bg-[#062733]/80
   backdrop-blur-sm
 
   flex
   items-center
   justify-center
 
+  text-[9px]
+  leading-none
+  text-white/95
+  font-medium
+
   transition-all
   duration-200
 
-  shadow-[0_0_12px_rgba(34,211,238,.30)]
+  shadow-[0_0_10px_rgba(34,211,238,.24)]
 
-  hover:bg-[#1A7B8F]
-  hover:border-cyan-200
-  hover:shadow-[0_0_18px_rgba(34,211,238,.40)]
-  ${meta ? 'min-w-[104px] px-2 pr-5' : 'w-[16px] px-0'}
+  hover:bg-[#0A3442]/90
+  hover:border-cyan-200/75
+  hover:shadow-[0_0_15px_rgba(34,211,238,.34)]
+  
+  ${meta ? 'min-w-[104px] px-2 pr-5 gap-1.5' : 'px-0'}
 `}
         
       >
         {meta && (
           <>
-            <span className={`w-1.5 h-1.5 rounded-full ${meta.dot}`} />
+            <span className={`w-1.5 h-1.5 rounded-full shrink-0 shadow-[0_0_8px_rgba(255,255,255,.35)] ${meta.dot}`} />
             <span className="truncate">{meta.label}</span>
           </>
         )}
