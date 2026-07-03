@@ -452,6 +452,15 @@ const esPasada = (iso?: string | null) => {
   return new Date(iso).getTime() < inicioHoy().getTime();
 };
 
+  const telefonoActualFicha = telefonoLimpioConversacion(
+  paciente?.telefono || selected?.telefono_e164 || selected?.telefono
+);
+
+const patientsMismoTelefono = patients.filter((p) => {
+  const tel = telefonoLimpioConversacion(p.telefono);
+  return tel && telefonoActualFicha && (tel === telefonoActualFicha || tel.endsWith(telefonoActualFicha) || telefonoActualFicha.endsWith(tel));
+});
+
 const fichaProximaCita = (() => {
   if (esHoyOFutura(paciente?.proxima_cita_fecha)) {
     return {
@@ -459,6 +468,16 @@ const fichaProximaCita = (() => {
       motivo: paciente?.proxima_cita_motivo || null,
     };
   }
+
+  const futurasPatients = patientsMismoTelefono
+  .filter(p => esHoyOFutura(p.proxima_cita_fecha))
+  .map(p => ({
+    fecha: p.proxima_cita_fecha || null,
+    motivo: p.proxima_cita_motivo || null,
+  }))
+  .sort((a, b) => new Date(a.fecha!).getTime() - new Date(b.fecha!).getTime());
+
+if (futurasPatients[0]) return futurasPatients[0];
 
   const candidatas = [
     {
