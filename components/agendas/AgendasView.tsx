@@ -1720,40 +1720,43 @@ useEffect(() => {
     const color = eventoSlot && !esBloqueoEvento ? getColorTratamiento(eventoSlot) : null;
     const bloqueadoAutomatico = isHorarioNoDisponible(hora, diaMovilSeleccionado, agendaActiva);
     const bloqueado = bloqueadoAutomatico || esBloqueoEvento;
+    const esUltimaLineaEvento = esUltimaLineaVisibleEvento(eventoSlot, slotFinDate);
 
-    return (
-  <button
-    key={slotKey}
-    type="button"
-    onClick={() => manejarSeleccion(slotKey, eventoSlot)}
-    onDoubleClick={() => {
-      if (eventoSlot && !esBloqueoEvento) {
-        setEventoSeleccionado(eventoSlot);
-        setModoEdicion(false);
-        setModalCitaAbierto(true);
-      }
-    }}
-    style={{
-      height: SLOT_HEIGHT,
-      backgroundColor: esBloqueoEvento
-        ? 'rgba(6,182,212,.25)'
-        : eventoSlot && !esBloqueoEvento
-          ? color?.bg
-          : undefined,
-    }}
-    className={`
-      w-full block border-b border-cyan-400/5 text-left px-2 text-[10px] transition-all
-      ${bloqueadoAutomatico ? 'bg-cyan-500/25 hover:bg-cyan-500/30' : ''}
-      ${!bloqueado && !eventoSlot ? 'hover:bg-cyan-500/10' : ''}
-    `}
-  >
+  return (
+    <div
+  key={slotKey}
+  role="button"
+  tabIndex={0}
+  onClick={() => manejarSeleccion(slotKey, eventoSlot)}
+  onDoubleClick={() => {
+    if (eventoSlot && !esBloqueoEvento) {
+      setEventoSeleccionado(eventoSlot);
+      setModoEdicion(false);
+      setModalCitaAbierto(true);
+    }
+  }}
+  style={{
+    height: SLOT_HEIGHT,
+    backgroundColor: esBloqueoEvento
+      ? 'rgba(6,182,212,.25)'
+      : eventoSlot && !esBloqueoEvento
+        ? color?.bg
+        : undefined,
+  }}
+  className={`
+    relative w-full block border-b border-cyan-400/5 text-left px-2 text-[10px] transition-all
+    ${bloqueadoAutomatico ? 'bg-cyan-500/25 hover:bg-cyan-500/30' : ''}
+    ${!bloqueado && !eventoSlot ? 'hover:bg-cyan-500/10' : ''}
+  `}
+>
+  <div className="flex items-center min-w-0 pr-[125px]">
     <span
       className={
         eventoSlot && !esBloqueoEvento
-          ? `${color?.text || 'text-white'} font-semibold`
+          ? `${color?.text || 'text-white'} font-semibold shrink-0`
           : bloqueado
-            ? 'text-white/90'
-            : 'text-white'
+            ? 'text-white/90 shrink-0'
+            : 'text-white shrink-0'
       }
     >
       {hora}
@@ -1764,8 +1767,13 @@ useEffect(() => {
         {eventoSlot.titulo || eventoSlot.nombre_paciente || 'Cita'}
       </span>
     )}
-  </button>
-);
+  </div>
+
+  {eventoSlot && !esBloqueoEvento && esUltimaLineaEvento && (
+    renderEstadoVisitaControl(eventoSlot, color)
+  )}
+</div>
+    );
   })}
 </div>
   </div>
@@ -1975,50 +1983,59 @@ useEffect(() => {
 
                     const bloqueadoAutomatico = isHorarioNoDisponible(hora, dia, agendaActiva);
                     const bloqueado = bloqueadoAutomatico || esBloqueoEvento;
+                    const esUltimaLineaEvento = esUltimaLineaVisibleEvento(eventoSlot, slotFinDate);
 
-                    return (
-                      <button
-                        key={slotKey}
-                        onClick={() => manejarSeleccion(slotKey, eventoSlot)}
-                        onDoubleClick={() => {
-                          if (eventoSlot && !esBloqueoEvento) {
-                            setEventoSeleccionado(eventoSlot);
-                            setModoEdicion(false);
-                            setModalCitaAbierto(true);
-                          }
-                        }}
-                        style={{
-                          height: SLOT_HEIGHT,
-                          backgroundColor: esBloqueoEvento
-                            ? 'rgba(6,182,212,.25)'
-                            : eventoSlot && !esBloqueoEvento
-                              ? color?.bg
-                              : undefined,
-                        }}
-                        className={`
-  w-full block border-b border-cyan-400/5 text-left px-2 text-[10px] transition-all
-  ${bloqueadoAutomatico ? 'bg-cyan-500/25 hover:bg-cyan-500/30' : ''}
-  ${!bloqueado && !eventoSlot ? 'hover:bg-cyan-500/10' : ''}
-`}
-                      >
-                        <span
-                          className={
-                            eventoSlot && !esBloqueoEvento
-                              ? `${color?.text || 'text-white'} font-semibold`
-                              : bloqueado
-                                ? 'text-white/90'
-                                : 'text-white'
-                          }
-                        >
-                          {hora}
-                        </span>
+                  return (
+                    <div
+  key={slotKey}
+  role="button"
+  tabIndex={0}
+  onClick={() => manejarSeleccion(slotKey, eventoSlot)}
+  onDoubleClick={() => {
+    if (eventoSlot && !esBloqueoEvento) {
+      setEventoSeleccionado(eventoSlot);
+      setModoEdicion(false);
+      setModalCitaAbierto(true);
+    }
+  }}
+  style={{
+    height: SLOT_HEIGHT,
+    backgroundColor: esBloqueoEvento
+      ? 'rgba(6,182,212,.25)'
+      : eventoSlot && !esBloqueoEvento
+        ? color?.bg
+        : undefined,
+  }}
+  className={`
+    relative w-full block border-b border-cyan-400/5 text-left px-2 text-[10px] transition-all
+    ${bloqueadoAutomatico ? 'bg-cyan-500/25 hover:bg-cyan-500/30' : ''}
+    ${!bloqueado && !eventoSlot ? 'hover:bg-cyan-500/10' : ''}
+  `}
+>
+  <div className="flex items-center min-w-0 pr-[125px]">
+    <span
+      className={
+        eventoSlot && !esBloqueoEvento
+          ? `${color?.text || 'text-white'} font-semibold shrink-0`
+          : bloqueado
+            ? 'text-white/90 shrink-0'
+            : 'text-white shrink-0'
+      }
+    >
+      {hora}
+    </span>
 
-                        {eventoSlot && !esBloqueoEvento && esInicioEvento && (
-                          <span className={`ml-3 text-[11px] font-semibold truncate ${color?.text || 'text-white'}`}>
-                            {eventoSlot.titulo || eventoSlot.nombre_paciente || 'Cita'}
-                          </span>
-                        )}
-                      </button>
+    {eventoSlot && !esBloqueoEvento && esInicioEvento && (
+      <span className={`ml-3 text-[11px] font-semibold truncate ${color?.text || 'text-white'}`}>
+        {eventoSlot.titulo || eventoSlot.nombre_paciente || 'Cita'}
+      </span>
+    )}
+  </div>
+
+  {eventoSlot && !esBloqueoEvento && esUltimaLineaEvento && (
+    renderEstadoVisitaControl(eventoSlot, color)
+  )}
+</div>
                     );
                   })}
                 </div>
