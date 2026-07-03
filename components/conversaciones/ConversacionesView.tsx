@@ -436,6 +436,70 @@ const pacientesFiltradosNuevaConv = useMemo(() => {
     .slice(0, 6);
 }, [patients, nuevoContactoConversacion.nombre_completo]);
 
+  const inicioHoy = () => {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
+
+const esHoyOFutura = (iso?: string | null) => {
+  if (!iso) return false;
+  return new Date(iso).getTime() >= inicioHoy().getTime();
+};
+
+const esPasada = (iso?: string | null) => {
+  if (!iso) return false;
+  return new Date(iso).getTime() < inicioHoy().getTime();
+};
+
+const fichaProximaCita = (() => {
+  if (esHoyOFutura(paciente?.proxima_cita_fecha)) {
+    return {
+      fecha: paciente?.proxima_cita_fecha || null,
+      motivo: paciente?.proxima_cita_motivo || null,
+    };
+  }
+
+  const candidatas = [
+    {
+      fecha: selected?.proxima_cita_fecha || null,
+      motivo: selected?.proxima_cita_motivo || selected?.motivo || null,
+    },
+    {
+      fecha: selected?.fecha_inicio || null,
+      motivo: selected?.motivo || null,
+    },
+  ]
+    .filter(c => esHoyOFutura(c.fecha))
+    .sort((a, b) => new Date(a.fecha!).getTime() - new Date(b.fecha!).getTime());
+
+  return candidatas[0] || { fecha: null, motivo: null };
+})();
+
+const fichaUltimaCita = (() => {
+  if (paciente?.ultima_cita_fecha) {
+    return {
+      fecha: paciente.ultima_cita_fecha,
+      motivo: paciente.ultima_cita_motivo || null,
+    };
+  }
+
+  const candidatas = [
+    {
+      fecha: selected?.ultima_cita_fecha || null,
+      motivo: selected?.ultima_cita_motivo || null,
+    },
+    {
+      fecha: selected?.fecha_inicio || null,
+      motivo: selected?.motivo || null,
+    },
+  ]
+    .filter(c => esPasada(c.fecha))
+    .sort((a, b) => new Date(b.fecha!).getTime() - new Date(a.fecha!).getTime());
+
+  return candidatas[0] || { fecha: null, motivo: null };
+})();
+
 const filtered = convs.filter(c => {
   if (filter !== 'todas' && c.estado_visual !== filter) return false;
 
@@ -1304,20 +1368,20 @@ return (
               <div>
                 <div className="text-cyan-100/50 mb-1">Última cita</div>
                 <div className="font-medium text-white">
-                  {formatDate(paciente?.ultima_cita_fecha || selected?.ultima_cita_fecha)}
+                  {formatDate(fichaUltimaCita.fecha)}
                 </div>
                 <div className="text-cyan-100/50">
-                  {paciente?.ultima_cita_motivo || selected?.ultima_cita_motivo || '—'}
+                  {fichaUltimaCita.motivo || '—'}
                 </div>
               </div>
 
               <div>
                 <div className="text-cyan-100/50 mb-1">Próxima cita</div>
                 <div className="font-medium text-white">
-                  {formatDate(paciente?.proxima_cita_fecha || selected?.proxima_cita_fecha)}
+                  {formatDate(fichaProximaCita.fecha)}
                 </div>
                 <div className="text-cyan-100/50">
-                  {paciente?.proxima_cita_motivo || selected?.proxima_cita_motivo || '—'}
+                  {fichaProximaCita.motivo || '—'}
                 </div>
               </div>
             </div>
@@ -1585,20 +1649,20 @@ return (
           <div>
             <div className="text-cyan-100/50 mb-1">Última cita</div>
             <div className="font-medium text-white">
-              {formatDate(paciente?.ultima_cita_fecha || selected?.ultima_cita_fecha)}
+              {formatDate(fichaUltimaCita.fecha)}
             </div>
             <div className="text-cyan-100/50">
-              {paciente?.ultima_cita_motivo || selected?.ultima_cita_motivo || '—'}
+              {fichaUltimaCita.motivo || '—'}
             </div>
           </div>
 
           <div>
             <div className="text-cyan-100/50 mb-1">Próxima cita</div>
             <div className="font-medium text-white">
-              {formatDate(paciente?.proxima_cita_fecha || selected?.proxima_cita_fecha)}
+              {formatDate(fichaProximaCita.fecha)})}
             </div>
             <div className="text-cyan-100/50">
-              {paciente?.proxima_cita_motivo || selected?.proxima_cita_motivo || '—'}
+              {fichaProximaCita.motivo || '—'}
             </div>
           </div>
         </div>
