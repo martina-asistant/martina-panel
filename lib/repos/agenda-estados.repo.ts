@@ -110,20 +110,15 @@ export async function listEstadosVisita(): Promise<AgendaEstadoVisita[]> {
   return (data || []) as AgendaEstadoVisita[];
 }
 
-export async function deleteEstadoVisita(input: {
-  event_id: string;
-  calendar_id: string;
-  paciente_id?: string | null;
-  telefono?: string | null;
-  fecha_inicio?: string | null;
-  fecha_fin?: string | null;
-  motivo?: string | null;
-}): Promise<boolean> {
+export async function deleteEstadoVisita(
+  eventId: string,
+  calendarId: string
+): Promise<boolean> {
   const supa = createBrowserSupa();
 
   if (!supa) {
     const idx = mockEstadosVisita.findIndex(
-      (e) => e.event_id === input.event_id && e.calendar_id === input.calendar_id
+      (e) => e.event_id === eventId && e.calendar_id === calendarId
     );
 
     if (idx >= 0) {
@@ -136,51 +131,12 @@ export async function deleteEstadoVisita(input: {
   const { error } = await supa
     .from('agenda_estados_visita')
     .delete()
-    .eq('event_id', input.event_id)
-    .eq('calendar_id', input.calendar_id);
+    .eq('event_id', eventId)
+    .eq('calendar_id', calendarId);
 
   if (error) {
     console.error('Error borrando estado visita:', error);
     return false;
-  }
-
-  const telefono = normalizarTelefono(input.telefono);
-
-  let patient: any = null;
-
-  if (input.paciente_id) {
-    const { data } = await supa
-      .from('patients')
-      .select('*')
-      .or(`id.eq.${input.paciente_id},paciente_id.eq.${input.paciente_id}`)
-      .maybeSingle();
-
-    patient = data;
-  }
-
-  if (!patient && telefono) {
-    const { data } = await supa
-      .from('patients')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    patient = (data || []).find((p) => {
-      const t = normalizarTelefono(p.telefono);
-      return t === telefono || t.endsWith(telefono) || telefono.endsWith(t);
-    }) || null;
-  }
-
-  if (patient) {
-    await supa
-      .from('patients')
-      .update({
-        ultima_cita_fecha: null,
-        ultima_cita_motivo: null,
-        proxima_cita_fecha: input.fecha_inicio || null,
-        proxima_cita_fin: input.fecha_fin || null,
-        proxima_cita_motivo: input.motivo || null,
-      })
-      .eq('id', patient.id);
   }
 
   return true;
