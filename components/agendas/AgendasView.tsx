@@ -1344,6 +1344,17 @@ const renderEstadoVisitaControl = (
 
       {abierto && (
         <div className="absolute right-0 top-[calc(100%+5px)] z-[200] min-w-[155px] overflow-hidden rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
+          <button
+  type="button"
+  onClick={(e) => {
+    e.stopPropagation();
+    limpiarEstadoVisita(evento);
+  }}
+  className="flex w-full items-center gap-2 px-3 py-2 text-left text-[11px] text-white hover:bg-cyan-500/15"
+>
+  <span className="w-2 h-2 rounded-full bg-white shadow-[0_0_6px_rgba(255,255,255,.55)]" />
+  <span>Sin estado</span>
+</button>
           {ESTADOS_VISITA.map((estado) => (
             <button
               key={estado.value}
