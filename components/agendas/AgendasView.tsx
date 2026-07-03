@@ -1245,15 +1245,15 @@ const renderEstadoVisitaControl = (
           color: colorTexto,
         }}
         className={`
-  h-[22px]
-  w-[22px]
+  h-[18px]
+  w-[18px]
 
-  rounded-[8px]
+  rounded-[6px]
 
   border
-  border-cyan-400/35
+  border-cyan-300/40
 
-  bg-[#062733]/80
+  bg-[#0D4956]
   backdrop-blur-md
 
   flex
@@ -1263,12 +1263,13 @@ const renderEstadoVisitaControl = (
   transition-all
   duration-200
 
-  shadow-[0_0_10px_rgba(34,211,238,.14)]
+  shadow-[0_0_8px_rgba(34,211,238,.12)]
 
-  hover:bg-[#0A3442]
-  hover:border-cyan-300/60
-  hover:shadow-[0_0_14px_rgba(34,211,238,.22)]
+  hover:bg-[#146273]
+  hover:border-cyan-300/70
+  hover:shadow-[0_0_12px_rgba(34,211,238,.20)]
 `}
+        
       >
         {meta && (
           <>
