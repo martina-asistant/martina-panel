@@ -1250,10 +1250,15 @@ const siguienteCita = eventos
   const limpiarEstadoVisita = async (evento: EventoAgenda) => {
   if (!evento?.event_id || !evento?.calendar_id || loading) return;
 
-  const ok = await deleteEstadoVisita(
-    evento.event_id,
-    evento.calendar_id
-  );
+  const ok = await deleteEstadoVisita({
+  event_id: evento.event_id,
+  calendar_id: evento.calendar_id,
+  paciente_id: (evento as any).paciente_id || null,
+  telefono: evento.telefono || null,
+  fecha_inicio: evento.fecha_inicio,
+  fecha_fin: evento.fecha_fin,
+  motivo: evento.motivo || null,
+});
 
   if (!ok) return;
 
