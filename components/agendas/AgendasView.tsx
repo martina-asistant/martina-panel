@@ -1201,6 +1201,10 @@ const cambiarEstadoVisita = async (
     estado_visita: estado,
     observaciones: null,
     updated_by: usuarioPanel,
+    
+    fecha_inicio: evento.fecha_inicio,
+    fecha_fin: evento.fecha_fin,
+    motivo: evento.motivo || null,
   });
 
   if (!guardado) return;
