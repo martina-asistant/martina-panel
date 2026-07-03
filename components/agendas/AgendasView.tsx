@@ -1241,13 +1241,30 @@ const renderEstadoVisitaControl = (
           color: colorTexto,
         }}
         className={`
-          h-[18px] rounded-full border
-          bg-black/5 backdrop-blur-sm
-          flex items-center justify-center gap-1
-          text-[9px] font-semibold leading-none
-          shadow-[0_0_8px_rgba(0,0,0,.15)]
-          ${meta ? 'min-w-[112px] px-2 pr-4' : 'w-[28px] px-0'}
-        `}
+  h-[22px]
+  w-[22px]
+
+  rounded-[8px]
+
+  border
+  border-cyan-400/35
+
+  bg-[#062733]/80
+  backdrop-blur-md
+
+  flex
+  items-center
+  justify-center
+
+  transition-all
+  duration-200
+
+  shadow-[0_0_10px_rgba(34,211,238,.14)]
+
+  hover:bg-[#0A3442]
+  hover:border-cyan-300/60
+  hover:shadow-[0_0_14px_rgba(34,211,238,.22)]
+`}
       >
         {meta && (
           <>
