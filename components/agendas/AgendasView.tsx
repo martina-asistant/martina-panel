@@ -1279,9 +1279,9 @@ const renderEstadoVisitaControl = (
   rounded-[5px]
 
   border
-  border-cyan-200/60
+  border-cyan-300/65
 
-  bg-white/5
+  bg-[#146273]/80
   backdrop-blur-sm
 
   flex
@@ -1291,11 +1291,11 @@ const renderEstadoVisitaControl = (
   transition-all
   duration-200
 
-  shadow-[0_0_10px_rgba(34,211,238,.20)]
+  shadow-[0_0_12px_rgba(34,211,238,.30)]
 
-  hover:bg-cyan-500/15
-  hover:border-cyan-200/80
-  hover:shadow-[0_0_14px_rgba(34,211,238,.28)]
+  hover:bg-[#1A7B8F]
+  hover:border-cyan-200
+  hover:shadow-[0_0_18px_rgba(34,211,238,.40)]
 `}
         
       >
