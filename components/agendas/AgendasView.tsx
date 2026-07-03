@@ -10,7 +10,8 @@ import type { LaboratorioTrabajo, EstadoLaboratorio, LaboratorioNombre, TipoTrab
 import type { UsuarioPanel } from '@/lib/types/db.types';
 import {
   listEstadosVisita,
-  upsertEstadoVisita
+  upsertEstadoVisita,
+  deleteEstadoVisita
 } from '@/lib/repos/agenda-estados.repo';
 
 const agendas = [
