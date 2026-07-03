@@ -1299,14 +1299,14 @@ const renderEstadoVisitaControl = (
   hover:border-cyan-200/75
   hover:shadow-[0_0_15px_rgba(34,211,238,.34)]
   
-  ${meta ? 'min-w-[104px] px-2 pr-5 gap-1.5' : 'px-0'}
+  ${meta ? 'min-w-[86px] max-w-[96px] px-1.5 pr-4 gap-1' : 'px-0'}
 `}
         
       >
         {meta && (
           <>
             <span className={`w-1.5 h-1.5 rounded-full shrink-0 shadow-[0_0_8px_rgba(255,255,255,.35)] ${meta.dot}`} />
-            <span className="truncate">{meta.label}</span>
+            <span className="truncate tracking-[0.02em]">{meta.label}</span>
           </>
         )}
 
