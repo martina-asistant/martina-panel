@@ -1184,21 +1184,29 @@ const cambiarEstadoVisita = async (
 ) => {
   if (!evento?.event_id || !evento?.calendar_id || loading) return;
 
-  if (estado === 'finalizada') {
-    const ok = window.confirm(
-      '¿Marcar esta cita como finalizada? Pasará a Última cita del paciente.'
-    );
+  const esCitaPasada =
+  new Date(evento.fecha_fin || evento.fecha_inicio) < new Date();
 
-    if (!ok) return;
-  }
+const requiereConfirmacion =
+  estado === 'finalizada' ||
+  estado === 'no_ha_venido';
 
-  if (estado === 'no_ha_venido') {
-    const ok = window.confirm(
-      '¿Marcar como No ha venido? Se limpiará la próxima cita, pero no pasará a Última cita.'
-    );
+if (requiereConfirmacion) {
+  setConfirmarEstadoVisita({
+    evento,
+    estado,
+    titulo: esCitaPasada
+      ? 'Vas a modificar una cita pasada'
+      : estado === 'finalizada'
+        ? 'Vas a cambiar el estado de esta cita a Finalizada'
+        : 'Vas a cambiar el estado de esta cita a No ha venido',
+    texto: '¿Deseas continuar?',
+    textoBoton: esCitaPasada ? 'Sí, modificar' : 'Sí, cambiar estado',
+  });
 
-    if (!ok) return;
-  }
+  setMenuEstadoVisitaAbierto(null);
+  return;
+}
 
   const telefonoEvento = normalizarTelefonoBusquedaAgenda(evento.telefono);
 const fechaEvento = new Date(evento.fecha_inicio);
