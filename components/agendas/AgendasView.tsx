@@ -139,6 +139,9 @@ const normalizarTexto = (texto: string) =>
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '');
 
+const formatTextoCitaAgenda = (texto?: string | null) =>
+  String(texto || '').replace(/\bLimpieza\b/gi, 'Profilaxis');
+
 const getTratamientoValue = (motivo: string) => {
   const normalizado = normalizarTexto(motivo || '');
 
@@ -1922,7 +1925,7 @@ useEffect(() => {
 
     {eventoSlot && !esBloqueoEvento && esInicioEvento && (
       <span className={`ml-3 text-[11px] font-semibold truncate ${color?.text || 'text-white'}`}>
-        {eventoSlot.titulo || eventoSlot.nombre_paciente || 'Cita'}
+        {formatTextoCitaAgenda(eventoSlot.titulo || eventoSlot.nombre_paciente || 'Cita')}
       </span>
     )}
   </div>
@@ -2175,7 +2178,7 @@ useEffect(() => {
 
     {eventoSlot && !esBloqueoEvento && esInicioEvento && (
       <span className={`ml-3 text-[11px] font-semibold truncate ${color?.text || 'text-white'}`}>
-        {eventoSlot.titulo || eventoSlot.nombre_paciente || 'Cita'}
+        {formatTextoCitaAgenda(eventoSlot.titulo || eventoSlot.nombre_paciente || 'Cita')}
       </span>
     )}
   </div>
