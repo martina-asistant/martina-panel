@@ -1895,9 +1895,7 @@ useEffect(() => {
   }}
   style={{
     height: SLOT_HEIGHT,
-    backgroundColor: seleccionado && (!eventoSlot || esBloqueoEvento)
-    ? 'rgba(34,211,238,.34)'
-    : esBloqueoEvento
+    backgroundColor: esBloqueoEvento
       ? 'rgba(6,182,212,.25)'
       : eventoSlot && !esBloqueoEvento
         ? color?.bg
@@ -2148,9 +2146,7 @@ useEffect(() => {
   }}
   style={{
     height: SLOT_HEIGHT,
-    backgroundColor: seleccionado && (!eventoSlot || esBloqueoEvento)
-    ? 'rgba(34,211,238,.34)'
-    : esBloqueoEvento
+    backgroundColor: esBloqueoEvento
       ? 'rgba(6,182,212,.25)'
       : eventoSlot && !esBloqueoEvento
         ? color?.bg
