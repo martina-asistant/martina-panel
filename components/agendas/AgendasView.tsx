@@ -464,6 +464,7 @@ const [nuevoTrabajoLaboratorio, setNuevoTrabajoLaboratorio] = useState({
   trabajo: 'Incrustación' as TipoTrabajoLaboratorio,
   estado: 'pte_gestionar' as EstadoLaboratorio,
   anotaciones: '',
+  piezas: '',
   fecha_cita: '',
   event_id_origen: '',
   calendar_id_origen: '',
@@ -893,6 +894,7 @@ setNuevoPaciente({
     telefono: eventoActivo.telefono || '',
     laboratorio: 'Julio',
     trabajo: 'Incrustación',
+    piezas: '',
     estado: 'pte_gestionar',
     anotaciones: '',
     fecha_cita:
@@ -1179,6 +1181,7 @@ const guardarInsertarLaboratorio = async () => {
       telefono: nuevoTrabajoLaboratorio.telefono || null,
       laboratorio: nuevoTrabajoLaboratorio.laboratorio,
       trabajo: nuevoTrabajoLaboratorio.trabajo,
+      piezas: nuevoTrabajoLaboratorio.piezas,
       estado: nuevoTrabajoLaboratorio.estado,
       anotaciones: nuevoTrabajoLaboratorio.anotaciones,
       fecha_cita: nuevoTrabajoLaboratorio.fecha_cita || null,
@@ -3745,6 +3748,24 @@ useEffect(() => {
             </div>
           </div>
 
+<div>
+  <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-300">
+    Piezas
+  </label>
+
+  <input
+    value={nuevoTrabajoLaboratorio.piezas}
+    onChange={(e) =>
+      setNuevoTrabajoLaboratorio(prev => ({
+        ...prev,
+        piezas: e.target.value,
+      }))
+    }
+    placeholder="Ej: 13-23"
+    className="w-full rounded-xl border border-cyan-400/20 bg-[#04141D] px-3 py-2 text-white outline-none focus:border-cyan-400"
+  />
+</div>
+          
           <div>
             <div className="text-cyan-300 text-xs uppercase tracking-wider mb-2 font-bold">
               Anotaciones
@@ -3924,6 +3945,24 @@ useEffect(() => {
             )}
           </div>
 
+<div>
+  <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-cyan-300">
+    Piezas
+  </label>
+
+  <input
+    value={nuevoTrabajoLaboratorio.piezas}
+    onChange={(e) =>
+      setNuevoTrabajoLaboratorio(prev => ({
+        ...prev,
+        piezas: e.target.value,
+      }))
+    }
+    placeholder="Ej: 13-23"
+    className="w-full rounded-xl border border-cyan-400/20 bg-[#04141D] px-3 py-2 text-white outline-none focus:border-cyan-400"
+  />
+</div>
+          
           <div>
             <div className="text-cyan-300 text-xs uppercase tracking-wider mb-2 font-bold">
               Anotaciones
