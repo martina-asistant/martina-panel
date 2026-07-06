@@ -545,6 +545,18 @@ const diasMesMovil = useMemo(
     return { inicioKey, finKey, inicio, fin };
   };
 
+  const esSlotSeleccionado = (slotKey: string) => {
+  if (!slotInicio) return false;
+
+  if (!slotFin) {
+    return slotKey === slotInicio;
+  }
+
+  const [inicio, fin] = [slotInicio, slotFin].sort();
+
+  return slotKey >= inicio && slotKey <= fin;
+};
+
   const bloqueoSeleccionado = (() => {
     const rango = getRangoSeleccionado();
 
@@ -1863,6 +1875,7 @@ useEffect(() => {
     const bloqueadoAutomatico = isHorarioNoDisponible(hora, diaMovilSeleccionado, agendaActiva);
     const bloqueado = bloqueadoAutomatico || esBloqueoEvento;
     const esUltimaLineaEvento = esUltimaLineaVisibleEvento(eventoSlot, slotFinDate);
+    const seleccionado = esSlotSeleccionado(slotKey);
 
   return (
     <div
@@ -1879,7 +1892,9 @@ useEffect(() => {
   }}
   style={{
     height: SLOT_HEIGHT,
-    backgroundColor: esBloqueoEvento
+    backgroundColor: seleccionado && (!eventoSlot || esBloqueoEvento)
+    ? 'rgba(34,211,238,.34)'
+    : esBloqueoEvento
       ? 'rgba(6,182,212,.25)'
       : eventoSlot && !esBloqueoEvento
         ? color?.bg
@@ -1887,6 +1902,7 @@ useEffect(() => {
   }}
   className={`
     relative w-full block border-b border-cyan-400/5 text-left px-2 text-[10px] transition-all
+    ${seleccionado ? 'ring-1 ring-cyan-200/80 shadow-[inset_0_0_0_1px_rgba(165,243,252,.65),0_0_14px_rgba(34,211,238,.25)]' : ''}
     ${bloqueadoAutomatico ? 'bg-cyan-500/25 hover:bg-cyan-500/30' : ''}
     ${!bloqueado && !eventoSlot ? 'hover:bg-cyan-500/10' : ''}
   `}
@@ -2126,6 +2142,7 @@ useEffect(() => {
                     const bloqueadoAutomatico = isHorarioNoDisponible(hora, dia, agendaActiva);
                     const bloqueado = bloqueadoAutomatico || esBloqueoEvento;
                     const esUltimaLineaEvento = esUltimaLineaVisibleEvento(eventoSlot, slotFinDate);
+                  const seleccionado = esSlotSeleccionado(slotKey);
 
                   return (
                     <div
@@ -2142,7 +2159,9 @@ useEffect(() => {
   }}
   style={{
     height: SLOT_HEIGHT,
-    backgroundColor: esBloqueoEvento
+    backgroundColor: seleccionado && (!eventoSlot || esBloqueoEvento)
+    ? 'rgba(34,211,238,.34)'
+    : esBloqueoEvento
       ? 'rgba(6,182,212,.25)'
       : eventoSlot && !esBloqueoEvento
         ? color?.bg
@@ -2150,6 +2169,7 @@ useEffect(() => {
   }}
   className={`
     relative w-full block border-b border-cyan-400/5 text-left px-2 text-[10px] transition-all
+    ${seleccionado ? 'ring-1 ring-cyan-200/80 shadow-[inset_0_0_0_1px_rgba(165,243,252,.65),0_0_14px_rgba(34,211,238,.25)]' : ''}
     ${bloqueadoAutomatico ? 'bg-cyan-500/25 hover:bg-cyan-500/30' : ''}
     ${!bloqueado && !eventoSlot ? 'hover:bg-cyan-500/10' : ''}
   `}
