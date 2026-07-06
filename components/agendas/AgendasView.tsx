@@ -1267,8 +1267,17 @@ const ok = await deleteEstadoVisita(
     return copia;
   });
 };
-
-const ahora = new Date();
+  
+const renderEstadoVisitaControl = (
+  evento: EventoAgenda,
+  color: { text: string } | null
+) => {
+  const key = getEventoEstadoKey(evento);
+  const estadoActual = estadosVisita[key]?.estado_visita || '';
+  const meta = getEstadoVisitaMeta(estadoActual);
+  const colorTexto = getColorTextoCita(color);
+  const abierto = menuEstadoVisitaAbierto === key;
+  const ahora = new Date();
 
 const esCitaPasada =
   new Date(evento.fecha_fin || evento.fecha_inicio) < ahora;
@@ -1280,16 +1289,6 @@ const estadosDisponibles = esCitaPasada
         e.value === 'no_ha_venido'
     )
   : ESTADOS_VISITA;
-  
-const renderEstadoVisitaControl = (
-  evento: EventoAgenda,
-  color: { text: string } | null
-) => {
-  const key = getEventoEstadoKey(evento);
-  const estadoActual = estadosVisita[key]?.estado_visita || '';
-  const meta = getEstadoVisitaMeta(estadoActual);
-  const colorTexto = getColorTextoCita(color);
-  const abierto = menuEstadoVisitaAbierto === key;
 
   return (
     <div
