@@ -1178,59 +1178,35 @@ const cargarEstadosVisita = async () => {
   setEstadosVisita(mapa);
 };
 
-const cambiarEstadoVisita = async (
+const aplicarCambioEstadoVisita = async (
   evento: EventoAgenda,
   estado: EstadoVisita
 ) => {
   if (!evento?.event_id || !evento?.calendar_id || loading) return;
 
-  const esCitaPasada =
-  new Date(evento.fecha_fin || evento.fecha_inicio) < new Date();
-
-const requiereConfirmacion =
-  estado === 'finalizada' ||
-  estado === 'no_ha_venido';
-
-if (requiereConfirmacion) {
-  setConfirmarEstadoVisita({
-    evento,
-    estado,
-    titulo: esCitaPasada
-      ? 'Vas a modificar una cita pasada'
-      : estado === 'finalizada'
-        ? 'Vas a cambiar el estado de esta cita a Finalizada'
-        : 'Vas a cambiar el estado de esta cita a No ha venido',
-    texto: '¿Deseas continuar?',
-    textoBoton: esCitaPasada ? 'Sí, modificar' : 'Sí, cambiar estado',
-  });
-
-  setMenuEstadoVisitaAbierto(null);
-  return;
-}
-
   const telefonoEvento = normalizarTelefonoBusquedaAgenda(evento.telefono);
-const fechaEvento = new Date(evento.fecha_inicio);
+  const fechaEvento = new Date(evento.fecha_inicio);
 
-const siguienteCita = eventos
-  .filter((e) => {
-    if (!e.event_id || e.event_id === evento.event_id) return false;
-    if (esBloqueoAgenda(e)) return false;
+  const siguienteCita = eventos
+    .filter((e) => {
+      if (!e.event_id || e.event_id === evento.event_id) return false;
+      if (esBloqueoAgenda(e)) return false;
 
-    const tel = normalizarTelefonoBusquedaAgenda(e.telefono);
-    if (!telefonoEvento || !tel) return false;
+      const tel = normalizarTelefonoBusquedaAgenda(e.telefono);
+      if (!telefonoEvento || !tel) return false;
 
-    return (
-      tel === telefonoEvento ||
-      tel.endsWith(telefonoEvento) ||
-      telefonoEvento.endsWith(tel)
-    );
-  })
-  .filter((e) => new Date(e.fecha_inicio) > fechaEvento)
-  .sort(
-    (a, b) =>
-      new Date(a.fecha_inicio).getTime() -
-      new Date(b.fecha_inicio).getTime()
-  )[0] || null;
+      return (
+        tel === telefonoEvento ||
+        tel.endsWith(telefonoEvento) ||
+        telefonoEvento.endsWith(tel)
+      );
+    })
+    .filter((e) => new Date(e.fecha_inicio) > fechaEvento)
+    .sort(
+      (a, b) =>
+        new Date(a.fecha_inicio).getTime() -
+        new Date(b.fecha_inicio).getTime()
+    )[0] || null;
 
   const guardado = await upsertEstadoVisita({
     event_id: evento.event_id,
@@ -1241,11 +1217,11 @@ const siguienteCita = eventos
     estado_visita: estado,
     observaciones: null,
     updated_by: usuarioPanel,
-    
+
     fecha_inicio: evento.fecha_inicio,
     fecha_fin: evento.fecha_fin,
     motivo: evento.motivo || null,
-    
+
     siguiente_cita_fecha: siguienteCita?.fecha_inicio || null,
     siguiente_cita_fin: siguienteCita?.fecha_fin || null,
     siguiente_cita_motivo: siguienteCita?.motivo || null,
@@ -1260,6 +1236,39 @@ const siguienteCita = eventos
     ...prev,
     [key]: guardado,
   }));
+};
+
+const cambiarEstadoVisita = async (
+  evento: EventoAgenda,
+  estado: EstadoVisita
+) => {
+  if (!evento?.event_id || !evento?.calendar_id || loading) return;
+
+  const esCitaPasada =
+    new Date(evento.fecha_fin || evento.fecha_inicio) < new Date();
+
+  const requiereConfirmacion =
+    estado === 'finalizada' ||
+    estado === 'no_ha_venido';
+
+  if (requiereConfirmacion) {
+    setConfirmarEstadoVisita({
+      evento,
+      estado,
+      titulo: esCitaPasada
+        ? 'Vas a modificar una cita pasada'
+        : estado === 'finalizada'
+          ? 'Vas a cambiar el estado de esta cita a Finalizada'
+          : 'Vas a cambiar el estado de esta cita a No ha venido',
+      texto: '¿Deseas continuar?',
+      textoBoton: esCitaPasada ? 'Sí, modificar' : 'Sí, cambiar estado',
+    });
+
+    setMenuEstadoVisitaAbierto(null);
+    return;
+  }
+
+  await aplicarCambioEstadoVisita(evento, estado);
 };
 
   const limpiarEstadoVisita = async (evento: EventoAgenda) => {
