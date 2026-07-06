@@ -2125,20 +2125,6 @@ useEffect(() => {
                       : false;
 
                     const color = eventoSlot && !esBloqueoEvento ? getColorTratamiento(eventoSlot) : null;
-
-                    const seleccionado = (() => {
-                      if (!slotInicio) return false;
-
-                      if (!slotFin) {
-                        return slotKey === slotInicio;
-                      }
-
-                      const inicio = [slotInicio, slotFin].sort()[0];
-                      const fin = [slotInicio, slotFin].sort()[1];
-
-                      return slotKey >= inicio && slotKey <= fin;
-                    })();
-
                     const bloqueadoAutomatico = isHorarioNoDisponible(hora, dia, agendaActiva);
                     const bloqueado = bloqueadoAutomatico || esBloqueoEvento;
                     const esUltimaLineaEvento = esUltimaLineaVisibleEvento(eventoSlot, slotFinDate);
