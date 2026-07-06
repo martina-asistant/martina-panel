@@ -181,6 +181,7 @@ export interface LaboratorioTrabajo {
 
   laboratorio?: LaboratorioNombre | string | null;
   trabajo?: TipoTrabajoLaboratorio | string | null;
+  piezas?: string | null
   estado: EstadoLaboratorio;
 
   anotaciones?: string | null;
