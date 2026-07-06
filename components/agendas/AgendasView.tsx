@@ -861,7 +861,10 @@ const guardarCambiosCita = async () => {
     trabajo: 'Incrustación',
     estado: 'pte_gestionar',
     anotaciones: '',
-    fecha_cita: '',
+    fecha_cita:
+  getTratamientoValue(eventoActivo.motivo || '') === 'Prueba-colocar'
+    ? eventoActivo.fecha_inicio
+    : '',
     event_id_origen: eventoActivo.event_id || '',
     calendar_id_origen: eventoActivo.calendar_id || '',
   });
@@ -1144,10 +1147,7 @@ const guardarInsertarLaboratorio = async () => {
       trabajo: nuevoTrabajoLaboratorio.trabajo,
       estado: nuevoTrabajoLaboratorio.estado,
       anotaciones: nuevoTrabajoLaboratorio.anotaciones,
-      fecha_cita:
-  getTratamientoValue(eventoActivo?.motivo || '') === 'Prueba-colocar'
-    ? eventoActivo.fecha_inicio
-    : null,
+      fecha_cita: nuevoTrabajoLaboratorio.fecha_cita || null,
       event_id_origen: nuevoTrabajoLaboratorio.event_id_origen || null,
       calendar_id_origen: nuevoTrabajoLaboratorio.calendar_id_origen || null,
       usuario: usuarioPanel,
