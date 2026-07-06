@@ -409,14 +409,14 @@ return (
       <div className="w-full overflow-hidden">
         <table className="w-full table-fixed text-sm">
           <colgroup>
-            <col className="w-[17%]" />
-            <col className="w-[10%]" />
+            <col className="w-[15%]" />
+            <col className="w-[9%]" />
             <col className="w-[10%]" />
             <col className="w-[8%]" />
-            <col className="w-[26%]" />
+            <col className="w-[28%]" />
             <col className="w-[15%]" />
             <col className="w-[10%]" />
-            <col className="w-[4%]" />
+            <col className="w-[5%]" />
           </colgroup>
 
           <thead className="bg-cyan-500/10 text-cyan-300/75 text-xs uppercase tracking-[0.18em]">
