@@ -413,13 +413,14 @@ const LaboratorioView = () => {
         <div className="w-full overflow-hidden">
           <table className="w-full table-fixed text-sm">
             <colgroup>
-  <col className="w-[15%]" />
-  <col className="w-[10%]" />
-  <col className="w-[10%]" />
-  <col className="w-[33%]" />
-  <col className="w-[15%]" />
-  <col className="w-[12%]" />
-  <col className="w-[7%]" />
+  <col className="w-[15%]" />  {/* Paciente */}
+  <col className="w-[10%]" />  {/* Laboratorio */}
+  <col className="w-[10%]" />  {/* Trabajo */}
+  <col className="w-[8%]" />   {/* Piezas */}
+  <col className="w-[29%]" />  {/* Anotaciones */}
+  <col className="w-[14%]" />  {/* Estado */}
+  <col className="w-[9%]" />   {/* Fecha */}
+  <col className="w-[5%]" />   {/* Flecha */}
 </colgroup>
 
             <thead className="bg-cyan-500/10 text-cyan-300/75 text-xs uppercase tracking-[0.18em]">
@@ -427,6 +428,7 @@ const LaboratorioView = () => {
                 <th className="text-left px-5 py-4 font-medium">Paciente</th>
                 <th className="text-left px-5 py-4 font-medium">Laboratorio</th>
                 <th className="text-left px-5 py-4 font-medium">Trabajo</th>
+                <th className="text-left px-5 py-4 font-medium">Anotaciones</th>
                 <th className="text-left px-5 py-4 font-medium">Anotaciones</th>
                 <th className="text-left px-5 py-4 font-medium">Estado</th>
                 <th className="text-left px-5 py-4 font-medium">Fecha cita</th>
@@ -459,6 +461,10 @@ const LaboratorioView = () => {
                       <td className="px-5 py-4 text-cyan-100/80 truncate">
                         {t.trabajo || '—'}
                       </td>
+
+                      <td className="px-5 py-4 text-cyan-100/75 whitespace-nowrap">
+  {t.piezas || '—'}
+</td>
 
                       <td className="px-5 py-4 text-cyan-100/65 truncate">
                         {t.anotaciones || '—'}
@@ -502,7 +508,7 @@ const LaboratorioView = () => {
 
                     {abierto && (
                       <tr>
-                        <td colSpan={7} className="border-t border-cyan-500/10 bg-black/20 px-6 py-4">
+                        <td colSpan={8} className="border-t border-cyan-500/10 bg-black/20 px-6 py-4">
                           <div className="grid grid-cols-[auto_auto_auto_1fr] gap-x-10 gap-y-3 text-sm">
                             <div>
                               <div className="text-cyan-300 text-[10px] uppercase tracking-wider mb-1 font-bold">Origen</div>
@@ -551,7 +557,7 @@ const LaboratorioView = () => {
 
               {!loading && filtered.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-6 py-10 text-center text-cyan-100/45">
+                  <td colSpan={8} className="px-6 py-10 text-center text-cyan-100/45">
                     Sin resultados
                   </td>
                 </tr>
