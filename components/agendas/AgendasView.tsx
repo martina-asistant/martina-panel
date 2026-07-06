@@ -4045,6 +4045,46 @@ useEffect(() => {
     </div>
   </div>
 )}
+
+      {confirmarEstadoVisita && (
+  <div className="fixed inset-0 z-[300] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div className="w-full max-w-md rounded-3xl border border-cyan-400/20 bg-[#03111A] shadow-[0_0_35px_rgba(34,211,238,.18)] overflow-hidden">
+
+      <div className="px-6 py-5 border-b border-cyan-500/10">
+        <h3 className="text-lg font-semibold text-white">
+          {confirmarEstadoVisita.titulo}
+        </h3>
+      </div>
+
+      <div className="px-6 py-6">
+        <p className="text-sm text-cyan-100/80">
+          {confirmarEstadoVisita.texto}
+        </p>
+      </div>
+
+      <div className="flex justify-end gap-3 px-6 py-5 border-t border-cyan-500/10">
+        <button
+          onClick={() => setConfirmarEstadoVisita(null)}
+          className="px-4 py-2 rounded-xl border border-white/15 text-white hover:bg-white/5"
+        >
+          No
+        </button>
+
+        <button
+          onClick={() => {
+            // De momento no hace nada
+            setConfirmarEstadoVisita(null);
+          }}
+          className="px-4 py-2 rounded-xl bg-cyan-500/20 border border-cyan-400/30 text-cyan-100 hover:bg-cyan-500/30"
+        >
+          {confirmarEstadoVisita.textoBoton}
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
+      
     </div>
   );
 }
