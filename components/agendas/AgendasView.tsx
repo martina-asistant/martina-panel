@@ -4083,9 +4083,17 @@ useEffect(() => {
 
         <button
           type="button"
-          onClick={() => {
-            setConfirmarEstadoVisita(null);
-          }}
+          onClick={async () => {
+  const pendiente = confirmarEstadoVisita;
+  if (!pendiente) return;
+
+  setConfirmarEstadoVisita(null);
+
+  await aplicarCambioEstadoVisita(
+    pendiente.evento,
+    pendiente.estado
+  );
+}}
           style={{
             backgroundColor: getColorTratamiento(confirmarEstadoVisita.evento).bg,
           }}
