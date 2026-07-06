@@ -422,7 +422,7 @@ return (
           <thead className="bg-cyan-500/10 text-cyan-300/75 text-xs uppercase tracking-[0.18em]">
             <tr>
               <th className="text-left px-5 py-4 font-medium">Paciente</th>
-              <th className="text-left px-5 py-4 font-medium">Laboratorio</th>
+              <th className="text-left px-4 py-4 font-medium">Laboratorio</th>
               <th className="text-left px-5 py-4 font-medium">Trabajo</th>
               <th className="text-left px-3 py-4 font-medium">Piezas</th>
               <th className="text-left px-5 py-4 font-medium">Anotaciones</th>
