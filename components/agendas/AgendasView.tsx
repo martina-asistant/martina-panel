@@ -834,6 +834,25 @@ const guardarCambiosCita = async () => {
     fecha_fin: fechaFin,
   });
 
+  setNuevaCita({
+  nombre_paciente: '',
+  telefono: '',
+  motivo,
+  detalle_motivo: '',
+  fecha_inicio: fechaInicio,
+  fecha_fin: fechaFin,
+});
+
+setBusquedaPaciente('');
+setMostrarResultadosPaciente(false);
+setMostrarNuevoPaciente(false);
+
+setNuevoPaciente({
+  nombre: '',
+  apellidos: '',
+  telefono: '',
+});
+    
   setMostrarInsertar(true);
 };
 
