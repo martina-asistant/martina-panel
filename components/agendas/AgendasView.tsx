@@ -410,6 +410,13 @@ export default function AgendasView() {
   const [eventos, setEventos] = useState<EventoAgenda[]>([]);
   const [estadosVisita, setEstadosVisita] = useState<Record<string, AgendaEstadoVisita>>({});
   const [menuEstadoVisitaAbierto, setMenuEstadoVisitaAbierto] = useState<string | null>(null);
+  const [confirmarEstadoVisita, setConfirmarEstadoVisita] = useState<{
+  evento: EventoAgenda;
+  estado: EstadoVisita;
+  titulo: string;
+  texto: string;
+  textoBoton: string;
+} | null>(null);
   const [loading, setLoading] = useState(false);
   const [slotInicio, setSlotInicio] = useState<string | null>(null);
   const [slotFin, setSlotFin] = useState<string | null>(null);
