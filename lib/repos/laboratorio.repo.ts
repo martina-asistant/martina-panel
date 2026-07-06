@@ -63,6 +63,13 @@ const crearTextoCambioLaboratorio = (
 ) => {
   const autor = usuario || 'Panel';
 
+if ((patch as any).piezas !== undefined) {
+  return {
+    tipo: `Piezas - ${(patch as any).piezas || 'Sin piezas'}`,
+    texto: `Piezas actualizadas por ${autor}`,
+  };
+}
+  
   if (patch.anotaciones !== undefined) {
   return {
     tipo: `Anotaciones - ${patch.anotaciones}`,
@@ -149,6 +156,7 @@ export async function crearTrabajoLaboratorio({
   trabajo: TipoTrabajoLaboratorio | string;
   estado?: EstadoLaboratorio;
   anotaciones?: string | null;
+  piezas?: string | null;
   fecha_cita?: string | null;
   event_id_origen?: string | null;
   calendar_id_origen?: string | null;
@@ -172,6 +180,7 @@ export async function crearTrabajoLaboratorio({
     trabajo,
     estado,
     anotaciones: anotaciones || null,
+    piezas: piezas || null,
     fecha_cita,
     event_id_origen,
     calendar_id_origen,
