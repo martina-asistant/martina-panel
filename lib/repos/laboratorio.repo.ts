@@ -134,6 +134,7 @@ export async function crearTrabajoLaboratorio({
   telefono,
   laboratorio = 'Julio',
   trabajo,
+  piezas,
   estado = 'pte_gestionar',
   anotaciones,
   fecha_cita = null,
