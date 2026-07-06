@@ -63,19 +63,19 @@ const crearTextoCambioLaboratorio = (
 ) => {
   const autor = usuario || 'Panel';
 
-  if (patch.estado) {
-    return {
-      tipo: `Estado - ${getEstadoLaboratorioLabelRepo(patch.estado)}`,
-      texto: `Trabajo actualizado por ${autor}`,
-    };
-  }
-
   if (patch.anotaciones !== undefined) {
-    return {
-      tipo: 'Anotación',
-      texto: `Anotación actualizada por ${autor}`,
-    };
-  }
+  return {
+    tipo: `Anotaciones - ${patch.anotaciones}`,
+    texto: `Anotaciones actualizadas por ${autor}`,
+  };
+}
+
+if (patch.estado) {
+  return {
+    tipo: `Estado - ${getEstadoLaboratorioLabelRepo(patch.estado)}`,
+    texto: `Trabajo actualizado por ${autor}`,
+  };
+}
 
   if (patch.fecha_cita !== undefined) {
     return {
