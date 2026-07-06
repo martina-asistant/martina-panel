@@ -42,6 +42,68 @@ const crearEntradaHistorial = ({
   usuario: usuario || null,
 });
 
+const getEstadoLaboratorioLabelRepo = (estado?: string | null) => {
+  const mapa: Record<string, string> = {
+    pte_gestionar: 'Pte gestionar',
+    disenado: 'Diseñado',
+    impreso: 'Impreso',
+    fresado: 'Fresado',
+    horneado: 'Horneado',
+    en_clinica: 'En clínica',
+    finalizado: 'Finalizado',
+  };
+
+  return estado ? mapa[estado] || estado : '';
+};
+
+const crearTextoCambioLaboratorio = (
+  patch: Partial<LaboratorioTrabajo>,
+  usuario?: string | null,
+  tipoCambio = 'Trabajo'
+) => {
+  const autor = usuario || 'Panel';
+
+  if (patch.estado) {
+    return {
+      tipo: `Estado - ${getEstadoLaboratorioLabelRepo(patch.estado)}`,
+      texto: `Trabajo actualizado por ${autor}`,
+    };
+  }
+
+  if (patch.anotaciones !== undefined) {
+    return {
+      tipo: 'Anotación',
+      texto: `Anotación actualizada por ${autor}`,
+    };
+  }
+
+  if (patch.fecha_cita !== undefined) {
+    return {
+      tipo: 'Fecha cita',
+      texto: `Fecha de cita actualizada por ${autor}`,
+    };
+  }
+
+  if (patch.trabajo) {
+    return {
+      tipo: `Trabajo - ${patch.trabajo}`,
+      texto: `Trabajo actualizado por ${autor}`,
+    };
+  }
+
+  if (patch.laboratorio) {
+    return {
+      tipo: `Laboratorio - ${patch.laboratorio}`,
+      texto: `Laboratorio actualizado por ${autor}`,
+    };
+  }
+
+  return {
+    tipo: tipoCambio,
+    texto: `Trabajo actualizado por ${autor}`,
+  };
+};
+
 export async function listTrabajosLaboratorio(): Promise<LaboratorioTrabajo[]> {
   const supa = createBrowserSupa();
 
@@ -153,11 +215,13 @@ export async function actualizarTrabajoLaboratorio(
 ): Promise<LaboratorioTrabajo | null> {
   const supa = createBrowserSupa();
 
-  const nuevaEntrada = crearEntradaHistorial({
-    tipo: tipoCambio,
-    texto: JSON.stringify(patch),
-    usuario,
-  });
+  const cambio = crearTextoCambioLaboratorio(patch, usuario, tipoCambio);
+
+const nuevaEntrada = crearEntradaHistorial({
+  tipo: cambio.tipo,
+  texto: cambio.texto,
+  usuario,
+});
 
   if (!supa) {
     const idx = mockTrabajosLaboratorio.findIndex(t => t.id === id);
@@ -171,9 +235,9 @@ export async function actualizarTrabajoLaboratorio(
       ...patch,
       updated_at: ahoraISO(),
       ultimo_cambio: crearUltimoCambio({
-        tipo: tipoCambio,
-        usuario,
-      }),
+  tipo: cambio.tipo,
+  usuario,
+}),
       historial: [...historialActual, nuevaEntrada],
     };
 
@@ -201,9 +265,9 @@ export async function actualizarTrabajoLaboratorio(
       ...patch,
       updated_at: ahoraISO(),
       ultimo_cambio: crearUltimoCambio({
-        tipo: tipoCambio,
-        usuario,
-      }),
+  tipo: cambio.tipo,
+  usuario,
+}),
       historial: [...historialActual, nuevaEntrada],
     })
     .eq('id', id)
