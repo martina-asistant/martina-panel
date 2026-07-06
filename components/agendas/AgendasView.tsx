@@ -1277,6 +1277,7 @@ const renderEstadoVisitaControl = (
   const meta = getEstadoVisitaMeta(estadoActual);
   const colorTexto = getColorTextoCita(color);
   const abierto = menuEstadoVisitaAbierto === key;
+  
   const ahora = new Date();
 
 const esCitaPasada =
@@ -1387,6 +1388,10 @@ const estadosDisponibles = esCitaPasada
     ))}
   </div>
 )}
+       </div>
+    );
+};
+  
 
 const esUltimaLineaVisibleEvento = (
   evento: EventoAgenda | null | undefined,
