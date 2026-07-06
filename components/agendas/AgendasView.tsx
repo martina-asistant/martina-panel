@@ -4056,27 +4056,26 @@ useEffect(() => {
 )}
 
       {confirmarEstadoVisita && (
-  <div className="fixed inset-0 z-[300] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-    <div className="w-full max-w-[430px] rounded-[28px] border border-cyan-400/35 bg-[#03111A] px-7 py-7 shadow-[0_0_40px_rgba(34,211,238,.22)]">
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 backdrop-blur-sm">
+    <div className="w-full max-w-[330px] rounded-3xl border border-cyan-300/45 bg-[#03111A]/95 px-6 py-5 shadow-[0_0_46px_rgba(34,211,238,.28)]">
 
-      <h3 className="text-center text-[13px] font-semibold tracking-[0.34em] uppercase text-cyan-300 mb-5">
+      <div className="text-center text-cyan-300 text-[12px] uppercase tracking-[0.28em] font-medium mb-4">
         {confirmarEstadoVisita.titulo}
-      </h3>
-
-      <div className="text-center text-sm font-semibold text-white mb-6">
-        {confirmarEstadoVisita.evento.nombre_paciente || confirmarEstadoVisita.evento.titulo || 'Cita'}
-        {confirmarEstadoVisita.evento.motivo ? ` - ${confirmarEstadoVisita.evento.motivo}` : ''}
       </div>
 
-      <p className="text-center text-sm text-white mb-7">
-        {confirmarEstadoVisita.texto}
-      </p>
+      <div className="text-center text-cyan-100 text-sm font-medium mb-5">
+        {confirmarEstadoVisita.evento.titulo || confirmarEstadoVisita.evento.nombre_paciente || 'Cita'}
+      </div>
 
-      <div className="flex justify-center gap-4">
+      <div className="text-center text-white/95 text-sm mb-5">
+        {confirmarEstadoVisita.texto}
+      </div>
+
+      <div className="flex justify-center gap-3">
         <button
           type="button"
           onClick={() => setConfirmarEstadoVisita(null)}
-          className="rounded-full border border-cyan-300/50 px-6 py-1.5 text-sm text-cyan-100 hover:bg-cyan-500/10 transition-all"
+          className="rounded-full border border-cyan-400/50 bg-cyan-500/10 px-5 py-1.5 text-sm text-cyan-100 hover:bg-cyan-500/20 hover:border-cyan-300/70 transition-all"
         >
           No
         </button>
@@ -4084,20 +4083,24 @@ useEffect(() => {
         <button
           type="button"
           onClick={async () => {
-  const pendiente = confirmarEstadoVisita;
-  if (!pendiente) return;
+            const pendiente = confirmarEstadoVisita;
+            if (!pendiente) return;
 
-  setConfirmarEstadoVisita(null);
+            setConfirmarEstadoVisita(null);
 
-  await aplicarCambioEstadoVisita(
-    pendiente.evento,
-    pendiente.estado
-  );
-}}
-          style={{
-            backgroundColor: getColorTratamiento(confirmarEstadoVisita.evento).bg,
+            await aplicarCambioEstadoVisita(
+              pendiente.evento,
+              pendiente.estado
+            );
           }}
-          className="rounded-full border border-white/25 px-5 py-1.5 text-sm text-white hover:brightness-110 transition-all"
+          disabled={loading}
+          style={{
+            backgroundColor: getColorTratamiento(confirmarEstadoVisita.evento).bg
+              .replace('.95)', '.68)')
+              .replace('.90)', '.68)')
+              .replace('.85)', '.68)'),
+          }}
+          className="rounded-full border border-white/25 px-5 py-1.5 text-sm text-white hover:brightness-110 disabled:opacity-50 transition-all"
         >
           {confirmarEstadoVisita.textoBoton}
         </button>
