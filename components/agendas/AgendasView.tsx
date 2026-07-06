@@ -4048,34 +4048,39 @@ useEffect(() => {
 
       {confirmarEstadoVisita && (
   <div className="fixed inset-0 z-[300] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-    <div className="w-full max-w-md rounded-3xl border border-cyan-400/20 bg-[#03111A] shadow-[0_0_35px_rgba(34,211,238,.18)] overflow-hidden">
+    <div className="w-full max-w-[430px] rounded-[28px] border border-cyan-400/35 bg-[#03111A] px-7 py-7 shadow-[0_0_40px_rgba(34,211,238,.22)]">
 
-      <div className="px-6 py-5 border-b border-cyan-500/10">
-        <h3 className="text-lg font-semibold text-white">
-          {confirmarEstadoVisita.titulo}
-        </h3>
+      <h3 className="text-center text-[13px] font-semibold tracking-[0.34em] uppercase text-cyan-300 mb-5">
+        {confirmarEstadoVisita.titulo}
+      </h3>
+
+      <div className="text-center text-sm font-semibold text-white mb-6">
+        {confirmarEstadoVisita.evento.nombre_paciente || confirmarEstadoVisita.evento.titulo || 'Cita'}
+        {confirmarEstadoVisita.evento.motivo ? ` - ${confirmarEstadoVisita.evento.motivo}` : ''}
       </div>
 
-      <div className="px-6 py-6">
-        <p className="text-sm text-cyan-100/80">
-          {confirmarEstadoVisita.texto}
-        </p>
-      </div>
+      <p className="text-center text-sm text-white mb-7">
+        {confirmarEstadoVisita.texto}
+      </p>
 
-      <div className="flex justify-end gap-3 px-6 py-5 border-t border-cyan-500/10">
+      <div className="flex justify-center gap-4">
         <button
+          type="button"
           onClick={() => setConfirmarEstadoVisita(null)}
-          className="px-4 py-2 rounded-xl border border-white/15 text-white hover:bg-white/5"
+          className="rounded-full border border-cyan-300/50 px-6 py-1.5 text-sm text-cyan-100 hover:bg-cyan-500/10 transition-all"
         >
           No
         </button>
 
         <button
+          type="button"
           onClick={() => {
-            // De momento no hace nada
             setConfirmarEstadoVisita(null);
           }}
-          className="px-4 py-2 rounded-xl bg-cyan-500/20 border border-cyan-400/30 text-cyan-100 hover:bg-cyan-500/30"
+          style={{
+            backgroundColor: getColorTratamiento(confirmarEstadoVisita.evento).bg,
+          }}
+          className="rounded-full border border-white/25 px-5 py-1.5 text-sm text-white hover:brightness-110 transition-all"
         >
           {confirmarEstadoVisita.textoBoton}
         </button>
