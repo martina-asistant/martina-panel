@@ -1293,7 +1293,7 @@ const estadosDisponibles = esCitaPasada
 
   return (
     <div
-      className="absolute right-1 bottom-[2px] z-[80]"
+      className={`absolute right-1 bottom-[2px] ${abierto ? 'z-[1000]' : 'z-[80]'}`}
       onClick={(e) => e.stopPropagation()}
       onDoubleClick={(e) => e.stopPropagation()}
     >
