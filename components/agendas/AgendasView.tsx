@@ -1144,7 +1144,10 @@ const guardarInsertarLaboratorio = async () => {
       trabajo: nuevoTrabajoLaboratorio.trabajo,
       estado: nuevoTrabajoLaboratorio.estado,
       anotaciones: nuevoTrabajoLaboratorio.anotaciones,
-      fecha_cita: eventoActivo.fecha_inicio,
+      fecha_cita:
+  nuevoTrabajoLaboratorio.trabajo === 'Prueba-colocar'
+    ? eventoActivo.fecha_inicio
+    : null,
       event_id_origen: nuevoTrabajoLaboratorio.event_id_origen || null,
       calendar_id_origen: nuevoTrabajoLaboratorio.calendar_id_origen || null,
       usuario: usuarioPanel,
