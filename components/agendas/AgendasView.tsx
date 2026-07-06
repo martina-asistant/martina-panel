@@ -1902,7 +1902,7 @@ useEffect(() => {
   }}
   className={`
     relative w-full block border-b border-cyan-400/5 text-left px-2 text-[10px] transition-all
-    ${seleccionado ? 'ring-1 ring-cyan-200/80 shadow-[inset_0_0_0_1px_rgba(165,243,252,.65),0_0_14px_rgba(34,211,238,.25)]' : ''}
+    ${seleccionado ? 'outline outline-[0.5px] outline-cyan-200/55 outline-offset-[-1px]' : ''}
     ${bloqueadoAutomatico ? 'bg-cyan-500/25 hover:bg-cyan-500/30' : ''}
     ${!bloqueado && !eventoSlot ? 'hover:bg-cyan-500/10' : ''}
   `}
@@ -2155,7 +2155,7 @@ useEffect(() => {
   }}
   className={`
     relative w-full block border-b border-cyan-400/5 text-left px-2 text-[10px] transition-all
-    ${seleccionado ? 'ring-1 ring-cyan-200/80 shadow-[inset_0_0_0_1px_rgba(165,243,252,.65),0_0_14px_rgba(34,211,238,.25)]' : ''}
+    ${seleccionado ? 'outline outline-[0.5px] outline-cyan-200/55 outline-offset-[-1px]' : ''}
     ${bloqueadoAutomatico ? 'bg-cyan-500/25 hover:bg-cyan-500/30' : ''}
     ${!bloqueado && !eventoSlot ? 'hover:bg-cyan-500/10' : ''}
   `}
