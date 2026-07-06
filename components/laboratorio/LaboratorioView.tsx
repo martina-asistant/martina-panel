@@ -107,6 +107,7 @@ const LaboratorioView = () => {
     telefono: '',
     laboratorio: 'Julio' as LaboratorioNombre,
     trabajo: 'Incrustación' as TipoTrabajoLaboratorio,
+    piezas: '',
     estado: 'pte_gestionar' as EstadoLaboratorio,
     anotaciones: '',
     fecha_cita: '',
@@ -220,6 +221,7 @@ const LaboratorioView = () => {
       telefono: '',
       laboratorio: 'Julio',
       trabajo: 'Incrustación',
+      piezas: '',
       estado: 'pte_gestionar',
       anotaciones: '',
       fecha_cita: '',
@@ -242,6 +244,7 @@ const LaboratorioView = () => {
       telefono: trabajo.telefono || '',
       laboratorio: (trabajo.laboratorio || 'Julio') as LaboratorioNombre,
       trabajo: (trabajo.trabajo || 'Incrustación') as TipoTrabajoLaboratorio,
+      piezas: trabajo.piezas || '',
       estado: trabajo.estado || 'pte_gestionar',
       anotaciones: trabajo.anotaciones || '',
       fecha_cita: trabajo.fecha_cita || '',
@@ -274,6 +277,7 @@ const LaboratorioView = () => {
         telefono: nuevoTrabajo.telefono || null,
         laboratorio: nuevoTrabajo.laboratorio,
         trabajo: nuevoTrabajo.trabajo,
+        piezas: nuevoTrabajo.piezas,
         estado: nuevoTrabajo.estado,
         anotaciones: nuevoTrabajo.anotaciones,
         fecha_cita: nuevoTrabajo.fecha_cita || null,
@@ -428,7 +432,6 @@ const LaboratorioView = () => {
                 <th className="text-left px-5 py-4 font-medium">Paciente</th>
                 <th className="text-left px-5 py-4 font-medium">Laboratorio</th>
                 <th className="text-left px-5 py-4 font-medium">Trabajo</th>
-                <th className="text-left px-5 py-4 font-medium">Anotaciones</th>
                 <th className="text-left px-5 py-4 font-medium">Anotaciones</th>
                 <th className="text-left px-5 py-4 font-medium">Estado</th>
                 <th className="text-left px-5 py-4 font-medium">Fecha cita</th>
