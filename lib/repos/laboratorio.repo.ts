@@ -158,7 +158,7 @@ export async function crearTrabajoLaboratorio({
   const historial = [
     crearEntradaHistorial({
       tipo: 'Creación',
-      texto: `Trabajo creado${anotaciones ? `: ${anotaciones}` : ''}`,
+      texto: `Trabajo creado por ${usuario || 'Panel'}`,
       usuario,
     }),
   ];
