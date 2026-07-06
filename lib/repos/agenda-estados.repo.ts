@@ -79,15 +79,23 @@ async function aplicarEfectoEstadoVisita(input: UpsertEstadoVisitaInput) {
   }
 
   if (input.estado_visita === 'no_ha_venido') {
-    await supa
-      .from('patients')
-      .update({
-        proxima_cita_fecha: input.siguiente_cita_fecha || null,
-        proxima_cita_fin: input.siguiente_cita_fin || null,
-        proxima_cita_motivo: input.siguiente_cita_motivo || null,
-      })
-      .eq('id', patient.id);
-  }
+  const mismaUltimaCita =
+    patient.ultima_cita_fecha &&
+    input.fecha_inicio &&
+    new Date(patient.ultima_cita_fecha).getTime() === new Date(input.fecha_inicio).getTime();
+
+  await supa
+    .from('patients')
+    .update({
+      ultima_cita_fecha: mismaUltimaCita ? null : patient.ultima_cita_fecha,
+      ultima_cita_motivo: mismaUltimaCita ? null : patient.ultima_cita_motivo,
+
+      proxima_cita_fecha: input.siguiente_cita_fecha || null,
+      proxima_cita_fin: input.siguiente_cita_fin || null,
+      proxima_cita_motivo: input.siguiente_cita_motivo || null,
+    })
+    .eq('id', patient.id);
+}
 }
 
 export async function listEstadosVisita(): Promise<AgendaEstadoVisita[]> {
