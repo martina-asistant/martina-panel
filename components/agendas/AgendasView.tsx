@@ -1356,7 +1356,7 @@ const estadosDisponibles = esCitaPasada
       </button>
 
       {abierto && (
-  <div className="absolute right-0 top-[calc(100%+5px)] z-[200] min-w-[155px] overflow-hidden rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
+  <div className="absolute right-0 top-[calc(100%+5px)] z-[999] min-w-[155px] overflow-hidden rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
 
     {!esCitaPasada && (
       <button
