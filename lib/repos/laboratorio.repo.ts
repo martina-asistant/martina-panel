@@ -154,9 +154,9 @@ export async function crearTrabajoLaboratorio({
   telefono?: string | null;
   laboratorio?: LaboratorioNombre | string | null;
   trabajo: TipoTrabajoLaboratorio | string;
+  piezas?: string | null;
   estado?: EstadoLaboratorio;
   anotaciones?: string | null;
-  piezas?: string | null;
   fecha_cita?: string | null;
   event_id_origen?: string | null;
   calendar_id_origen?: string | null;
@@ -178,9 +178,9 @@ export async function crearTrabajoLaboratorio({
     telefono: telefono || null,
     laboratorio: laboratorio || 'Julio',
     trabajo,
+    piezas: piezas || null,
     estado,
     anotaciones: anotaciones || null,
-    piezas: piezas || null,
     fecha_cita,
     event_id_origen,
     calendar_id_origen,
