@@ -29,21 +29,29 @@ export default function SettingsWhatsAppPage() {
       script.src = "https://connect.facebook.net/es_ES/sdk.js";
       script.async = true;
       script.defer = true;
+      script.crossOrigin = "anonymous";
       document.body.appendChild(script);
     }
 
     const listener = (event: MessageEvent) => {
+      if (!event.origin.endsWith("facebook.com")) return;
+
       console.log("========== META EVENT ==========");
       console.log("Origin:", event.origin);
       console.log("Data:", event.data);
+
+      try {
+        const data = JSON.parse(event.data);
+        console.log("Parsed:", data);
+      } catch {
+        console.log("Non JSON event");
+      }
+
       console.log("================================");
     };
 
     window.addEventListener("message", listener);
-
-    return () => {
-      window.removeEventListener("message", listener);
-    };
+    return () => window.removeEventListener("message", listener);
   }, []);
 
   const launchSignup = () => {
@@ -61,12 +69,13 @@ export default function SettingsWhatsAppPage() {
       },
       {
         config_id: CONFIG_ID,
+        auth_type: "rerequest",
         response_type: "code",
         override_default_response_type: true,
         extras: {
           setup: {},
-          featureType: "",
-          sessionInfoVersion: "3",
+          featureType: "whatsapp_business_app_onboarding",
+          sessionInfoVersion: 3,
         },
       }
     );
@@ -75,12 +84,7 @@ export default function SettingsWhatsAppPage() {
   return (
     <div style={{ padding: 40 }}>
       <h1>Conectar WhatsApp (modo prueba)</h1>
-
-      <p>
-        Pulsa el botón y observa qué pantalla abre Meta. No completes el flujo
-        si tienes dudas — puedes cerrar el popup en cualquier momento.
-      </p>
-
+      <p>No completes el flujo si tienes dudas. Puedes cerrar el popup.</p>
       <button onClick={launchSignup}>Conectar WhatsApp</button>
     </div>
   );
