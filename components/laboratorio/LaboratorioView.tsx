@@ -535,7 +535,8 @@ return (
     </div>
 
     {mostrarModal && (
-      <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm px-3 sm:px-4 py-6">
+      <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm">
+        <div className="h-full overflow-y-auto px-3 sm:px-4 py-6">
         <div className="mx-auto w-full max-w-3xl rounded-3xl border border-cyan-300/45 bg-[#03111A]/95 overflow-visible shadow-[0_0_46px_rgba(34,211,238,.24)]">
           <div className="px-5 sm:px-6 py-5 border-b border-cyan-300/20 flex items-start justify-between">
             <div>
@@ -808,6 +809,7 @@ return (
           </div>
         </div>
       </div>
+         </div>  
     )}
   </div>
 );
