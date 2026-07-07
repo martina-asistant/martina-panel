@@ -162,134 +162,107 @@ export async function crearTrabajoLaboratorio({
   calendar_id_origen?: string | null;
   usuario?: string | null;
 }): Promise<LaboratorioTrabajo | null> {
+  
   const supa = createBrowserSupa();
 
-  const historial = [
-    crearEntradaHistorial({
-      tipo: 'Creación',
-      texto: `Trabajo creado por ${usuario || 'Panel'}`,
-      usuario,
-    }),
-  ];
+const cambio = crearTextoCambioLaboratorio(patch, usuario, tipoCambio);
 
-  const nuevo = {
-    paciente_id: paciente_id || null,
-    nombre_paciente,
-    telefono: telefono || null,
-    laboratorio: laboratorio || 'Julio',
-    trabajo,
-    piezas: piezas || null,
-    estado,
-    anotaciones: anotaciones || null,
-    fecha_cita,
-    event_id_origen,
-    calendar_id_origen,
+if (!supa) {
+  const idx = mockTrabajosLaboratorio.findIndex(t => t.id === id);
+
+  if (idx < 0) return null;
+
+  const actual = mockTrabajosLaboratorio[idx];
+  const historialActual = actual.historial || [];
+
+  let nuevaEntrada = crearEntradaHistorial({
+    tipo: cambio.tipo,
+    texto: cambio.texto,
+    usuario,
+  });
+
+  if (
+    patch.anotaciones !== undefined &&
+    actual.anotaciones &&
+    actual.anotaciones.trim() &&
+    actual.anotaciones !== patch.anotaciones
+  ) {
+    nuevaEntrada = crearEntradaHistorial({
+      tipo: `Anotaciones - ${actual.anotaciones}`,
+      texto: `Anotación anterior guardada por ${usuario || 'Panel'}`,
+      usuario,
+    });
+  }
+
+  mockTrabajosLaboratorio[idx] = {
+    ...actual,
+    ...patch,
+    updated_at: ahoraISO(),
     ultimo_cambio: crearUltimoCambio({
-      tipo: 'Creación',
+      tipo: nuevaEntrada.tipo,
       usuario,
     }),
-    historial,
-    updated_at: ahoraISO(),
+    historial: [...historialActual, nuevaEntrada],
   };
 
-  if (!supa) {
-    const mock = {
-      ...nuevo,
-      id: crypto.randomUUID(),
-      created_at: ahoraISO(),
-    } as unknown as LaboratorioTrabajo;
-
-    mockTrabajosLaboratorio.unshift(mock);
-    return mock;
-  }
-
-  const { data, error } = await supa
-    .from('laboratorio_trabajos')
-    .insert(nuevo)
-    .select('*')
-    .single();
-
-  if (error) {
-    console.error('Error creando trabajo laboratorio:', error);
-    return null;
-  }
-
-  return data as LaboratorioTrabajo;
+  return mockTrabajosLaboratorio[idx];
 }
 
-export async function actualizarTrabajoLaboratorio(
-  id: string,
-  patch: Partial<LaboratorioTrabajo>,
-  usuario?: string | null,
-  tipoCambio = 'Trabajo'
-): Promise<LaboratorioTrabajo | null> {
-  const supa = createBrowserSupa();
+  const { data: actual, error: errorActual } = await supa
+  .from('laboratorio_trabajos')
+  .select('historial, anotaciones, piezas, trabajo, laboratorio, estado, fecha_cita')
+  .eq('id', id)
+  .single();
 
-  const cambio = crearTextoCambioLaboratorio(patch, usuario, tipoCambio);
+if (errorActual) {
+  console.error('Error leyendo historial laboratorio:', errorActual);
+  return null;
+}
 
-const nuevaEntrada = crearEntradaHistorial({
+const historialActual = Array.isArray(actual?.historial)
+  ? actual.historial
+  : [];
+
+let nuevaEntrada = crearEntradaHistorial({
   tipo: cambio.tipo,
   texto: cambio.texto,
   usuario,
 });
 
-  if (!supa) {
-    const idx = mockTrabajosLaboratorio.findIndex(t => t.id === id);
+if (
+  patch.anotaciones !== undefined &&
+  actual?.anotaciones &&
+  actual.anotaciones.trim() &&
+  actual.anotaciones !== patch.anotaciones
+) {
+  nuevaEntrada = crearEntradaHistorial({
+    tipo: `Anotaciones - ${actual.anotaciones}`,
+    texto: `Anotación anterior guardada por ${usuario || 'Panel'}`,
+    usuario,
+  });
+}
 
-    if (idx < 0) return null;
+const { data, error } = await supa
+  .from('laboratorio_trabajos')
+  .update({
+    ...patch,
+    updated_at: ahoraISO(),
+    ultimo_cambio: crearUltimoCambio({
+      tipo: nuevaEntrada.tipo,
+      usuario,
+    }),
+    historial: [...historialActual, nuevaEntrada],
+  })
+  .eq('id', id)
+  .select('*')
+  .single();
 
-    const historialActual = mockTrabajosLaboratorio[idx].historial || [];
+if (error) {
+  console.error('Error actualizando trabajo laboratorio:', error);
+  return null;
+}
 
-    mockTrabajosLaboratorio[idx] = {
-      ...mockTrabajosLaboratorio[idx],
-      ...patch,
-      updated_at: ahoraISO(),
-      ultimo_cambio: crearUltimoCambio({
-  tipo: cambio.tipo,
-  usuario,
-}),
-      historial: [...historialActual, nuevaEntrada],
-    };
-
-    return mockTrabajosLaboratorio[idx];
-  }
-
-  const { data: actual, error: errorActual } = await supa
-    .from('laboratorio_trabajos')
-    .select('historial')
-    .eq('id', id)
-    .single();
-
-  if (errorActual) {
-    console.error('Error leyendo historial laboratorio:', errorActual);
-    return null;
-  }
-
-  const historialActual = Array.isArray(actual?.historial)
-    ? actual.historial
-    : [];
-
-  const { data, error } = await supa
-    .from('laboratorio_trabajos')
-    .update({
-      ...patch,
-      updated_at: ahoraISO(),
-      ultimo_cambio: crearUltimoCambio({
-  tipo: cambio.tipo,
-  usuario,
-}),
-      historial: [...historialActual, nuevaEntrada],
-    })
-    .eq('id', id)
-    .select('*')
-    .single();
-
-  if (error) {
-    console.error('Error actualizando trabajo laboratorio:', error);
-    return null;
-  }
-
-  return data as LaboratorioTrabajo;
+return data as LaboratorioTrabajo;
 }
 
 export function actualizarEstadoLaboratorio(
