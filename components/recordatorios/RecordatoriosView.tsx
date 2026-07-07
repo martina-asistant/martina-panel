@@ -70,7 +70,7 @@ const RecordatoriosView = () => {
   );
 
   return (
-    <div className="min-h-full overflow-y-auto px-2 py-4 lg:p-8 bg-[#02141B] text-white">
+    <div className="h-full min-h-0 overflow-y-auto overflow-x-hidden px-2 py-4 lg:p-8 bg-[#02141B] text-white pb-40 scrollbar-thin scrollbar-thumb-cyan-400/40 scrollbar-track-transparent">
       <div className="mb-6 lg:mb-8 px-2 lg:px-0">
         <h1 className="inline-block text-3xl lg:text-2xl font-semibold tracking-[-0.015em] bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent mb-1">
           Recordatorios
