@@ -81,6 +81,11 @@ const formatHora = (iso?: string | null) => {
   });
 };
 
+const getTipoCambioLimpio = (tipo?: string | null) => {
+  if (!tipo) return '—';
+  return tipo.split(' - ')[0];
+};
+
 const LaboratorioView = () => {
   const [items, setItems] = useState<LaboratorioTrabajo[]>([]);
   const [filter, setFilter] = useState<FiltroLab>('todos');
@@ -525,26 +530,8 @@ return (
                   {abierto && (
                     <tr>
                       <td colSpan={8} className="border-t border-cyan-500/10 bg-black/20 px-6 py-4">
-                        <div className="grid grid-cols-[auto_auto_auto_1fr] gap-x-10 gap-y-3 text-sm">
-                          <div>
-                            <div className="text-cyan-300 text-[10px] uppercase tracking-wider mb-1 font-bold">Origen</div>
-                            <div className="text-white/90">{ultimo?.usuario || '—'}</div>
-                          </div>
-
-                          <div>
-                            <div className="text-cyan-300 text-[10px] uppercase tracking-wider mb-1 font-bold">Cambio</div>
-                            <div className="text-white/90">{ultimo?.tipo || 'Creación'}</div>
-                          </div>
-
-                          <div>
-                            <div className="text-cyan-300 text-[10px] uppercase tracking-wider mb-1 font-bold">Actualizado</div>
-                            <div className="text-white/90">
-                              {ultimo?.fecha ? `${formatFechaDetalle(ultimo.fecha)} · ${formatHora(ultimo.fecha)}` : '—'}
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="mt-4 space-y-2">
+                    
+                        <div className="space-y-2">
                           {historial.map((h, index) => (
                             <div key={`${t.id}-hist-${index}`} className="rounded-2xl border border-cyan-400/15 bg-black/20 px-4 py-3 text-sm">
                               <div className="text-cyan-300 text-xs mb-1">
@@ -807,7 +794,7 @@ return (
 
               <div>
                 <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">Cambio</div>
-                <div className="text-white/95 text-sm">{trabajoSeleccionado ? 'Trabajo' : 'Creación'}</div>
+                <div className="text-white/95 text-sm">{trabajoSeleccionado ? getTipoCambioLimpio(trabajoSeleccionado.historial?.at(-1)?.tipo) : 'Creación'}</div>
               </div>
 
               <div>
