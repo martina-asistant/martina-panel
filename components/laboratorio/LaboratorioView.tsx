@@ -315,7 +315,7 @@ const LaboratorioView = () => {
   };
 
 return (
-  <div className="h-[100dvh] overflow-y-auto overflow-x-hidden px-2 py-4 sm:p-8 bg-[#02141B] text-white pb-32">
+  <div className="h-[100dvh] overflow-y-auto overflow-x-hidden px-2 py-4 sm:p-8 bg-[#02141B] text-white pb-32 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-300/35">
     <div className="mb-8 px-2 sm:px-0 flex items-end justify-between gap-4">
       <div>
         <h1 className="text-2xl font-semibold tracking-[-0.015em] origin-left inline-block bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent">
