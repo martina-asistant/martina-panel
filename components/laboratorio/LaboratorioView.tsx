@@ -255,64 +255,108 @@ const LaboratorioView = () => {
     setMostrarModal(true);
   };
 
-  const guardarTrabajo = async () => {
-    if (loadingGuardar) return;
+const guardarTrabajo = async () => {
+  if (loadingGuardar) return;
 
-    if (!nuevoTrabajo.nombre_paciente.trim()) {
-      console.error('Falta paciente');
-      return;
-    }
+  if (!nuevoTrabajo.nombre_paciente.trim()) {
+    console.error('Falta paciente');
+    return;
+  }
 
-    if (!nuevoTrabajo.anotaciones.trim()) {
-      console.error('Falta anotación');
-      return;
-    }
+  if (!nuevoTrabajo.anotaciones.trim()) {
+    console.error('Falta anotación');
+    return;
+  }
 
-    setLoadingGuardar(true);
+  setLoadingGuardar(true);
 
-    try {
-      const payload = {
-        paciente_id: nuevoTrabajo.paciente_id || null,
-        nombre_paciente: nuevoTrabajo.nombre_paciente.trim(),
-        telefono: nuevoTrabajo.telefono || null,
-        laboratorio: nuevoTrabajo.laboratorio,
-        trabajo: nuevoTrabajo.trabajo,
-        piezas: nuevoTrabajo.piezas,
-        estado: nuevoTrabajo.estado,
-        anotaciones: nuevoTrabajo.anotaciones,
-        fecha_cita: nuevoTrabajo.fecha_cita || null,
-        event_id_origen: nuevoTrabajo.event_id_origen || null,
-        calendar_id_origen: nuevoTrabajo.calendar_id_origen || null,
-      };
+  try {
+    const payload = {
+      paciente_id: nuevoTrabajo.paciente_id || null,
+      nombre_paciente: nuevoTrabajo.nombre_paciente.trim(),
+      telefono: nuevoTrabajo.telefono || null,
+      laboratorio: nuevoTrabajo.laboratorio,
+      trabajo: nuevoTrabajo.trabajo,
+      piezas: nuevoTrabajo.piezas || null,
+      estado: nuevoTrabajo.estado,
+      anotaciones: nuevoTrabajo.anotaciones,
+      fecha_cita: nuevoTrabajo.fecha_cita || null,
+      event_id_origen: nuevoTrabajo.event_id_origen || null,
+      calendar_id_origen: nuevoTrabajo.calendar_id_origen || null,
+    };
 
-      const guardado = trabajoSeleccionado
-        ? await actualizarTrabajoLaboratorio(
-            trabajoSeleccionado.id,
-            payload,
-            usuarioPanel,
-            'Trabajo'
-          )
-        : await crearTrabajoLaboratorio({
-            ...payload,
-            usuario: usuarioPanel,
-          });
+    let guardado: LaboratorioTrabajo | null = null;
 
-      if (!guardado) {
-        console.error('Error guardando trabajo laboratorio');
+    if (trabajoSeleccionado) {
+      const patch: Partial<LaboratorioTrabajo> = {};
+
+      if (payload.laboratorio !== trabajoSeleccionado.laboratorio) {
+        patch.laboratorio = payload.laboratorio;
+      }
+
+      if (payload.trabajo !== trabajoSeleccionado.trabajo) {
+        patch.trabajo = payload.trabajo;
+      }
+
+      if ((payload.piezas || '') !== (trabajoSeleccionado.piezas || '')) {
+        patch.piezas = payload.piezas;
+      }
+
+      if (payload.estado !== trabajoSeleccionado.estado) {
+        patch.estado = payload.estado;
+      }
+
+      if ((payload.anotaciones || '') !== (trabajoSeleccionado.anotaciones || '')) {
+        patch.anotaciones = payload.anotaciones;
+      }
+
+      if ((payload.fecha_cita || '') !== (trabajoSeleccionado.fecha_cita || '')) {
+        patch.fecha_cita = payload.fecha_cita;
+      }
+
+      if ((payload.event_id_origen || '') !== (trabajoSeleccionado.event_id_origen || '')) {
+        patch.event_id_origen = payload.event_id_origen;
+      }
+
+      if ((payload.calendar_id_origen || '') !== (trabajoSeleccionado.calendar_id_origen || '')) {
+        patch.calendar_id_origen = payload.calendar_id_origen;
+      }
+
+      if (Object.keys(patch).length === 0) {
+        setMostrarModal(false);
+        setTrabajoSeleccionado(null);
         return;
       }
 
-      setMostrarModal(false);
-      setTrabajoSeleccionado(null);
-      setBusquedaPaciente('');
-      setMostrarResultadosPaciente(false);
-      await cargarLaboratorio();
-    } catch (error) {
-      console.error('Error guardando laboratorio:', error);
-    } finally {
-      setLoadingGuardar(false);
+      guardado = await actualizarTrabajoLaboratorio(
+        trabajoSeleccionado.id,
+        patch,
+        usuarioPanel,
+        'Trabajo'
+      );
+    } else {
+      guardado = await crearTrabajoLaboratorio({
+        ...payload,
+        usuario: usuarioPanel,
+      });
     }
-  };
+
+    if (!guardado) {
+      console.error('Error guardando trabajo laboratorio');
+      return;
+    }
+
+    setMostrarModal(false);
+    setTrabajoSeleccionado(null);
+    setBusquedaPaciente('');
+    setMostrarResultadosPaciente(false);
+    await cargarLaboratorio();
+  } catch (error) {
+    console.error('Error guardando laboratorio:', error);
+  } finally {
+    setLoadingGuardar(false);
+  }
+};  
 
 return (
   <div className="h-full min-h-0 overflow-y-auto overflow-x-hidden px-2 py-4 sm:p-8 bg-[#02141B] text-white pb-40 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-300/35">
