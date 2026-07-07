@@ -315,7 +315,7 @@ const LaboratorioView = () => {
   };
 
 return (
-  <div className="min-h-full overflow-y-auto px-2 py-4 sm:p-8 bg-[#02141B] text-white">
+  <div className="h-[100dvh] overflow-y-auto overflow-x-hidden px-2 py-4 sm:p-8 bg-[#02141B] text-white pb-32">
     <div className="mb-8 px-2 sm:px-0 flex items-end justify-between gap-4">
       <div>
         <h1 className="text-2xl font-semibold tracking-[-0.015em] origin-left inline-block bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent">
@@ -411,11 +411,11 @@ return (
           <colgroup>
             <col className="w-[14%]" />
             <col className="w-[10%]" />
-            <col className="w-[11%]" />
-            <col className="w-[7%]" />
-            <col className="w-[31%]" />
+            <col className="w-[10%]" />
+            <col className="w-[5%]" />
+            <col className="w-[35%]" />
             <col className="w-[12%]" />
-            <col className="w-[11%]" />
+            <col className="w-[10%]" />
             <col className="w-[5%]" />
           </colgroup>
 
@@ -424,7 +424,7 @@ return (
               <th className="text-left px-5 py-4 font-medium">Paciente</th>
               <th className="text-left px-4 py-4 font-medium">Laboratorio</th>
               <th className="text-left px-5 py-4 font-medium">Trabajo</th>
-              <th className="text-left px-3 py-3 font-medium">Piezas</th>
+              <th className="text-left px-2 py-4 font-medium">Piezas</th>
               <th className="text-left px-5 py-4 font-medium">Anotaciones</th>
               <th className="text-left px-5 py-4 font-medium">Estado</th>
               <th className="text-left px-5 py-4 font-medium">Fecha cita</th>
