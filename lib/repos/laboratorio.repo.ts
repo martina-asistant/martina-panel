@@ -63,26 +63,26 @@ const crearTextoCambioLaboratorio = (
 ) => {
   const autor = usuario || 'Panel';
 
-if ((patch as any).piezas !== undefined) {
-  return {
-    tipo: `Piezas - ${(patch as any).piezas || 'Sin piezas'}`,
-    texto: `Piezas actualizadas por ${autor}`,
-  };
-}
-  
-  if (patch.anotaciones !== undefined) {
-  return {
-    tipo: `Anotaciones - ${patch.anotaciones}`,
-    texto: `Anotaciones actualizadas por ${autor}`,
-  };
-}
+  if ((patch as any).piezas !== undefined) {
+    return {
+      tipo: `Piezas - ${(patch as any).piezas || 'Sin piezas'}`,
+      texto: `Piezas actualizadas por ${autor}`,
+    };
+  }
 
-if (patch.estado) {
-  return {
-    tipo: `Estado - ${getEstadoLaboratorioLabelRepo(patch.estado)}`,
-    texto: `Trabajo actualizado por ${autor}`,
-  };
-}
+  if (patch.anotaciones !== undefined) {
+    return {
+      tipo: `Anotaciones - ${patch.anotaciones}`,
+      texto: `Anotaciones actualizadas por ${autor}`,
+    };
+  }
+
+  if (patch.estado) {
+    return {
+      tipo: `Estado - ${getEstadoLaboratorioLabelRepo(patch.estado)}`,
+      texto: `Trabajo actualizado por ${autor}`,
+    };
+  }
 
   if (patch.fecha_cita !== undefined) {
     return {
@@ -109,6 +109,39 @@ if (patch.estado) {
     tipo: tipoCambio,
     texto: `Trabajo actualizado por ${autor}`,
   };
+};
+
+const crearEntradaSegunCambio = ({
+  actual,
+  patch,
+  usuario,
+  tipoCambio,
+}: {
+  actual: Partial<LaboratorioTrabajo>;
+  patch: Partial<LaboratorioTrabajo>;
+  usuario?: string | null;
+  tipoCambio?: string;
+}) => {
+  const cambio = crearTextoCambioLaboratorio(patch, usuario, tipoCambio);
+
+  if (
+    patch.anotaciones !== undefined &&
+    actual.anotaciones &&
+    actual.anotaciones.trim() &&
+    actual.anotaciones !== patch.anotaciones
+  ) {
+    return crearEntradaHistorial({
+      tipo: `Anotaciones - ${actual.anotaciones}`,
+      texto: `Anotación anterior guardada por ${usuario || 'Panel'}`,
+      usuario,
+    });
+  }
+
+  return crearEntradaHistorial({
+    tipo: cambio.tipo,
+    texto: cambio.texto,
+    usuario,
+  });
 };
 
 export async function listTrabajosLaboratorio(): Promise<LaboratorioTrabajo[]> {
@@ -162,107 +195,141 @@ export async function crearTrabajoLaboratorio({
   calendar_id_origen?: string | null;
   usuario?: string | null;
 }): Promise<LaboratorioTrabajo | null> {
-  
   const supa = createBrowserSupa();
 
-const cambio = crearTextoCambioLaboratorio(patch, usuario, tipoCambio);
-
-if (!supa) {
-  const idx = mockTrabajosLaboratorio.findIndex(t => t.id === id);
-
-  if (idx < 0) return null;
-
-  const actual = mockTrabajosLaboratorio[idx];
-  const historialActual = actual.historial || [];
-
-  let nuevaEntrada = crearEntradaHistorial({
-    tipo: cambio.tipo,
-    texto: cambio.texto,
-    usuario,
-  });
-
-  if (
-    patch.anotaciones !== undefined &&
-    actual.anotaciones &&
-    actual.anotaciones.trim() &&
-    actual.anotaciones !== patch.anotaciones
-  ) {
-    nuevaEntrada = crearEntradaHistorial({
-      tipo: `Anotaciones - ${actual.anotaciones}`,
-      texto: `Anotación anterior guardada por ${usuario || 'Panel'}`,
-      usuario,
-    });
-  }
-
-  mockTrabajosLaboratorio[idx] = {
-    ...actual,
-    ...patch,
-    updated_at: ahoraISO(),
-    ultimo_cambio: crearUltimoCambio({
-      tipo: nuevaEntrada.tipo,
+  const historial = [
+    crearEntradaHistorial({
+      tipo: 'Creación',
+      texto: `Trabajo creado por ${usuario || 'Panel'}`,
       usuario,
     }),
-    historial: [...historialActual, nuevaEntrada],
+  ];
+
+  const nuevo = {
+    paciente_id: paciente_id || null,
+    nombre_paciente,
+    telefono: telefono || null,
+    laboratorio: laboratorio || 'Julio',
+    trabajo,
+    piezas: piezas || null,
+    estado,
+    anotaciones: anotaciones || null,
+    fecha_cita,
+    event_id_origen,
+    calendar_id_origen,
+    ultimo_cambio: crearUltimoCambio({
+      tipo: 'Creación',
+      usuario,
+    }),
+    historial,
+    updated_at: ahoraISO(),
   };
 
-  return mockTrabajosLaboratorio[idx];
+  if (!supa) {
+    const mock = {
+      ...nuevo,
+      id: crypto.randomUUID(),
+      created_at: ahoraISO(),
+    } as unknown as LaboratorioTrabajo;
+
+    mockTrabajosLaboratorio.unshift(mock);
+    return mock;
+  }
+
+  const { data, error } = await supa
+    .from('laboratorio_trabajos')
+    .insert(nuevo)
+    .select('*')
+    .single();
+
+  if (error) {
+    console.error('Error creando trabajo laboratorio:', error);
+    return null;
+  }
+
+  return data as LaboratorioTrabajo;
 }
+
+export async function actualizarTrabajoLaboratorio(
+  id: string,
+  patch: Partial<LaboratorioTrabajo>,
+  usuario?: string | null,
+  tipoCambio = 'Trabajo'
+): Promise<LaboratorioTrabajo | null> {
+  const supa = createBrowserSupa();
+
+  if (!supa) {
+    const idx = mockTrabajosLaboratorio.findIndex(t => t.id === id);
+
+    if (idx < 0) return null;
+
+    const actual = mockTrabajosLaboratorio[idx];
+    const historialActual = actual.historial || [];
+
+    const nuevaEntrada = crearEntradaSegunCambio({
+      actual,
+      patch,
+      usuario,
+      tipoCambio,
+    });
+
+    mockTrabajosLaboratorio[idx] = {
+      ...actual,
+      ...patch,
+      updated_at: ahoraISO(),
+      ultimo_cambio: crearUltimoCambio({
+        tipo: nuevaEntrada.tipo,
+        usuario,
+      }),
+      historial: [...historialActual, nuevaEntrada],
+    };
+
+    return mockTrabajosLaboratorio[idx];
+  }
 
   const { data: actual, error: errorActual } = await supa
-  .from('laboratorio_trabajos')
-  .select('historial, anotaciones, piezas, trabajo, laboratorio, estado, fecha_cita')
-  .eq('id', id)
-  .single();
+    .from('laboratorio_trabajos')
+    .select('historial, anotaciones, piezas, trabajo, laboratorio, estado, fecha_cita')
+    .eq('id', id)
+    .single();
 
-if (errorActual) {
-  console.error('Error leyendo historial laboratorio:', errorActual);
-  return null;
-}
+  if (errorActual) {
+    console.error('Error leyendo historial laboratorio:', errorActual);
+    return null;
+  }
 
-const historialActual = Array.isArray(actual?.historial)
-  ? actual.historial
-  : [];
+  const historialActual = Array.isArray(actual?.historial)
+    ? actual.historial
+    : [];
 
-let nuevaEntrada = crearEntradaHistorial({
-  tipo: cambio.tipo,
-  texto: cambio.texto,
-  usuario,
-});
-
-if (
-  patch.anotaciones !== undefined &&
-  actual?.anotaciones &&
-  actual.anotaciones.trim() &&
-  actual.anotaciones !== patch.anotaciones
-) {
-  nuevaEntrada = crearEntradaHistorial({
-    tipo: `Anotaciones - ${actual.anotaciones}`,
-    texto: `Anotación anterior guardada por ${usuario || 'Panel'}`,
+  const nuevaEntrada = crearEntradaSegunCambio({
+    actual: actual || {},
+    patch,
     usuario,
+    tipoCambio,
   });
-}
 
-const { data, error } = await supa
-  .from('laboratorio_trabajos')
-  .update({
-    ...patch,
-    updated_at: ahoraISO(),
-    ultimo_cambio: crearUltimoCambio({
-      tipo: nuevaEntrada.tipo,
-      usuario,
-    }),
-    historial: [...historialActual, nuevaEntrada],
-  })
-  .eq('id', id)
-  .select('*')
-  .single();
+  const { data, error } = await supa
+    .from('laboratorio_trabajos')
+    .update({
+      ...patch,
+      updated_at: ahoraISO(),
+      ultimo_cambio: crearUltimoCambio({
+        tipo: nuevaEntrada.tipo,
+        usuario,
+      }),
+      historial: [...historialActual, nuevaEntrada],
+    })
+    .eq('id', id)
+    .select('*')
+    .single();
 
-if (error) {
-  console.error('Error actualizando trabajo laboratorio:', error);
-  return null;
-}
+  if (error) {
+    console.error('Error actualizando trabajo laboratorio:', error);
+    return null;
+  }
 
-return data as LaboratorioTrabajo;
+  return data as LaboratorioTrabajo;
 }
 
 export function actualizarEstadoLaboratorio(
@@ -270,12 +337,7 @@ export function actualizarEstadoLaboratorio(
   estado: EstadoLaboratorio,
   usuario?: string | null
 ) {
-  return actualizarTrabajoLaboratorio(
-    id,
-    { estado },
-    usuario,
-    'Estado'
-  );
+  return actualizarTrabajoLaboratorio(id, { estado }, usuario, 'Estado');
 }
 
 export function actualizarAnotacionLaboratorio(
@@ -283,12 +345,7 @@ export function actualizarAnotacionLaboratorio(
   anotaciones: string,
   usuario?: string | null
 ) {
-  return actualizarTrabajoLaboratorio(
-    id,
-    { anotaciones },
-    usuario,
-    'Anotación'
-  );
+  return actualizarTrabajoLaboratorio(id, { anotaciones }, usuario, 'Anotación');
 }
 
 export function actualizarFechaCitaLaboratorio(
@@ -296,12 +353,7 @@ export function actualizarFechaCitaLaboratorio(
   fecha_cita: string | null,
   usuario?: string | null
 ) {
-  return actualizarTrabajoLaboratorio(
-    id,
-    { fecha_cita },
-    usuario,
-    'Fecha cita'
-  );
+  return actualizarTrabajoLaboratorio(id, { fecha_cita }, usuario, 'Fecha cita');
 }
 
 export async function obtenerTrabajosPorPaciente(
