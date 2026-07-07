@@ -31,13 +31,33 @@ export default function SettingsWhatsAppPage() {
       script.defer = true;
       document.body.appendChild(script);
     }
+
+    const listener = (event: MessageEvent) => {
+      console.log("========== META EVENT ==========");
+      console.log("Origin:", event.origin);
+      console.log("Data:", event.data);
+      console.log("================================");
+    };
+
+    window.addEventListener("message", listener);
+
+    return () => {
+      window.removeEventListener("message", listener);
+    };
   }, []);
 
   const launchSignup = () => {
+    if (!window.FB) {
+      console.error("Facebook SDK todavía no está cargado");
+      return;
+    }
+
     window.FB.login(
       (response: any) => {
-        console.log("Respuesta de Meta:", response);
-        // Solo observación por ahora: no se manda nada a ningún backend ni se guarda nada
+        console.log("========== META RESPONSE ==========");
+        console.log(response);
+        console.log(JSON.stringify(response, null, 2));
+        console.log("===================================");
       },
       {
         config_id: CONFIG_ID,
@@ -55,7 +75,12 @@ export default function SettingsWhatsAppPage() {
   return (
     <div style={{ padding: 40 }}>
       <h1>Conectar WhatsApp (modo prueba)</h1>
-      <p>Pulsa el botón y observa qué pantalla abre Meta. No completes el flujo si tienes dudas — puedes cerrar el popup en cualquier momento.</p>
+
+      <p>
+        Pulsa el botón y observa qué pantalla abre Meta. No completes el flujo
+        si tienes dudas — puedes cerrar el popup en cualquier momento.
+      </p>
+
       <button onClick={launchSignup}>Conectar WhatsApp</button>
     </div>
   );
