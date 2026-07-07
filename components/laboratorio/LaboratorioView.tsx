@@ -409,11 +409,11 @@ return (
       <div className="w-full overflow-hidden">
         <table className="w-full table-fixed text-sm">
           <colgroup>
-            <col className="w-[15%]" />
+            <col className="w-[14%]" />
             <col className="w-[10%]" />
             <col className="w-[11%]" />
-            <col className="w-[8%]" />
-            <col className="w-[29%]" />
+            <col className="w-[7%]" />
+            <col className="w-[31%]" />
             <col className="w-[12%]" />
             <col className="w-[11%]" />
             <col className="w-[5%]" />
@@ -424,7 +424,7 @@ return (
               <th className="text-left px-5 py-4 font-medium">Paciente</th>
               <th className="text-left px-4 py-4 font-medium">Laboratorio</th>
               <th className="text-left px-5 py-4 font-medium">Trabajo</th>
-              <th className="text-left px-3 py-4 font-medium">Piezas</th>
+              <th className="text-left px-3 py-3 font-medium">Piezas</th>
               <th className="text-left px-5 py-4 font-medium">Anotaciones</th>
               <th className="text-left px-5 py-4 font-medium">Estado</th>
               <th className="text-left px-5 py-4 font-medium">Fecha cita</th>
