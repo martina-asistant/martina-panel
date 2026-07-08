@@ -42,9 +42,38 @@ export async function GET(request: Request) {
 
   const tokenData = await tokenResponse.json();
 
+  if (!tokenResponse.ok || !tokenData.access_token) {
+    return NextResponse.json({
+      ok: false,
+      step: "callback_exchange_code",
+      meta: tokenData,
+    });
+  }
+
+  const accessToken = tokenData.access_token;
+
+  const grantedAssetsUrl = new URL(
+    `https://graph.facebook.com/${GRAPH_VERSION}/me`
+  );
+
+  grantedAssetsUrl.searchParams.set(
+    "fields",
+    "id,name,businesses{id,name,owned_whatsapp_business_accounts{id,name,phone_numbers{id,display_phone_number,verified_name,quality_rating}}}"
+  );
+  grantedAssetsUrl.searchParams.set("access_token", accessToken);
+
+  const assetsResponse = await fetch(grantedAssetsUrl.toString(), {
+    method: "GET",
+    cache: "no-store",
+  });
+
+  const assetsData = await assetsResponse.json();
+
   return NextResponse.json({
-    ok: tokenResponse.ok,
-    step: "callback_exchange_code",
-    tokenData,
+    ok: assetsResponse.ok,
+    step: "get_whatsapp_assets",
+    token_received: true,
+    expires_in: tokenData.expires_in,
+    assets: assetsData,
   });
 }
