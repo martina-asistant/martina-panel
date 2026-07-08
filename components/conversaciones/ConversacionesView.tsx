@@ -1749,74 +1749,80 @@ return (
   </div>
 
   {/* CHAT MÓVIL */}
+  <>
+  <div className="relative z-10 bg-[#F8FBFC] px-3 pt-6 pb-3 border-b border-cyan-100 shadow-[0_12px_30px_rgba(14,124,139,.08)] shrink-0">
+    <button
+      onClick={selected ? doCerrar : undefined}
+      disabled={!selected}
+      className="absolute top-1 right-2 w-6 h-6 rounded-full flex items-center justify-center text-white bg-[linear-gradient(180deg,#214955_0%,#163C46_100%)] border border-cyan-300/20 shadow-[0_0_0_3px_rgba(34,211,238,.10),0_0_14px_rgba(34,211,238,.22)] hover:scale-105 transition-all z-30 disabled:opacity-40 disabled:pointer-events-none"
+    >
+      <span className="text-[12px] leading-[1] flex items-center justify-center translate-y-[-1px]">✕</span>
+    </button>
+
+    <div className="w-full rounded-3xl border border-[#6FD7E2]/45 bg-[linear-gradient(180deg,#0F2C35_0%,#163C46_100%)] px-3 py-3 shadow-[0_0_28px_rgba(34,211,238,.16),0_12px_26px_rgba(14,124,139,.12),inset_0_1px_0_rgba(255,255,255,.06)]">
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => setMostrarListaMovil(true)}
+          className="w-8 h-8 rounded-xl bg-white/5 border border-[#6FD7E2]/55 text-cyan-100 flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(34,211,238,.12)]"
+          title="Abrir conversaciones"
+        >
+          <span className="text-2xl leading-none -translate-y-[1px]">›</span>
+        </button>
+
+        <div className="min-w-0 flex-1">
+          <div className="font-semibold text-white truncate leading-tight">
+            {selected?.nombre_paciente || (selected ? formatTelefono(selected.telefono_e164) : 'Sin conversación')}
+          </div>
+
+          <div className="text-[11px] text-cyan-100/75 truncate mt-1">
+            {selected
+              ? `${formatTelefono(selected.telefono_e164)} · ${selected.motivo || 'Sin motivo'}`
+              : 'Selecciona o crea una conversación'}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-1 shrink-0">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={doTomar}
+            disabled={!selected}
+            className="h-6 min-w-[74px] px-2 bg-cyan-50 border-cyan-300/40 text-cyan-700 hover:bg-cyan-100 whitespace-nowrap text-[10px] leading-none disabled:opacity-50"
+          >
+            Tomar
+          </Button>
+
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={doDevolver}
+            disabled={!selected}
+            className="h-6 min-w-[74px] px-2 bg-cyan-50 border-cyan-300/40 text-cyan-700 hover:bg-cyan-100 whitespace-nowrap text-[10px] leading-none disabled:opacity-50"
+          >
+            Devolver
+          </Button>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setMostrarFichaMovil(true)}
+          className="w-8 h-8 rounded-xl bg-white/5 border border-[#6FD7E2]/55 text-cyan-100 flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(34,211,238,.12)]"
+          title="Ver ficha paciente"
+        >
+          <span className="text-2xl leading-none -translate-y-[1px]">‹</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   {!selected ? (
     <div className="flex-1 flex items-center justify-center text-slate-400 text-sm px-6 text-center">
-      Selecciona una conversación
+      Sin datos
     </div>
   ) : (
     <>
-           <div className="relative z-10 bg-[#F8FBFC] px-4 pt-6 pb-3 border-b border-cyan-100 shadow-[0_12px_30px_rgba(14,124,139,.08)] shrink-0 overflow-hidden">
-        <button
-          onClick={doCerrar}
-          className="absolute top-1 right-2 w-6 h-6 rounded-full flex items-center justify-center text-white bg-[linear-gradient(180deg,#214955_0%,#163C46_100%)] border border-cyan-300/20 shadow-[0_0_0_3px_rgba(34,211,238,.10),0_0_14px_rgba(34,211,238,.22)] hover:scale-105 transition-all z-30"
-        >
-          <span className="text-[12px] leading-[1] flex items-center justify-center translate-y-[-1px]">✕</span>
-        </button>
-
-        <div className="w-full rounded-3xl border border-[#6FD7E2]/45 bg-[linear-gradient(180deg,#0F2C35_0%,#163C46_100%)] px-3 py-3 shadow-[0_0_28px_rgba(34,211,238,.16),0_12px_26px_rgba(14,124,139,.12),inset_0_1px_0_rgba(255,255,255,.06)]">
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setMostrarListaMovil(true)}
-              className="w-8 h-8 rounded-xl bg-white/5 border border-[#6FD7E2]/55 text-cyan-100 flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(34,211,238,.12)]"
-              title="Abrir conversaciones"
-            >
-              <span className="text-2xl leading-none -translate-y-[1px]">›</span>
-            </button>
-
-            <div className="min-w-0 flex-1">
-              <div className="font-semibold text-white truncate leading-tight">
-                {selected.nombre_paciente || formatTelefono(selected.telefono_e164)}
-              </div>
-
-              <div className="text-[11px] text-cyan-100/75 truncate mt-1">
-                {formatTelefono(selected.telefono_e164)} · {selected.motivo || 'Sin motivo'}
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-1 shrink-0">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={doTomar}
-                className="h-6 min-w-[74px] px-2 bg-cyan-50 border-cyan-300/40 text-cyan-700 hover:bg-cyan-100 whitespace-nowrap text-[10px] leading-none"
-              >
-                Tomar
-              </Button>
-
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={doDevolver}
-                className="h-6 min-w-[74px] px-2 bg-cyan-50 border-cyan-300/40 text-cyan-700 hover:bg-cyan-100 whitespace-nowrap text-[10px] leading-none"
-              >
-                Devolver
-              </Button>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setMostrarFichaMovil(true)}
-              className="w-8 h-8 rounded-xl bg-white/5 border border-[#6FD7E2]/55 text-cyan-100 flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(34,211,238,.12)]"
-              title="Ver ficha paciente"
-            >
-              <span className="text-2xl leading-none -translate-y-[1px]">‹</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div
+           <div
   ref={mensajesScrollRef}
   className="flex-1 min-h-0 overflow-y-auto px-3 py-4 space-y-4 bg-[radial-gradient(circle_at_top,rgba(34,211,238,.04),#F8FBFC_45%)]"
 >
@@ -2031,9 +2037,10 @@ return (
           )}
         </div>
       </div>
+       )}
+      
     </>
-  )}
-</div>
+  </div>
   </div>
 
 {/* MODAL CREAR CONVERSACIÓN */}
