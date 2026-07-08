@@ -2,6 +2,7 @@
 
 const APP_ID = "977693254901935";
 const CONFIG_ID = "3881222728839399";
+
 const REDIRECT_URI =
   "https://martina-panel-sage.vercel.app/api/whatsapp/callback";
 
@@ -14,6 +15,15 @@ export default function SettingsWhatsAppPage() {
     url.searchParams.set("response_type", "code");
     url.searchParams.set("config_id", CONFIG_ID);
     url.searchParams.set("override_default_response_type", "true");
+
+    url.searchParams.set(
+      "extras",
+      JSON.stringify({
+        setup: {},
+        featureType: "whatsapp_business_app_onboarding",
+        sessionInfoVersion: 3,
+      })
+    );
 
     window.location.href = url.toString();
   };
