@@ -947,9 +947,9 @@ const toggleAudioMessage = async (id: string) => {
       [id]: duration
     }));
   }
+};
 
-
-  return (
+return (
     <div className="h-full flex bg-[#02141B] text-white overflow-hidden">
       <div className="hidden lg:flex h-full w-full">
       <div className="w-[28%] min-w-[280px] max-w-[340px] border-r border-cyan-500/15 bg-[#03111A] flex flex-col shrink-0 min-h-0">
