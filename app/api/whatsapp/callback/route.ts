@@ -52,28 +52,25 @@ export async function GET(request: Request) {
 
   const accessToken = tokenData.access_token;
 
-  const grantedAssetsUrl = new URL(
-    `https://graph.facebook.com/${GRAPH_VERSION}/me`
+  const debugUrl = new URL(
+    `https://graph.facebook.com/${GRAPH_VERSION}/debug_token`
   );
 
-  grantedAssetsUrl.searchParams.set(
-    "fields",
-    "id,name,businesses{id,name,owned_whatsapp_business_accounts{id,name,phone_numbers{id,display_phone_number,verified_name,quality_rating}}}"
-  );
-  grantedAssetsUrl.searchParams.set("access_token", accessToken);
+  debugUrl.searchParams.set("input_token", accessToken);
+  debugUrl.searchParams.set("access_token", `${appId}|${appSecret}`);
 
-  const assetsResponse = await fetch(grantedAssetsUrl.toString(), {
+  const debugResponse = await fetch(debugUrl.toString(), {
     method: "GET",
     cache: "no-store",
   });
 
-  const assetsData = await assetsResponse.json();
+  const debugData = await debugResponse.json();
 
   return NextResponse.json({
-    ok: assetsResponse.ok,
-    step: "get_whatsapp_assets",
+    ok: debugResponse.ok,
+    step: "debug_token",
     token_received: true,
     expires_in: tokenData.expires_in,
-    assets: assetsData,
+    debug: debugData,
   });
 }
