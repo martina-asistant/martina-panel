@@ -565,6 +565,15 @@ const filtered = convs.filter(c => {
     toast.success('Conversación cerrada');
   };
 
+  const abrirCrearConversacion = () => {
+  setNuevoContactoConversacion({
+    nombre_completo: '',
+    telefono: '',
+  });
+  setPacienteSeleccionadoNuevaConv(null);
+  setMostrarCrearConversacion(true);
+};
+  
  const crearNuevaConversacion = async () => {
   if (creandoConversacion) return;
 
@@ -1087,10 +1096,40 @@ return (
       </div>
             <div className="flex-1 flex flex-col min-w-0 min-h-0 bg-[#F8FBFC] text-[#06111A] shadow-[0_0_25px_rgba(14,124,139,.08)]">
         {!selected ? (
-          <div className="flex-1 flex items-center justify-center text-slate-400 text-sm">
-            Selecciona una conversación
+  <>
+    <div className="relative z-10 bg-[#F8FBFC] px-8 py-3 border-b border-cyan-100 shadow-[0_12px_30px_rgba(14,124,139,.08)] shrink-0">
+      <button
+        onClick={abrirCrearConversacion}
+        className="absolute top-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center text-white bg-[linear-gradient(180deg,#214955_0%,#163C46_100%)] border border-cyan-300/15 shadow-[0_0_0_3px_rgba(34,211,238,.10),0_0_18px_rgba(34,211,238,.25)] hover:scale-105 transition-all z-20"
+      >
+        <span className="text-[12px] leading-[1] flex items-center justify-center translate-y-[-1px]">✕</span>
+      </button>
+
+      <div className="w-full rounded-3xl border border-[#6FD7E2]/35 bg-[linear-gradient(180deg,#0F2C35_0%,#163C46_100%)] px-8 py-3 shadow-[0_0_34px_rgba(34,211,238,.18),0_16px_32px_rgba(14,124,139,.14),inset_0_1px_0_rgba(255,255,255,.06)]">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0">
+            <div className="font-semibold text-white">Sin conversación</div>
+            <div className="text-xs text-cyan-100/75">Selecciona o crea una conversación</div>
           </div>
-        ) : (
+
+          <div className="flex flex-wrap items-center gap-3">
+            <Button size="sm" variant="outline" onClick={abrirCrearConversacion} className="bg-cyan-50 border-cyan-300/35 text-cyan-700 hover:bg-cyan-100 whitespace-nowrap">
+              Tomar conversación
+            </Button>
+
+            <Button size="sm" variant="outline" onClick={abrirCrearConversacion} className="bg-cyan-50 border-cyan-300/35 text-cyan-700 hover:bg-cyan-100 whitespace-nowrap">
+              Devolver a Martina
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div className="flex-1 flex items-center justify-center text-slate-400 text-sm">
+      Sin datos
+    </div>
+  </>
+) : (
           <>
             <div className="relative z-10 bg-[#F8FBFC] px-8 py-3 border-b border-cyan-100 shadow-[0_12px_30px_rgba(14,124,139,.08)] shrink-0">
               <button
@@ -1355,11 +1394,11 @@ return (
       </div>
 
       <div className="w-[24%] min-w-[280px] max-w-[340px] border-l border-cyan-500/15 bg-[#03111A] overflow-y-auto shrink-0 min-h-0">
-        {!selected ? null : (
+        {(
           <div className="p-5 space-y-5">
             <div className="flex items-center gap-3">
               <div className="w-16 h-16 rounded-full bg-[radial-gradient(circle_at_35%_30%,#1A6C78_0%,#0D4450_45%,#072B34_100%)] border-2 border-cyan-200/80 flex items-center justify-center text-lg font-semibold text-white shadow-[0_0_12px_rgba(34,211,238,.65),0_0_28px_rgba(34,211,238,.30),inset_0_0_12px_rgba(255,255,255,.18)]">
-                {(paciente?.nombre_completo || selected.nombre_paciente || '?')
+                {(paciente?.nombre_completo || selected?.nombre_paciente || '?')
                   .split(' ')
                   .map(s => s[0])
                   .slice(0, 2)
@@ -1368,11 +1407,11 @@ return (
 
               <div className="min-w-0">
                 <div className="font-semibold truncate text-white">
-                  {paciente?.nombre_completo || selected.nombre_paciente || 'Sin nombre registrado'}
+                  {paciente?.nombre_completo || selected?.nombre_paciente || 'Sin nombre registrado'}
                 </div>
 
                 <div className="text-xs text-cyan-100/60">
-                  {formatTelefono(paciente?.telefono || selected.telefono_e164) || 'Sin teléfono registrado'}
+                  {formatTelefono(paciente?.telefono || selected?.telefono_e164) || 'Sin teléfono registrado'}
                 </div>
               </div>
             </div>
@@ -1636,11 +1675,10 @@ return (
       </button>
     </div>
 
-    {selected && (
       <div className="p-5 space-y-5">
         <div className="flex items-center gap-3">
           <div className="w-16 h-16 rounded-full bg-[radial-gradient(circle_at_35%_30%,#1A6C78_0%,#0D4450_45%,#072B34_100%)] border-2 border-cyan-200/80 flex items-center justify-center text-lg font-semibold text-white shadow-[0_0_12px_rgba(34,211,238,.65),0_0_28px_rgba(34,211,238,.30),inset_0_0_12px_rgba(255,255,255,.18)]">
-            {(paciente?.nombre_completo || selected.nombre_paciente || '?')
+            {(paciente?.nombre_completo || selected?.nombre_paciente || '?')
               .split(' ')
               .map(s => s[0])
               .slice(0, 2)
@@ -1649,11 +1687,11 @@ return (
 
           <div className="min-w-0">
             <div className="font-semibold truncate text-white">
-              {paciente?.nombre_completo || selected.nombre_paciente || 'Sin nombre registrado'}
+              {paciente?.nombre_completo || selected?.nombre_paciente || 'Sin nombre registrado'}
             </div>
 
             <div className="text-xs text-cyan-100/60">
-              {formatTelefono(paciente?.telefono || selected.telefono_e164) || 'Sin teléfono registrado'}
+              {formatTelefono(paciente?.telefono || selected?.telefono_e164) || 'Sin teléfono registrado'}
             </div>
           </div>
         </div>
@@ -1745,16 +1783,14 @@ return (
           </Button>
         </div>
       </div>
-    )}
   </div>
 
   {/* CHAT MÓVIL */}
   <>
     <div className="relative z-10 bg-[#F8FBFC] px-3 pt-6 pb-3 border-b border-cyan-100 shadow-[0_12px_30px_rgba(14,124,139,.08)] shrink-0">
       <button
-        onClick={selected ? doCerrar : undefined}
-        disabled={!selected}
-        className="absolute top-1 right-2 w-6 h-6 rounded-full flex items-center justify-center text-white bg-[linear-gradient(180deg,#214955_0%,#163C46_100%)] border border-cyan-300/20 shadow-[0_0_0_3px_rgba(34,211,238,.10),0_0_14px_rgba(34,211,238,.22)] hover:scale-105 transition-all z-30 disabled:opacity-40 disabled:pointer-events-none"
+        onClick={selected ? doCerrar : abrirCrearConversacion}
+        className="absolute top-1 right-2 w-6 h-6 rounded-full flex items-center justify-center text-white bg-[linear-gradient(180deg,#214955_0%,#163C46_100%)] border border-cyan-300/20 shadow-[0_0_0_3px_rgba(34,211,238,.10),0_0_14px_rgba(34,211,238,.22)] hover:scale-105 transition-all z-30"
       >
         <span className="text-[12px] leading-[1] flex items-center justify-center translate-y-[-1px]">✕</span>
       </button>
@@ -1786,8 +1822,7 @@ return (
             <Button
               size="sm"
               variant="outline"
-              onClick={doTomar}
-              disabled={!selected}
+              onClick={selected ? doTomar : abrirCrearConversacion}
               className="h-6 min-w-[74px] px-2 bg-cyan-50 border-cyan-300/40 text-cyan-700 hover:bg-cyan-100 whitespace-nowrap text-[10px] leading-none disabled:opacity-50"
             >
               Tomar
@@ -1796,8 +1831,7 @@ return (
             <Button
               size="sm"
               variant="outline"
-              onClick={doDevolver}
-              disabled={!selected}
+              onClick={selected ? doDevolver : abrirCrearConversacion}
               className="h-6 min-w-[74px] px-2 bg-cyan-50 border-cyan-300/40 text-cyan-700 hover:bg-cyan-100 whitespace-nowrap text-[10px] leading-none disabled:opacity-50"
             >
               Devolver
