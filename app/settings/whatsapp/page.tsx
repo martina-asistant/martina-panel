@@ -62,11 +62,36 @@ export default function SettingsWhatsAppPage() {
 
     window.FB.login(
       (response: any) => {
-        console.log("========== META RESPONSE ==========");
-        console.log(response);
-        console.log(JSON.stringify(response, null, 2));
-        console.log("===================================");
-      },
+  console.log("========== META RESPONSE ==========");
+  console.log(response);
+  console.log(JSON.stringify(response, null, 2));
+  console.log("===================================");
+
+  const code = response?.authResponse?.code;
+
+  if (!code) {
+    console.error("Meta no ha devuelto code");
+    return;
+  }
+
+  fetch("/api/whatsapp/connect", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ code }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("========== BACKEND RESPONSE ==========");
+      console.log(data);
+      console.log(JSON.stringify(data, null, 2));
+      console.log("======================================");
+    })
+    .catch((error) => {
+      console.error("Error llamando al backend:", error);
+    });
+},
       {
         config_id: CONFIG_ID,
         auth_type: "rerequest",
