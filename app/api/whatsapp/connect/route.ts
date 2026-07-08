@@ -24,27 +24,26 @@ export async function POST(request: Request) {
     }
 
     const tokenUrl = new URL(
-  `https://graph.facebook.com/${GRAPH_VERSION}/oauth/access_token`
-);
+      `https://graph.facebook.com/${GRAPH_VERSION}/oauth/access_token`
+    );
 
-tokenUrl.searchParams.set("client_id", appId);
-tokenUrl.searchParams.set("client_secret", appSecret);
-tokenUrl.searchParams.set("code", code);
+    tokenUrl.searchParams.set("client_id", appId);
+    tokenUrl.searchParams.set("client_secret", appSecret);
+    tokenUrl.searchParams.set("code", code);
 
+    const tokenResponse = await fetch(tokenUrl.toString(), {
+      method: "GET",
+      cache: "no-store",
+    });
 
-const tokenResponse = await fetch(tokenUrl.toString(), {
-  method: "GET",
-  cache: "no-store",
-});
+    const tokenData = await tokenResponse.json();
 
-const tokenData = await tokenResponse.json();
-
-if (!tokenResponse.ok) {
-  return NextResponse.json(
-    { ok: false, step: "exchange_code", meta: tokenData },
-    { status: 400 }
-  );
-}
+    if (!tokenResponse.ok) {
+      return NextResponse.json(
+        { ok: false, step: "exchange_code", meta: tokenData },
+        { status: 400 }
+      );
+    }
 
     const accessToken = tokenData.access_token;
 
