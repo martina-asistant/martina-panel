@@ -1768,7 +1768,7 @@ return (
             <button
               type="button"
               onClick={() => setMostrarListaMovil(true)}
-              className="w-8 h-8 rounded-xl bg-white/5 border border-[#6FD7E2]/55 text-cyan-100 flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(34,211,238,.12)] mr-1"
+              className="w-8 h-8 rounded-xl bg-white/5 border border-[#6FD7E2]/55 text-cyan-100 flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(34,211,238,.12)]"
               title="Abrir conversaciones"
             >
               <span className="text-2xl leading-none -translate-y-[1px]">›</span>
@@ -1807,7 +1807,7 @@ return (
             <button
               type="button"
               onClick={() => setMostrarFichaMovil(true)}
-              className="w-8 h-8 rounded-xl bg-white/5 border border-[#6FD7E2]/55 text-cyan-100 flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(34,211,238,.12)] ml-1"
+              className="w-8 h-8 rounded-xl bg-white/5 border border-[#6FD7E2]/55 text-cyan-100 flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(34,211,238,.12)]"
               title="Ver ficha paciente"
             >
               <span className="text-2xl leading-none -translate-y-[1px]">‹</span>
