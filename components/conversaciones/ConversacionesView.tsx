@@ -943,7 +943,7 @@ const toggleAudioMessage = async (id: string) => {
 
   if (Number.isFinite(duration) && duration > 0) {
     setAudioDurations(prev => ({
-      ...prev,
+      .prev,
       [id]: duration
     }));
   }
