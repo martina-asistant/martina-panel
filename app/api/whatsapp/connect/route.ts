@@ -30,10 +30,7 @@ export async function POST(request: Request) {
 tokenUrl.searchParams.set("client_id", appId);
 tokenUrl.searchParams.set("client_secret", appSecret);
 tokenUrl.searchParams.set("code", code);
-tokenUrl.searchParams.set(
-  "redirect_uri",
-  "https://martina-panel-sage.vercel.app/settings/whatsapp"
-);
+
 
 const tokenResponse = await fetch(tokenUrl.toString(), {
   method: "GET",
