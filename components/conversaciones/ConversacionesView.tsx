@@ -1750,298 +1750,296 @@ return (
 
   {/* CHAT MÓVIL */}
   <>
-  <div className="relative z-10 bg-[#F8FBFC] px-3 pt-6 pb-3 border-b border-cyan-100 shadow-[0_12px_30px_rgba(14,124,139,.08)] shrink-0">
-    <button
-      onClick={selected ? doCerrar : undefined}
-      disabled={!selected}
-      className="absolute top-1 right-2 w-6 h-6 rounded-full flex items-center justify-center text-white bg-[linear-gradient(180deg,#214955_0%,#163C46_100%)] border border-cyan-300/20 shadow-[0_0_0_3px_rgba(34,211,238,.10),0_0_14px_rgba(34,211,238,.22)] hover:scale-105 transition-all z-30 disabled:opacity-40 disabled:pointer-events-none"
-    >
-      <span className="text-[12px] leading-[1] flex items-center justify-center translate-y-[-1px]">✕</span>
-    </button>
+    <div className="relative z-10 bg-[#F8FBFC] px-3 pt-6 pb-3 border-b border-cyan-100 shadow-[0_12px_30px_rgba(14,124,139,.08)] shrink-0">
+      <button
+        onClick={selected ? doCerrar : undefined}
+        disabled={!selected}
+        className="absolute top-1 right-2 w-6 h-6 rounded-full flex items-center justify-center text-white bg-[linear-gradient(180deg,#214955_0%,#163C46_100%)] border border-cyan-300/20 shadow-[0_0_0_3px_rgba(34,211,238,.10),0_0_14px_rgba(34,211,238,.22)] hover:scale-105 transition-all z-30 disabled:opacity-40 disabled:pointer-events-none"
+      >
+        <span className="text-[12px] leading-[1] flex items-center justify-center translate-y-[-1px]">✕</span>
+      </button>
 
-    <div className="w-full rounded-3xl border border-[#6FD7E2]/45 bg-[linear-gradient(180deg,#0F2C35_0%,#163C46_100%)] px-3 py-3 shadow-[0_0_28px_rgba(34,211,238,.16),0_12px_26px_rgba(14,124,139,.12),inset_0_1px_0_rgba(255,255,255,.06)]">
-      <div className="flex items-center gap-2">
-        <button
-          type="button"
-          onClick={() => setMostrarListaMovil(true)}
-          className="w-8 h-8 rounded-xl bg-white/5 border border-[#6FD7E2]/55 text-cyan-100 flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(34,211,238,.12)]"
-          title="Abrir conversaciones"
-        >
-          <span className="text-2xl leading-none -translate-y-[1px]">›</span>
-        </button>
-
-        <div className="min-w-0 flex-1">
-          <div className="font-semibold text-white truncate leading-tight">
-            {selected?.nombre_paciente || (selected ? formatTelefono(selected.telefono_e164) : 'Sin conversación')}
-          </div>
-
-          <div className="text-[11px] text-cyan-100/75 truncate mt-1">
-            {selected
-              ? `${formatTelefono(selected.telefono_e164)} · ${selected.motivo || 'Sin motivo'}`
-              : 'Selecciona o crea una conversación'}
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-1 shrink-0">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={doTomar}
-            disabled={!selected}
-            className="h-6 min-w-[74px] px-2 bg-cyan-50 border-cyan-300/40 text-cyan-700 hover:bg-cyan-100 whitespace-nowrap text-[10px] leading-none disabled:opacity-50"
-          >
-            Tomar
-          </Button>
-
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={doDevolver}
-            disabled={!selected}
-            className="h-6 min-w-[74px] px-2 bg-cyan-50 border-cyan-300/40 text-cyan-700 hover:bg-cyan-100 whitespace-nowrap text-[10px] leading-none disabled:opacity-50"
-          >
-            Devolver
-          </Button>
-        </div>
-
-        <button
-          type="button"
-          onClick={() => setMostrarFichaMovil(true)}
-          className="w-8 h-8 rounded-xl bg-white/5 border border-[#6FD7E2]/55 text-cyan-100 flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(34,211,238,.12)]"
-          title="Ver ficha paciente"
-        >
-          <span className="text-2xl leading-none -translate-y-[1px]">‹</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  {!selected ? (
-    <div className="flex-1 flex items-center justify-center text-slate-400 text-sm px-6 text-center">
-      Sin datos
-    </div>
-  ) : (
-    <>
-           <div
-  ref={mensajesScrollRef}
-  className="flex-1 min-h-0 overflow-y-auto px-3 py-4 space-y-4 bg-[radial-gradient(circle_at_top,rgba(34,211,238,.04),#F8FBFC_45%)]"
->
-        {mensajes.map(m => {
-          const isPaciente =
-            m.tipo_emisor === 'paciente' ||
-            m.direccion === 'entrante';
-
-  const esAudio = m.tipo_mensaje === 'audio' || isAudioMessage(m.contenido_texto);
-const audioSrc = m.url_archivo || '';
-
-const isAttachment = isAttachmentMessage(m);
-const attachmentName = getAttachmentFileName(m);
-
-return (
-  <div
-    key={m.id}
-    className={cn(
-      'flex',
-      isPaciente ? 'justify-start' : 'justify-end'
-    )}
-  >
-    <div
-      className={cn(
-        'w-fit max-w-[88%] rounded-2xl pl-4 pr-2 py-1.5 text-sm shadow-sm',
-        isPaciente
-          ? 'bg-white border border-slate-200 text-[#06111A] rounded-bl-sm'
-          : 'bg-[#D9F7FA] border border-[#B6EAEF] text-[#184B53] rounded-br-sm shadow-[0_0_12px_rgba(34,211,238,.08)]'
-      )}
-    >
-      {esAudio ? (
-        <AudioBubble
-          src={audioSrc}
-          onDelete={() => eliminarMensaje(m.id)}
-        />
-      ) : isAttachment ? (
-        <AttachmentBubble
-          fileName={attachmentName}
-          url={(m as any).url_archivo || null}
-          mimeType={(m as any).mime_type || null}
-          onDelete={() => eliminarMensaje(m.id)}
-        />
-      ) : (
-        <div className="relative pr-7">
+      <div className="w-full rounded-3xl border border-[#6FD7E2]/45 bg-[linear-gradient(180deg,#0F2C35_0%,#163C46_100%)] px-3 py-3 shadow-[0_0_28px_rgba(34,211,238,.16),0_12px_26px_rgba(14,124,139,.12),inset_0_1px_0_rgba(255,255,255,.06)]">
+        <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => setMenuMensajeId(menuMensajeId === m.id ? null : m.id)}
-            className="absolute top-[2px] right-1 w-4 h-4 rounded-full text-cyan-900/45 hover:text-cyan-900 hover:bg-cyan-100 flex items-center justify-center z-20"
-            title="Opciones mensaje"
+            onClick={() => setMostrarListaMovil(true)}
+            className="w-8 h-8 rounded-xl bg-white/5 border border-[#6FD7E2]/55 text-cyan-100 flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(34,211,238,.12)]"
+            title="Abrir conversaciones"
           >
-            <MoreVertical className="w-4 h-4" />
+            <span className="text-2xl leading-none -translate-y-[1px]">›</span>
           </button>
 
-          {menuMensajeId === m.id && (
-            <div className="absolute top-5 right-0 z-50 w-36 rounded-xl border border-cyan-200 bg-white shadow-xl overflow-hidden">
-              <button
-                type="button"
-                onClick={() => eliminarMensaje(m.id)}
-                className="w-full px-3 py-2 text-left text-xs text-red-600 hover:bg-red-50"
-              >
-                Eliminar mensaje
-              </button>
+          <div className="min-w-0 flex-1">
+            <div className="font-semibold text-white truncate leading-tight">
+              {selected?.nombre_paciente || (selected ? formatTelefono(selected.telefono_e164) : 'Sin conversación')}
             </div>
-          )}
 
-          <div className="max-w-full whitespace-pre-wrap break-words leading-snug">
-            {renderWhatsappText(m.contenido_texto || '')}
-            <span className="float-right ml-2 mt-[3px] text-[10px] whitespace-nowrap text-cyan-900/45">
-              {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
-            </span>
+            <div className="text-[11px] text-cyan-100/75 truncate mt-1">
+              {selected
+                ? `${formatTelefono(selected.telefono_e164)} · ${selected.motivo || 'Sin motivo'}`
+                : 'Selecciona o crea una conversación'}
+            </div>
           </div>
-        </div>
-      )}
 
-      {(esAudio || isAttachment) && (
+          <div className="flex flex-col gap-1 shrink-0">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={doTomar}
+              disabled={!selected}
+              className="h-6 min-w-[74px] px-2 bg-cyan-50 border-cyan-300/40 text-cyan-700 hover:bg-cyan-100 whitespace-nowrap text-[10px] leading-none disabled:opacity-50"
+            >
+              Tomar
+            </Button>
+
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={doDevolver}
+              disabled={!selected}
+              className="h-6 min-w-[74px] px-2 bg-cyan-50 border-cyan-300/40 text-cyan-700 hover:bg-cyan-100 whitespace-nowrap text-[10px] leading-none disabled:opacity-50"
+            >
+              Devolver
+            </Button>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setMostrarFichaMovil(true)}
+            className="w-8 h-8 rounded-xl bg-white/5 border border-[#6FD7E2]/55 text-cyan-100 flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(34,211,238,.12)]"
+            title="Ver ficha paciente"
+          >
+            <span className="text-2xl leading-none -translate-y-[1px]">‹</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    {!selected ? (
+      <div className="flex-1 flex items-center justify-center text-slate-400 text-sm px-6 text-center">
+        Sin datos
+      </div>
+    ) : (
+      <>
         <div
-          className={cn(
-            'text-[10px] mt-2 text-right',
-            isPaciente ? 'text-slate-400' : 'text-cyan-900/60'
-          )}
+          ref={mensajesScrollRef}
+          className="flex-1 min-h-0 overflow-y-auto px-3 py-4 space-y-4 bg-[radial-gradient(circle_at_top,rgba(34,211,238,.04),#F8FBFC_45%)]"
         >
-          {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
-        </div>
-      )}
-    </div>
-  </div>
-);      
-        })}
+          {mensajes.map(m => {
+            const isPaciente =
+              m.tipo_emisor === 'paciente' ||
+              m.direccion === 'entrante';
 
-        {mensajes.length === 0 && (
-          <div className="text-center text-sm text-slate-400 py-8">
-            Sin mensajes
-          </div>
-        )}
+            const esAudio = m.tipo_mensaje === 'audio' || isAudioMessage(m.contenido_texto);
+            const audioSrc = m.url_archivo || '';
 
-        <div ref={mensajesEndRef} />
-      </div>
+            const isAttachment = isAttachmentMessage(m);
+            const attachmentName = getAttachmentFileName(m);
 
-      <div className="px-3 py-3 border-t border-[#6FD7E2]/20 bg-[#F8FBFC] shadow-[0_-6px_20px_rgba(14,124,139,.08)] shrink-0">
-        <div className="flex items-center gap-2 rounded-2xl border border-[#6FD7E2]/35 bg-[linear-gradient(180deg,#0F2C35_0%,#163C46_100%)] p-2.5 shadow-[0_-10px_35px_rgba(34,211,238,.14),0_14px_30px_rgba(34,211,238,.10),inset_0_1px_0_rgba(255,255,255,.05)]">
-          <input
-            ref={fileInputRef}
-            type="file"
-            className="hidden"
-            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) enviarAdjunto(file);
-            }}
-          />
-
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={grabandoAudio || enviandoAudio}
-            className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] shadow-[0_0_20px_rgba(14,124,139,.35)] text-white flex items-center justify-center transition-all disabled:opacity-40 shrink-0"
-            title="Adjuntar archivo"
-          >
-            <Paperclip className="w-4 h-4" />
-          </button>
-
-          {audioPreviewUrl ? (
-            <div className="flex-1 h-10 rounded-xl bg-white border border-cyan-100 px-2 flex items-center gap-2 min-w-0">
-              <audio
-                ref={audioPreviewRef}
-                src={audioPreviewUrl}
-                onEnded={() => setReproduciendoPreview(false)}
-                className="hidden"
-              />
-
-              <button
-                type="button"
-                onClick={limpiarPreviewAudio}
-                disabled={enviandoAudio}
-                className="h-8 w-8 rounded-lg text-red-500 hover:bg-red-50 flex items-center justify-center disabled:opacity-40"
-                title="Borrar audio"
+            return (
+              <div
+                key={m.id}
+                className={cn(
+                  'flex',
+                  isPaciente ? 'justify-start' : 'justify-end'
+                )}
               >
-                <Trash2 className="w-4 h-4" />
-              </button>
+                <div
+                  className={cn(
+                    'w-fit max-w-[88%] rounded-2xl pl-4 pr-2 py-1.5 text-sm shadow-sm',
+                    isPaciente
+                      ? 'bg-white border border-slate-200 text-[#06111A] rounded-bl-sm'
+                      : 'bg-[#D9F7FA] border border-[#B6EAEF] text-[#184B53] rounded-br-sm shadow-[0_0_12px_rgba(34,211,238,.08)]'
+                  )}
+                >
+                  {esAudio ? (
+                    <AudioBubble
+                      src={audioSrc}
+                      onDelete={() => eliminarMensaje(m.id)}
+                    />
+                  ) : isAttachment ? (
+                    <AttachmentBubble
+                      fileName={attachmentName}
+                      url={(m as any).url_archivo || null}
+                      mimeType={(m as any).mime_type || null}
+                      onDelete={() => eliminarMensaje(m.id)}
+                    />
+                  ) : (
+                    <div className="relative pr-7">
+                      <button
+                        type="button"
+                        onClick={() => setMenuMensajeId(menuMensajeId === m.id ? null : m.id)}
+                        className="absolute top-[2px] right-1 w-4 h-4 rounded-full text-cyan-900/45 hover:text-cyan-900 hover:bg-cyan-100 flex items-center justify-center z-20"
+                        title="Opciones mensaje"
+                      >
+                        <MoreVertical className="w-4 h-4" />
+                      </button>
 
-              <button
-                type="button"
-                onClick={togglePreviewAudio}
-                disabled={enviandoAudio}
-                className="h-8 w-8 rounded-lg text-cyan-800 hover:bg-cyan-50 flex items-center justify-center disabled:opacity-40"
-                title={reproduciendoPreview ? 'Pausar audio' : 'Escuchar audio'}
-              >
-                {reproduciendoPreview ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-              </button>
+                      {menuMensajeId === m.id && (
+                        <div className="absolute top-5 right-0 z-50 w-36 rounded-xl border border-cyan-200 bg-white shadow-xl overflow-hidden">
+                          <button
+                            type="button"
+                            onClick={() => eliminarMensaje(m.id)}
+                            className="w-full px-3 py-2 text-left text-xs text-red-600 hover:bg-red-50"
+                          >
+                            Eliminar mensaje
+                          </button>
+                        </div>
+                      )}
 
-              <div className="min-w-0 flex-1 truncate text-sm text-slate-700">
-                Audio listo para enviar
+                      <div className="max-w-full whitespace-pre-wrap break-words leading-snug">
+                        {renderWhatsappText(m.contenido_texto || '')}
+                        <span className="float-right ml-2 mt-[3px] text-[10px] whitespace-nowrap text-cyan-900/45">
+                          {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {(esAudio || isAttachment) && (
+                    <div
+                      className={cn(
+                        'text-[10px] mt-2 text-right',
+                        isPaciente ? 'text-slate-400' : 'text-cyan-900/60'
+                      )}
+                    >
+                      {formatTime(m.created_at)} {!isPaciente && getInicialEmisor(m)}
+                    </div>
+                  )}
+                </div>
               </div>
+            );
+          })}
 
-              <button
-                type="button"
-                onClick={enviarAudioPreview}
-                disabled={enviandoAudio}
-                className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] text-white flex items-center justify-center disabled:opacity-40"
-                title="Enviar audio"
-              >
-                <Send className="w-4 h-4" />
-              </button>
+          {mensajes.length === 0 && (
+            <div className="text-center text-sm text-slate-400 py-8">
+              Sin mensajes
             </div>
-          ) : (
-            <>
-              <Input
-                placeholder={
-                  grabandoAudio
-                    ? `Grabando audio... ${formatAudioTime(segundosGrabacion)}`
-                    : 'Escribe un mensaje...'
-                }
-                value={nuevoMensaje}
-                onChange={(e) => setNuevoMensaje(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    if (!grabandoAudio) enviarMensaje();
-                  }
-                }}
-                disabled={grabandoAudio}
-                className="flex-1 h-10 rounded-xl bg-white border border-cyan-100 px-4 text-sm text-slate-700 placeholder:text-slate-400 focus-visible:ring-cyan-400 disabled:opacity-60"
-              />
-
-              <button
-                type="button"
-                onClick={enviarMensaje}
-                disabled={!nuevoMensaje.trim() || grabandoAudio}
-                className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_24px_rgba(14,124,139,.45)] text-white flex items-center justify-center shrink-0"
-                title="Enviar"
-              >
-                <Send className="w-4 h-4" />
-              </button>
-            </>
           )}
 
-          {!audioPreviewUrl && (
+          <div ref={mensajesEndRef} />
+        </div>
+
+        <div className="px-3 py-3 border-t border-[#6FD7E2]/20 bg-[#F8FBFC] shadow-[0_-6px_20px_rgba(14,124,139,.08)] shrink-0">
+          <div className="flex items-center gap-2 rounded-2xl border border-[#6FD7E2]/35 bg-[linear-gradient(180deg,#0F2C35_0%,#163C46_100%)] p-2.5 shadow-[0_-10px_35px_rgba(34,211,238,.14),0_14px_30px_rgba(34,211,238,.10),inset_0_1px_0_rgba(255,255,255,.05)]">
+            <input
+              ref={fileInputRef}
+              type="file"
+              className="hidden"
+              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) enviarAdjunto(file);
+              }}
+            />
+
             <button
               type="button"
-              onClick={grabandoAudio ? pararGrabacionAudio : iniciarGrabacionAudio}
-              disabled={enviandoAudio}
-              className={cn(
-                'w-10 h-10 rounded-xl text-white flex items-center justify-center transition-all shrink-0',
-                grabandoAudio
-                  ? 'bg-red-500 hover:bg-red-600 shadow-[0_0_20px_rgba(239,68,68,.35)]'
-                  : 'bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] shadow-[0_0_20px_rgba(14,124,139,.35)]'
-              )}
-              title={grabandoAudio ? 'Parar grabación' : 'Grabar audio'}
+              onClick={() => fileInputRef.current?.click()}
+              disabled={grabandoAudio || enviandoAudio}
+              className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] shadow-[0_0_20px_rgba(14,124,139,.35)] text-white flex items-center justify-center transition-all disabled:opacity-40 shrink-0"
+              title="Adjuntar archivo"
             >
-              {grabandoAudio ? <Square className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+              <Paperclip className="w-4 h-4" />
             </button>
-          )}
+
+            {audioPreviewUrl ? (
+              <div className="flex-1 h-10 rounded-xl bg-white border border-cyan-100 px-2 flex items-center gap-2 min-w-0">
+                <audio
+                  ref={audioPreviewRef}
+                  src={audioPreviewUrl}
+                  onEnded={() => setReproduciendoPreview(false)}
+                  className="hidden"
+                />
+
+                <button
+                  type="button"
+                  onClick={limpiarPreviewAudio}
+                  disabled={enviandoAudio}
+                  className="h-8 w-8 rounded-lg text-red-500 hover:bg-red-50 flex items-center justify-center disabled:opacity-40"
+                  title="Borrar audio"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={togglePreviewAudio}
+                  disabled={enviandoAudio}
+                  className="h-8 w-8 rounded-lg text-cyan-800 hover:bg-cyan-50 flex items-center justify-center disabled:opacity-40"
+                  title={reproduciendoPreview ? 'Pausar audio' : 'Escuchar audio'}
+                >
+                  {reproduciendoPreview ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                </button>
+
+                <div className="min-w-0 flex-1 truncate text-sm text-slate-700">
+                  Audio listo para enviar
+                </div>
+
+                <button
+                  type="button"
+                  onClick={enviarAudioPreview}
+                  disabled={enviandoAudio}
+                  className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] text-white flex items-center justify-center disabled:opacity-40"
+                  title="Enviar audio"
+                >
+                  <Send className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <>
+                <Input
+                  placeholder={
+                    grabandoAudio
+                      ? `Grabando audio... ${formatAudioTime(segundosGrabacion)}`
+                      : 'Escribe un mensaje...'
+                  }
+                  value={nuevoMensaje}
+                  onChange={(e) => setNuevoMensaje(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      if (!grabandoAudio) enviarMensaje();
+                    }
+                  }}
+                  disabled={grabandoAudio}
+                  className="flex-1 h-10 rounded-xl bg-white border border-cyan-100 px-4 text-sm text-slate-700 placeholder:text-slate-400 focus-visible:ring-cyan-400 disabled:opacity-60"
+                />
+
+                <button
+                  type="button"
+                  onClick={enviarMensaje}
+                  disabled={!nuevoMensaje.trim() || grabandoAudio}
+                  className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_24px_rgba(14,124,139,.45)] text-white flex items-center justify-center shrink-0"
+                  title="Enviar"
+                >
+                  <Send className="w-4 h-4" />
+                </button>
+              </>
+            )}
+
+            {!audioPreviewUrl && (
+              <button
+                type="button"
+                onClick={grabandoAudio ? pararGrabacionAudio : iniciarGrabacionAudio}
+                disabled={enviandoAudio}
+                className={cn(
+                  'w-10 h-10 rounded-xl text-white flex items-center justify-center transition-all shrink-0',
+                  grabandoAudio
+                    ? 'bg-red-500 hover:bg-red-600 shadow-[0_0_20px_rgba(239,68,68,.35)]'
+                    : 'bg-gradient-to-br from-[#17C7D6] to-[#0E7C8B] shadow-[0_0_20px_rgba(14,124,139,.35)]'
+                )}
+                title={grabandoAudio ? 'Parar grabación' : 'Grabar audio'}
+              >
+                {grabandoAudio ? <Square className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+              </button>
+            )}
+          </div>
         </div>
-      </div>
-       )}
-      
-    </>
-  </div>
-  </div>
+      </>
+    )}
+  </>
 
 {/* MODAL CREAR CONVERSACIÓN */}
 {mostrarCrearConversacion && (
