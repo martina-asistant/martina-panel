@@ -2040,6 +2040,8 @@ return (
       </>
     )}
   </>
+      </div>
+</div>
 
 {/* MODAL CREAR CONVERSACIÓN */}
 {mostrarCrearConversacion && (
