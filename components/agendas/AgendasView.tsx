@@ -469,6 +469,8 @@ export default function AgendasView() {
   const [mostrarInsertar, setMostrarInsertar] = useState(false);
   const [nuevaCita, setNuevaCita] = useState({
   nombre_paciente: '',
+  nombre: '',
+  apellidos: '',
   telefono: '',
   motivo: 'Primera visita',
   detalle_motivo: '',
@@ -876,6 +878,8 @@ const guardarCambiosCita = async () => {
 
   setNuevaCita({
     nombre_paciente: '',
+    nombre: '',
+    apellidos: '',
     telefono: '',
     motivo,
     detalle_motivo: '',
@@ -885,6 +889,8 @@ const guardarCambiosCita = async () => {
 
   setNuevaCita({
   nombre_paciente: '',
+  nombre: '',
+  apellidos: '',
   telefono: '',
   motivo,
   detalle_motivo: '',
@@ -976,8 +982,8 @@ const guardarInsertarCita = async () => {
         accion: 'insertar_cita',
         agenda: agendaActiva,
         nombre_paciente: nuevaCita.nombre_paciente,
-        nombre: nuevoPaciente.nombre,
-        apellidos: nuevoPaciente.apellidos,
+        nombre: nuevaCita.nombre,
+apellidos: nuevaCita.apellidos,
         telefono: nuevaCita.telefono,
         motivo: nuevaCita.motivo,
         detalle_motivo: nuevaCita.detalle_motivo,
@@ -4115,10 +4121,12 @@ useEffect(() => {
             const nombreCompleto = `${nuevoPaciente.nombre} ${nuevoPaciente.apellidos}`.trim();
 
             setNuevaCita({
-              ...nuevaCita,
-              nombre_paciente: nombreCompleto,
-              telefono: nuevoPaciente.telefono,
-            });
+  ...nuevaCita,
+  nombre_paciente: nombreCompleto,
+  nombre: nuevoPaciente.nombre.trim(),
+  apellidos: nuevoPaciente.apellidos.trim(),
+  telefono: nuevoPaciente.telefono,
+});
 
             setBusquedaPaciente(nombreCompleto);
             setMostrarNuevoPaciente(false);
