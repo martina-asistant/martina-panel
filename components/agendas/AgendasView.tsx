@@ -711,6 +711,18 @@ const guardarCambiosCita = async () => {
 
   const citaActualizada = eventoSeleccionado;
 
+  const citaOriginal = eventos.find(
+    (evento) => evento.event_id === citaActualizada.event_id
+  );
+
+  const cambiaInicio =
+    citaOriginal &&
+    new Date(citaOriginal.fecha_inicio).getTime() !==
+      new Date(citaActualizada.fecha_inicio).getTime();
+
+  const nuevoNumeroCambios =
+    (citaActualizada.cambios || 0) + (cambiaInicio ? 1 : 0);
+
   setModalCitaAbierto(false);
   setEventoSeleccionado(null);
   setEventoActivo(null);
@@ -719,16 +731,16 @@ const guardarCambiosCita = async () => {
   setSlotFin(null);
 
   setEventos((prev) =>
-  prev.map((evento) =>
-    evento.event_id === citaActualizada.event_id
-      ? {
-          ...evento,
-          ...citaActualizada,
-          cambios: (citaActualizada.cambios || 0) + 1,
-        }
-      : evento
-  )
-);
+    prev.map((evento) =>
+      evento.event_id === citaActualizada.event_id
+        ? {
+            ...evento,
+            ...citaActualizada,
+            cambios: nuevoNumeroCambios,
+          }
+        : evento
+    )
+  );
 
   setLoading(true);
 
@@ -749,7 +761,7 @@ const guardarCambiosCita = async () => {
         detalle_motivo: citaActualizada.detalle_motivo,
         origen: citaActualizada.origen,
         estado: citaActualizada.estado,
-        cambios: (citaActualizada.cambios || 0) + 1,
+        cambios: nuevoNumeroCambios,
         fecha_inicio: citaActualizada.fecha_inicio,
         fecha_fin: citaActualizada.fecha_fin,
         usuario: usuarioPanel,
