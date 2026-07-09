@@ -380,12 +380,15 @@ const getColorTratamiento = (evento: EventoAgenda) => {
     return { bg: 'rgba(125,211,252,.90)', text: 'text-white' };
   }
 
-  if (
-    motivo === 'prótesis' ||
-    motivo === 'protesis' ||
-    motivo === 'impresiones' ||
-    motivo === 'prueba-colocar'
-  ) {
+  if (motivo === 'prótesis' || motivo === 'protesis') {
+    return { bg: 'rgba(255,142,43,.85)', text: 'text-white' };
+  }
+
+  if (motivo === 'impresiones') {
+    return { bg: 'rgba(255,169,77,.85)', text: 'text-white' };
+  }
+
+  if (motivo === 'prueba-colocar') {
     return { bg: 'rgba(249,115,22,.90)', text: 'text-white' };
   }
 
