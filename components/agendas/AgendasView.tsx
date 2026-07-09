@@ -373,7 +373,7 @@ const getColorTratamiento = (evento: EventoAgenda) => {
   }
 
   if (motivo === 'revisión' || motivo === 'revision') {
-    return { bg: 'rgba(93,115,184,.90)', text: 'text-white' };
+    return { bg: 'rgba(108,156,224,.90)', text: 'text-white' };
   }
 
   if (motivo === 'revisión general' || motivo === 'revision general') {
