@@ -27,6 +27,7 @@ const TRATAMIENTOS = [
   'Revisión',
   'Revisión general',
   'Limpieza',
+  'Blanqueamiento',
   'Obturación',
   'Endodoncia',
   'Rec+Post',
@@ -39,6 +40,8 @@ const TRATAMIENTOS = [
   'Tallados',
   'Prótesis',
   'Férula Michigan',
+  'Ver-valorar',
+  'Ortodoncia',
   'Fotos',
 ];
 
@@ -188,6 +191,8 @@ const getDuracionPorMotivo = (motivo: string) => {
   if (m === 'revisión' || m === 'revision') return 5;
 
   if (m === 'limpieza') return 30;
+  
+  if (m === 'blanqueamiento') return 60;
 
   if (m === 'obturación' || m === 'obturacion') return 30;
 
@@ -214,6 +219,10 @@ const getDuracionPorMotivo = (motivo: string) => {
   if (m === 'prótesis' || m === 'protesis') return 30;
 
   if (m === 'férula michigan' || m === 'ferula michigan') return 30;
+  
+  if (m === 'ver-valorar' || m === 'ver valorar') return 15;
+  
+  if (m === 'ortodoncia') return 45;
 
   if (m === 'fotos' ) return 5;
 
@@ -403,6 +412,30 @@ if (motivo === 'fotos') {
   if (motivo === 'cirugía' || motivo === 'cirugia') {
     return { bg: 'rgba(255,255,255,.95)', text: 'text-[#03111A]' };
   }
+
+  // VER-VALORAR (lila claro elegante)
+if (motivo === 'ver-valorar' || motivo === 'ver valorar') {
+  return {
+    bg: 'rgba(192,132,252,.90)',
+    text: 'text-white',
+  };
+}
+
+// ORTODONCIA (morado intenso)
+if (motivo === 'ortodoncia') {
+  return {
+    bg: 'rgba(126,34,206,.92)',
+    text: 'text-white',
+  };
+}
+
+// BLANQUEAMIENTO (plata brillante)
+if (motivo === 'blanqueamiento') {
+  return {
+    bg: 'rgba(236,242,247,.96)',
+    text: 'text-slate-800',
+  };
+}
 
   return { bg: 'rgba(59,130,246,.85)', text: 'text-white' };
 };
