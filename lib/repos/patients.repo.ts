@@ -7,6 +7,94 @@ const normalizePhone = (phone?: string | number | null) => {
   return String(phone).replace(/\D/g, '');
 };
 
+const normalizarTexto = (texto: string) =>
+  texto
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+
+const separarNombreYApellidos = (nombreCompleto: string) => {
+  const limpio = nombreCompleto.trim().replace(/\s+/g, ' ');
+  const partes = limpio.split(' ');
+
+  const nombresCompuestos = [
+    'maria pilar',
+    'maria jose',
+    'maria del mar',
+    'maria dolores',
+    'maria angeles',
+    'maria carmen',
+    'maria luisa',
+    'maria teresa',
+    'maria isabel',
+    'maria jesus',
+    'maria cristina',
+    'maria victoria',
+    'maria concepcion',
+    'maria soledad',
+    'maria rosario',
+    'ana maria',
+    'ana belen',
+    'ana isabel',
+    'ana cristina',
+    'ana maria',
+    'jose luis',
+    'jose antonio',
+    'jose alberto',
+    'jose manuel',
+    'jose maria',
+    'jose miguel',
+    'jose ramon',
+    'jose carlos',
+    'jose angel',
+    'jose ignacio',
+    'jose francisco',
+    'juan carlos',
+    'juan jose',
+    'juan antonio',
+    'juan manuel',
+    'juan francisco',
+    'juan alberto',
+    'juan miguel',
+    'juan luis',
+    'juan ramon',
+    'francisco jose',
+    'francisco javier',
+    'francisco manuel',
+    'miguel angel',
+    'miguel jose',
+    'angel luis',
+    'angel manuel',
+    'luis miguel',
+    'luis alberto',
+    'luis manuel',
+    'luis angel',
+    'carlos alberto',
+    'carlos manuel',
+    'pedro antonio',
+    'pedro jose',
+    'jesus maria',
+    'ivan juan',
+    'ivan jose',
+  ];
+
+  const primerasTres = normalizarTexto(partes.slice(0, 3).join(' '));
+  const primerasDos = normalizarTexto(partes.slice(0, 2).join(' '));
+
+  const cantidadNombre = nombresCompuestos.includes(primerasTres)
+    ? 3
+    : nombresCompuestos.includes(primerasDos)
+      ? 2
+      : 1;
+
+  return {
+    nombre: partes.slice(0, cantidadNombre).join(' '),
+    apellidos: partes.slice(cantidadNombre).join(' '),
+    nombre_completo: limpio,
+  };
+};
+
 export async function getPatientByPacienteId(
   paciente_id: string | null | undefined
 ): Promise<Patient | null> {
@@ -94,7 +182,7 @@ export async function getPatientByNombre(
 ): Promise<Patient | null> {
   if (!nombre) return null;
 
-  const clean = nombre.trim().toLowerCase();
+  const clean = normalizarTexto(nombre);
 
   if (!clean) return null;
 
@@ -103,17 +191,12 @@ export async function getPatientByNombre(
   if (!supa) {
     return (
       mockPatients.find(p => {
-        const nombreCompleto = (
+        const nombreCompleto = normalizarTexto(
           p.nombre_completo ||
           `${p.nombre || ''} ${p.apellidos || ''}`
-        )
-          .trim()
-          .toLowerCase();
-
-        return (
-          nombreCompleto === clean ||
-          nombreCompleto.includes(clean)
         );
+
+        return nombreCompleto === clean || nombreCompleto.includes(clean);
       }) || null
     );
   }
@@ -129,17 +212,12 @@ export async function getPatientByNombre(
   }
 
   const found = (data || []).find(p => {
-    const nombreCompleto = (
+    const nombreCompleto = normalizarTexto(
       p.nombre_completo ||
       `${p.nombre || ''} ${p.apellidos || ''}`
-    )
-      .trim()
-      .toLowerCase();
-
-    return (
-      nombreCompleto === clean ||
-      nombreCompleto.includes(clean)
     );
+
+    return nombreCompleto === clean || nombreCompleto.includes(clean);
   });
 
   return (found as Patient) || null;
@@ -157,7 +235,7 @@ export async function updatePatientNotas(
     if (idx >= 0) {
       mockPatients[idx] = {
         ...mockPatients[idx],
-        notas_internas: notas
+        notas_internas: notas,
       };
 
       return mockPatients[idx];
@@ -211,14 +289,13 @@ export async function crearPatientDesdeConversacion({
   const supa = createBrowserSupa();
 
   const limpio = normalizePhone(telefono);
-  const partes = nombre_completo.trim().split(/\s+/);
-  const nombre = partes[0] || '';
-  const apellidos = partes.slice(1).join(' ');
+
+  const nombreSeparado = separarNombreYApellidos(nombre_completo);
 
   const nuevo = {
-    nombre,
-    apellidos,
-    nombre_completo: nombre_completo.trim(),
+    nombre: nombreSeparado.nombre,
+    apellidos: nombreSeparado.apellidos,
+    nombre_completo: nombreSeparado.nombre_completo,
     telefono: limpio,
   };
 
