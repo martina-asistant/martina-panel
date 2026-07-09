@@ -373,7 +373,7 @@ const getColorTratamiento = (evento: EventoAgenda) => {
   }
 
   if (motivo === 'revisión' || motivo === 'revision') {
-    return { bg: 'rgba(125,211,252,.90)', text: 'text-white' };
+    return { bg: 'rgba(93,115,184,.90)', text: 'text-white' };
   }
 
   if (motivo === 'revisión general' || motivo === 'revision general') {
@@ -416,7 +416,7 @@ if (motivo === 'fotos') {
   // VER-VALORAR (lila claro elegante)
 if (motivo === 'ver-valorar' || motivo === 'ver valorar') {
   return {
-    bg: 'rgba(192,132,252,.90)',
+    bg: 'rgba(184,163,209,.90)',
     text: 'text-white',
   };
 }
@@ -424,7 +424,7 @@ if (motivo === 'ver-valorar' || motivo === 'ver valorar') {
 // ORTODONCIA (morado intenso)
 if (motivo === 'ortodoncia') {
   return {
-    bg: 'rgba(126,34,206,.92)',
+    bg: 'rgba(122,91,157,.90)',
     text: 'text-white',
   };
 }
@@ -432,7 +432,7 @@ if (motivo === 'ortodoncia') {
 // BLANQUEAMIENTO (plata brillante)
 if (motivo === 'blanqueamiento') {
   return {
-    bg: 'rgba(236,242,247,.96)',
+    bg: 'rgba(246,239,230,.90)',
     text: 'text-slate-800',
   };
 }
