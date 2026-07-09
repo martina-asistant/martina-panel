@@ -976,6 +976,8 @@ const guardarInsertarCita = async () => {
         accion: 'insertar_cita',
         agenda: agendaActiva,
         nombre_paciente: nuevaCita.nombre_paciente,
+        nombre: nuevoPaciente.nombre,
+        apellidos: nuevoPaciente.apellidos,
         telefono: nuevaCita.telefono,
         motivo: nuevaCita.motivo,
         detalle_motivo: nuevaCita.detalle_motivo,
