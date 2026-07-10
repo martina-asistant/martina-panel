@@ -422,7 +422,7 @@ return (
             key={t.id}
             type="button"
             onClick={() => abrirEditar(t)}
-            className="w-full grid grid-cols-[1fr_40px_56px_88px] gap-2 items-center px-3 py-4 border-t border-cyan-500/10 text-left hover:bg-cyan-500/5"
+            className="w-full grid grid-cols-[1fr_48px_62px_94px] gap-2 items-center px-3 py-4 border-t border-cyan-500/10 text-left hover:bg-cyan-500/5"
           >
             <div className="min-w-0 font-medium text-white truncate">
               {t.nombre_paciente || '—'}
