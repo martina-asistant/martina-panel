@@ -1790,7 +1790,7 @@ return (
     <div className="relative z-10 bg-[#F8FBFC] px-3 pt-6 pb-3 border-b border-cyan-100 shadow-[0_12px_30px_rgba(14,124,139,.08)] shrink-0">
       <button
         onClick={selected ? doCerrar : abrirCrearConversacion}
-        className="absolute top-1 right-1.5 w-6 h-6 rounded-full flex items-center justify-center text-white bg-[linear-gradient(180deg,#214955_0%,#163C46_100%)] border border-cyan-300/20 shadow-[0_0_0_3px_rgba(34,211,238,.10),0_0_14px_rgba(34,211,238,.22)] hover:scale-105 transition-all z-30"
+        className="absolute top-1 right-1 w-6 h-6 rounded-full flex items-center justify-center text-white bg-[linear-gradient(180deg,#214955_0%,#163C46_100%)] border border-cyan-300/20 shadow-[0_0_0_3px_rgba(34,211,238,.10),0_0_14px_rgba(34,211,238,.22)] hover:scale-105 transition-all z-30"
       >
         <span className="text-[12px] leading-[1] flex items-center justify-center translate-y-[-1px]">✕</span>
       </button>
