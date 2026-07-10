@@ -180,6 +180,7 @@ export default function SettingsWhatsAppPage() {
       },
       {
         config_id: CONFIG_ID,
+        auth_type: "rerequest",
         response_type: "code",
         override_default_response_type: true,
         extras: {
