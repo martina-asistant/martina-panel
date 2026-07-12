@@ -109,7 +109,7 @@ export async function upsertIntegracionWhatsapp(
       DEFAULT_NOMBRE_CLINICA,
 
     proveedor:
-      actual?.proveedor || "meta",
+      actual?.proveedor ?? "meta",
 
     estado:
       input.estado ??
@@ -200,10 +200,7 @@ export async function marcarWhatsappConectado(input: {
   return upsertIntegracionWhatsapp({
     ...input,
 
-    /*
-     * El token permanente se guarda únicamente
-     * en Vercel como variable de entorno.
-     */
+    // El token permanente está protegido en Vercel.
     access_token: null,
     token_expires_at: null,
 
@@ -220,15 +217,5 @@ export async function marcarWhatsappError(input: {
     cliente_id: input.cliente_id,
     estado: "error",
     ultimo_error: input.ultimo_error,
-  });
-}
-
-export async function marcarWhatsappDesconectado(
-  clienteId = DEFAULT_CLIENTE_ID
-) {
-  return upsertIntegracionWhatsapp({
-    cliente_id: clienteId,
-    estado: "desconectada",
-    ultimo_error: null,
   });
 }
