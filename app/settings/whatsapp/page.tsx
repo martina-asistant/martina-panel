@@ -137,50 +137,55 @@ export default function SettingsWhatsAppPage() {
     };
   }, []);
 
-  const launchSignup = () => {
-    if (!window.FB || !sdkReady) {
-      alert(
-        "Meta todavía se está cargando. Espera unos segundos y vuelve a intentarlo."
-      );
-      return;
-    }
-
-    setConnecting(true);
-    sessionRef.current = null;
-
-    window.FB.login(
-  (response: MetaLoginResponse) => {
-    console.log("========== META LOGIN RESPONSE ==========");
-    console.log(response);
-    console.log("=========================================");
-
-    const code = response.authResponse?.code;
-
-    if (!code) {
-      console.error("Meta no devolvió el código de autorización.");
-      setConnecting(false);
-      return;
-    }
-
-    console.log("Código recibido correctamente:", Boolean(code));
-    console.log(
-      "Datos de la sesión de WhatsApp:",
-      sessionRef.current
+ const launchSignup = () => {
+  if (!window.FB || !sdkReady) {
+    alert(
+      "Meta todavía se está cargando. Espera unos segundos y vuelve a intentarlo."
     );
-
-    setConnecting(false);
-  },
-  {
-    config_id: CONFIG_ID,
-    response_type: "code",
-    override_default_response_type: true,
-    extras: {
-      version: "v3",
-      featureType: "whatsapp_business_app_onboarding",
-    },
+    return;
   }
-);
-  };
+
+  setConnecting(true);
+  sessionRef.current = null;
+
+  window.FB.login(
+    (response: MetaLoginResponse) => {
+      console.log("========== META LOGIN RESPONSE ==========");
+      console.log(response);
+      console.log("=========================================");
+
+      const code = response.authResponse?.code;
+
+      if (!code) {
+        console.error("Meta no devolvió el código de autorización.");
+        setConnecting(false);
+        return;
+      }
+
+      console.log("Código recibido correctamente:", Boolean(code));
+      console.log(
+        "Datos de la sesión de WhatsApp (Coex):",
+        sessionRef.current
+      );
+
+      setConnecting(false);
+    },
+    {
+      config_id: CONFIG_ID,
+      response_type: "code",
+      override_default_response_type: true,
+      // CAMBIA ESTA SECCIÓN EXACTAMENTE ASÍ:
+      extras: {
+        sessionInfoVersion: "v4",
+        features: [
+          {
+            name: "whatsapp_business_app_onboarding"
+          }
+        ]
+      }
+    }
+  );
+};
 
   return (
     <main style={{ padding: 40 }}>
