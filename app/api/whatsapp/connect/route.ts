@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 
+import {
+  marcarWhatsappConectado,
+  marcarWhatsappError,
+} from "@/lib/repos/integracionesWhatsappRepo";
+
 const GRAPH_VERSION = "v23.0";
 const WABA_ID = "1781228559216594";
+const CONFIG_ID = "3881222728839399";
 const TELEFONO_ESPERADO = "34613198435";
 
 type MetaPhoneNumber = {
@@ -88,11 +94,19 @@ export async function POST() {
       (await phoneNumbersResponse.json()) as MetaPhoneNumbersResponse;
 
     if (!phoneNumbersResponse.ok || phoneNumbersData.error) {
+      const errorMessage = getMetaErrorMessage(
+        phoneNumbersData.error
+      );
+
+      await marcarWhatsappError({
+        ultimo_error: errorMessage,
+      });
+
       return NextResponse.json(
         {
           ok: false,
           step: "get_phone_numbers",
-          error: getMetaErrorMessage(phoneNumbersData.error),
+          error: errorMessage,
           meta: phoneNumbersData,
         },
         { status: 400 }
@@ -106,12 +120,18 @@ export async function POST() {
     );
 
     if (!phoneNumber) {
+      const errorMessage =
+        "Meta no devolvió el número +34 613 19 84 35 dentro de la WABA conectada";
+
+      await marcarWhatsappError({
+        ultimo_error: errorMessage,
+      });
+
       return NextResponse.json(
         {
           ok: false,
           step: "find_phone_number",
-          error:
-            "Meta no devolvió el número +34 613 19 84 35 dentro de la WABA conectada",
+          error: errorMessage,
           phone_numbers_found: phoneNumbersData.data || [],
         },
         { status: 404 }
@@ -135,38 +155,73 @@ export async function POST() {
       (await subscribeResponse.json()) as MetaSubscribeResponse;
 
     if (!subscribeResponse.ok || subscribeData.error) {
+      const errorMessage = getMetaErrorMessage(
+        subscribeData.error
+      );
+
+      await marcarWhatsappError({
+        ultimo_error: errorMessage,
+      });
+
       return NextResponse.json(
         {
           ok: false,
           step: "subscribe_app",
-          error: getMetaErrorMessage(subscribeData.error),
+          error: errorMessage,
           meta: subscribeData,
         },
         { status: 400 }
       );
     }
 
+    const displayPhoneNumber =
+      phoneNumber.display_phone_number ||
+      "+34 613 19 84 35";
+
+    // 3. Guardar la integración conectada en Supabase
+    const integracion = await marcarWhatsappConectado({
+      waba_id: WABA_ID,
+      phone_number_id: phoneNumber.id,
+      display_phone_number: displayPhoneNumber,
+      config_id: CONFIG_ID,
+      business_id: null,
+    });
+
     return NextResponse.json({
       ok: true,
       message: "WhatsApp conectado correctamente con Martina",
-      waba_id: WABA_ID,
-      phone_number_id: phoneNumber.id,
+      waba_id: integracion.waba_id,
+      phone_number_id: integracion.phone_number_id,
       display_phone_number:
-        phoneNumber.display_phone_number || "+34 613 19 84 35",
+        integracion.display_phone_number,
       verified_name: phoneNumber.verified_name || null,
       quality_rating: phoneNumber.quality_rating || null,
       subscribed: subscribeData.success === true,
+      saved_in_supabase: true,
     });
   } catch (error) {
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : "Error interno conectando WhatsApp";
+
     console.error("Error conectando WhatsApp:", error);
+
+    try {
+      await marcarWhatsappError({
+        ultimo_error: errorMessage,
+      });
+    } catch (supabaseError) {
+      console.error(
+        "No se pudo guardar el error en Supabase:",
+        supabaseError
+      );
+    }
 
     return NextResponse.json(
       {
         ok: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Error interno conectando WhatsApp",
+        error: errorMessage,
       },
       { status: 500 }
     );
