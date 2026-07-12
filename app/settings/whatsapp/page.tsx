@@ -76,15 +76,18 @@ export default function SettingsWhatsAppPage() {
       console.log(message);
       console.log("========================================");
 
-      if (message.event === "FINISH") {
-        sessionRef.current =
-          (message.data as EmbeddedSignupSession) || null;
+      if (
+  message.event === "FINISH" ||
+  message.event === "FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING"
+) {
+  sessionRef.current =
+    (message.data as EmbeddedSignupSession) || null;
 
-        console.log(
-          "Embedded Signup finalizado:",
-          sessionRef.current
-        );
-      }
+  console.log(
+    "Embedded Signup finalizado:",
+    sessionRef.current
+  );
+}
 
       if (message.event === "CANCEL") {
         console.warn("Embedded Signup cancelado:", message.data);
@@ -169,14 +172,11 @@ export default function SettingsWhatsAppPage() {
   },
   {
     config_id: CONFIG_ID,
-    auth_type: "rerequest",
     response_type: "code",
     override_default_response_type: true,
     extras: {
-      setup: {},
-      featureType: "whatsapp_business_app_onboarding",
-      sessionInfoVersion: "3",
       version: "v3",
+      featureType: "whatsapp_business_app_onboarding",
     },
   }
 );
