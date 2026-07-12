@@ -255,13 +255,8 @@ export default function SettingsWhatsAppPage() {
               backendResult
             );
 
-            setStatus(
-              sessionRef.current
-                ? "Código procesado y sesión de WhatsApp recibida"
-                : "Código procesado; esperando la sesión de WhatsApp"
-            );
-
-            comprobarResultado();
+            setStatus("WhatsApp conectado correctamente");
+setConnecting(false);
           } catch (error) {
             console.error(
               "Error procesando la conexión en el backend:",
