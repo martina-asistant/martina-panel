@@ -246,13 +246,6 @@ export default function SettingsWhatsAppPage() {
             sessionRef.current
           );
 
-          window.addEventListener("message", (e) => {
-  console.log("===== MESSAGE EVENT =====");
-  console.log("Origin:", e.origin);
-  console.log("Data:", e.data);
-  console.log("=========================");
-});
-
           try {
             const backendResult =
               await enviarCodigoAlBackend(code);
