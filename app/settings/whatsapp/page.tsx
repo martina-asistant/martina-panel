@@ -146,50 +146,40 @@ export default function SettingsWhatsAppPage() {
     sessionRef.current = null;
 
     window.FB.login(
-      (response: MetaLoginResponse) => {
-        console.log("========== META LOGIN RESPONSE ==========");
-        console.log(response);
-        console.log("=========================================");
+  (response: MetaLoginResponse) => {
+    console.log("========== META LOGIN RESPONSE ==========");
+    console.log(response);
+    console.log("=========================================");
 
-        const code = response.authResponse?.code;
+    const code = response.authResponse?.code;
 
-        if (!code) {
-          console.error(
-            "Meta no devolvió el código de autorización."
-          );
-          setConnecting(false);
-          return;
-        }
+    if (!code) {
+      console.error("Meta no devolvió el código de autorización.");
+      setConnecting(false);
+      return;
+    }
 
-        console.log("Código recibido correctamente:", Boolean(code));
-        console.log(
-          "Datos de la sesión de WhatsApp:",
-          sessionRef.current
-        );
-
-        /*
-         * En esta primera ejecución no enviamos aún el código
-         * ni los IDs al backend.
-         *
-         * Primero comprobamos que Meta abre el onboarding completo
-         * de WhatsApp Business App y devuelve:
-         * - waba_id
-         * - phone_number_id
-         */
-        setConnecting(false);
-      },
-      {
-        config_id: CONFIG_ID,
-        auth_type: "rerequest",
-        response_type: "code",
-        override_default_response_type: true,
-        extras: {
-          setup: {},
-          featureType: "whatsapp_business_app_onboarding",
-          sessionInfoVersion: "3",
-        },
-      }
+    console.log("Código recibido correctamente:", Boolean(code));
+    console.log(
+      "Datos de la sesión de WhatsApp:",
+      sessionRef.current
     );
+
+    setConnecting(false);
+  },
+  {
+    config_id: CONFIG_ID,
+    auth_type: "rerequest",
+    response_type: "code",
+    override_default_response_type: true,
+    extras: {
+      setup: {},
+      featureType: "whatsapp_business_app_onboarding",
+      sessionInfoVersion: "3",
+      version: "v3",
+    },
+  }
+);
   };
 
   return (
