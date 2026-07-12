@@ -45,8 +45,43 @@ const CONFIG_ID = "3881222728839399";
 export default function SettingsWhatsAppPage() {
   const [sdkReady, setSdkReady] = useState(false);
   const [connecting, setConnecting] = useState(false);
+  const [status, setStatus] = useState("Esperando para conectar");
 
+  const codeRef = useRef<string | null>(null);
   const sessionRef = useRef<EmbeddedSignupSession | null>(null);
+
+  const comprobarResultado = () => {
+    const code = codeRef.current;
+    const session = sessionRef.current;
+
+    if (!code || !session?.waba_id || !session?.phone_number_id) {
+      return;
+    }
+
+    console.log("========== COEXISTENCE COMPLETADO ==========");
+    console.log("Código recibido:", true);
+    console.log("Sesión de WhatsApp:", session);
+    console.log("WABA esperada:", "880108154700144");
+    console.log("============================================");
+
+    if (session.waba_id !== "880108154700144") {
+      console.warn(
+        "Meta devolvió una WABA distinta de la esperada:",
+        session.waba_id
+      );
+      setStatus("Conectado, pero Meta devolvió otra cuenta de WhatsApp");
+      setConnecting(false);
+      return;
+    }
+
+    /*
+     * Todavía no enviamos nada al backend.
+     * Primero verificamos que el onboarding real termine
+     * y que Meta devuelva la WABA y el Phone Number ID correctos.
+     */
+    setStatus("Onboarding de WhatsApp completado correctamente");
+    setConnecting(false);
+  };
 
   useEffect(() => {
     const handleEmbeddedSignupMessage = (event: MessageEvent) => {
@@ -72,30 +107,37 @@ export default function SettingsWhatsAppPage() {
         return;
       }
 
-      console.log("========== WA EMBEDDED SIGNUP ==========");
+      console.log("========== WA_EMBEDDED_SIGNUP ==========");
       console.log(message);
       console.log("========================================");
 
       if (
-  message.event === "FINISH" ||
-  message.event === "FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING"
-) {
-  sessionRef.current =
-    (message.data as EmbeddedSignupSession) || null;
+        message.event === "FINISH" ||
+        message.event === "FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING"
+      ) {
+        sessionRef.current =
+          (message.data as EmbeddedSignupSession) || null;
 
-  console.log(
-    "Embedded Signup finalizado:",
-    sessionRef.current
-  );
-}
+        console.log(
+          "Sesión recibida por postMessage:",
+          sessionRef.current
+        );
+
+        setStatus("Sesión de WhatsApp recibida");
+        comprobarResultado();
+        return;
+      }
 
       if (message.event === "CANCEL") {
         console.warn("Embedded Signup cancelado:", message.data);
+        setStatus("Conexión cancelada");
         setConnecting(false);
+        return;
       }
 
       if (message.event === "ERROR") {
         console.error("Error en Embedded Signup:", message.data);
+        setStatus("Meta devolvió un error durante la conexión");
         setConnecting(false);
       }
     };
@@ -111,6 +153,7 @@ export default function SettingsWhatsAppPage() {
       });
 
       setSdkReady(true);
+      setStatus("Meta cargado");
     };
 
     const existingScript = document.getElementById("facebook-jssdk");
@@ -127,6 +170,7 @@ export default function SettingsWhatsAppPage() {
       document.body.appendChild(script);
     } else if (window.FB) {
       setSdkReady(true);
+      setStatus("Meta cargado");
     }
 
     return () => {
@@ -137,55 +181,64 @@ export default function SettingsWhatsAppPage() {
     };
   }, []);
 
- const launchSignup = () => {
-  if (!window.FB || !sdkReady) {
-    alert(
-      "Meta todavía se está cargando. Espera unos segundos y vuelve a intentarlo."
-    );
-    return;
-  }
-
-  setConnecting(true);
-  sessionRef.current = null;
-
-  window.FB.login(
-    (response: MetaLoginResponse) => {
-      console.log("========== META LOGIN RESPONSE ==========");
-      console.log(response);
-      console.log("=========================================");
-
-      const code = response.authResponse?.code;
-
-      if (!code) {
-        console.error("Meta no devolvió el código de autorización.");
-        setConnecting(false);
-        return;
-      }
-
-      console.log("Código recibido correctamente:", Boolean(code));
-      console.log(
-        "Datos de la sesión de WhatsApp (Coex):",
-        sessionRef.current
+  const launchSignup = () => {
+    if (!window.FB || !sdkReady) {
+      alert(
+        "Meta todavía se está cargando. Espera unos segundos y vuelve a intentarlo."
       );
-
-      setConnecting(false);
-    },
-    {
-      config_id: CONFIG_ID,
-      response_type: "code",
-      override_default_response_type: true,
-      // CAMBIA ESTA SECCIÓN EXACTAMENTE ASÍ:
-      extras: {
-        sessionInfoVersion: "v4",
-        features: [
-          {
-            name: "whatsapp_business_app_onboarding"
-          }
-        ]
-      }
+      return;
     }
-  );
-};
+
+    setConnecting(true);
+    setStatus("Abriendo el onboarding de WhatsApp...");
+
+    codeRef.current = null;
+    sessionRef.current = null;
+
+    window.FB.login(
+      (response: MetaLoginResponse) => {
+        console.log("========== META LOGIN RESPONSE ==========");
+        console.log(response);
+        console.log("=========================================");
+
+        const code = response.authResponse?.code;
+
+        if (!code) {
+          console.error("Meta no devolvió el código de autorización.");
+          setStatus("Meta no devolvió el código de autorización");
+          setConnecting(false);
+          return;
+        }
+
+        codeRef.current = code;
+
+        console.log("Código recibido correctamente:", true);
+        console.log(
+          "Sesión disponible en este momento:",
+          sessionRef.current
+        );
+
+        setStatus(
+          sessionRef.current
+            ? "Código y sesión recibidos"
+            : "Código recibido; esperando la sesión de WhatsApp"
+        );
+
+        comprobarResultado();
+      },
+      {
+        config_id: CONFIG_ID,
+        response_type: "code",
+        override_default_response_type: true,
+        extras: {
+          setup: {},
+          featureType: "whatsapp_business_app_onboarding",
+          sessionInfoVersion: "3",
+          version: "v4",
+        },
+      }
+    );
+  };
 
   return (
     <main style={{ padding: 40 }}>
@@ -207,6 +260,10 @@ export default function SettingsWhatsAppPage() {
             ? "Conectar WhatsApp"
             : "Cargando Meta..."}
       </button>
+
+      <p style={{ marginTop: 16 }}>
+        Estado: {status}
+      </p>
     </main>
   );
 }
