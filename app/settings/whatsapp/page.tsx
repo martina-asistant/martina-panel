@@ -54,115 +54,30 @@ const CONFIG_ID = "3881222728839399";
 export default function SettingsWhatsAppPage() {
   const [sdkReady, setSdkReady] = useState(false);
   const [connecting, setConnecting] = useState(false);
-  const [status, setStatus] = useState(
-    "Esperando para conectar"
-  );
+  const [status, setStatus] = useState("Esperando para conectar");
 
   const codeRef = useRef<string | null>(null);
-  const sessionRef =
-    useRef<EmbeddedSignupSession | null>(null);
+  const sessionRef = useRef<EmbeddedSignupSession | null>(null);
 
-  // Evita procesar dos veces si code y session llegan casi juntos.
-  const processingRef = useRef(false);
-
-  const enviarConexionAlBackend = async (
-    code: string,
-    session: EmbeddedSignupSession
-  ) => {
-    setStatus(
-      "Procesando la conexión completa en el servidor..."
-    );
-
-    const response = await fetch("/api/whatsapp/connect", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        code,
-        session,
-      }),
-    });
-
-    const result =
-      (await response.json()) as ConnectBackendResponse;
-
-    console.log(
-      "========== RESPUESTA DEL BACKEND =========="
-    );
-    console.log(result);
-    console.log(
-      "==========================================="
-    );
-
-    if (!response.ok || !result.ok) {
-      const errorMessage =
-        result.error ||
-        result.message ||
-        "El servidor no pudo procesar la conexión";
-
-      throw new Error(errorMessage);
-    }
-
-    return result;
-  };
-
-  const finalizarConexionSiCompleta = async () => {
+  const comprobarResultado = () => {
     const code = codeRef.current;
     const session = sessionRef.current;
 
-    if (
-      processingRef.current ||
-      !code ||
-      !session?.waba_id ||
-      !session?.phone_number_id
-    ) {
+    if (!code || !session?.waba_id || !session?.phone_number_id) {
       return;
     }
 
-    processingRef.current = true;
-
-    console.log(
-      "========== COEXISTENCE COMPLETADO =========="
-    );
+    console.log("========== COEXISTENCE COMPLETADO ==========");
     console.log("Código recibido:", true);
     console.log("Sesión de WhatsApp:", session);
-    console.log(
-      "============================================"
-    );
+    console.log("============================================");
 
-    try {
-      const backendResult =
-        await enviarConexionAlBackend(code, session);
-
-      console.log(
-        "Conexión completa procesada por el backend:",
-        backendResult
-      );
-
-      setStatus("WhatsApp conectado correctamente");
-      setConnecting(false);
-    } catch (error) {
-      console.error(
-        "Error procesando la conexión completa:",
-        error
-      );
-
-      setStatus(
-        error instanceof Error
-          ? `Error: ${error.message}`
-          : "Error procesando la conexión"
-      );
-
-      setConnecting(false);
-      processingRef.current = false;
-    }
+    setStatus("Onboarding de WhatsApp completado correctamente");
+    setConnecting(false);
   };
 
   useEffect(() => {
-    const handleEmbeddedSignupMessage = (
-      event: MessageEvent
-    ) => {
+    const handleEmbeddedSignupMessage = (event: MessageEvent) => {
       if (
         event.origin !== "https://www.facebook.com" &&
         event.origin !== "https://web.facebook.com"
@@ -185,69 +100,42 @@ export default function SettingsWhatsAppPage() {
         return;
       }
 
-      console.log(
-        "========== WA_EMBEDDED_SIGNUP =========="
-      );
+      console.log("========== WA_EMBEDDED_SIGNUP ==========");
       console.log(message);
-      console.log(
-        "========================================"
-      );
+      console.log("========================================");
 
       if (
         message.event === "FINISH" ||
-        message.event ===
-          "FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING"
+        message.event === "FINISH_WHATSAPP_BUSINESS_APP_ONBOARDING"
       ) {
-        const session =
+        sessionRef.current =
           (message.data as EmbeddedSignupSession) || null;
-
-        sessionRef.current = session;
 
         console.log(
           "Sesión recibida por postMessage:",
           sessionRef.current
         );
 
-        setStatus(
-          codeRef.current
-            ? "Código y sesión de WhatsApp recibidos"
-            : "Sesión recibida; esperando el código"
-        );
-
-        void finalizarConexionSiCompleta();
+        setStatus("Sesión de WhatsApp recibida");
+        comprobarResultado();
         return;
       }
 
       if (message.event === "CANCEL") {
-        console.warn(
-          "Embedded Signup cancelado:",
-          message.data
-        );
-
+        console.warn("Embedded Signup cancelado:", message.data);
         setStatus("Conexión cancelada");
         setConnecting(false);
-        processingRef.current = false;
         return;
       }
 
       if (message.event === "ERROR") {
-        console.error(
-          "Error en Embedded Signup:",
-          message.data
-        );
-
-        setStatus(
-          "Meta devolvió un error durante la conexión"
-        );
+        console.error("Error en Embedded Signup:", message.data);
+        setStatus("Meta devolvió un error durante la conexión");
         setConnecting(false);
-        processingRef.current = false;
       }
     };
 
-    window.addEventListener(
-      "message",
-      handleEmbeddedSignupMessage
-    );
+    window.addEventListener("message", handleEmbeddedSignupMessage);
 
     window.fbAsyncInit = () => {
       window.FB?.init({
@@ -261,15 +149,13 @@ export default function SettingsWhatsAppPage() {
       setStatus("Meta cargado");
     };
 
-    const existingScript =
-      document.getElementById("facebook-jssdk");
+    const existingScript = document.getElementById("facebook-jssdk");
 
     if (!existingScript) {
       const script = document.createElement("script");
 
       script.id = "facebook-jssdk";
-      script.src =
-        "https://connect.facebook.net/es_ES/sdk.js";
+      script.src = "https://connect.facebook.net/es_ES/sdk.js";
       script.async = true;
       script.defer = true;
       script.crossOrigin = "anonymous";
@@ -288,6 +174,36 @@ export default function SettingsWhatsAppPage() {
     };
   }, []);
 
+  const enviarCodigoAlBackend = async (code: string) => {
+    setStatus("Procesando la conexión en el servidor...");
+
+    const response = await fetch("/api/whatsapp/connect", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ code }),
+    });
+
+    const result =
+      (await response.json()) as ConnectBackendResponse;
+
+    console.log("========== RESPUESTA DEL BACKEND ==========");
+    console.log(result);
+    console.log("===========================================");
+
+    if (!response.ok || !result.ok) {
+      const errorMessage =
+        result.error ||
+        result.message ||
+        "El servidor no pudo procesar la conexión";
+
+      throw new Error(errorMessage);
+    }
+
+    return result;
+  };
+
   const launchSignup = () => {
     if (!window.FB || !sdkReady) {
       alert(
@@ -301,50 +217,61 @@ export default function SettingsWhatsAppPage() {
 
     codeRef.current = null;
     sessionRef.current = null;
-    processingRef.current = false;
 
     window.FB.login(
       (response: MetaLoginResponse) => {
-        console.log(
-          "========== META LOGIN RESPONSE =========="
-        );
-        console.log(response);
-        console.log(
-          "========================================="
-        );
+        void (async () => {
+          console.log("========== META LOGIN RESPONSE ==========");
+          console.log(response);
+          console.log("=========================================");
 
-        const code = response.authResponse?.code;
+          const code = response.authResponse?.code;
 
-        if (!code) {
-          console.error(
-            "Meta no devolvió el código de autorización."
+          if (!code) {
+            console.error(
+              "Meta no devolvió el código de autorización."
+            );
+            setStatus(
+              "Meta no devolvió el código de autorización"
+            );
+            setConnecting(false);
+            return;
+          }
+
+          codeRef.current = code;
+
+          console.log("Código recibido correctamente:", true);
+          console.log(
+            "Sesión disponible en este momento:",
+            sessionRef.current
           );
 
-          setStatus(
-            "Meta no devolvió el código de autorización"
-          );
-          setConnecting(false);
-          return;
-        }
+          try {
+            const backendResult =
+              await enviarCodigoAlBackend(code);
 
-        codeRef.current = code;
+            console.log(
+              "Código procesado por el backend:",
+              backendResult
+            );
 
-        console.log(
-          "Código recibido correctamente:",
-          true
-        );
-        console.log(
-          "Sesión disponible en este momento:",
-          sessionRef.current
-        );
+            setStatus("WhatsApp conectado correctamente");
+setConnecting(false);
+          } catch (error) {
+            console.error(
+              "Error procesando la conexión en el backend:",
+              error
+            );
 
-        setStatus(
-          sessionRef.current
-            ? "Código y sesión de WhatsApp recibidos"
-            : "Código recibido; esperando la sesión de WhatsApp"
-        );
+            setStatus(
+              error instanceof Error
+                ? `Error: ${error.message}`
+                : "Error procesando la conexión"
+            );
 
-        void finalizarConexionSiCompleta();
+            setConnecting(false);
+          }
+        })();
       },
       {
         config_id: CONFIG_ID,
@@ -352,9 +279,9 @@ export default function SettingsWhatsAppPage() {
         override_default_response_type: true,
         extras: {
           setup: {},
-          featureType:
-            "whatsapp_business_app_onboarding",
+          featureType: "whatsapp_business_app_onboarding",
           sessionInfoVersion: "3",
+          version: "v3",
         },
       }
     );
@@ -365,9 +292,8 @@ export default function SettingsWhatsAppPage() {
       <h1>Conectar WhatsApp</h1>
 
       <p>
-        Conecta el WhatsApp Business de Rambla Vilar
-        Dental manteniendo la aplicación instalada en el
-        móvil.
+        Conecta el WhatsApp Business de Rambla Vilar Dental
+        manteniendo la aplicación instalada en el móvil.
       </p>
 
       <button
