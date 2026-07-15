@@ -191,10 +191,17 @@ export default function SettingsWhatsAppPage() {
     event: MessageEvent
   ) => {
     // DEBUG: ver TODOS los postMessage que llegan
-    console.log("========== POSTMESSAGE RECIBIDO ==========");
-    console.log("Origin:", event.origin);
-    console.log("Data:", event.data);
-    console.log("==========================================");
+    console.log("========== POSTMESSAGE ==========");
+console.log("Origin:", event.origin);
+console.log("Tipo JS:", typeof event.data);
+
+if (typeof event.data === "string") {
+  console.log("String:", event.data);
+} else {
+  console.log("Objeto:", event.data);
+}
+
+console.log("===============================");
 
     if (
         event.origin !== "https://www.facebook.com" &&
