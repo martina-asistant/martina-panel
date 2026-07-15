@@ -96,15 +96,7 @@ export default function SettingsWhatsAppPage() {
 
       const result =
         (await response.json()) as ConnectBackendResponse;
-
-      console.log(
-        "========== RESPUESTA DEL BACKEND =========="
-      );
-      console.log(result);
-      console.log(
-        "==========================================="
-      );
-
+      
       if (!response.ok || !result.ok) {
         const errorMessage =
           result.error ||
