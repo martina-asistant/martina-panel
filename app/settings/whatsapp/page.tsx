@@ -186,11 +186,17 @@ export default function SettingsWhatsAppPage() {
       }
     }, [enviarConexionAlBackend]);
 
-  useEffect(() => {
-    const handleEmbeddedSignupMessage = (
-      event: MessageEvent
-    ) => {
-      if (
+ useEffect(() => {
+  const handleEmbeddedSignupMessage = (
+    event: MessageEvent
+  ) => {
+    // DEBUG: ver TODOS los postMessage que llegan
+    console.log("========== POSTMESSAGE RECIBIDO ==========");
+    console.log("Origin:", event.origin);
+    console.log("Data:", event.data);
+    console.log("==========================================");
+
+    if (
         event.origin !== "https://www.facebook.com" &&
         event.origin !== "https://web.facebook.com"
       ) {
