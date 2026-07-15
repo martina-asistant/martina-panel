@@ -1940,12 +1940,17 @@ useEffect(() => {
 
     const eventosDia = eventos.filter(e => e.fecha_inicio && sameDay(e.fecha_inicio, diaMovilSeleccionado));
 
-    const eventoSlot = eventosDia.find((evento) => {
-      const inicioEvento = new Date(evento.fecha_inicio);
-      const finEvento = new Date(evento.fecha_fin);
+    const eventosSlot = eventosDia.filter((evento) => {
+  const inicioEvento = new Date(evento.fecha_inicio);
+  const finEvento = new Date(evento.fecha_fin);
 
-      return inicioEvento < slotFinDate && finEvento > slotInicioDate;
-    });
+  return inicioEvento < slotFinDate && finEvento > slotInicioDate;
+});
+
+const eventoSlot =
+  eventosSlot.find((evento) => !esBloqueoAgenda(evento)) ||
+  eventosSlot.find((evento) => esBloqueoAgenda(evento)) ||
+  null;
 
     const esBloqueoEvento = esBloqueoAgenda(eventoSlot);
     const esInicioEvento = eventoSlot
@@ -2192,12 +2197,17 @@ useEffect(() => {
                     const slotFinDate = new Date(slotInicioDate);
                     slotFinDate.setMinutes(slotFinDate.getMinutes() + 15);
 
-                    const eventoSlot = eventosDia.find((evento) => {
-                      const inicioEvento = new Date(evento.fecha_inicio);
-                      const finEvento = new Date(evento.fecha_fin);
+                   const eventosSlot = eventosDia.filter((evento) => {
+  const inicioEvento = new Date(evento.fecha_inicio);
+  const finEvento = new Date(evento.fecha_fin);
 
-                      return inicioEvento < slotFinDate && finEvento > slotInicioDate;
-                    });
+  return inicioEvento < slotFinDate && finEvento > slotInicioDate;
+});
+
+const eventoSlot =
+  eventosSlot.find((evento) => !esBloqueoAgenda(evento)) ||
+  eventosSlot.find((evento) => esBloqueoAgenda(evento)) ||
+  null;
 
                     const esBloqueoEvento = esBloqueoAgenda(eventoSlot);
 
