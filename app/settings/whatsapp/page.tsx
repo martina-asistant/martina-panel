@@ -302,7 +302,7 @@ console.log("===============================");
         appId: APP_ID,
         cookie: true,
         xfbml: true,
-        version: "v23.0",
+        version: "v25.0",
       });
 
       setSdkReady(true);
@@ -399,12 +399,12 @@ console.log("===============================");
         response_type: "code",
         override_default_response_type: true,
         extras: {
-          setup: {},
-          featureType:
-            "whatsapp_business_app_onboarding",
-          sessionInfoVersion: "3",
-          version: "v3",
-        },
+  setup: {},
+  featureType:
+    "whatsapp_business_app_onboarding",
+  sessionInfoVersion: "4",
+  version: "v4",
+},
       }
     );
   };
