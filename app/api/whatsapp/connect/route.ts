@@ -20,8 +20,12 @@ type ConnectRequestBody = {
 type MetaPhoneNumber = {
   id: string;
   display_phone_number?: string;
-  verified_name?: string;
+ verified_name?: string;
   quality_rating?: string;
+
+  code_verification_status?: string;
+  platform_type?: string;
+  name_status?: string;
 };
 
 type MetaPhoneNumbersResponse = {
@@ -139,7 +143,7 @@ export async function POST(request: Request) {
 
     phoneNumbersUrl.searchParams.set(
       "fields",
-      "id,display_phone_number,verified_name,quality_rating"
+      "id,display_phone_number,verified_name,quality_rating,code_verification_status,platform_type,name_status"
     );
 
     const phoneNumbersResponse = await fetch(
@@ -215,6 +219,19 @@ export async function POST(request: Request) {
       );
     }
 
+    console.log("========== ESTADO DEL NÚMERO ==========");
+console.log({
+  phone_number_id: phoneNumber.id,
+  display_phone_number: phoneNumber.display_phone_number,
+  verified_name: phoneNumber.verified_name,
+  quality_rating: phoneNumber.quality_rating,
+  code_verification_status:
+    phoneNumber.code_verification_status,
+  platform_type: phoneNumber.platform_type,
+  name_status: phoneNumber.name_status,
+});
+console.log("=======================================");
+    
     // 2. Suscribir la aplicación a la WABA para recibir webhooks.
     const subscribeUrl =
       `https://graph.facebook.com/${GRAPH_VERSION}/` +
