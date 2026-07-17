@@ -1947,77 +1947,142 @@ useEffect(() => {
   return inicioEvento < slotFinDate && finEvento > slotInicioDate;
 });
 
-const eventoSlot =
-  eventosSlot.find((evento) => !esBloqueoAgenda(evento)) ||
-  eventosSlot.find((evento) => esBloqueoAgenda(evento)) ||
-  null;
+const eventosRealesSlot = eventosSlot
+  .filter((evento) => !esBloqueoAgenda(evento))
+  .sort(
+    (a, b) =>
+      new Date(a.fecha_inicio).getTime() -
+      new Date(b.fecha_inicio).getTime()
+  );
 
-    const esBloqueoEvento = esBloqueoAgenda(eventoSlot);
-    const esInicioEvento = eventoSlot
-      ? new Date(eventoSlot.fecha_inicio).getTime() === slotInicioDate.getTime()
-      : false;
+const bloqueoEvento =
+  eventosSlot.find((evento) => esBloqueoAgenda(evento)) || null;
 
-    const color = eventoSlot && !esBloqueoEvento ? getColorTratamiento(eventoSlot) : null;
-    const bloqueadoAutomatico = isHorarioNoDisponible(hora, diaMovilSeleccionado, agendaActiva);
-    const bloqueado = bloqueadoAutomatico || esBloqueoEvento;
-    const esUltimaLineaEvento = esUltimaLineaVisibleEvento(eventoSlot, slotFinDate);
-    const seleccionado = esSlotSeleccionado(slotKey);
+const filasSlot: Array<EventoAgenda | null> =
+  eventosRealesSlot.length > 0
+    ? eventosRealesSlot
+    : [bloqueoEvento];
 
-  return (
-    <div
-  key={slotKey}
-  role="button"
-  tabIndex={0}
-  onClick={() => manejarSeleccion(slotKey, eventoSlot)}
-  onDoubleClick={() => {
-    if (eventoSlot && !esBloqueoEvento) {
-      setEventoSeleccionado(eventoSlot);
-      setModoEdicion(false);
-      setModalCitaAbierto(true);
-    }
-  }}
-  style={{
-    height: SLOT_HEIGHT,
-    backgroundColor: seleccionado && (!eventoSlot || esBloqueoEvento)
-    ? 'rgba(34,211,238,.34)'
-    : esBloqueoEvento
-      ? 'rgba(6,182,212,.25)'
-      : eventoSlot && !esBloqueoEvento
-        ? color?.bg
-        : undefined,
-  }}
-  className={`
-    relative w-full block border-b border-cyan-400/5 text-left px-2 text-[10px] transition-all
-    ${seleccionado ? 'outline outline-[0.5px] outline-cyan-200/55 outline-offset-[-1px]' : ''}
-    ${bloqueadoAutomatico ? 'bg-cyan-500/25 hover:bg-cyan-500/30' : ''}
-    ${!bloqueado && !eventoSlot ? 'hover:bg-cyan-500/10' : ''}
-  `}
->
-  <div className="flex items-center min-w-0 pr-1">
-    <span
-      className={
+const bloqueadoAutomatico = isHorarioNoDisponible(
+  hora,
+  diaMovilSeleccionado,
+  agendaActiva
+);
+
+const seleccionado = esSlotSeleccionado(slotKey);
+const haySolapamiento = eventosRealesSlot.length > 1;
+
+return (
+  <div key={slotKey}>
+    {filasSlot.map((eventoSlot, indiceFila) => {
+      const esBloqueoEvento = esBloqueoAgenda(eventoSlot);
+
+      const esInicioEvento = eventoSlot
+        ? new Date(eventoSlot.fecha_inicio).getTime() ===
+          slotInicioDate.getTime()
+        : false;
+
+      const color =
         eventoSlot && !esBloqueoEvento
-          ? `${color?.text || 'text-white'} font-semibold shrink-0`
-          : bloqueado
-            ? 'text-white/90 shrink-0'
-            : 'text-white shrink-0'
-      }
-    >
-      {hora}
-    </span>
+          ? getColorTratamiento(eventoSlot)
+          : null;
 
-    {eventoSlot && !esBloqueoEvento && esInicioEvento && (
-      <span className={`ml-3 text-[11px] font-semibold truncate ${color?.text || 'text-white'}`}>
-        {formatTextoCitaAgenda(eventoSlot.titulo || eventoSlot.nombre_paciente || 'Cita')}
-      </span>
-    )}
+      const bloqueado = bloqueadoAutomatico || esBloqueoEvento;
+
+      const esUltimaLineaEvento = esUltimaLineaVisibleEvento(
+        eventoSlot,
+        slotFinDate
+      );
+
+      const mostrarTitulo =
+        eventoSlot &&
+        !esBloqueoEvento &&
+        (esInicioEvento || haySolapamiento);
+
+      return (
+        <div
+          key={
+            eventoSlot?.event_id
+              ? `${slotKey}-${eventoSlot.event_id}`
+              : `${slotKey}-fila-${indiceFila}`
+          }
+          role="button"
+          tabIndex={0}
+          onClick={() => manejarSeleccion(slotKey, eventoSlot)}
+          onDoubleClick={() => {
+            if (eventoSlot && !esBloqueoEvento) {
+              setEventoSeleccionado(eventoSlot);
+              setModoEdicion(false);
+              setModalCitaAbierto(true);
+            }
+          }}
+          style={{
+            height: SLOT_HEIGHT,
+            backgroundColor:
+              seleccionado && (!eventoSlot || esBloqueoEvento)
+                ? 'rgba(34,211,238,.34)'
+                : esBloqueoEvento
+                  ? 'rgba(6,182,212,.25)'
+                  : eventoSlot && !esBloqueoEvento
+                    ? color?.bg
+                    : undefined,
+          }}
+          className={`
+            relative w-full block border-b border-cyan-400/5 text-left px-2 text-[10px] transition-all
+            ${
+              seleccionado
+                ? 'outline outline-[0.5px] outline-cyan-200/55 outline-offset-[-1px]'
+                : ''
+            }
+            ${
+              bloqueadoAutomatico
+                ? 'bg-cyan-500/25 hover:bg-cyan-500/30'
+                : ''
+            }
+            ${
+              !bloqueado && !eventoSlot
+                ? 'hover:bg-cyan-500/10'
+                : ''
+            }
+          `}
+        >
+          <div className="flex items-center min-w-0 pr-1">
+            <span
+              className={
+                eventoSlot && !esBloqueoEvento
+                  ? `${color?.text || 'text-white'} font-semibold shrink-0`
+                  : bloqueado
+                    ? 'text-white/90 shrink-0'
+                    : 'text-white shrink-0'
+              }
+            >
+              {hora}
+            </span>
+
+            {mostrarTitulo && (
+              <span
+                className={`ml-3 text-[11px] font-semibold truncate ${
+                  color?.text || 'text-white'
+                }`}
+              >
+                {formatTextoCitaAgenda(
+                  eventoSlot.titulo ||
+                    eventoSlot.nombre_paciente ||
+                    'Cita'
+                )}
+              </span>
+            )}
+          </div>
+
+          {eventoSlot &&
+            !esBloqueoEvento &&
+            esUltimaLineaEvento &&
+            renderEstadoVisitaControl(eventoSlot, color)}
+        </div>
+      );
+    })}
   </div>
-
-  {eventoSlot && !esBloqueoEvento && esUltimaLineaEvento && (
-    renderEstadoVisitaControl(eventoSlot, color)
-  )}
-</div>
-    );
+);
   })}
 </div>
   </div>
@@ -2204,78 +2269,152 @@ const eventoSlot =
   return inicioEvento < slotFinDate && finEvento > slotInicioDate;
 });
 
-const eventoSlot =
-  eventosSlot.find((evento) => !esBloqueoAgenda(evento)) ||
-  eventosSlot.find((evento) => esBloqueoAgenda(evento)) ||
-  null;
 
-                    const esBloqueoEvento = esBloqueoAgenda(eventoSlot);
+const eventosRealesSlot = eventosSlot
+  .filter((evento) => !esBloqueoAgenda(evento))
+  .sort(
+    (a, b) =>
+      new Date(a.fecha_inicio).getTime() -
+      new Date(b.fecha_inicio).getTime()
+  );
 
-                    const esInicioEvento = eventoSlot
-                      ? new Date(eventoSlot.fecha_inicio).getTime() === slotInicioDate.getTime()
-                      : false;
+const bloqueoEvento =
+  eventosSlot.find((evento) => esBloqueoAgenda(evento)) || null;
 
-                    const color = eventoSlot && !esBloqueoEvento ? getColorTratamiento(eventoSlot) : null;
-                    const bloqueadoAutomatico = isHorarioNoDisponible(hora, dia, agendaActiva);
-                    const bloqueado = bloqueadoAutomatico || esBloqueoEvento;
-                    const esUltimaLineaEvento = esUltimaLineaVisibleEvento(eventoSlot, slotFinDate);
-                  const seleccionado = esSlotSeleccionado(slotKey);
+const filasSlot: Array<EventoAgenda | null> =
+  eventosRealesSlot.length > 0
+    ? eventosRealesSlot
+    : [bloqueoEvento];
 
-                  return (
-                    <div
-  key={slotKey}
-  role="button"
-  tabIndex={0}
-  onClick={() => manejarSeleccion(slotKey, eventoSlot)}
-  onDoubleClick={() => {
-    if (eventoSlot && !esBloqueoEvento) {
-      setEventoSeleccionado(eventoSlot);
-      setModoEdicion(false);
-      setModalCitaAbierto(true);
-    }
-  }}
-  style={{
-    height: SLOT_HEIGHT,
-    backgroundColor: seleccionado && (!eventoSlot || esBloqueoEvento)
-    ? 'rgba(34,211,238,.34)'
-    : esBloqueoEvento
-      ? 'rgba(6,182,212,.25)'
-      : eventoSlot && !esBloqueoEvento
-        ? color?.bg
-        : undefined,
-  }}
-  className={`
-    relative w-full block border-b border-cyan-400/5 text-left px-2 text-[10px] transition-all
-    ${seleccionado ? 'outline outline-[0.5px] outline-cyan-200/55 outline-offset-[-1px]' : ''}
-    ${bloqueadoAutomatico ? 'bg-cyan-500/25 hover:bg-cyan-500/30' : ''}
-    ${!bloqueado && !eventoSlot ? 'hover:bg-cyan-500/10' : ''}
-  `}
->
-  <div className="flex items-center min-w-0 pr-1">
-    <span
-      className={
+const bloqueadoAutomatico = isHorarioNoDisponible(
+  hora,
+  dia,
+  agendaActiva
+);
+
+const seleccionado = esSlotSeleccionado(slotKey);
+const haySolapamiento = eventosRealesSlot.length > 1;
+
+return (
+  <div key={slotKey}>
+    {filasSlot.map((eventoSlot, indiceFila) => {
+      const esBloqueoEvento = esBloqueoAgenda(eventoSlot);
+
+      const esInicioEvento = eventoSlot
+        ? new Date(eventoSlot.fecha_inicio).getTime() ===
+          slotInicioDate.getTime()
+        : false;
+
+      const color =
         eventoSlot && !esBloqueoEvento
-          ? `${color?.text || 'text-white'} font-semibold shrink-0`
-          : bloqueado
-            ? 'text-white/90 shrink-0'
-            : 'text-white shrink-0'
-      }
-    >
-      {hora}
-    </span>
+          ? getColorTratamiento(eventoSlot)
+          : null;
 
-    {eventoSlot && !esBloqueoEvento && esInicioEvento && (
-      <span className={`ml-3 text-[11px] font-semibold truncate ${color?.text || 'text-white'}`}>
-        {formatTextoCitaAgenda(eventoSlot.titulo || eventoSlot.nombre_paciente || 'Cita')}
-      </span>
-    )}
+      const bloqueado =
+        bloqueadoAutomatico || esBloqueoEvento;
+
+      const esUltimaLineaEvento =
+        esUltimaLineaVisibleEvento(
+          eventoSlot,
+          slotFinDate
+        );
+
+      const mostrarTitulo =
+        eventoSlot &&
+        !esBloqueoEvento &&
+        (esInicioEvento || haySolapamiento);
+
+      return (
+        <div
+          key={
+            eventoSlot?.event_id
+              ? `${slotKey}-${eventoSlot.event_id}`
+              : `${slotKey}-fila-${indiceFila}`
+          }
+          role="button"
+          tabIndex={0}
+          onClick={() =>
+            manejarSeleccion(slotKey, eventoSlot)
+          }
+          onDoubleClick={() => {
+            if (eventoSlot && !esBloqueoEvento) {
+              setEventoSeleccionado(eventoSlot);
+              setModoEdicion(false);
+              setModalCitaAbierto(true);
+            }
+          }}
+          style={{
+            height: SLOT_HEIGHT,
+            backgroundColor:
+              seleccionado &&
+              (!eventoSlot || esBloqueoEvento)
+                ? 'rgba(34,211,238,.34)'
+                : esBloqueoEvento
+                  ? 'rgba(6,182,212,.25)'
+                  : eventoSlot &&
+                      !esBloqueoEvento
+                    ? color?.bg
+                    : undefined,
+          }}
+          className={`
+            relative w-full block border-b border-cyan-400/5 text-left px-2 text-[10px] transition-all
+            ${
+              seleccionado
+                ? 'outline outline-[0.5px] outline-cyan-200/55 outline-offset-[-1px]'
+                : ''
+            }
+            ${
+              bloqueadoAutomatico
+                ? 'bg-cyan-500/25 hover:bg-cyan-500/30'
+                : ''
+            }
+            ${
+              !bloqueado && !eventoSlot
+                ? 'hover:bg-cyan-500/10'
+                : ''
+            }
+          `}
+        >
+          <div className="flex items-center min-w-0 pr-1">
+            <span
+              className={
+                eventoSlot && !esBloqueoEvento
+                  ? `${color?.text || 'text-white'} font-semibold shrink-0`
+                  : bloqueado
+                    ? 'text-white/90 shrink-0'
+                    : 'text-white shrink-0'
+              }
+            >
+              {hora}
+            </span>
+
+            {mostrarTitulo && (
+              <span
+                className={`ml-3 text-[11px] font-semibold truncate ${
+                  color?.text || 'text-white'
+                }`}
+              >
+                {formatTextoCitaAgenda(
+                  eventoSlot.titulo ||
+                    eventoSlot.nombre_paciente ||
+                    'Cita'
+                )}
+              </span>
+            )}
+          </div>
+
+          {eventoSlot &&
+            !esBloqueoEvento &&
+            esUltimaLineaEvento &&
+            renderEstadoVisitaControl(
+              eventoSlot,
+              color
+            )}
+        </div>
+      );
+    })}
   </div>
-
-  {eventoSlot && !esBloqueoEvento && esUltimaLineaEvento && (
-    renderEstadoVisitaControl(eventoSlot, color)
-  )}
-</div>
-                    );
+);
                   })}
                 </div>
               );
@@ -2283,7 +2422,7 @@ const eventoSlot =
           </div>
         </div>
       </div>
-
+                  
       
       {/* ---------- MODAL BUSCAR PACIENTE DESKTOP ---------- */}
 
