@@ -194,17 +194,17 @@ const LaboratorioView = () => {
   }, []);
 
   const filtered = useMemo(() => {
-    const data =
-      filter === 'todos'
-        ? items
-        : items.filter((i) => i.estado === filter);
+  const data =
+    filter === 'todos'
+      ? items.filter((i) => i.estado !== 'finalizado')
+      : items.filter((i) => i.estado === filter);
 
-    return [...data].sort((a, b) => {
-      const fechaA = new Date(a.updated_at || a.created_at).getTime();
-      const fechaB = new Date(b.updated_at || b.created_at).getTime();
-      return fechaB - fechaA;
-    });
-  }, [items, filter]);
+  return [...data].sort((a, b) => {
+    const fechaA = new Date(a.updated_at || a.created_at).getTime();
+    const fechaB = new Date(b.updated_at || b.created_at).getTime();
+    return fechaB - fechaA;
+  });
+}, [items, filter]);
 
   const pacientesFiltrados = patients.filter((patient) => {
     const texto =
