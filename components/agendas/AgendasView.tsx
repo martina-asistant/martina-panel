@@ -26,11 +26,12 @@ const TRATAMIENTOS = [
   'Primera visita',
   'Revisión',
   'Revisión general',
-  'Limpieza',
+  'Profilaxis',
   'Blanqueamiento',
   'Obturación',
   'Endodoncia',
   'Rec+Post',
+  'Exodoncia',
   'Implante',
   'Cirugía',
   'Quitar puntos',
@@ -118,9 +119,9 @@ const formatFechaLaboratorioDetalle = (iso?: string | null) => {
 };
 
 const TIPOS_RECALL = [
-  { label: 'MTO Periodontal 4 meses', value: 'Limpieza', meses: 4 },
-  { label: 'MTO Periodontal 6 meses', value: 'Limpieza', meses: 6 },
-  { label: 'MTO Periodontal 1 año', value: 'Limpieza', meses: 12 },
+  { label: 'MTO Periodontal 4 meses', value: 'Profilaxis', meses: 4 },
+  { label: 'MTO Periodontal 6 meses', value: 'Profilaxis', meses: 6 },
+  { label: 'MTO Periodontal 1 año', value: 'Profilaxis', meses: 12 },
   { label: 'Revisión', value: 'Revisión', meses: null },
   { label: 'Revisión general', value: 'Revisión general', meses: null },
 ];
@@ -128,7 +129,7 @@ const TIPOS_RECALL = [
 const tipoRecallLabel = (tipo?: string | null) => {
   if (!tipo) return '—';
 
-  if (tipo === 'Limpieza') return 'MTO Periodontal';
+  if (tipo === 'Profilaxis' || tipo === 'Limpieza') { return 'MTO Periodontal'; }
   if (tipo === 'Revisión') return 'Revisión';
   if (tipo === 'Revisión general') return 'Revisión general';
 
@@ -143,7 +144,7 @@ const normalizarTexto = (texto: string) =>
     .replace(/[\u0300-\u036f]/g, '');
 
 const formatTextoCitaAgenda = (texto?: string | null) =>
-  String(texto || '').replace(/\bLimpieza\b/gi, 'Profilaxis');
+  String(texto || '');
 
 const getTratamientoValue = (motivo: string) => {
   const normalizado = normalizarTexto(motivo || '');
@@ -190,7 +191,7 @@ const getDuracionPorMotivo = (motivo: string) => {
   if (m === 'revisión general' || m === 'revision general') return 30;
   if (m === 'revisión' || m === 'revision') return 5;
 
-  if (m === 'limpieza') return 30;
+  if (m === 'profilaxis' || m === 'limpieza') return 30;
   
   if (m === 'blanqueamiento') return 60;
 
@@ -201,6 +202,8 @@ const getDuracionPorMotivo = (motivo: string) => {
   if (m === 'endodoncia') return 45;
 
   if (m === 'rec+post') return 45;
+
+  if (m === 'exodoncia') return 60;
 
   if (m === 'implante') return 45;
 
@@ -364,9 +367,16 @@ const getColorTratamiento = (evento: EventoAgenda) => {
     return { bg: 'rgba(236,72,153,.90)', text: 'text-white' };
   }
 
-  if (motivo === 'limpieza') {
-    return { bg: 'rgba(148,163,184,.90)', text: 'text-white' };
-  }
+  if (motivo === 'profilaxis' || motivo === 'limpieza') {
+  return { bg: 'rgba(148,163,184,.90)', text: 'text-white' };
+}
+
+if (motivo === 'exodoncia') {
+  return {
+    bg: 'rgba(232,194,184,.90)',
+    text: 'text-[#03111A]',
+  };
+}
 
   if (motivo === 'obturación' || motivo === 'obturacion') {
     return { bg: 'rgba(168,85,247,.90)', text: 'text-white' };
@@ -919,11 +929,12 @@ setNuevoPaciente({
   let motivoRecall = 'Revisión general';
 
   if (
-    motivoOriginal.includes('limpieza') ||
-    motivoOriginal.includes('higiene')
-  ) {
-    motivoRecall = 'Limpieza';
-  }
+  motivoOriginal.includes('profilaxis') ||
+  motivoOriginal.includes('limpieza') ||
+  motivoOriginal.includes('higiene')
+) {
+  motivoRecall = 'Profilaxis';
+}
 
   setNuevoRecall({
     paciente_id: '',
