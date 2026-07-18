@@ -35,9 +35,9 @@ const agendas = [
 ];
 
 const TIPOS_RECALL = [
-  { label: 'MTO Periodontal 4 meses', value: 'Limpieza', meses: 4 },
-  { label: 'MTO Periodontal 6 meses', value: 'Limpieza', meses: 6 },
-  { label: 'MTO Periodontal 1 año', value: 'Limpieza', meses: 12 },
+  { label: 'MTO Periodontal 4 meses', value: 'Profilaxis', meses: 4 },
+  { label: 'MTO Periodontal 6 meses', value: 'Profilaxis', meses: 6 },
+  { label: 'MTO Periodontal 1 año', value: 'Profilaxis', meses: 12 },
   { label: 'Revisión', value: 'Revisión', meses: null },
   { label: 'Revisión general', value: 'Revisión general', meses: null },
 ];
@@ -111,7 +111,10 @@ const recallEstadoVisual = (
 const tipoRecallLabel = (tipo?: string | null) => {
   if (!tipo) return '—';
 
-  if (tipo === 'Limpieza') return 'MTO Periodontal';
+  if (tipo === 'Profilaxis' || tipo === 'Limpieza') {
+    return 'MTO Periodontal';
+  }
+
   if (tipo === 'Revisión') return 'Revisión';
   if (tipo === 'Revisión general') return 'Revisión general';
 
@@ -140,7 +143,7 @@ const RecallsView = () => {
     paciente_id: '',
     nombre_paciente: '',
     telefono: '',
-    motivo_recall: 'Limpieza',
+    motivo_recall: 'Profilaxis',
     tipo_recall: 'MTO Periodontal',
     detalle_recall: '',
     fecha_recall: '',
@@ -226,7 +229,7 @@ const RecallsView = () => {
       paciente_id: r.paciente_id || '',
       nombre_paciente: r.nombre_paciente || r.nombre_completo || '',
       telefono: r.telefono || '',
-      motivo_recall: r.motivo_recall || 'Limpieza',
+      motivo_recall: r.motivo_recall || 'Profilaxis',
       tipo_recall:
         r.tipo_recall ||
         tipoRecallLabel(r.motivo_recall || r.tipo),
@@ -745,7 +748,7 @@ const RecallsView = () => {
                   <div className="absolute left-0 top-[calc(100%+8px)] z-[120] w-full max-h-56 overflow-y-auto rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.22)]">
                     {TIPOS_RECALL.map((tipo) => (
                       <button
-                        key={tipo.value}
+                        key={tipo.label}
                         type="button"
                         onClick={() => {
                           setNuevoRecall({
