@@ -373,8 +373,8 @@ const getColorTratamiento = (evento: EventoAgenda) => {
 
 if (motivo === 'exodoncia') {
   return {
-    bg: 'rgba(232,194,184,.90)',
-    text: 'text-[#03111A]',
+    bg: 'rgba(248,113,113,.90)',
+    text: 'text-white',
   };
 }
 
