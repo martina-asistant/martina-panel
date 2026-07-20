@@ -2008,7 +2008,7 @@ return (
       const mostrarTitulo =
         eventoSlot &&
         !esBloqueoEvento &&
-        (esInicioEvento || haySolapamiento);
+        esInicioEvento;
 
       return (
         <div
@@ -2333,7 +2333,7 @@ return (
       const mostrarTitulo =
         eventoSlot &&
         !esBloqueoEvento &&
-        (esInicioEvento || haySolapamiento);
+        esInicioEvento;
 
       return (
         <div
