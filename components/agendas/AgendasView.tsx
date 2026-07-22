@@ -757,7 +757,18 @@ const rangoFin = addDays(
 const guardarCambiosCita = async () => {
   if (!eventoSeleccionado || loading) return;
 
-  const citaActualizada = eventoSeleccionado;
+  const nombrePacienteActualizado =
+  eventoSeleccionado.nombre_paciente?.trim() || '';
+
+if (!nombrePacienteActualizado) {
+  console.error('El nombre del paciente no puede quedar vacío');
+  return;
+}
+
+  const citaActualizada = {
+  ...eventoSeleccionado,
+  nombre_paciente: nombrePacienteActualizado,
+};
 
   const citaOriginal = eventos.find(
     (evento) => evento.event_id === citaActualizada.event_id
@@ -2762,26 +2773,63 @@ return (
           >
             <div className="px-6 py-5 border-b border-white/20">
               <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h2 className="text-xl font-semibold text-white">
-                    {eventoSeleccionado.nombre_paciente || eventoSeleccionado.titulo}
-                    {eventoSeleccionado.motivo ? ` - ${eventoSeleccionado.motivo}` : ''}
-                  </h2>
+               <div className="min-w-0 flex-1">
+  {modoEdicion ? (
+    <div className="space-y-2">
+      <div className="text-[10px] uppercase tracking-[0.14em] text-cyan-300">
+        Nombre del paciente
+      </div>
 
-                  <p className="text-cyan-200 text-sm mt-1">
-                    {new Date(eventoSeleccionado.fecha_inicio).toLocaleDateString('es-ES')}
-                    {' · '}
-                    {new Date(eventoSeleccionado.fecha_inicio).toLocaleTimeString('es-ES', {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                    {' - '}
-                    {new Date(eventoSeleccionado.fecha_fin).toLocaleTimeString('es-ES', {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </p>
-                </div>
+      <input
+        type="text"
+        value={eventoSeleccionado.nombre_paciente || ''}
+        onChange={(e) =>
+          setEventoSeleccionado({
+            ...eventoSeleccionado,
+            nombre_paciente: e.target.value,
+          })
+        }
+        className="
+          w-full rounded-xl
+          border border-cyan-300/25
+          bg-[#03111A]/55
+          px-3 py-2
+          text-base font-semibold text-white
+          outline-none
+          focus:border-cyan-300/55
+          focus:ring-1 focus:ring-cyan-300/20
+        "
+      />
+
+      <div className="text-sm font-medium text-white/85">
+        {eventoSeleccionado.motivo
+          ? `Tratamiento: ${eventoSeleccionado.motivo}`
+          : ''}
+      </div>
+    </div>
+  ) : (
+    <h2 className="text-xl font-semibold text-white">
+      {eventoSeleccionado.nombre_paciente || eventoSeleccionado.titulo}
+      {eventoSeleccionado.motivo
+        ? ` - ${eventoSeleccionado.motivo}`
+        : ''}
+    </h2>
+  )}
+
+  <p className="text-cyan-200 text-sm mt-1">
+    {new Date(eventoSeleccionado.fecha_inicio).toLocaleDateString('es-ES')}
+    {' · '}
+    {new Date(eventoSeleccionado.fecha_inicio).toLocaleTimeString('es-ES', {
+      hour: '2-digit',
+      minute: '2-digit',
+    })}
+    {' - '}
+    {new Date(eventoSeleccionado.fecha_fin).toLocaleTimeString('es-ES', {
+      hour: '2-digit',
+      minute: '2-digit',
+    })}
+  </p>
+</div>
 
                 <div className="flex items-center gap-3">
                   {modoEdicion && (
