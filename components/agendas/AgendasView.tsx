@@ -14,6 +14,9 @@ import {
   deleteEstadoVisita
 } from '@/lib/repos/agenda-estados.repo';
 import {
+  crearAgendaAnotacion,
+  actualizarAgendaAnotacion,
+  eliminarAgendaAnotacion,
   listAgendaAnotaciones,
   listTitulosAgendaAnotaciones,
   type AgendaAnotacion,
@@ -58,6 +61,16 @@ type PatientOption = {
   nombre_completo: string | null;
   telefono: string | null;
 };
+
+type EventoAgendaVisual = EventoAgenda & {
+  es_anotacion?: boolean;
+  anotacion_id?: string;
+};
+
+const esAnotacionAgenda = (
+  evento?: EventoAgendaVisual | null
+): evento is EventoAgendaVisual & { es_anotacion: true; anotacion_id: string } =>
+  Boolean(evento?.es_anotacion && evento?.anotacion_id);
 
 const LABORATORIOS = ['Julio', 'Alex', 'Juanjo', 'Claudia', 'Otro'];
 
@@ -356,6 +369,13 @@ const esBloqueoAgenda = (evento?: EventoAgenda | null) =>
 const getColorTratamiento = (evento: EventoAgenda) => {
   const motivo = (evento.motivo || '').trim().toLowerCase();
 
+  if (motivo === 'anotacion') {
+    return {
+      bg: 'rgba(14,116,144,.88)',
+      text: 'text-white',
+    };
+  }
+
   if (motivo === 'primera visita') {
     return { bg: 'rgba(250,204,21,.90)', text: 'text-white' };
   }
@@ -491,6 +511,18 @@ const [titulosAnotaciones, setTitulosAnotaciones] = useState<
   const [usuarioPanel, setUsuarioPanel] = useState('panel');
   const [datosUsuarioPanel, setDatosUsuarioPanel] = useState<UsuarioPanel | null>(null);
   const [mostrarInsertar, setMostrarInsertar] = useState(false);
+  const [modoInsertarAnotacion, setModoInsertarAnotacion] = useState(false);
+  const [mostrarResultadosAnotacion, setMostrarResultadosAnotacion] = useState(false);
+  const [anotacionSeleccionada, setAnotacionSeleccionada] = useState<AgendaAnotacion | null>(null);
+  const [modalAnotacionAbierto, setModalAnotacionAbierto] = useState(false);
+  const [modoEdicionAnotacion, setModoEdicionAnotacion] = useState(false);
+  const [nuevaAnotacion, setNuevaAnotacion] = useState({
+    titulo: '',
+    telefono: '',
+    detalle: '',
+    fecha_inicio: '',
+    fecha_fin: '',
+  });
   const [nuevaCita, setNuevaCita] = useState({
   nombre_paciente: '',
   nombre: '',
@@ -589,6 +621,30 @@ const diasMesMovil = useMemo(
   () => getDiasMes(diaMovilSeleccionado),
   [diaMovilSeleccionado]
 );  
+
+  const eventosVisuales = useMemo<EventoAgendaVisual[]>(() => {
+    const citas: EventoAgendaVisual[] = eventos;
+
+    const anotaciones: EventoAgendaVisual[] = anotacionesAgenda.map((anotacion) => ({
+      event_id: `anotacion-${anotacion.id}`,
+      calendar_id: `anotacion-${anotacion.agenda}`,
+      titulo: `ANOTACIÓN - ${anotacion.titulo}`,
+      nombre_paciente: '',
+      telefono: anotacion.telefono || '',
+      motivo: 'anotacion',
+      detalle_motivo: anotacion.detalle || '',
+      fecha_inicio: anotacion.fecha_inicio,
+      fecha_fin: anotacion.fecha_fin,
+      origen: anotacion.origen || '',
+      estado: '',
+      cambios: 0,
+      profesional: anotacion.agenda,
+      es_anotacion: true,
+      anotacion_id: anotacion.id,
+    } as EventoAgendaVisual));
+
+    return [...citas, ...anotaciones];
+  }, [eventos, anotacionesAgenda]);
 
   const crearFechaDesdeSlot = (slotKey: string) => {
     const [fechaKey, hora] = slotKey.split('|');
@@ -960,6 +1016,7 @@ setNuevoPaciente({
   telefono: '',
 });
     
+  setModoInsertarAnotacion(false);
   setMostrarInsertar(true);
 };
 
@@ -1064,6 +1121,165 @@ apellidos: nuevaCita.apellidos,
     setLoading(false);
   }
 };
+
+const abrirModoAnotacion = () => {
+  const fechaInicio = nuevaCita.fecha_inicio;
+  const fechaFin = nuevaCita.fecha_fin;
+
+  if (!fechaInicio || !fechaFin) return;
+
+  setNuevaAnotacion({
+    titulo: '',
+    telefono: '',
+    detalle: '',
+    fecha_inicio: fechaInicio,
+    fecha_fin: fechaFin,
+  });
+  setMostrarResultadosAnotacion(false);
+  setModoInsertarAnotacion(true);
+};
+
+const volverModoCita = () => {
+  setNuevaCita((prev) => ({
+    ...prev,
+    fecha_inicio: nuevaAnotacion.fecha_inicio || prev.fecha_inicio,
+    fecha_fin: nuevaAnotacion.fecha_fin || prev.fecha_fin,
+  }));
+  setMostrarResultadosAnotacion(false);
+  setModoInsertarAnotacion(false);
+};
+
+const cerrarModalInsertar = () => {
+  setMostrarInsertar(false);
+  setModoInsertarAnotacion(false);
+  setMostrarResultadosAnotacion(false);
+};
+
+const guardarInsertarAnotacion = async () => {
+  if (loading) return;
+
+  const titulo = nuevaAnotacion.titulo.trim();
+
+  if (!titulo || !nuevaAnotacion.fecha_inicio || !nuevaAnotacion.fecha_fin) {
+    console.error('Falta el título, la fecha o la hora de la anotación');
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const creada = await crearAgendaAnotacion({
+      agenda: agendaActiva as 'fede' | 'celia' | 'ana',
+      titulo,
+      telefono: nuevaAnotacion.telefono.trim() || null,
+      detalle: nuevaAnotacion.detalle.trim() || null,
+      fecha_inicio: nuevaAnotacion.fecha_inicio,
+      fecha_fin: nuevaAnotacion.fecha_fin,
+      origen: usuarioPanel,
+    });
+
+    if (!creada) {
+      console.error('No se ha podido crear la anotación');
+      return;
+    }
+
+    cerrarModalInsertar();
+    setSlotInicio(null);
+    setSlotFin(null);
+    await cargarAgenda();
+    setTitulosAnotaciones(await listTitulosAgendaAnotaciones());
+  } catch (error) {
+    console.error('Error guardando anotación:', error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+const abrirDetalleAnotacion = (evento: EventoAgendaVisual) => {
+  const anotacion = anotacionesAgenda.find(
+    (item) => item.id === evento.anotacion_id
+  );
+
+  if (!anotacion) return;
+
+  setAnotacionSeleccionada(anotacion);
+  setModoEdicionAnotacion(false);
+  setModalAnotacionAbierto(true);
+  setEventoActivo(null);
+};
+
+const guardarCambiosAnotacion = async () => {
+  if (!anotacionSeleccionada || loading) return;
+
+  const titulo = anotacionSeleccionada.titulo.trim();
+  if (!titulo) {
+    console.error('El título de la anotación no puede quedar vacío');
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const actualizada = await actualizarAgendaAnotacion(
+      anotacionSeleccionada.id,
+      {
+        agenda: anotacionSeleccionada.agenda,
+        titulo,
+        telefono: anotacionSeleccionada.telefono?.trim() || null,
+        detalle: anotacionSeleccionada.detalle?.trim() || null,
+        fecha_inicio: anotacionSeleccionada.fecha_inicio,
+        fecha_fin: anotacionSeleccionada.fecha_fin,
+        origen: anotacionSeleccionada.origen || usuarioPanel,
+      }
+    );
+
+    if (!actualizada) {
+      console.error('No se ha podido modificar la anotación');
+      return;
+    }
+
+    setAnotacionesAgenda((prev) =>
+      prev.map((item) => item.id === actualizada.id ? actualizada : item)
+    );
+    setAnotacionSeleccionada(actualizada);
+    setModoEdicionAnotacion(false);
+    setTitulosAnotaciones(await listTitulosAgendaAnotaciones());
+  } catch (error) {
+    console.error('Error modificando anotación:', error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+const borrarAnotacion = async () => {
+  if (!anotacionSeleccionada || loading) return;
+
+  setLoading(true);
+
+  try {
+    const eliminada = await eliminarAgendaAnotacion(anotacionSeleccionada.id);
+
+    if (!eliminada) {
+      console.error('No se ha podido eliminar la anotación');
+      return;
+    }
+
+    setAnotacionesAgenda((prev) =>
+      prev.filter((item) => item.id !== anotacionSeleccionada.id)
+    );
+    setModalAnotacionAbierto(false);
+    setAnotacionSeleccionada(null);
+    setModoEdicionAnotacion(false);
+    setSlotInicio(null);
+    setSlotFin(null);
+    setTitulosAnotaciones(await listTitulosAgendaAnotaciones());
+  } catch (error) {
+    console.error('Error eliminando anotación:', error);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const buscarPacienteEnAgenda = async () => {
   if (buscandoPacienteAgenda) return;
@@ -1997,7 +2213,7 @@ useEffect(() => {
     const slotFinDate = new Date(slotInicioDate);
     slotFinDate.setMinutes(slotFinDate.getMinutes() + 15);
 
-    const eventosDia = eventos.filter(e => e.fecha_inicio && sameDay(e.fecha_inicio, diaMovilSeleccionado));
+    const eventosDia = eventosVisuales.filter(e => e.fecha_inicio && sameDay(e.fecha_inicio, diaMovilSeleccionado));
 
     const eventosSlot = eventosDia.filter((evento) => {
   const inicioEvento = new Date(evento.fecha_inicio);
@@ -2067,8 +2283,13 @@ return (
           }
           role="button"
           tabIndex={0}
-          onClick={() => manejarSeleccion(slotKey, eventoSlot)}
+          onClick={() => manejarSeleccion(slotKey, esAnotacionAgenda(eventoSlot) ? null : eventoSlot)}
           onDoubleClick={() => {
+            if (esAnotacionAgenda(eventoSlot)) {
+              abrirDetalleAnotacion(eventoSlot);
+              return;
+            }
+
             if (eventoSlot && !esBloqueoEvento) {
               setEventoSeleccionado(eventoSlot);
               setModoEdicion(false);
@@ -2135,6 +2356,7 @@ return (
 
           {eventoSlot &&
             !esBloqueoEvento &&
+            !esAnotacionAgenda(eventoSlot) &&
             esUltimaLineaEvento &&
             renderEstadoVisitaControl(eventoSlot, color)}
         </div>
@@ -2308,7 +2530,7 @@ return (
             ))}
 
             {diasSemana.map((dia) => {
-              const eventosDia = eventos.filter(e => e.fecha_inicio && sameDay(e.fecha_inicio, dia));
+              const eventosDia = eventosVisuales.filter(e => e.fecha_inicio && sameDay(e.fecha_inicio, dia));
 
               return (
                 <div
@@ -2393,9 +2615,14 @@ return (
           role="button"
           tabIndex={0}
           onClick={() =>
-            manejarSeleccion(slotKey, eventoSlot)
+            manejarSeleccion(slotKey, esAnotacionAgenda(eventoSlot) ? null : eventoSlot)
           }
           onDoubleClick={() => {
+            if (esAnotacionAgenda(eventoSlot)) {
+              abrirDetalleAnotacion(eventoSlot);
+              return;
+            }
+
             if (eventoSlot && !esBloqueoEvento) {
               setEventoSeleccionado(eventoSlot);
               setModoEdicion(false);
@@ -2464,6 +2691,7 @@ return (
 
           {eventoSlot &&
             !esBloqueoEvento &&
+            !esAnotacionAgenda(eventoSlot) &&
             esUltimaLineaEvento &&
             renderEstadoVisitaControl(
               eventoSlot,
@@ -3185,34 +3413,50 @@ return (
       <div className="px-6 py-5 border-b border-cyan-300/20 flex items-start justify-between">
         <div>
           <h2 className="text-xl font-semibold text-white">
-  {nuevaCita.nombre_paciente && nuevaCita.motivo
-    ? `${nuevaCita.nombre_paciente} - ${nuevaCita.motivo}`
-    : 'Insertar cita'}
-</h2>
+            {modoInsertarAnotacion
+              ? nuevaAnotacion.titulo.trim()
+                ? `ANOTACIÓN - ${nuevaAnotacion.titulo.trim()}`
+                : 'Insertar anotación'
+              : nuevaCita.nombre_paciente && nuevaCita.motivo
+                ? `${nuevaCita.nombre_paciente} - ${nuevaCita.motivo}`
+                : 'Insertar cita'}
+          </h2>
           <p className="text-cyan-200 text-sm mt-1">
-            {new Date(nuevaCita.fecha_inicio).toLocaleDateString('es-ES')} · {toInputTime(nuevaCita.fecha_inicio)} - {toInputTime(nuevaCita.fecha_fin)}
+            {new Date(modoInsertarAnotacion ? nuevaAnotacion.fecha_inicio : nuevaCita.fecha_inicio).toLocaleDateString('es-ES')} · {toInputTime(modoInsertarAnotacion ? nuevaAnotacion.fecha_inicio : nuevaCita.fecha_inicio)} - {toInputTime(modoInsertarAnotacion ? nuevaAnotacion.fecha_fin : nuevaCita.fecha_fin)}
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            onClick={guardarInsertarCita}
-            disabled={loading}
-            className="text-cyan-200 hover:text-white text-2xl disabled:opacity-50"
-          >
-            ✓
-          </button>
+        <div className="flex flex-col items-end">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={modoInsertarAnotacion ? guardarInsertarAnotacion : guardarInsertarCita}
+              disabled={loading}
+              className="text-cyan-200 hover:text-white text-2xl disabled:opacity-50"
+            >
+              ✓
+            </button>
+
+            <button
+              onClick={cerrarModalInsertar}
+              className="text-white/80 hover:text-white text-xl"
+            >
+              ✕
+            </button>
+          </div>
 
           <button
-            onClick={() => setMostrarInsertar(false)}
-            className="text-white/80 hover:text-white text-xl"
+            type="button"
+            onClick={modoInsertarAnotacion ? volverModoCita : abrirModoAnotacion}
+            className="mt-1 text-[11px] text-cyan-300 hover:text-cyan-100"
           >
-            ✕
+            {modoInsertarAnotacion ? 'Volver a cita' : 'Anotación interna'}
           </button>
         </div>
       </div>
 
       <div className="p-6 space-y-5">
+        {!modoInsertarAnotacion ? (
+          <>
         
         {/* DESKTOP - fecha y horas */}
 <div className="hidden lg:grid grid-cols-3 gap-4">
@@ -3538,10 +3782,360 @@ return (
     </div>
   </div>
 </div>
+          </>
+        ) : (
+          <>
+            <div className="hidden lg:grid grid-cols-3 gap-4">
+              <input
+                type="date"
+                value={toInputDate(nuevaAnotacion.fecha_inicio)}
+                onChange={(e) => {
+                  const fecha = e.target.value;
+                  setNuevaAnotacion({
+                    ...nuevaAnotacion,
+                    fecha_inicio: buildISOFromDateTime(fecha, toInputTime(nuevaAnotacion.fecha_inicio)),
+                    fecha_fin: buildISOFromDateTime(fecha, toInputTime(nuevaAnotacion.fecha_fin)),
+                  });
+                }}
+                className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
+              />
+              <input
+                type="time"
+                step={300}
+                value={toInputTime(nuevaAnotacion.fecha_inicio)}
+                onChange={(e) => {
+                  const fecha = toInputDate(nuevaAnotacion.fecha_inicio);
+                  setNuevaAnotacion({
+                    ...nuevaAnotacion,
+                    fecha_inicio: buildISOFromDateTime(fecha, e.target.value),
+                  });
+                }}
+                className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
+              />
+              <input
+                type="time"
+                step={300}
+                value={toInputTime(nuevaAnotacion.fecha_fin)}
+                onChange={(e) => {
+                  const fecha = toInputDate(nuevaAnotacion.fecha_inicio);
+                  setNuevaAnotacion({
+                    ...nuevaAnotacion,
+                    fecha_fin: buildISOFromDateTime(fecha, e.target.value),
+                  });
+                }}
+                className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
+              />
+            </div>
+
+            <div className="lg:hidden space-y-3">
+              <input
+                type="date"
+                value={toInputDate(nuevaAnotacion.fecha_inicio)}
+                onChange={(e) => {
+                  const fecha = e.target.value;
+                  setNuevaAnotacion({
+                    ...nuevaAnotacion,
+                    fecha_inicio: buildISOFromDateTime(fecha, toInputTime(nuevaAnotacion.fecha_inicio)),
+                    fecha_fin: buildISOFromDateTime(fecha, toInputTime(nuevaAnotacion.fecha_fin)),
+                  });
+                }}
+                className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
+              />
+              <div className="grid grid-cols-2 gap-3">
+                <input
+                  type="time"
+                  step={300}
+                  value={toInputTime(nuevaAnotacion.fecha_inicio)}
+                  onChange={(e) => {
+                    const fecha = toInputDate(nuevaAnotacion.fecha_inicio);
+                    setNuevaAnotacion({
+                      ...nuevaAnotacion,
+                      fecha_inicio: buildISOFromDateTime(fecha, e.target.value),
+                    });
+                  }}
+                  className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
+                />
+                <input
+                  type="time"
+                  step={300}
+                  value={toInputTime(nuevaAnotacion.fecha_fin)}
+                  onChange={(e) => {
+                    const fecha = toInputDate(nuevaAnotacion.fecha_inicio);
+                    setNuevaAnotacion({
+                      ...nuevaAnotacion,
+                      fecha_fin: buildISOFromDateTime(fecha, e.target.value),
+                    });
+                  }}
+                  className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 items-start">
+              <div className="relative">
+                <input
+                  placeholder="Buscar o escribir anotación"
+                  value={nuevaAnotacion.titulo}
+                  onChange={(e) => {
+                    setNuevaAnotacion({ ...nuevaAnotacion, titulo: e.target.value });
+                    setMostrarResultadosAnotacion(true);
+                  }}
+                  onFocus={() => setMostrarResultadosAnotacion(true)}
+                  className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+                />
+
+                {mostrarResultadosAnotacion && nuevaAnotacion.titulo.trim() && (
+                  <div className="absolute left-0 top-[calc(100%+8px)] z-[150] max-h-44 w-full overflow-y-auto rounded-2xl border border-cyan-400/25 bg-[#03111A] shadow-[0_0_25px_rgba(34,211,238,.18)]">
+                    {titulosAnotaciones
+                      .filter((item) => normalizarTexto(item.titulo).includes(normalizarTexto(nuevaAnotacion.titulo)))
+                      .slice(0, 8)
+                      .map((item) => (
+                        <button
+                          key={item.titulo}
+                          type="button"
+                          onClick={() => {
+                            setNuevaAnotacion({
+                              ...nuevaAnotacion,
+                              titulo: item.titulo,
+                              telefono: item.telefono || nuevaAnotacion.telefono,
+                            });
+                            setMostrarResultadosAnotacion(false);
+                          }}
+                          className="block w-full px-4 py-2 text-left text-sm text-white hover:bg-cyan-500/15"
+                        >
+                          <div>{item.titulo}</div>
+                          {item.telefono && <div className="text-xs text-cyan-100/60">{item.telefono}</div>}
+                        </button>
+                      ))}
+                  </div>
+                )}
+              </div>
+
+              <input
+                placeholder="Teléfono opcional"
+                value={nuevaAnotacion.telefono}
+                onChange={(e) => setNuevaAnotacion({ ...nuevaAnotacion, telefono: e.target.value })}
+                className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+              />
+            </div>
+
+            <textarea
+              placeholder="Detalle de la anotación"
+              value={nuevaAnotacion.detalle}
+              onChange={(e) => setNuevaAnotacion({ ...nuevaAnotacion, detalle: e.target.value })}
+              rows={4}
+              className="w-full rounded-2xl border border-white/25 bg-black/20 p-4 text-white resize-none outline-none"
+            />
+
+            <div className="pt-2 border-t border-white/20">
+              <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">Origen</div>
+              <div className="text-white/95 text-sm">{usuarioPanel}</div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   </div>
 )}
+
+      {modalAnotacionAbierto && anotacionSeleccionada && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm pt-[4vh]">
+          <div className="w-full max-w-2xl rounded-3xl border border-cyan-300/45 bg-[#03111A]/95 overflow-visible shadow-[0_0_46px_rgba(34,211,238,.24)]">
+            <div className="px-6 py-5 border-b border-cyan-300/20 flex items-start justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-white">
+                  ANOTACIÓN - {anotacionSeleccionada.titulo}
+                </h2>
+                <p className="text-cyan-200 text-sm mt-1">
+                  {new Date(anotacionSeleccionada.fecha_inicio).toLocaleDateString('es-ES')} · {toInputTime(anotacionSeleccionada.fecha_inicio)} - {toInputTime(anotacionSeleccionada.fecha_fin)}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                {modoEdicionAnotacion ? (
+                  <button
+                    onClick={guardarCambiosAnotacion}
+                    disabled={loading}
+                    className="text-cyan-200 hover:text-white text-2xl disabled:opacity-50"
+                  >
+                    ✓
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setModoEdicionAnotacion(true)}
+                    className="text-cyan-200 hover:text-white text-sm"
+                  >
+                    Editar
+                  </button>
+                )}
+
+                <button
+                  onClick={() => {
+                    setModalAnotacionAbierto(false);
+                    setAnotacionSeleccionada(null);
+                    setModoEdicionAnotacion(false);
+                  }}
+                  className="text-white/80 hover:text-white text-xl"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-5">
+              {modoEdicionAnotacion ? (
+                <>
+                  <div className="hidden lg:grid grid-cols-3 gap-4">
+                    <input
+                      type="date"
+                      value={toInputDate(anotacionSeleccionada.fecha_inicio)}
+                      onChange={(e) => {
+                        const fecha = e.target.value;
+                        setAnotacionSeleccionada({
+                          ...anotacionSeleccionada,
+                          fecha_inicio: buildISOFromDateTime(fecha, toInputTime(anotacionSeleccionada.fecha_inicio)),
+                          fecha_fin: buildISOFromDateTime(fecha, toInputTime(anotacionSeleccionada.fecha_fin)),
+                        });
+                      }}
+                      className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
+                    />
+                    <input
+                      type="time"
+                      step={300}
+                      value={toInputTime(anotacionSeleccionada.fecha_inicio)}
+                      onChange={(e) => {
+                        const fecha = toInputDate(anotacionSeleccionada.fecha_inicio);
+                        setAnotacionSeleccionada({
+                          ...anotacionSeleccionada,
+                          fecha_inicio: buildISOFromDateTime(fecha, e.target.value),
+                        });
+                      }}
+                      className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
+                    />
+                    <input
+                      type="time"
+                      step={300}
+                      value={toInputTime(anotacionSeleccionada.fecha_fin)}
+                      onChange={(e) => {
+                        const fecha = toInputDate(anotacionSeleccionada.fecha_inicio);
+                        setAnotacionSeleccionada({
+                          ...anotacionSeleccionada,
+                          fecha_fin: buildISOFromDateTime(fecha, e.target.value),
+                        });
+                      }}
+                      className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
+                    />
+                  </div>
+
+                  <div className="lg:hidden space-y-3">
+                    <input
+                      type="date"
+                      value={toInputDate(anotacionSeleccionada.fecha_inicio)}
+                      onChange={(e) => {
+                        const fecha = e.target.value;
+                        setAnotacionSeleccionada({
+                          ...anotacionSeleccionada,
+                          fecha_inicio: buildISOFromDateTime(fecha, toInputTime(anotacionSeleccionada.fecha_inicio)),
+                          fecha_fin: buildISOFromDateTime(fecha, toInputTime(anotacionSeleccionada.fecha_fin)),
+                        });
+                      }}
+                      className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
+                    />
+                    <div className="grid grid-cols-2 gap-3">
+                      <input
+                        type="time"
+                        step={300}
+                        value={toInputTime(anotacionSeleccionada.fecha_inicio)}
+                        onChange={(e) => {
+                          const fecha = toInputDate(anotacionSeleccionada.fecha_inicio);
+                          setAnotacionSeleccionada({
+                            ...anotacionSeleccionada,
+                            fecha_inicio: buildISOFromDateTime(fecha, e.target.value),
+                          });
+                        }}
+                        className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
+                      />
+                      <input
+                        type="time"
+                        step={300}
+                        value={toInputTime(anotacionSeleccionada.fecha_fin)}
+                        onChange={(e) => {
+                          const fecha = toInputDate(anotacionSeleccionada.fecha_inicio);
+                          setAnotacionSeleccionada({
+                            ...anotacionSeleccionada,
+                            fecha_fin: buildISOFromDateTime(fecha, e.target.value),
+                          });
+                        }}
+                        className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none [color-scheme:dark]"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                    <input
+                      value={anotacionSeleccionada.titulo}
+                      onChange={(e) => setAnotacionSeleccionada({ ...anotacionSeleccionada, titulo: e.target.value })}
+                      placeholder="Título"
+                      className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+                    />
+                    <input
+                      value={anotacionSeleccionada.telefono || ''}
+                      onChange={(e) => setAnotacionSeleccionada({ ...anotacionSeleccionada, telefono: e.target.value })}
+                      placeholder="Teléfono opcional"
+                      className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2 text-white outline-none"
+                    />
+                  </div>
+
+                  <textarea
+                    value={anotacionSeleccionada.detalle || ''}
+                    onChange={(e) => setAnotacionSeleccionada({ ...anotacionSeleccionada, detalle: e.target.value })}
+                    rows={4}
+                    placeholder="Detalle de la anotación"
+                    className="w-full rounded-2xl border border-white/25 bg-black/20 p-4 text-white resize-none outline-none"
+                  />
+                </>
+              ) : (
+                <>
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">Título</div>
+                      <div className="text-white/95 text-sm">{anotacionSeleccionada.titulo}</div>
+                    </div>
+                    <div>
+                      <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">Teléfono</div>
+                      <div className="text-white/95 text-sm">{anotacionSeleccionada.telefono || 'Sin teléfono'}</div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">Detalle</div>
+                    <div className="min-h-[90px] whitespace-pre-wrap rounded-2xl border border-white/15 bg-black/15 p-4 text-white/95 text-sm">
+                      {anotacionSeleccionada.detalle || 'Sin detalle'}
+                    </div>
+                  </div>
+                </>
+              )}
+
+              <div className="flex items-end justify-between gap-4 pt-2 border-t border-white/20">
+                <div>
+                  <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">Origen</div>
+                  <div className="text-white/95 text-sm">{anotacionSeleccionada.origen || 'panel'}</div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={borrarAnotacion}
+                  disabled={loading}
+                  className="text-xs text-red-300 hover:text-red-200 disabled:opacity-50"
+                >
+                  Eliminar anotación
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
 
       {mostrarInsertarRecall && (
   <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-sm pt-[4vh]">
