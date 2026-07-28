@@ -719,6 +719,7 @@ const anotaciones = await listAgendaAnotaciones(
 setEventos(data);
 setAnotacionesAgenda(anotaciones);
 setLoading(false);
+};    
 
   const gestionarBloqueo = async () => {
     if (!slotInicio || loading) return;
@@ -1654,6 +1655,7 @@ const esUltimaLineaVisibleEvento = (
   cargarPatients();
   cargarLaboratorio();
   cargarEstadosVisita();
+  cargarTitulosAnotaciones();
 }, []);
 
 useEffect(() => {
