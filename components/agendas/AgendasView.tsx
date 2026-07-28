@@ -516,12 +516,15 @@ const [titulosAnotaciones, setTitulosAnotaciones] = useState<
   const [anotacionSeleccionada, setAnotacionSeleccionada] = useState<AgendaAnotacion | null>(null);
   const [modalAnotacionAbierto, setModalAnotacionAbierto] = useState(false);
   const [modoEdicionAnotacion, setModoEdicionAnotacion] = useState(false);
+  const [anotacionOriginal, setAnotacionOriginal] = useState<AgendaAnotacion | null>(null);
+  const [confirmarEliminarAnotacion, setConfirmarEliminarAnotacion] = useState(false);
   const [nuevaAnotacion, setNuevaAnotacion] = useState({
     titulo: '',
     telefono: '',
     detalle: '',
     fecha_inicio: '',
     fecha_fin: '',
+    bloquear_tramo: false,
   });
   const [nuevaCita, setNuevaCita] = useState({
   nombre_paciente: '',
@@ -1124,16 +1127,16 @@ apellidos: nuevaCita.apellidos,
 
 const abrirModoAnotacion = () => {
   const fechaInicio = nuevaCita.fecha_inicio;
-  const fechaFin = nuevaCita.fecha_fin;
 
-  if (!fechaInicio || !fechaFin) return;
+  if (!fechaInicio) return;
 
   setNuevaAnotacion({
     titulo: '',
     telefono: '',
     detalle: '',
     fecha_inicio: fechaInicio,
-    fecha_fin: fechaFin,
+    fecha_fin: sumarMinutosISO(fechaInicio, 15),
+    bloquear_tramo: false,
   });
   setMostrarResultadosAnotacion(false);
   setModoInsertarAnotacion(true);
@@ -1155,6 +1158,59 @@ const cerrarModalInsertar = () => {
   setMostrarResultadosAnotacion(false);
 };
 
+const crearBloqueoAnotacion = async (
+  anotacion: Pick<AgendaAnotacion, 'agenda' | 'fecha_inicio' | 'fecha_fin'>
+) => {
+  const response = await fetch('/agendas/gestionar', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      accion: 'bloquear',
+      agenda: anotacion.agenda,
+      fecha_inicio: anotacion.fecha_inicio,
+      fecha_fin: anotacion.fecha_fin,
+      usuario: usuarioPanel,
+    }),
+  });
+
+  const data = await response.json();
+
+  if (!data?.ok) {
+    throw new Error(data?.mensaje || 'No se ha podido bloquear el tramo');
+  }
+
+  return {
+    event_id: String(data.event_id || '').trim() || null,
+    calendar_id: String(data.calendar_id || '').trim() || null,
+  };
+};
+
+const eliminarBloqueoAnotacion = async (
+  anotacion: Pick<AgendaAnotacion, 'agenda' | 'fecha_inicio' | 'fecha_fin'>
+) => {
+  const response = await fetch('/agendas/gestionar', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      accion: 'desbloquear',
+      agenda: anotacion.agenda,
+      fecha_inicio: anotacion.fecha_inicio,
+      fecha_fin: anotacion.fecha_fin,
+      usuario: usuarioPanel,
+    }),
+  });
+
+  const data = await response.json();
+
+  if (!data?.ok) {
+    throw new Error(data?.mensaje || 'No se ha podido desbloquear el tramo');
+  }
+};
+
 const guardarInsertarAnotacion = async () => {
   if (loading) return;
 
@@ -1167,18 +1223,40 @@ const guardarInsertarAnotacion = async () => {
 
   setLoading(true);
 
+  let bloqueoCreado: {
+    event_id: string | null;
+    calendar_id: string | null;
+  } | null = null;
+
+  const datosBloqueo = {
+    agenda: agendaActiva as 'fede' | 'celia' | 'ana',
+    fecha_inicio: nuevaAnotacion.fecha_inicio,
+    fecha_fin: nuevaAnotacion.fecha_fin,
+  };
+
   try {
+    if (nuevaAnotacion.bloquear_tramo) {
+      bloqueoCreado = await crearBloqueoAnotacion(datosBloqueo);
+    }
+
     const creada = await crearAgendaAnotacion({
-      agenda: agendaActiva as 'fede' | 'celia' | 'ana',
+      agenda: datosBloqueo.agenda,
       titulo,
       telefono: nuevaAnotacion.telefono.trim() || null,
       detalle: nuevaAnotacion.detalle.trim() || null,
       fecha_inicio: nuevaAnotacion.fecha_inicio,
       fecha_fin: nuevaAnotacion.fecha_fin,
       origen: usuarioPanel,
+      bloquear_tramo: nuevaAnotacion.bloquear_tramo,
+      bloqueo_event_id: bloqueoCreado?.event_id || null,
+      bloqueo_calendar_id: bloqueoCreado?.calendar_id || null,
     });
 
     if (!creada) {
+      if (bloqueoCreado) {
+        await eliminarBloqueoAnotacion(datosBloqueo);
+      }
+
       console.error('No se ha podido crear la anotación');
       return;
     }
@@ -1202,14 +1280,16 @@ const abrirDetalleAnotacion = (evento: EventoAgendaVisual) => {
 
   if (!anotacion) return;
 
-  setAnotacionSeleccionada(anotacion);
-  setModoEdicionAnotacion(false);
+  setAnotacionSeleccionada({ ...anotacion });
+  setAnotacionOriginal({ ...anotacion });
+  setModoEdicionAnotacion(true);
+  setConfirmarEliminarAnotacion(false);
   setModalAnotacionAbierto(true);
   setEventoActivo(null);
 };
 
 const guardarCambiosAnotacion = async () => {
-  if (!anotacionSeleccionada || loading) return;
+  if (!anotacionSeleccionada || !anotacionOriginal || loading) return;
 
   const titulo = anotacionSeleccionada.titulo.trim();
   if (!titulo) {
@@ -1219,7 +1299,31 @@ const guardarCambiosAnotacion = async () => {
 
   setLoading(true);
 
+  const estabaBloqueada = anotacionOriginal.bloquear_tramo;
+  const debeEstarBloqueada = anotacionSeleccionada.bloquear_tramo;
+  const cambioTramo =
+    anotacionOriginal.agenda !== anotacionSeleccionada.agenda ||
+    new Date(anotacionOriginal.fecha_inicio).getTime() !==
+      new Date(anotacionSeleccionada.fecha_inicio).getTime() ||
+    new Date(anotacionOriginal.fecha_fin).getTime() !==
+      new Date(anotacionSeleccionada.fecha_fin).getTime();
+
+  let bloqueoNuevo: {
+    event_id: string | null;
+    calendar_id: string | null;
+  } | null = null;
+  let bloqueoAnteriorEliminado = false;
+
   try {
+    if (estabaBloqueada && (!debeEstarBloqueada || cambioTramo)) {
+      await eliminarBloqueoAnotacion(anotacionOriginal);
+      bloqueoAnteriorEliminado = true;
+    }
+
+    if (debeEstarBloqueada && (!estabaBloqueada || cambioTramo)) {
+      bloqueoNuevo = await crearBloqueoAnotacion(anotacionSeleccionada);
+    }
+
     const actualizada = await actualizarAgendaAnotacion(
       anotacionSeleccionada.id,
       {
@@ -1230,10 +1334,25 @@ const guardarCambiosAnotacion = async () => {
         fecha_inicio: anotacionSeleccionada.fecha_inicio,
         fecha_fin: anotacionSeleccionada.fecha_fin,
         origen: anotacionSeleccionada.origen || usuarioPanel,
+        bloquear_tramo: debeEstarBloqueada,
+        bloqueo_event_id: debeEstarBloqueada
+          ? bloqueoNuevo?.event_id || anotacionOriginal.bloqueo_event_id || null
+          : null,
+        bloqueo_calendar_id: debeEstarBloqueada
+          ? bloqueoNuevo?.calendar_id || anotacionOriginal.bloqueo_calendar_id || null
+          : null,
       }
     );
 
     if (!actualizada) {
+      if (bloqueoNuevo) {
+        await eliminarBloqueoAnotacion(anotacionSeleccionada);
+      }
+
+      if (bloqueoAnteriorEliminado) {
+        await crearBloqueoAnotacion(anotacionOriginal);
+      }
+
       console.error('No se ha podido modificar la anotación');
       return;
     }
@@ -1241,10 +1360,28 @@ const guardarCambiosAnotacion = async () => {
     setAnotacionesAgenda((prev) =>
       prev.map((item) => item.id === actualizada.id ? actualizada : item)
     );
-    setAnotacionSeleccionada(actualizada);
-    setModoEdicionAnotacion(false);
+    setAnotacionSeleccionada({ ...actualizada });
+    setAnotacionOriginal({ ...actualizada });
+    setModoEdicionAnotacion(true);
     setTitulosAnotaciones(await listTitulosAgendaAnotaciones());
+    await cargarAgenda();
   } catch (error) {
+    if (bloqueoNuevo) {
+      try {
+        await eliminarBloqueoAnotacion(anotacionSeleccionada);
+      } catch (rollbackError) {
+        console.error('Error revirtiendo el nuevo bloqueo:', rollbackError);
+      }
+    }
+
+    if (bloqueoAnteriorEliminado) {
+      try {
+        await crearBloqueoAnotacion(anotacionOriginal);
+      } catch (rollbackError) {
+        console.error('Error restaurando el bloqueo anterior:', rollbackError);
+      }
+    }
+
     console.error('Error modificando anotación:', error);
   } finally {
     setLoading(false);
@@ -1254,32 +1391,54 @@ const guardarCambiosAnotacion = async () => {
 const borrarAnotacion = async () => {
   if (!anotacionSeleccionada || loading) return;
 
+  const anotacionAEliminar = { ...anotacionSeleccionada };
   setLoading(true);
 
+  let bloqueoEliminado = false;
+
   try {
-    const eliminada = await eliminarAgendaAnotacion(anotacionSeleccionada.id);
+    if (anotacionAEliminar.bloquear_tramo) {
+      await eliminarBloqueoAnotacion(anotacionAEliminar);
+      bloqueoEliminado = true;
+    }
+
+    const eliminada = await eliminarAgendaAnotacion(anotacionAEliminar.id);
 
     if (!eliminada) {
+      if (bloqueoEliminado) {
+        await crearBloqueoAnotacion(anotacionAEliminar);
+      }
+
       console.error('No se ha podido eliminar la anotación');
       return;
     }
 
     setAnotacionesAgenda((prev) =>
-      prev.filter((item) => item.id !== anotacionSeleccionada.id)
+      prev.filter((item) => item.id !== anotacionAEliminar.id)
     );
+    setConfirmarEliminarAnotacion(false);
     setModalAnotacionAbierto(false);
     setAnotacionSeleccionada(null);
+    setAnotacionOriginal(null);
     setModoEdicionAnotacion(false);
     setSlotInicio(null);
     setSlotFin(null);
     setTitulosAnotaciones(await listTitulosAgendaAnotaciones());
+    await cargarAgenda();
   } catch (error) {
+    if (bloqueoEliminado) {
+      try {
+        await crearBloqueoAnotacion(anotacionAEliminar);
+      } catch (rollbackError) {
+        console.error('Error restaurando el bloqueo eliminado:', rollbackError);
+      }
+    }
+
     console.error('Error eliminando anotación:', error);
   } finally {
     setLoading(false);
   }
 };
-
 
   const buscarPacienteEnAgenda = async () => {
   if (buscandoPacienteAgenda) return;
@@ -3927,9 +4086,26 @@ return (
               className="w-full rounded-2xl border border-white/25 bg-black/20 p-4 text-white resize-none outline-none"
             />
 
-            <div className="pt-2 border-t border-white/20">
-              <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">Origen</div>
-              <div className="text-white/95 text-sm">{usuarioPanel}</div>
+            <div className="flex items-end justify-between gap-4 pt-2 border-t border-white/20">
+              <div>
+                <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">Origen</div>
+                <div className="text-white/95 text-sm">{usuarioPanel}</div>
+              </div>
+
+              <label className="flex cursor-pointer items-center gap-2 text-[11px] font-medium tracking-[0.08em] text-cyan-200">
+                <input
+                  type="checkbox"
+                  checked={nuevaAnotacion.bloquear_tramo}
+                  onChange={(e) =>
+                    setNuevaAnotacion({
+                      ...nuevaAnotacion,
+                      bloquear_tramo: e.target.checked,
+                    })
+                  }
+                  className="h-4 w-4 accent-cyan-400"
+                />
+                BLOQUEAR TRAMO
+              </label>
             </div>
           </>
         )}
@@ -3973,7 +4149,9 @@ return (
                   onClick={() => {
                     setModalAnotacionAbierto(false);
                     setAnotacionSeleccionada(null);
+                    setAnotacionOriginal(null);
                     setModoEdicionAnotacion(false);
+                    setConfirmarEliminarAnotacion(false);
                   }}
                   className="text-white/80 hover:text-white text-xl"
                 >
@@ -4116,20 +4294,39 @@ return (
                 </>
               )}
 
-              <div className="flex items-end justify-between gap-4 pt-2 border-t border-white/20">
+              <div className="flex flex-col gap-4 pt-2 border-t border-white/20 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                   <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">Origen</div>
                   <div className="text-white/95 text-sm">{anotacionSeleccionada.origen || 'panel'}</div>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={borrarAnotacion}
-                  disabled={loading}
-                  className="text-xs text-red-300 hover:text-red-200 disabled:opacity-50"
-                >
-                  Eliminar anotación
-                </button>
+                <div className="flex items-center justify-end gap-3">
+                  <label className="flex cursor-pointer items-center gap-2 text-[11px] font-medium tracking-[0.08em] text-cyan-200">
+                    <input
+                      type="checkbox"
+                      checked={anotacionSeleccionada.bloquear_tramo}
+                      onChange={(e) =>
+                        setAnotacionSeleccionada({
+                          ...anotacionSeleccionada,
+                          bloquear_tramo: e.target.checked,
+                        })
+                      }
+                      className="h-4 w-4 accent-cyan-400"
+                    />
+                    BLOQUEAR TRAMO
+                  </label>
+
+                  <span className="text-white/25">|</span>
+
+                  <button
+                    type="button"
+                    onClick={() => setConfirmarEliminarAnotacion(true)}
+                    disabled={loading}
+                    className="text-[11px] font-medium tracking-[0.08em] text-red-300 hover:text-red-200 disabled:opacity-50"
+                  >
+                    ELIMINAR ANOTACIÓN
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -4979,6 +5176,45 @@ return (
   </div>
 )}
       
+      {confirmarEliminarAnotacion && anotacionSeleccionada && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/65 backdrop-blur-sm">
+          <div className="w-full max-w-[330px] rounded-3xl border border-cyan-300/45 bg-[#03111A]/95 px-6 py-5 shadow-[0_0_46px_rgba(34,211,238,.28)]">
+            <div className="text-center text-cyan-300 text-[12px] uppercase tracking-[0.28em] font-medium mb-4">
+              Va a eliminar esta anotación
+            </div>
+
+            <div className="text-center text-cyan-100 text-sm font-medium mb-5">
+              {anotacionSeleccionada.titulo}
+            </div>
+
+            <div className="text-center text-white/95 text-sm mb-5">
+              {anotacionSeleccionada.bloquear_tramo
+                ? 'También se liberará el tramo bloqueado en Google Calendar. ¿Desea continuar?'
+                : '¿Desea continuar?'}
+            </div>
+
+            <div className="flex justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => setConfirmarEliminarAnotacion(false)}
+                className="rounded-full border border-cyan-400/50 bg-cyan-500/10 px-5 py-1.5 text-sm text-cyan-100 hover:bg-cyan-500/20 hover:border-cyan-300/70 transition-all"
+              >
+                No
+              </button>
+
+              <button
+                type="button"
+                onClick={borrarAnotacion}
+                disabled={loading}
+                className="rounded-full border border-red-300/35 bg-red-500/25 px-5 py-1.5 text-sm text-white hover:bg-red-500/35 disabled:opacity-50 transition-all"
+              >
+                Sí, eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {mostrarCancelar && eventoActivo && (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 backdrop-blur-sm">
     <div className="w-full max-w-[330px] rounded-3xl border border-cyan-300/45 bg-[#03111A]/95 px-6 py-5 shadow-[0_0_46px_rgba(34,211,238,.28)]">
