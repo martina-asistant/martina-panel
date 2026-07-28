@@ -9,6 +9,11 @@ export type AgendaAnotacion = {
   fecha_inicio: string;
   fecha_fin: string;
   origen: string | null;
+
+  bloquear_tramo: boolean;
+  bloqueo_event_id: string | null;
+  bloqueo_calendar_id: string | null;
+
   created_at: string;
   updated_at: string;
 };
@@ -21,6 +26,10 @@ export type CrearAgendaAnotacionInput = {
   fecha_inicio: string;
   fecha_fin: string;
   origen?: string | null;
+
+  bloquear_tramo?: boolean;
+  bloqueo_event_id?: string | null;
+  bloqueo_calendar_id?: string | null;
 };
 
 export const listAgendaAnotaciones = async (
@@ -76,6 +85,10 @@ export const crearAgendaAnotacion = async (
       fecha_inicio: input.fecha_inicio,
       fecha_fin: input.fecha_fin,
       origen: input.origen?.trim() || null,
+
+      bloquear_tramo: input.bloquear_tramo ?? false,
+      bloqueo_event_id: input.bloqueo_event_id?.trim() || null,
+      bloqueo_calendar_id: input.bloqueo_calendar_id?.trim() || null,
     })
     .select('*')
     .single();
@@ -128,6 +141,20 @@ export const actualizarAgendaAnotacion = async (
 
   if (input.origen !== undefined) {
     cambios.origen = input.origen?.trim() || null;
+  }
+
+  if (input.bloquear_tramo !== undefined) {
+    cambios.bloquear_tramo = input.bloquear_tramo;
+  }
+
+  if (input.bloqueo_event_id !== undefined) {
+    cambios.bloqueo_event_id =
+      input.bloqueo_event_id?.trim() || null;
+  }
+
+  if (input.bloqueo_calendar_id !== undefined) {
+    cambios.bloqueo_calendar_id =
+      input.bloqueo_calendar_id?.trim() || null;
   }
 
   const { data, error } = await supabase
