@@ -13,6 +13,11 @@ import {
   upsertEstadoVisita,
   deleteEstadoVisita
 } from '@/lib/repos/agenda-estados.repo';
+import {
+  listAgendaAnotaciones,
+  listTitulosAgendaAnotaciones,
+  type AgendaAnotacion,
+} from '@/lib/repos/agenda-anotaciones.repo';
 
 const agendas = [
   { key: 'fede', nombre: 'Agenda Dr. Federico' },
@@ -457,6 +462,15 @@ export default function AgendasView() {
   const [agendaActiva, setAgendaActiva] = useState('fede');
   const [semanaInicio, setSemanaInicio] = useState(() => getMonday(new Date()));
   const [eventos, setEventos] = useState<EventoAgenda[]>([]);
+  const [anotacionesAgenda, setAnotacionesAgenda] =
+  useState<AgendaAnotacion[]>([]);
+
+const [titulosAnotaciones, setTitulosAnotaciones] = useState<
+  Array<{
+    titulo: string;
+    telefono: string | null;
+  }>
+>([]);
   const [estadosVisita, setEstadosVisita] = useState<Record<string, AgendaEstadoVisita>>({});
   const [menuEstadoVisitaAbierto, setMenuEstadoVisitaAbierto] = useState<string | null>(null);
   const [confirmarEstadoVisita, setConfirmarEstadoVisita] = useState<{
@@ -693,12 +707,18 @@ const rangoFin = addDays(
   }
 
   if (agendaActiva === 'ana') {
-    data = await getAgendaAna(toISO(rangoInicio), toISO(rangoFin));
-  }
+  data = await getAgendaAna(toISO(rangoInicio), toISO(rangoFin));
+}
 
-  setEventos(data);
-  setLoading(false);
-};
+const anotaciones = await listAgendaAnotaciones(
+  agendaActiva as 'fede' | 'celia' | 'ana',
+  toISO(rangoInicio),
+  toISO(rangoFin)
+);
+
+setEventos(data);
+setAnotacionesAgenda(anotaciones);
+setLoading(false);
 
   const gestionarBloqueo = async () => {
     if (!slotInicio || loading) return;
@@ -1625,6 +1645,11 @@ const esUltimaLineaVisibleEvento = (
     const data = await listTrabajosLaboratorio();
     setTrabajosLaboratorio(data);
   };
+
+    const cargarTitulosAnotaciones = async () => {
+  const data = await listTitulosAgendaAnotaciones();
+  setTitulosAnotaciones(data);
+};
 
   cargarPatients();
   cargarLaboratorio();
