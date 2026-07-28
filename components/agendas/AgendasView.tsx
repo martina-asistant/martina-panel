@@ -782,6 +782,14 @@ if (!nombrePacienteActualizado) {
   const nuevoNumeroCambios =
     (citaActualizada.cambios || 0) + (cambiaInicio ? 1 : 0);
 
+  const nuevoOrigen = cambiaInicio
+  ? usuarioPanel
+  : citaActualizada.origen;
+
+const nuevoEstado = cambiaInicio
+  ? 'modificada'
+  : citaActualizada.estado;
+
   setModalCitaAbierto(false);
   setEventoSeleccionado(null);
   setEventoActivo(null);
@@ -795,6 +803,8 @@ if (!nombrePacienteActualizado) {
         ? {
             ...evento,
             ...citaActualizada,
+            origen: nuevoOrigen,
+            estado: nuevoEstado,
             cambios: nuevoNumeroCambios,
           }
         : evento
@@ -818,8 +828,8 @@ if (!nombrePacienteActualizado) {
         nombre_paciente: citaActualizada.nombre_paciente,
         motivo: citaActualizada.motivo,
         detalle_motivo: citaActualizada.detalle_motivo,
-        origen: citaActualizada.origen,
-        estado: citaActualizada.estado,
+        origen: nuevoOrigen,
+        estado: nuevoEstado,
         cambios: nuevoNumeroCambios,
         fecha_inicio: citaActualizada.fecha_inicio,
         fecha_fin: citaActualizada.fecha_fin,
