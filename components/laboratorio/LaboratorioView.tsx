@@ -532,7 +532,7 @@ return (
                       <td colSpan={8} className="border-t border-cyan-500/10 bg-black/20 px-6 py-4">
                     
                         <div className="space-y-2">
-                          {historial.map((h, index) => (
+                          {[...historial].reverse().map((h, index) => (
                             <div key={`${t.id}-hist-${index}`} className="rounded-2xl border border-cyan-400/15 bg-black/20 px-4 py-3 text-sm">
                               <div className="text-cyan-300 text-xs mb-1">
                                 {formatFechaDetalle(h.fecha)} · {formatHora(h.fecha)}
