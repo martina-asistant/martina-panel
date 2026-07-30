@@ -7,7 +7,7 @@ export type EstadoRecordatorio = 'sin_respuesta' | 'confirmada' | 'no_podra_asis
 export type EstadoRecall = 'pendiente_envio' | 'enviado' | 'quiere_cita' | 'confirmada' | 'pospuesta';
 export type EstadoLaboratorio = 'pte_gestionar' | 'disenado' | 'impreso' | 'fresado' | 'horneado' | 'en_clinica' | 'finalizado';
 export type LaboratorioNombre = 'Julio' | 'Alex' | 'Juanjo' | 'Claudia' | 'Otro';
-export type TipoTrabajoLaboratorio = 'Incrustación' | 'Corona' | 'Puente' | 'Implante' | 'Férula' | 'Otro';
+export type TipoTrabajoLaboratorio = 'Incrustación' | 'Corona' | 'Implante' | 'Carilla/s' | 'Puente' | 'Férula' | 'Rehabilitación' | 'Otro';
 export type RolMensaje = 'paciente' | 'martina' | 'recepcion' | 'sistema';
 export type RolUsuarioPanel = 'admin' | 'doctor' | 'doctora' | 'recepcion';
 
