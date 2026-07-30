@@ -15,6 +15,12 @@ import type {
 } from '@/lib/types/db.types';
 import { cn } from '@/lib/utils/cn';
 import { createClient } from '@/lib/supabase/client';
+import {
+  getAgendaFede,
+  getAgendaCelia,
+  getAgendaAna,
+  type EventoAgenda,
+} from '@/lib/repos/agendas.repo';
 
 type FiltroLab = 'todos' | EstadoLaboratorio;
 
@@ -88,6 +94,14 @@ const getTipoCambioLimpio = (tipo?: string | null) => {
   return tipo.split(' - ')[0];
 };
 
+const normalizarNombrePaciente = (nombre?: string | null) =>
+  String(nombre || '').trim().toLocaleLowerCase('es-ES');
+
+const esCitaPruebaColocar = (evento: EventoAgenda) =>
+  String(evento.motivo || '')
+    .trim()
+    .toLocaleLowerCase('es-ES') === 'prueba-colocar';
+
 const LaboratorioView = () => {
   const [items, setItems] = useState<LaboratorioTrabajo[]>([]);
   const [filter, setFilter] = useState<FiltroLab>('todos');
@@ -124,9 +138,88 @@ const LaboratorioView = () => {
 
   const cargarLaboratorio = async () => {
     setLoading(true);
-    const data = await listTrabajosLaboratorio();
-    setItems(data);
-    setLoading(false);
+
+    try {
+      const data = await listTrabajosLaboratorio();
+
+      const trabajosSinCita = data.filter(
+        (trabajo) =>
+          trabajo.estado !== 'en_clinica' &&
+          trabajo.estado !== 'finalizado' &&
+          !trabajo.fecha_cita &&
+          !trabajo.event_id_origen
+      );
+
+      if (trabajosSinCita.length === 0) {
+        setItems(data);
+        return;
+      }
+
+      const fechaInicio = new Date();
+      const fechaFin = new Date(fechaInicio);
+      fechaFin.setMonth(fechaFin.getMonth() + 3);
+
+      const agendas = await Promise.all([
+        getAgendaFede(fechaInicio.toISOString(), fechaFin.toISOString()),
+        getAgendaCelia(fechaInicio.toISOString(), fechaFin.toISOString()),
+        getAgendaAna(fechaInicio.toISOString(), fechaFin.toISOString()),
+      ]);
+
+      const citasPruebaColocar = agendas
+        .flat()
+        .filter(esCitaPruebaColocar)
+        .filter(
+          (evento) =>
+            new Date(evento.fecha_inicio).getTime() >= fechaInicio.getTime()
+        )
+        .sort(
+          (a, b) =>
+            new Date(a.fecha_inicio).getTime() -
+            new Date(b.fecha_inicio).getTime()
+        );
+
+      let huboActualizaciones = false;
+
+      for (const trabajo of trabajosSinCita) {
+        const nombreTrabajo = normalizarNombrePaciente(
+          trabajo.nombre_paciente
+        );
+
+        const cita = citasPruebaColocar.find(
+          (evento) =>
+            normalizarNombrePaciente(evento.nombre_paciente) ===
+            nombreTrabajo
+        );
+
+        if (!cita) continue;
+
+        const actualizado = await actualizarTrabajoLaboratorio(
+          trabajo.id,
+          {
+            fecha_cita: cita.fecha_inicio,
+            event_id_origen: cita.event_id,
+            calendar_id_origen: cita.calendar_id,
+          },
+          usuarioPanel,
+          'Fecha cita'
+        );
+
+        if (actualizado) {
+          huboActualizaciones = true;
+        }
+      }
+
+      if (huboActualizaciones) {
+        setItems(await listTrabajosLaboratorio());
+      } else {
+        setItems(data);
+      }
+    } catch (error) {
+      console.error('Error vinculando citas de prueba-colocar:', error);
+      setItems(await listTrabajosLaboratorio());
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
