@@ -97,10 +97,17 @@ const getTipoCambioLimpio = (tipo?: string | null) => {
 const normalizarNombrePaciente = (nombre?: string | null) =>
   String(nombre || '').trim().toLocaleLowerCase('es-ES');
 
-const esCitaPruebaColocar = (evento: EventoAgenda) =>
-  String(evento.motivo || '')
+const esCitaPruebaColocar = (evento: EventoAgenda) => {
+  const motivo = String(evento.motivo || '')
     .trim()
-    .toLocaleLowerCase('es-ES') === 'prueba-colocar';
+    .toLocaleLowerCase('es-ES');
+
+  return (
+    motivo === 'prueba-colocar' ||
+    motivo === 'férula michigan' ||
+    motivo === 'ferula michigan'
+  );
+};
 
 const LaboratorioView = () => {
   const [items, setItems] = useState<LaboratorioTrabajo[]>([]);
