@@ -43,9 +43,11 @@ const LABORATORIOS = ['Julio', 'Juanjo', 'Alex', 'Claudia', 'Otro'];
 const TIPOS_TRABAJO = [
   'Incrustación',
   'Corona',
-  'Puente',
   'Implante',
+  'Carilla/s',
+  'Puente',
   'Férula',
+  'Rehabilitación',
   'Otro',
 ];
 
