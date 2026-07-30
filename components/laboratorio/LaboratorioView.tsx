@@ -24,6 +24,19 @@ import {
 
 type FiltroLab = 'todos' | EstadoLaboratorio;
 
+type CampoOrdenLaboratorio =
+  | 'paciente'
+  | 'laboratorio'
+  | 'trabajo'
+  | 'fecha_cita';
+
+type DireccionOrdenLaboratorio = 'abajo' | 'arriba';
+
+type OrdenLaboratorio = {
+  campo: CampoOrdenLaboratorio;
+  direccion: DireccionOrdenLaboratorio;
+} | null;
+
 type PatientOption = {
   id: string;
   paciente_id: string | null;
@@ -112,6 +125,7 @@ const esCitaPruebaColocar = (evento: EventoAgenda) => {
 const LaboratorioView = () => {
   const [items, setItems] = useState<LaboratorioTrabajo[]>([]);
   const [filter, setFilter] = useState<FiltroLab>('todos');
+  const [orden, setOrden] = useState<OrdenLaboratorio>(null);
   const [loading, setLoading] = useState(true);
   const [loadingGuardar, setLoadingGuardar] = useState(false);
 
@@ -296,17 +310,78 @@ const LaboratorioView = () => {
   }, []);
 
   const filtered = useMemo(() => {
-  const data =
-    filter === 'todos'
-      ? items.filter((i) => i.estado !== 'finalizado')
-      : items.filter((i) => i.estado === filter);
+    const data =
+      filter === 'todos'
+        ? items.filter((i) => i.estado !== 'finalizado')
+        : items.filter((i) => i.estado === filter);
 
-  return [...data].sort((a, b) => {
-    const fechaA = new Date(a.updated_at || a.created_at).getTime();
-    const fechaB = new Date(b.updated_at || b.created_at).getTime();
-    return fechaB - fechaA;
-  });
-}, [items, filter]);
+    return [...data].sort((a, b) => {
+      if (!orden) {
+        const fechaA = new Date(a.updated_at || a.created_at).getTime();
+        const fechaB = new Date(b.updated_at || b.created_at).getTime();
+        return fechaB - fechaA;
+      }
+
+      if (orden.campo === 'fecha_cita') {
+        const sinFechaA = !a.fecha_cita;
+        const sinFechaB = !b.fecha_cita;
+
+        if (sinFechaA && !sinFechaB) return -1;
+        if (!sinFechaA && sinFechaB) return 1;
+        if (sinFechaA && sinFechaB) return 0;
+
+        const fechaA = new Date(a.fecha_cita as string).getTime();
+        const fechaB = new Date(b.fecha_cita as string).getTime();
+
+        return orden.direccion === 'abajo'
+          ? fechaA - fechaB
+          : fechaB - fechaA;
+      }
+
+      const valorA =
+        orden.campo === 'paciente'
+          ? a.nombre_paciente
+          : orden.campo === 'laboratorio'
+            ? a.laboratorio
+            : a.trabajo;
+
+      const valorB =
+        orden.campo === 'paciente'
+          ? b.nombre_paciente
+          : orden.campo === 'laboratorio'
+            ? b.laboratorio
+            : b.trabajo;
+
+      const comparacion = String(valorA || '').localeCompare(
+        String(valorB || ''),
+        'es',
+        { sensitivity: 'base' }
+      );
+
+      return orden.direccion === 'abajo'
+        ? comparacion
+        : -comparacion;
+    });
+  }, [items, filter, orden]);
+
+  const cambiarOrden = (campo: CampoOrdenLaboratorio) => {
+    setOrden((actual) => {
+      if (!actual || actual.campo !== campo) {
+        return { campo, direccion: 'abajo' };
+      }
+
+      if (actual.direccion === 'abajo') {
+        return { campo, direccion: 'arriba' };
+      }
+
+      return null;
+    });
+  };
+
+  const iconoOrden = (campo: CampoOrdenLaboratorio) => {
+    if (!orden || orden.campo !== campo) return '↕';
+    return orden.direccion === 'abajo' ? '↓' : '↑';
+  };
 
   const pacientesFiltrados = patients.filter((patient) => {
     const texto =
@@ -572,13 +647,61 @@ return (
 
           <thead className="bg-cyan-500/10 text-cyan-300/75 text-xs uppercase tracking-[0.18em]">
             <tr>
-              <th className="text-left px-5 py-4 font-medium">Paciente</th>
-              <th className="text-left px-4 py-4 font-medium">Laboratorio</th>
-              <th className="text-left px-5 py-4 font-medium">Trabajo</th>
+              <th className="text-left px-5 py-4 font-medium">
+                <span className="inline-flex items-center">
+                  Paciente
+                  <button
+                    type="button"
+                    onClick={() => cambiarOrden('paciente')}
+                    title="Ordenar por paciente"
+                    className="ml-1 inline-flex h-3 w-3 shrink-0 items-center justify-center text-[9px] leading-none text-cyan-200/65 hover:text-cyan-100"
+                  >
+                    {iconoOrden('paciente')}
+                  </button>
+                </span>
+              </th>
+              <th className="text-left px-4 py-4 font-medium">
+                <span className="inline-flex items-center">
+                  Laboratorio
+                  <button
+                    type="button"
+                    onClick={() => cambiarOrden('laboratorio')}
+                    title="Ordenar por laboratorio"
+                    className="ml-1 inline-flex h-3 w-3 shrink-0 items-center justify-center text-[9px] leading-none text-cyan-200/65 hover:text-cyan-100"
+                  >
+                    {iconoOrden('laboratorio')}
+                  </button>
+                </span>
+              </th>
+              <th className="text-left px-5 py-4 font-medium">
+                <span className="inline-flex items-center">
+                  Trabajo
+                  <button
+                    type="button"
+                    onClick={() => cambiarOrden('trabajo')}
+                    title="Ordenar por trabajo"
+                    className="ml-1 inline-flex h-3 w-3 shrink-0 items-center justify-center text-[9px] leading-none text-cyan-200/65 hover:text-cyan-100"
+                  >
+                    {iconoOrden('trabajo')}
+                  </button>
+                </span>
+              </th>
               <th className="text-left px-2 py-4 font-medium">Piezas</th>
               <th className="text-left px-5 py-4 font-medium">Anotaciones</th>
               <th className="text-left px-5 py-4 font-medium">Estado</th>
-              <th className="text-left px-5 py-4 font-medium">Fecha cita</th>
+              <th className="text-left px-5 py-4 font-medium">
+                <span className="inline-flex items-center">
+                  Fecha cita
+                  <button
+                    type="button"
+                    onClick={() => cambiarOrden('fecha_cita')}
+                    title="Ordenar por fecha de cita"
+                    className="ml-1 inline-flex h-3 w-3 shrink-0 items-center justify-center text-[9px] leading-none text-cyan-200/65 hover:text-cyan-100"
+                  >
+                    {iconoOrden('fecha_cita')}
+                  </button>
+                </span>
+              </th>
               <th className="px-3 py-4 font-medium" />
             </tr>
           </thead>
