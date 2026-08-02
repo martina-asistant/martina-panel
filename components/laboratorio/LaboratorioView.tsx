@@ -540,6 +540,13 @@ const guardarTrabajo = async () => {
   }
 };  
 
+const ultimoCambioSeleccionado = trabajoSeleccionado?.historial?.length
+  ? [...trabajoSeleccionado.historial].sort(
+      (a, b) =>
+        new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
+    )[0]
+  : null;
+
 return (
   <div className="h-full min-h-0 overflow-y-auto overflow-x-hidden px-2 py-4 sm:p-8 bg-[#02141B] text-white pb-40 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-300/35">
     <div className="mb-8 px-2 sm:px-0 flex items-end justify-between gap-4">
@@ -757,7 +764,13 @@ return (
                       <td colSpan={8} className="border-t border-cyan-500/10 bg-black/20 px-6 py-4">
                     
                         <div className="space-y-2">
-                          {[...historial].reverse().map((h, index) => (
+                          {[...historial]
+                            .sort(
+                              (a, b) =>
+                                new Date(b.fecha).getTime() -
+                                new Date(a.fecha).getTime()
+                            )
+                            .map((h, index) => (
                             <div key={`${t.id}-hist-${index}`} className="rounded-2xl border border-cyan-400/15 bg-black/20 px-4 py-3 text-sm">
                               <div className="text-cyan-300 text-xs mb-1">
                                 {formatFechaDetalle(h.fecha)} · {formatHora(h.fecha)}
@@ -1014,25 +1027,35 @@ return (
             <div className="grid grid-cols-[auto_auto_auto_1fr] gap-x-8 gap-y-3 pt-2 border-t border-white/20">
               <div>
                 <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">Origen</div>
-                <div className="text-white/95 text-sm">{usuarioPanel}</div>
+                <div className="text-white/95 text-sm">
+                  {trabajoSeleccionado
+                    ? ultimoCambioSeleccionado?.usuario || 'Panel'
+                    : usuarioPanel}
+                </div>
               </div>
 
               <div>
                 <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">Cambio</div>
-                <div className="text-white/95 text-sm">{trabajoSeleccionado ? getTipoCambioLimpio(trabajoSeleccionado.historial?.at(-1)?.tipo) : 'Creación'}</div>
+                <div className="text-white/95 text-sm">
+                  {trabajoSeleccionado
+                    ? getTipoCambioLimpio(ultimoCambioSeleccionado?.tipo)
+                    : 'Creación'}
+                </div>
               </div>
 
               <div>
                 <div className="text-cyan-300 text-[11px] uppercase tracking-wider mb-1 font-bold">Actualizado</div>
                 <div className="text-white/95 text-sm">
-                  {new Date().toLocaleDateString('es-ES', {
-                    day: 'numeric',
-                    month: 'short',
-                    year: '2-digit',
-                  })} · {new Date().toLocaleTimeString('es-ES', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
+                  {trabajoSeleccionado && ultimoCambioSeleccionado
+                    ? `${formatFechaDetalle(ultimoCambioSeleccionado.fecha)} · ${formatHora(ultimoCambioSeleccionado.fecha)}`
+                    : `${new Date().toLocaleDateString('es-ES', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: '2-digit',
+                      })} · ${new Date().toLocaleTimeString('es-ES', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}`}
                 </div>
               </div>
 
@@ -1047,7 +1070,13 @@ return (
 
             {mostrarHistorialModal && trabajoSeleccionado && (
               <div className="space-y-2">
-                {(trabajoSeleccionado.historial || []).map((h, index) => (
+                {[...(trabajoSeleccionado.historial || [])]
+                  .sort(
+                    (a, b) =>
+                      new Date(b.fecha).getTime() -
+                      new Date(a.fecha).getTime()
+                  )
+                  .map((h, index) => (
                   <div key={`modal-hist-${index}`} className="rounded-2xl border border-cyan-400/15 bg-black/20 px-4 py-3 text-sm">
                     <div className="text-cyan-300 text-xs mb-1">
                       {formatFechaDetalle(h.fecha)} · {formatHora(h.fecha)}
