@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const GRAPH_VERSION = "v23.0";
+const GRAPH_VERSION = "v23.0"; // alineado con connect/route.ts y el frontend
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -29,7 +29,6 @@ export async function GET(request: Request) {
   const tokenUrl = new URL(
     `https://graph.facebook.com/${GRAPH_VERSION}/oauth/access_token`
   );
-
   tokenUrl.searchParams.set("client_id", appId);
   tokenUrl.searchParams.set("client_secret", appSecret);
   tokenUrl.searchParams.set("redirect_uri", redirectUri);
@@ -52,10 +51,7 @@ export async function GET(request: Request) {
 
   const accessToken = tokenData.access_token;
 
-  const debugUrl = new URL(
-    `https://graph.facebook.com/${GRAPH_VERSION}/debug_token`
-  );
-
+  const debugUrl = new URL(`https://graph.facebook.com/${GRAPH_VERSION}/debug_token`);
   debugUrl.searchParams.set("input_token", accessToken);
   debugUrl.searchParams.set("access_token", `${appId}|${appSecret}`);
 
