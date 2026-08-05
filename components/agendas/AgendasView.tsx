@@ -48,7 +48,7 @@ const TRATAMIENTOS = [
   'Raspados',
   'Tallados',
   'Prótesis',
-  'Férula Michigan',
+  'Férula',
   'Ver-valorar',
   'Ortodoncia',
   'Fotos',
@@ -241,7 +241,7 @@ const getDuracionPorMotivo = (motivo: string) => {
 
   if (m === 'prótesis' || m === 'protesis') return 30;
 
-  if (m === 'férula michigan' || m === 'ferula michigan') return 30;
+  if (m === 'férula' || m === 'ferula' || m === 'férula michigan' || m === 'ferula michigan') return 30;
   
   if (m === 'ver-valorar' || m === 'ver valorar') return 15;
   
@@ -382,9 +382,9 @@ const getColorTratamiento = (evento: EventoAgenda) => {
     return { bg: 'rgba(250,204,21,.90)', text: 'text-white' };
   }
 
-  if (motivo === 'férula michigan' || motivo === 'ferula michigan') {
-    return { bg: 'rgba(202,138,4,.90)', text: 'text-white' };
-  }
+  if (motivo === 'férula' || motivo === 'ferula' || motivo === 'férula michigan' || motivo === 'ferula michigan') {
+  return { bg: 'rgba(202,138,4,.90)', text: 'text-white' };
+}
 
   if (motivo === 'endodoncia') {
     return { bg: 'rgba(244,114,182,.90)', text: 'text-white' };
