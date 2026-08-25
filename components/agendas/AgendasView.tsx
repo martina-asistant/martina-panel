@@ -349,11 +349,11 @@ const isHorarioNoDisponible = (hora: string, dia: Date, agenda: string) => {
     return !(manana || tarde);
   }
 
-  if (diaSemana === 1) return hora >= '17:00';
-  if (diaSemana === 2) return hora >= '14:00' && hora < '15:00';
-  if (diaSemana === 3) return hora >= '17:00';
-  if (diaSemana === 4) return hora >= '14:00' && hora < '15:00';
-  if (diaSemana === 5) return hora >= '14:00';
+if (diaSemana === 1) return hora >= '18:00';
+if (diaSemana === 2) return hora >= '14:00' && hora < '15:00';
+if (diaSemana === 3) return hora >= '18:00';
+if (diaSemana === 4) return hora >= '14:00' && hora < '15:00';
+if (diaSemana === 5) return hora >= '13:00';
 
   return false;
 };
