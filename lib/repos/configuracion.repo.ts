@@ -55,6 +55,31 @@ export async function updateCanalMartina(
 
   const ahora = new Date().toISOString();
 
+  let usuarioActualiza = updated_by;
+
+  if (!usuarioActualiza) {
+    const {
+      data: { user }
+    } = await supa.auth.getUser();
+
+    if (user?.email) {
+      const { data: usuarioPanel, error: errorUsuario } = await supa
+        .from('usuarios_panel')
+        .select('nombre')
+        .eq('email', user.email)
+        .maybeSingle();
+
+      if (errorUsuario) {
+        console.error(
+          'Error obteniendo usuario que actualiza Martina:',
+          errorUsuario
+        );
+      }
+
+      usuarioActualiza = usuarioPanel?.nombre || user.email;
+    }
+  }
+
   const { data: estadoActual, error: errorEstado } = await supa
     .from('configuracion_martina')
     .select('*')
@@ -73,7 +98,7 @@ export async function updateCanalMartina(
     .update({
       activo,
       updated_at: ahora,
-      updated_by
+      updated_by: usuarioActualiza
     })
     .eq('canal', canal)
     .select('*')
@@ -97,7 +122,10 @@ export async function updateCanalMartina(
       .maybeSingle();
 
     if (errorUltimoApagado) {
-      console.error('Error buscando último apagado Martina:', errorUltimoApagado);
+      console.error(
+        'Error buscando último apagado Martina:',
+        errorUltimoApagado
+      );
     }
 
     if (ultimoApagado?.created_at) {
@@ -110,24 +138,24 @@ export async function updateCanalMartina(
   }
 
   const { error: errorLog } = await supa
-  .from('configuracion_martina_log')
-  .insert({
-    canal,
-    activo_anterior: activoAnterior,
-    activo_nuevo: activo,
-    accion: activo ? 'activado' : 'desactivado',
-    updated_by,
-    minutos_desactivado: minutosDesactivado,
+    .from('configuracion_martina_log')
+    .insert({
+      canal,
+      activo_anterior: activoAnterior,
+      activo_nuevo: activo,
+      accion: activo ? 'activado' : 'desactivado',
+      updated_by: usuarioActualiza,
+      minutos_desactivado: minutosDesactivado,
 
-    fecha_hora: new Date().toLocaleString('es-ES', {
-      timeZone: 'Europe/Madrid',
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  });
+      fecha_hora: new Date().toLocaleString('es-ES', {
+        timeZone: 'Europe/Madrid',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
+    });
 
   if (errorLog) {
     console.error('Error insertando log Martina:', errorLog);
