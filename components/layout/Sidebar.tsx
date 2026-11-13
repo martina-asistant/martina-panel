@@ -22,10 +22,10 @@ import type { UsuarioPanel } from '@/lib/types/db.types';
 
 const nav = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/agendas', label: 'Agendas', icon: CalendarDays },
   { href: '/conversaciones', label: 'Conversaciones', icon: MessageSquare },
   { href: '/recordatorios', label: 'Recordatorios', icon: BellRing },
   { href: '/recalls', label: 'Recalls', icon: PhoneCall },
-  { href: '/agendas', label: 'Agendas', icon: CalendarDays },
   { href: '/laboratorio', label: 'Laboratorio', icon: FlaskConical },
 ];
 
