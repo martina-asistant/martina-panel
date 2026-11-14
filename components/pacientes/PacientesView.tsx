@@ -756,14 +756,14 @@ export default function PacientesView() {
                           : 'border-transparent hover:bg-white/[0.035]'
                       }`}
                     >
-                      
+                                         
                     
                     {/* ESCRITORIO: tres columnas alineadas sin scroll horizontal */}
                     <div className="grid w-full min-w-0 grid-cols-[minmax(0,1.4fr)_minmax(0,0.9fr)_minmax(0,1.6fr)] items-center gap-2">
 
                       {/* COLUMNA 1: NOMBRE COMPLETO Y ALERTA */}
-                      <div className="flex min-w-0 items-center justify-center gap-1.5">
-                        <span className="min-w-0 break-words text-center text-sm font-medium">
+                      <div className="flex min-w-0 items-center justify-start gap-1.5">
+                        <span className="min-w-0 break-words text-left text-sm font-medium">
                           {nombreVisible(p)}
                         </span>
 
@@ -773,12 +773,12 @@ export default function PacientesView() {
                       </div>
 
                       {/* COLUMNA 2: TELÉFONO */}
-                      <span className="min-w-0 break-words text-center text-xs tabular-nums text-white/50">
+                      <span className="min-w-0 break-words text-left text-xs tabular-nums text-white/50">
                         {p.telefono || 'Sin teléfono'}
                       </span>
 
                       {/* COLUMNA 3: PRÓXIMA CITA */}
-                      <span className="min-w-0 break-words text-center text-xs text-cyan-200/70">
+                      <span className="min-w-0 break-words text-left text-xs text-cyan-200/70">
                         Próx. cita{' '}
                         {mostrarFechaCorta(p.proxima_cita_fecha)}{' '}
                         {p.proxima_cita_motivo || ''}
@@ -790,6 +790,7 @@ export default function PacientesView() {
               )}
             </div>
           </div>
+
 
 
             {/* FICHA ESCRITORIO */}
