@@ -756,32 +756,40 @@ export default function PacientesView() {
                           : 'border-transparent hover:bg-white/[0.035]'
                       }`}
                     >
-                      {/* ESCRITORIO: una única línea, sin contador.
-                          Si los datos son largos, esta fila permite desplazamiento horizontal. */}
-                      <div className="flex min-w-max items-center gap-4 whitespace-nowrap">
-                        <span className="text-sm font-medium">
+                      
+                    {/* ESCRITORIO: tres columnas centradas y alineadas */}
+                    <div className="grid min-w-[620px] grid-cols-[minmax(200px,1.4fr)_100px_minmax(230px,1.5fr)] items-center gap-3">
+
+                      {/* COLUMNA 1: NOMBRE COMPLETO Y ALERTA */}
+                      <div className="flex min-w-0 items-center justify-center gap-1.5">
+                        <span className="text-center text-sm font-medium">
                           {nombreVisible(p)}
-                        </span>
-
-                        <span className="text-xs tabular-nums text-white/50">
-                          {p.telefono || 'Sin teléfono'}
-                        </span>
-
-                        <span className="text-xs text-cyan-200/70">
-                          Próx. cita{' '}
-                          {mostrarFechaCorta(p.proxima_cita_fecha)}{' '}
-                          {p.proxima_cita_motivo || ''}
                         </span>
 
                         {p.alerta_urgencia && (
                           <AlertTriangle className="h-4 w-4 shrink-0 text-amber-300" />
                         )}
                       </div>
-                    </button>
-                  ))
-                )}
-              </div>
+
+                      {/* COLUMNA 2: TELÉFONO */}
+                      <span className="text-center text-xs tabular-nums text-white/50">
+                        {p.telefono || 'Sin teléfono'}
+                      </span>
+
+                      {/* COLUMNA 3: PRÓXIMA CITA */}
+                      <span className="text-center text-xs text-cyan-200/70">
+                        Próx. cita{' '}
+                        {mostrarFechaCorta(p.proxima_cita_fecha)}{' '}
+                        {p.proxima_cita_motivo || ''}
+                      </span>
+
+                    </div>
+                  </button>
+                ))
+              )}
             </div>
+          </div>
+
 
             {/* FICHA ESCRITORIO */}
 
