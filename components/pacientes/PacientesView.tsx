@@ -757,12 +757,13 @@ export default function PacientesView() {
                       }`}
                     >
                       
-                    {/* ESCRITORIO: tres columnas centradas y alineadas */}
-                    <div className="grid min-w-[620px] grid-cols-[minmax(200px,1.4fr)_100px_minmax(230px,1.5fr)] items-center gap-3">
+                    
+                    {/* ESCRITORIO: tres columnas alineadas sin scroll horizontal */}
+                    <div className="grid w-full min-w-0 grid-cols-[minmax(0,1.4fr)_minmax(0,0.9fr)_minmax(0,1.6fr)] items-center gap-2">
 
                       {/* COLUMNA 1: NOMBRE COMPLETO Y ALERTA */}
                       <div className="flex min-w-0 items-center justify-center gap-1.5">
-                        <span className="text-center text-sm font-medium">
+                        <span className="min-w-0 break-words text-center text-sm font-medium">
                           {nombreVisible(p)}
                         </span>
 
@@ -772,12 +773,12 @@ export default function PacientesView() {
                       </div>
 
                       {/* COLUMNA 2: TELÉFONO */}
-                      <span className="text-center text-xs tabular-nums text-white/50">
+                      <span className="min-w-0 break-words text-center text-xs tabular-nums text-white/50">
                         {p.telefono || 'Sin teléfono'}
                       </span>
 
                       {/* COLUMNA 3: PRÓXIMA CITA */}
-                      <span className="text-center text-xs text-cyan-200/70">
+                      <span className="min-w-0 break-words text-center text-xs text-cyan-200/70">
                         Próx. cita{' '}
                         {mostrarFechaCorta(p.proxima_cita_fecha)}{' '}
                         {p.proxima_cita_motivo || ''}
