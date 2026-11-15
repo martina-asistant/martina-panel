@@ -960,6 +960,7 @@ const nuevoEstado = cambiaInicio
         agenda: agendaActiva,
         calendar_id: citaCancelada.calendar_id,
         event_id: citaCancelada.event_id,
+        nombre_paciente: citaCancelada.nombre_paciente,
         telefono: citaCancelada.telefono,
         fecha_inicio: citaCancelada.fecha_inicio,
         fecha_fin: citaCancelada.fecha_fin,
