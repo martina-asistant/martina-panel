@@ -1,18 +1,20 @@
 
 import { createClient } from '@/lib/supabase/client';
-import type { HistorialCita } from '@/lib/types/db.types';
+import type {
+  HistorialCita,
+  HistorialCitaCambio,
+} from '@/lib/types/db.types';
 
 /**
- * Repositorio de lectura del historial de pacientes.
+ * Repositorio exclusivo de lectura.
  *
- * Fuente: public.historial_citas
+ * Tablas:
+ * - public.historial_citas
+ * - public.historial_citas_cambios
  *
- * - No modifica citas.
- * - No escribe en Supabase.
- * - No modifica Google Calendar.
- * - No interviene en los estados de recepción.
- *
- * Puede reutilizarse en Pacientes y Dashboard.
+ * No escribe en Supabase.
+ * No modifica Google Calendar ni n8n.
+ * Reutilizable en Pacientes y Dashboard.
  */
 
 export async function listarHistorialPaciente(
@@ -51,9 +53,7 @@ export async function listarHistorialPaciente(
 
     historial.push(...citas);
 
-    if (citas.length < tamanoPagina) {
-      break;
-    }
+    if (citas.length < tamanoPagina) break;
 
     desde += tamanoPagina;
   }
@@ -62,13 +62,10 @@ export async function listarHistorialPaciente(
 }
 
 /**
- * Calcula el resumen a partir del historial.
+ * Resumen de citas de un paciente.
  *
- * La última cita corresponde a la última finalizada.
- * La próxima cita corresponde a la primera pendiente
- * cuya fecha de inicio sea futura.
- *
- * Cada registro de historial cuenta una sola vez.
+ * Los criterios coinciden con los utilizados
+ * para recalcular los datos en Supabase.
  */
 
 export function calcularResumenHistorial(
@@ -114,4 +111,73 @@ export function calcularResumenHistorial(
 
     total_citas: historial.length,
   };
+}
+
+/**
+ * Obtiene los movimientos registrados
+ * de las citas de un paciente.
+ *
+ * Utiliza los identificadores reales
+ * de historial_citas, nunca el teléfono.
+ *
+ * No modifica ningún dato.
+ */
+
+export async function listarCambiosHistorialPaciente(
+  historial: HistorialCita[]
+): Promise<HistorialCitaCambio[]> {
+  if (historial.length === 0) return [];
+
+  const supa = createClient();
+
+  if (!supa) {
+    throw new Error('Supabase no está configurado.');
+  }
+
+  const ids = [...new Set(historial.map((cita) => cita.id))];
+
+  const cambios: HistorialCitaCambio[] = [];
+
+  // Lotes pequeños para evitar consultas con demasiados IDs.
+  const tamanoLote = 100;
+  const tamanoPagina = 500;
+
+  for (let i = 0; i < ids.length; i += tamanoLote) {
+    const lote = ids.slice(i, i + tamanoLote);
+    let desde = 0;
+
+    while (true) {
+      const { data, error } = await supa
+        .from('historial_citas_cambios')
+        .select('*')
+        .in('historial_cita_id', lote)
+        .order('created_at', { ascending: false })
+        .order('id', { ascending: false })
+        .range(desde, desde + tamanoPagina - 1);
+
+      if (error) {
+        console.error(
+          'Error consultando cambios del historial:',
+          error
+        );
+        throw error;
+      }
+
+      const pagina = (data ?? []) as HistorialCitaCambio[];
+
+      cambios.push(...pagina);
+
+      if (pagina.length < tamanoPagina) break;
+
+      desde += tamanoPagina;
+    }
+  }
+
+  return cambios.sort((a, b) => {
+    const diferencia =
+      new Date(b.created_at).getTime() -
+      new Date(a.created_at).getTime();
+
+    return diferencia || b.id.localeCompare(a.id);
+  });
 }
