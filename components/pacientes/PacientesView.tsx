@@ -93,6 +93,60 @@ const mostrarFechaCorta = (valor?: string | null) => {
   }).format(fecha);
 };
 
+// Formato visual exclusivo del historial; no modifica los datos en Supabase.
+const textoHistorial = (valor?: string | null) => {
+  const texto = (valor ?? '').trim().replace(/\s+/g, ' ');
+  return texto ? texto.charAt(0).toLocaleUpperCase('es-ES') + texto.slice(1).toLocaleLowerCase('es-ES') : '';
+};
+
+const fechaHoraHistorial = (valor?: string | null) => {
+  if (!valor) return null;
+  const fecha = new Date(valor);
+  if (Number.isNaN(fecha.getTime())) return null;
+  const partes = new Intl.DateTimeFormat('es-ES', {
+    timeZone: 'Europe/Madrid',
+    day: '2-digit', month: '2-digit', year: '2-digit',
+    hour: 'numeric', minute: '2-digit', hourCycle: 'h23',
+  }).formatToParts(fecha);
+  const parte = (tipo: string) => partes.find((p) => p.type === tipo)?.value ?? '';
+  return {
+    dia: `${parte('day')}/${parte('month')}/${parte('year')}`,
+    hora: `${Number(parte('hour'))}:${parte('minute')}`,
+  };
+};
+
+const rangoHistorial = (inicio?: string | null, fin?: string | null) => {
+  const desde = fechaHoraHistorial(inicio);
+  const hasta = fechaHoraHistorial(fin);
+  if (!desde) return '—';
+  if (!hasta) return `${desde.dia} - ${desde.hora}`;
+  return `${desde.dia} - ${desde.hora} a ${hasta.hora}`;
+};
+
+const estiloEstadoHistorial: Record<string, { nombre: string; punto: string; fondo: string }> = {
+  pendiente: {
+    nombre: 'Pendiente',
+    punto: 'bg-amber-400',
+    fondo: 'border-amber-400/20 bg-amber-400/[0.06] text-amber-100/90',
+  },
+  no_ha_venido: {
+    nombre: 'No ha venido',
+    punto: 'bg-red-500',
+    fondo: 'border-red-400/20 bg-red-400/[0.06] text-red-100/90',
+  },
+  finalizada: {
+    nombre: 'Finalizada',
+    punto: 'bg-green-400',
+    fondo: 'border-green-400/20 bg-green-400/[0.06] text-green-100/90',
+  },
+  // Mantener visible el estado existente sin asignarle un color incorrecto.
+  cancelada: {
+    nombre: 'Cancelada',
+    punto: 'bg-slate-400',
+    fondo: 'border-slate-400/20 bg-slate-400/[0.06] text-slate-200/90',
+  },
+};
+
 // ================================================================
 // COMPONENTES VISUALES COMPARTIDOS
 // ================================================================
@@ -731,42 +785,45 @@ export default function PacientesView() {
                     </div>
                   ) : (
                     <div className="mt-4 space-y-2">
-                      {historial.map((cita) => (
-                        <div
-                          key={cita.id}
-                          className="rounded-xl border border-cyan-400/10 bg-black/10 p-3"
-                        >
-                          <div className="flex flex-wrap items-start justify-between gap-2">
-                            <div className="min-w-0">
-                              <div className="text-sm font-medium text-white/80">
-                                {cita.motivo || 'Cita sin motivo'}
-                              </div>
-                              <div className="mt-1 text-xs text-white/50">
-                                {mostrarFecha(cita.fecha_inicio)}
-                                {cita.fecha_fin ? ` – ${mostrarFecha(cita.fecha_fin)}` : ''}
-                              </div>
-                              {cita.detalle_motivo && (
-                                <div className="mt-1 break-words text-xs text-white/45">
-                                  {cita.detalle_motivo}
+                      {historial.map((cita) => {
+                        const estado = estiloEstadoHistorial[cita.estado] ?? {
+                          nombre: textoHistorial(cita.estado),
+                          punto: 'bg-slate-400',
+                          fondo: 'border-slate-400/20 bg-slate-400/[0.06] text-slate-200/90',
+                        };
+
+                        return (
+                          <div
+                            key={cita.id}
+                            className="rounded-xl border border-cyan-400/10 bg-black/10 p-3"
+                          >
+                            <div className="flex flex-wrap items-start justify-between gap-2">
+                              <div className="min-w-0 flex-1">
+                                <div className="break-words text-sm font-semibold text-cyan-300">
+                                  {textoHistorial(cita.motivo) || 'Cita sin motivo'}
                                 </div>
-                              )}
-                              {cita.profesional && (
-                                <div className="mt-1 text-xs text-white/40">
-                                  Profesional: {cita.profesional}
+                                <div className="mt-1 text-xs font-semibold text-white">
+                                  {rangoHistorial(cita.fecha_inicio, cita.fecha_fin)}
                                 </div>
-                              )}
+                                {cita.detalle_motivo && (
+                                  <div className="mt-1 break-words text-xs font-normal text-white">
+                                    {textoHistorial(cita.detalle_motivo)}
+                                  </div>
+                                )}
+                                {cita.profesional && (
+                                  <div className="mt-1 text-xs text-slate-400">
+                                    Profesional: {textoHistorial(cita.profesional)}
+                                  </div>
+                                )}
+                              </div>
+                              <span className={`inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-xs ${estado.fondo}`}>
+                                <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${estado.punto}`} aria-hidden="true" />
+                                {estado.nombre}
+                              </span>
                             </div>
-                            <span className="rounded-lg border border-cyan-400/15 px-2 py-1 text-xs text-cyan-200/75">
-                              {{
-                                pendiente: 'Pendiente',
-                                finalizada: 'Finalizada',
-                                no_ha_venido: 'No ha venido',
-                                cancelada: 'Cancelada',
-                              }[cita.estado] ?? cita.estado}
-                            </span>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </div>
