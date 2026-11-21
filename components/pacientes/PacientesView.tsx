@@ -557,7 +557,7 @@ export default function PacientesView() {
   // ================================================================
 
   const ficha = (
-    <div className="min-w-0 overflow-hidden rounded-3xl border border-cyan-400/15 bg-[#03111A]/90 p-4 sm:p-5 lg:p-6 md:flex md:h-full md:min-h-0 md:flex-col">
+    <div className={`min-w-0 overflow-hidden rounded-3xl border border-cyan-400/15 bg-[#03111A]/90 p-4 sm:p-5 lg:p-6 ${seleccionado || editando ? 'md:flex md:h-full md:min-h-0 md:flex-col' : ''}`}>
       {!seleccionado && !editando ? (
         <div className="min-w-0">
           <div className="text-[11px] uppercase tracking-[0.2em] text-cyan-300/70">
