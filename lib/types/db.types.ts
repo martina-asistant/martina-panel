@@ -1,5 +1,6 @@
-// Tipos exactos de las tablas existentes en Supabase.
-// NO modificar nombres ni añadir columnas sin acuerdo previo.
+
+ // Tipos exactos de las tablas existentes en Supabase.
+ // NO modificar nombres ni añadir columnas sin acuerdo previo.
 
 export type ModoAtencion = 'ia' | 'martina' | 'recepcion';
 export type EstadoVisualConv = 'nueva' | 'en_curso' | 'recepcion' | 'gestionada';
@@ -33,6 +34,7 @@ export interface Patient {
   ultima_cita_fecha: string | null;
   ultima_cita_motivo: string | null;
   proxima_cita_fecha: string | null;
+  proxima_cita_fin: string | null;
   proxima_cita_motivo: string | null;
   total_citas: number | null;
   alerta_urgencia: boolean | null;
@@ -131,7 +133,7 @@ export interface Recall {
 
   conversacion_id?: string | null;
   origen?: string | null;
-numero_cambios?: number | null;
+  numero_cambios?: number | null;
   tipo_recall?: string | null;
 }
 
@@ -181,7 +183,7 @@ export interface LaboratorioTrabajo {
 
   laboratorio?: LaboratorioNombre | string | null;
   trabajo?: TipoTrabajoLaboratorio | string | null;
-  piezas?: string | null
+  piezas?: string | null;
   estado: EstadoLaboratorio;
 
   anotaciones?: string | null;
@@ -237,4 +239,46 @@ export interface AgendaEstadoVisita {
 
   updated_at: string;
   updated_by: string | null;
+}
+
+// ================================================================
+// HISTORIAL DE CITAS
+// Tabla existente: public.historial_citas
+// Solo tipado. No modifica Supabase.
+// ================================================================
+
+export type EstadoHistorialCita =
+  | 'pendiente'
+  | 'finalizada'
+  | 'no_ha_venido'
+  | 'cancelada';
+
+export interface HistorialCita {
+  id: string;
+  patient_id: string;
+
+  event_id: string;
+  calendar_id: string;
+
+  nombre_paciente: string | null;
+  profesional: string | null;
+
+  motivo: string | null;
+  detalle_motivo: string | null;
+
+  fecha_inicio: string;
+  fecha_fin: string | null;
+
+  estado: EstadoHistorialCita;
+
+  cancelada_at: string | null;
+  cancelada_por: string | null;
+  canal_cancelacion: string | null;
+  motivo_cancelacion: string | null;
+
+  creada_por: string | null;
+  canal_creacion: string | null;
+
+  created_at: string;
+  updated_at: string | null;
 }
