@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -15,7 +14,7 @@ import {
   X,
 } from 'lucide-react';
 
-import type { Patient } from '@/lib/types/db.types';
+import type { Patient, HistorialCita } from '@/lib/types/db.types';
 import { createClient } from '@/lib/supabase/client';
 
 import {
@@ -23,6 +22,10 @@ import {
   crearPacienteManual,
   type PacienteFormulario,
 } from '@/lib/repos/pacientes.repo';
+import {
+  listarHistorialPaciente,
+  calcularResumenHistorial,
+} from '@/lib/repos/pacientes-historial.repo';
 
 // ================================================================
 // 1. DATOS Y UTILIDADES COMPARTIDAS (ESCRITORIO + MÓVIL)
@@ -174,6 +177,9 @@ export default function PacientesView() {
   });
 
   const [error, setError] = useState('');
+  const [historial, setHistorial] = useState<HistorialCita[]>([]);
+  const [cargandoHistorial, setCargandoHistorial] = useState(false);
+  const [errorHistorial, setErrorHistorial] = useState('');
 
   // En móvil: listado y ficha son pantallas distintas.
   // En escritorio: aparecen como columnas.
@@ -224,6 +230,54 @@ export default function PacientesView() {
       activo = false;
     };
   }, []);
+
+  // Historial exclusivo de lectura: no altera agendas ni crea/modifica citas.
+  // Se carga al seleccionar un paciente y se usa para refrescar su resumen
+  // en pantalla. No se escribe ningún resumen en Supabase desde esta vista.
+  useEffect(() => {
+    const patientId = seleccionado?.id;
+    if (!patientId) {
+      setHistorial([]);
+      setErrorHistorial('');
+      setCargandoHistorial(false);
+      return;
+    }
+
+    let activo = true;
+    setCargandoHistorial(true);
+    setErrorHistorial('');
+    setHistorial([]);
+
+    const cargarHistorial = async () => {
+      try {
+        const citas = await listarHistorialPaciente(patientId);
+        if (!activo) return;
+
+        setHistorial(citas);
+        if (citas.length === 0) return;
+
+        // Solo sincronizar la información mostrada cuando hay historial real.
+        // Preservar el resto de los campos, incluidos los editados por recepción.
+        const resumen = calcularResumenHistorial(citas);
+        setSeleccionado((anterior) =>
+          anterior?.id === patientId ? { ...anterior, ...resumen } : anterior
+        );
+        setPacientes((anteriores) =>
+          anteriores.map((p) =>
+            p.id === patientId ? { ...p, ...resumen } : p
+          )
+        );
+      } catch (e) {
+        console.error('Error cargando historial de citas:', e);
+        if (activo) setErrorHistorial('No se ha podido cargar el historial de citas.');
+      } finally {
+        if (activo) setCargandoHistorial(false);
+      }
+    };
+
+    void cargarHistorial();
+    return () => { activo = false; };
+  }, [seleccionado?.id]);
 
   // ================================================================
   // BÚSQUEDA DE PACIENTES
@@ -663,9 +717,58 @@ export default function PacientesView() {
                     <CalendarDays className="h-5 w-5 shrink-0 text-cyan-300/50" />
                   </div>
 
-                  <div className="mt-5 rounded-2xl border border-dashed border-cyan-400/10 px-4 py-8 text-center text-sm text-white/35">
-                    Historial no disponible
-                  </div>
+                  {cargandoHistorial ? (
+                    <div className="mt-5 py-6 text-center text-sm text-white/45">
+                      Cargando historial...
+                    </div>
+                  ) : errorHistorial ? (
+                    <div className="mt-5 rounded-xl border border-red-400/20 p-4 text-sm text-red-200">
+                      {errorHistorial}
+                    </div>
+                  ) : historial.length === 0 ? (
+                    <div className="mt-5 rounded-2xl border border-dashed border-cyan-400/10 px-4 py-8 text-center text-sm text-white/35">
+                      No hay citas registradas en el historial
+                    </div>
+                  ) : (
+                    <div className="mt-4 space-y-2">
+                      {historial.map((cita) => (
+                        <div
+                          key={cita.id}
+                          className="rounded-xl border border-cyan-400/10 bg-black/10 p-3"
+                        >
+                          <div className="flex flex-wrap items-start justify-between gap-2">
+                            <div className="min-w-0">
+                              <div className="text-sm font-medium text-white/80">
+                                {cita.motivo || 'Cita sin motivo'}
+                              </div>
+                              <div className="mt-1 text-xs text-white/50">
+                                {mostrarFecha(cita.fecha_inicio)}
+                                {cita.fecha_fin ? ` – ${mostrarFecha(cita.fecha_fin)}` : ''}
+                              </div>
+                              {cita.detalle_motivo && (
+                                <div className="mt-1 break-words text-xs text-white/45">
+                                  {cita.detalle_motivo}
+                                </div>
+                              )}
+                              {cita.profesional && (
+                                <div className="mt-1 text-xs text-white/40">
+                                  Profesional: {cita.profesional}
+                                </div>
+                              )}
+                            </div>
+                            <span className="rounded-lg border border-cyan-400/15 px-2 py-1 text-xs text-cyan-200/75">
+                              {{
+                                pendiente: 'Pendiente',
+                                finalizada: 'Finalizada',
+                                no_ha_venido: 'No ha venido',
+                                cancelada: 'Cancelada',
+                              }[cita.estado] ?? cita.estado}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Eliminación pendiente de verificar relaciones y política DELETE. */}
