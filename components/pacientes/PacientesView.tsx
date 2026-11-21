@@ -557,16 +557,52 @@ export default function PacientesView() {
   // ================================================================
 
   const ficha = (
-    <div className={`min-w-0 overflow-hidden rounded-3xl border border-cyan-400/15 bg-[#03111A]/90 p-4 sm:p-5 lg:p-6 ${seleccionado || editando ? 'md:flex md:h-full md:min-h-0 md:flex-col' : ''}`}>
+    <div className="min-w-0 overflow-hidden rounded-3xl border border-cyan-400/15 bg-[#03111A]/90 p-4 sm:p-5 lg:p-6 md:flex md:h-full md:min-h-0 md:flex-col">
       {!seleccionado && !editando ? (
-        <div className="min-w-0">
-          <div className="text-[11px] uppercase tracking-[0.2em] text-cyan-300/70">
-            Ficha de paciente
+        <div className="flex min-w-0 min-h-0 flex-1 flex-col">
+          <div className="border-b border-cyan-500/10 pb-5">
+            <div className="text-[11px] uppercase tracking-[0.2em] text-cyan-300/70">
+              Ficha de paciente
+            </div>
+            <p className="mt-4 text-sm text-white/40">
+              Selecciona un paciente para ver su ficha
+            </p>
           </div>
 
-          <p className="mt-4 text-sm text-white/40">
-            Selecciona un paciente para ver su ficha
-          </p>
+          {/* Estructura visible sin seleccionar paciente; ningún dato real se carga. */}
+          <div className="mt-5 flex min-h-0 flex-1 flex-col gap-5">
+            <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-3">
+              <ResumenCard label="Última cita" value="—" />
+              <ResumenCard label="Próxima cita" value="—" />
+              <ResumenCard label="Total" value="—" />
+            </div>
+
+            <div className="rounded-2xl border border-cyan-400/10 bg-black/10 p-4">
+              <div className="text-xs uppercase tracking-[0.12em] text-cyan-200/55">
+                Notas internas
+              </div>
+              <p className="mt-3 min-h-[44px] text-sm leading-6 text-white/35">
+                —
+              </p>
+            </div>
+
+            <div className="flex min-h-0 flex-1 flex-col rounded-2xl border border-cyan-400/10 bg-black/10 p-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <div className="text-xs uppercase tracking-[0.12em] text-cyan-200/55">
+                    Historial de citas
+                  </div>
+                  <p className="mt-1 text-xs text-white/30">
+                    Cronología de tratamientos y visitas
+                  </p>
+                </div>
+                <CalendarDays className="h-5 w-5 shrink-0 text-cyan-300/50" />
+              </div>
+              <div className="mt-5 rounded-2xl border border-dashed border-cyan-400/10 px-4 py-8 text-center text-sm text-white/35">
+                Selecciona un paciente para consultar su historial
+              </div>
+            </div>
+          </div>
         </div>
       ) : (
         <>
