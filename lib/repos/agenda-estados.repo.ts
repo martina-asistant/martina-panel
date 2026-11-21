@@ -1,10 +1,8 @@
+
 import { createClient as createBrowserSupa } from '@/lib/supabase/client';
 import type { AgendaEstadoVisita, EstadoVisita } from '@/lib/types/db.types';
 
 const mockEstadosVisita: AgendaEstadoVisita[] = [];
-
-const normalizarTelefono = (telefono?: string | null) =>
-  String(telefono || '').replace(/\D/g, '');
 
 type UpsertEstadoVisitaInput = {
   event_id: string;
@@ -15,89 +13,21 @@ type UpsertEstadoVisitaInput = {
   estado_visita: EstadoVisita;
   observaciones?: string | null;
   updated_by?: string | null;
-  
+
   fecha_inicio?: string | null;
   fecha_fin?: string | null;
   motivo?: string | null;
-  
+
   siguiente_cita_fecha?: string | null;
   siguiente_cita_fin?: string | null;
   siguiente_cita_motivo?: string | null;
 };
 
-async function aplicarEfectoEstadoVisita(input: UpsertEstadoVisitaInput) {
-  const supa = createBrowserSupa();
-  if (!supa) return;
-
-  if (input.estado_visita !== 'finalizada' && input.estado_visita !== 'no_ha_venido') {
-    return;
-  }
-
-  const telefono = normalizarTelefono(input.telefono);
-
-  const buscarPaciente = async () => {
-    if (input.paciente_id) {
-      const { data } = await supa
-        .from('patients')
-        .select('*')
-        .or(`id.eq.${input.paciente_id},paciente_id.eq.${input.paciente_id}`)
-        .maybeSingle();
-
-      if (data) return data;
-    }
-
-    if (!telefono) return null;
-
-    const { data } = await supa
-      .from('patients')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    return (data || []).find((p) => {
-      const t = normalizarTelefono(p.telefono);
-      return t === telefono || t.endsWith(telefono) || telefono.endsWith(t);
-    }) || null;
-  };
-
-  const patient = await buscarPaciente();
-  if (!patient) return;
-
-  if (input.estado_visita === 'finalizada') {
-    await supa
-      .from('patients')
-      .update({
-        ultima_cita_fecha: input.fecha_inicio || patient.proxima_cita_fecha || null,
-        ultima_cita_motivo: input.motivo || patient.proxima_cita_motivo || null,
-
-        proxima_cita_fecha: input.siguiente_cita_fecha || null,
-        proxima_cita_fin: input.siguiente_cita_fin || null,
-        proxima_cita_motivo: input.siguiente_cita_motivo || null,
-      })
-      .eq('id', patient.id);
-
-    return;
-  }
-
-  if (input.estado_visita === 'no_ha_venido') {
-  const mismaUltimaCita =
-    patient.ultima_cita_fecha &&
-    input.fecha_inicio &&
-    new Date(patient.ultima_cita_fecha).getTime() === new Date(input.fecha_inicio).getTime();
-
-  await supa
-    .from('patients')
-    .update({
-      ultima_cita_fecha: mismaUltimaCita ? null : patient.ultima_cita_fecha,
-      ultima_cita_motivo: mismaUltimaCita ? null : patient.ultima_cita_motivo,
-
-      proxima_cita_fecha: input.siguiente_cita_fecha || null,
-      proxima_cita_fin: input.siguiente_cita_fin || null,
-      proxima_cita_motivo: input.siguiente_cita_motivo || null,
-    })
-    .eq('id', patient.id);
-}
-}
-
+/**
+ * Consulta los estados de recepción.
+ *
+ * No modifica citas ni datos de pacientes.
+ */
 export async function listEstadosVisita(): Promise<AgendaEstadoVisita[]> {
   const supa = createBrowserSupa();
 
@@ -118,6 +48,11 @@ export async function listEstadosVisita(): Promise<AgendaEstadoVisita[]> {
   return (data || []) as AgendaEstadoVisita[];
 }
 
+/**
+ * Elimina un estado de recepción.
+ *
+ * Conserva el funcionamiento existente.
+ */
 export async function deleteEstadoVisita(
   eventId: string,
   calendarId: string
@@ -150,6 +85,14 @@ export async function deleteEstadoVisita(
   return true;
 }
 
+/**
+ * Guarda el estado de una visita en recepción.
+ *
+ * Mantiene la escritura original en agenda_estados_visita.
+ *
+ * No sobrescribe los resúmenes de patients.
+ * Los resúmenes se calculan desde historial_citas.
+ */
 export async function upsertEstadoVisita(
   input: UpsertEstadoVisitaInput
 ): Promise<AgendaEstadoVisita | null> {
@@ -169,7 +112,9 @@ export async function upsertEstadoVisita(
 
   if (!supa) {
     const idx = mockEstadosVisita.findIndex(
-      (e) => e.event_id === input.event_id && e.calendar_id === input.calendar_id
+      (e) =>
+        e.event_id === input.event_id &&
+        e.calendar_id === input.calendar_id
     );
 
     const item = {
@@ -198,8 +143,6 @@ export async function upsertEstadoVisita(
     console.error('Error guardando estado visita:', error);
     return null;
   }
-
-  await aplicarEfectoEstadoVisita(input);
 
   return data as AgendaEstadoVisita;
 }
