@@ -282,3 +282,37 @@ export interface HistorialCita {
   created_at: string;
   updated_at: string | null;
 }
+
+
+ // ================================================================
+ // HISTORIAL DE MODIFICACIONES DE CITAS
+ // Tabla existente: public.historial_citas_cambios
+ // Solo tipado. No modifica Supabase.
+ // ================================================================
+
+export interface HistorialCitaCambio {
+  id: string;
+  historial_cita_id: string;
+
+  tipo_movimiento: string;
+
+  fecha_anterior: string | null;
+  fecha_fin_anterior: string | null;
+
+  fecha_nueva: string | null;
+  fecha_fin_nueva: string | null;
+
+  motivo_anterior: string | null;
+  motivo_nuevo: string | null;
+
+  detalle_anterior: string | null;
+  detalle_nuevo: string | null;
+
+  realizado_por: string | null;
+  canal: string | null;
+  motivo_cambio: string | null;
+
+  created_at: string;
+  nombre_paciente: string | null;
+}
+
