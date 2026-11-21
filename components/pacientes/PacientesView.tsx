@@ -557,7 +557,7 @@ export default function PacientesView() {
   // ================================================================
 
   const ficha = (
-    <div className="min-w-0 overflow-hidden rounded-3xl border border-cyan-400/15 bg-[#03111A]/90 p-4 sm:p-5 lg:p-6">
+    <div className="min-w-0 overflow-hidden rounded-3xl border border-cyan-400/15 bg-[#03111A]/90 p-4 sm:p-5 lg:p-6 md:flex md:h-full md:min-h-0 md:flex-col">
       {!seleccionado && !editando ? (
         <div className="min-w-0">
           <div className="text-[11px] uppercase tracking-[0.2em] text-cyan-300/70">
@@ -714,7 +714,7 @@ export default function PacientesView() {
             </div>
           ) : (
             seleccionado && (
-              <div className="mt-5 min-w-0 space-y-5">
+              <div className="mt-5 min-w-0 space-y-5 md:flex md:min-h-0 md:flex-1 md:flex-col md:overflow-hidden">
                 <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-3">
                   <ResumenCard
                     label="Última cita"
@@ -745,7 +745,7 @@ export default function PacientesView() {
                   </div>
                 )}
 
-                <div className="rounded-2xl border border-cyan-400/10 bg-black/10 p-4">
+                <div className="rounded-2xl border border-cyan-400/10 bg-black/10 p-4 md:max-h-[150px] md:shrink-0 md:overflow-y-auto">
                   <div className="text-xs uppercase tracking-[0.12em] text-cyan-200/55">
                     Notas internas
                   </div>
@@ -756,8 +756,8 @@ export default function PacientesView() {
                   </p>
                 </div>
 
-                <div className="rounded-2xl border border-cyan-400/10 bg-black/10 p-4">
-                  <div className="flex items-center justify-between gap-3">
+                <div className="rounded-2xl border border-cyan-400/10 bg-black/10 p-4 md:flex md:min-h-0 md:flex-1 md:flex-col">
+                  <div className="flex items-center justify-between gap-3 md:shrink-0">
                     <div>
                       <div className="text-xs uppercase tracking-[0.12em] text-cyan-200/55">
                         Historial de citas
@@ -784,7 +784,7 @@ export default function PacientesView() {
                       No hay citas registradas en el historial
                     </div>
                   ) : (
-                    <div className="mt-4 space-y-2">
+                    <div className="mt-4 max-h-[390px] space-y-2 overflow-y-auto overflow-x-hidden pr-2 [scrollbar-width:thin] [scrollbar-color:#176477_#03111A] [&::-webkit-scrollbar]:w-[6px] [&::-webkit-scrollbar-track]:bg-[#03111A] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#176477] md:max-h-none md:min-h-0 md:flex-1">
                       {historial.map((cita) => {
                         const estado = estiloEstadoHistorial[cita.estado] ?? {
                           nombre: textoHistorial(cita.estado),
@@ -889,13 +889,13 @@ export default function PacientesView() {
         <div className="hidden md:block">
           {errorVisible}
 
-          <div className="grid w-full min-w-0 gap-5 md:grid-cols-2">
+          <div className="grid w-full min-w-0 gap-5 md:h-[780px] md:grid-cols-2">
             {/* LISTADO ESCRITORIO */}
 
-            <div className="min-w-0 overflow-hidden rounded-3xl border border-cyan-400/15 bg-[#03111A]/90">
+            <div className="min-w-0 overflow-hidden rounded-3xl border border-cyan-400/15 bg-[#03111A]/90 md:flex md:min-h-0 md:flex-col">
               {buscador}
 
-              <div className="max-h-[640px] overflow-y-auto overflow-x-hidden p-2 [scrollbar-width:thin] [scrollbar-color:#176477_#03111A] [&::-webkit-scrollbar]:w-[6px] [&::-webkit-scrollbar-track]:bg-[#03111A] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#176477]">
+              <div className="max-h-[640px] overflow-y-auto overflow-x-hidden p-2 md:max-h-none md:min-h-0 md:flex-1 [scrollbar-width:thin] [scrollbar-color:#176477_#03111A] [&::-webkit-scrollbar]:w-[6px] [&::-webkit-scrollbar-track]:bg-[#03111A] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#176477]">
                 {cargando ? (
                   <p className="py-10 text-center text-sm text-white/35">
                     Cargando pacientes...
