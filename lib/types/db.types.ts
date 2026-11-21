@@ -34,7 +34,7 @@ export interface Patient {
   ultima_cita_fecha: string | null;
   ultima_cita_motivo: string | null;
   proxima_cita_fecha: string | null;
-  proxima_cita_fin: string | null;
+  proxima_cita_fin?: string | null;
   proxima_cita_motivo: string | null;
   total_citas: number | null;
   alerta_urgencia: boolean | null;
@@ -183,7 +183,7 @@ export interface LaboratorioTrabajo {
 
   laboratorio?: LaboratorioNombre | string | null;
   trabajo?: TipoTrabajoLaboratorio | string | null;
-  piezas?: string | null;
+  piezas?: string | null
   estado: EstadoLaboratorio;
 
   anotaciones?: string | null;
