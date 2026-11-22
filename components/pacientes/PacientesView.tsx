@@ -142,8 +142,8 @@ const estiloEstadoHistorial: Record<string, { nombre: string; punto: string; fon
   // Mantener visible el estado existente sin asignarle un color incorrecto.
   cancelada: {
     nombre: 'Cancelada',
-    punto: 'bg-slate-400',
-    fondo: 'border-slate-400/20 bg-slate-400/[0.06] text-slate-200/90',
+    punto: 'bg-orange-400',
+    fondo: 'border-orange-400/20 bg-orange-400/[0.08] text-orange-200/90',
   },
 };
 
