@@ -75,16 +75,12 @@ export function calcularResumenHistorial(
   const ahora = fechaReferencia.getTime();
 
   const finalizadas = historial
-    .filter(
-      (cita) =>
-        cita.estado === 'finalizada' &&
-        new Date(cita.fecha_inicio).getTime() <= ahora
-    )
-    .sort(
-      (a, b) =>
-        new Date(b.fecha_inicio).getTime() -
-        new Date(a.fecha_inicio).getTime()
-    );
+  .filter((cita) => cita.estado === 'finalizada')
+  .sort(
+    (a, b) =>
+      new Date(b.fecha_inicio).getTime() -
+      new Date(a.fecha_inicio).getTime()
+  );
 
   const pendientesFuturas = historial
     .filter(
