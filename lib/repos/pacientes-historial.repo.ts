@@ -109,7 +109,9 @@ export function calcularResumenHistorial(
     proxima_cita_fin: proxima?.fecha_fin ?? null,
     proxima_cita_motivo: proxima?.motivo ?? null,
 
-    total_citas: historial.length,
+    total_citas: historial.filter(
+  (cita) => cita.estado === 'finalizada'
+).length,
   };
 }
 
