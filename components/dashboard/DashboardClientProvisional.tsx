@@ -93,7 +93,7 @@ function CajaLaboratorio() {
       <div aria-hidden="true" className="mt-3 h-px w-full bg-cyan-300/75 shadow-[0_0_10px_rgba(34,211,238,.75)]" />
       <div className="mt-3 overflow-hidden rounded-2xl border border-cyan-400/30 bg-[rgba(5,18,24,.78)]">
         {/* Móvil: paciente, estado y fecha; escritorio: las cinco columnas acordadas. */}
-        <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,114px)_76px] gap-2 bg-cyan-500/10 px-3 py-3 text-[10px] uppercase tracking-[.04em] text-cyan-300/90 lg:hidden">
+        <div className="grid grid-cols-[minmax(0,1fr)_100px_65px] gap-2 bg-cyan-500/10 px-3 py-3 text-[10px] uppercase tracking-[.04em] text-cyan-300/90 lg:hidden">
           <span>Paciente</span><span>Estado</span><span>Fecha cita</span>
         </div>
         <div className="hidden grid-cols-[minmax(0,2.5fr)_minmax(0,1fr)_minmax(0,1.1fr)_minmax(0,1.3fr)_85px] gap-2 bg-cyan-500/10 px-3 py-3 text-[10px] uppercase tracking-[.035em] text-cyan-300/90 lg:grid">
@@ -108,7 +108,7 @@ function CajaLaboratorio() {
             const pendiente=t.estado==='pte_gestionar';
             const chip=<span className={`inline-flex max-w-full items-center gap-1.5 rounded-full border px-2 py-1.5 text-[10px] ${pendiente?'border-red-500/40 bg-red-500/[.09] text-red-300':'border-cyan-500/25 bg-cyan-500/5 text-cyan-100'}`}><span className={`h-2 w-2 shrink-0 rounded-full shadow-[0_0_10px_currentColor] ${estado.color}`}/><span className="min-w-0 truncate">{pendiente?'Pendiente':estado.etiqueta}</span></span>;
             return <div key={t.id} className="border-t border-cyan-500/10 transition-colors hover:bg-cyan-500/[.035]">
-              <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,114px)_76px] items-center gap-2 px-3 py-3.5 text-xs lg:hidden">
+              <div className="grid grid-cols-[minmax(0,1fr)_100px_65px] items-center gap-2 px-3 py-3.5 text-xs lg:hidden">
                 <span className="min-w-0 truncate font-medium text-white" title={t.nombre_paciente||''}>{t.nombre_paciente||'—'}</span><span className="min-w-0">{chip}</span><span className="whitespace-nowrap text-[11px] text-cyan-100/75">{formatoFecha(t.fecha_cita)}</span>
               </div>
               <div className="hidden grid-cols-[minmax(0,2.5fr)_minmax(0,1fr)_minmax(0,1.1fr)_minmax(0,1.3fr)_85px] items-center gap-2 px-3 py-3.5 text-xs lg:grid">
