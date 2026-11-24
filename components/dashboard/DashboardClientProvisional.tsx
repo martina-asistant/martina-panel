@@ -15,7 +15,7 @@ import { createClient } from '@/lib/supabase/client';
  * MARTINA PANEL — DashboardClientProvisional (vista independiente de prueba, 24/11/2026).
  * 1. Los encabezados del Dashboard original se han conservado literalmente.
  * 2. Ninguna escritura a Supabase/Google Calendar desde las estadísticas.
- * 3. Los 21 eventos históricos tienen fechas created originales verificadas
+ * 3. Los 21 eventos históricos tienen fechas de cita y creación verificadas
  *    en el JSON de Google Calendar facilitado el 23/11/2026.
  * 4. Las modificaciones de Martina se leen de historial_citas_cambios si
  *    han quedado registradas. Las anteriores que no tengan trazabilidad
@@ -31,7 +31,8 @@ const MARTINA_HISTORICA: CitaMartina[] = [
     "calendar_id": "fede",
     "paciente": "Maricarmen Germán Mateo",
     "motivo": "primera visita",
-    "fechaActividad": "2026-07-23T07:43:42.000Z"
+    "fechaActividad": "2026-07-23T07:43:42.000Z",
+    "fechaCita": "2026-08-05T10:00:00+02:00"
   },
   {
     "id": "fede:o0pp96kh55fmm7f29lkok0n8tc",
@@ -39,7 +40,8 @@ const MARTINA_HISTORICA: CitaMartina[] = [
     "calendar_id": "fede",
     "paciente": "Victoria Balaguer Babiloni",
     "motivo": "revisión general",
-    "fechaActividad": "2026-07-24T08:37:28.000Z"
+    "fechaActividad": "2026-07-24T08:37:28.000Z",
+    "fechaCita": "2026-07-31T09:30:00+02:00"
   },
   {
     "id": "fede:b7oh3lqg7ipt82asecsvooll9o",
@@ -47,7 +49,8 @@ const MARTINA_HISTORICA: CitaMartina[] = [
     "calendar_id": "fede",
     "paciente": "Nongo Nong",
     "motivo": "primera visita",
-    "fechaActividad": "2026-07-25T09:07:18.000Z"
+    "fechaActividad": "2026-07-25T09:07:18.000Z",
+    "fechaCita": "2026-07-27T13:30:00+02:00"
   },
   {
     "id": "fede:dgk2mf57vo5lbfonlsmjrl2jhk",
@@ -55,7 +58,8 @@ const MARTINA_HISTORICA: CitaMartina[] = [
     "calendar_id": "fede",
     "paciente": "Martín Sánchez Fernández",
     "motivo": "revisión general",
-    "fechaActividad": "2026-07-27T09:19:56.000Z"
+    "fechaActividad": "2026-07-27T09:19:56.000Z",
+    "fechaCita": "2026-07-29T11:00:00+02:00"
   },
   {
     "id": "fede:0drvlu2sdlds1am7tdncu3bp0g",
@@ -63,7 +67,8 @@ const MARTINA_HISTORICA: CitaMartina[] = [
     "calendar_id": "fede",
     "paciente": "Sara Toran Rosario",
     "motivo": "primera visita",
-    "fechaActividad": "2026-07-27T16:24:14.000Z"
+    "fechaActividad": "2026-07-27T16:24:14.000Z",
+    "fechaCita": "2026-07-31T10:00:00+02:00"
   },
   {
     "id": "fede:mm9sv9qh2p5gf6hbs2q24rhde4",
@@ -71,7 +76,8 @@ const MARTINA_HISTORICA: CitaMartina[] = [
     "calendar_id": "fede",
     "paciente": "Raúl Ibáñez Jiménez",
     "motivo": "revision general",
-    "fechaActividad": "2026-07-31T08:59:10.000Z"
+    "fechaActividad": "2026-07-31T08:59:10.000Z",
+    "fechaCita": "2026-08-03T12:30:00+02:00"
   },
   {
     "id": "fede:9oh74iu7jnbqtdo4t7kh5d1214",
@@ -79,7 +85,8 @@ const MARTINA_HISTORICA: CitaMartina[] = [
     "calendar_id": "fede",
     "paciente": "Carlos López Ciprés",
     "motivo": "revisión general",
-    "fechaActividad": "2026-08-10T07:14:11.000Z"
+    "fechaActividad": "2026-08-10T07:14:11.000Z",
+    "fechaCita": "2026-08-11T10:30:00+02:00"
   },
   {
     "id": "fede:8bc00id9bo1ll32ceqc8r20474",
@@ -87,7 +94,8 @@ const MARTINA_HISTORICA: CitaMartina[] = [
     "calendar_id": "fede",
     "paciente": "Andrea Díaz Martínez",
     "motivo": "primera visita",
-    "fechaActividad": "2026-08-10T10:25:10.000Z"
+    "fechaActividad": "2026-08-10T10:25:10.000Z",
+    "fechaCita": "2026-08-11T12:15:00+02:00"
   },
   {
     "id": "fede:k7sonu6m43ubldrpoh9kjla7ms",
@@ -95,7 +103,8 @@ const MARTINA_HISTORICA: CitaMartina[] = [
     "calendar_id": "fede",
     "paciente": "Erick Mattei Gramada",
     "motivo": "primera visita",
-    "fechaActividad": "2026-08-11T14:39:54.000Z"
+    "fechaActividad": "2026-08-11T14:39:54.000Z",
+    "fechaCita": "2026-08-12T10:30:00+02:00"
   },
   {
     "id": "fede:d883v7giii451pkksp79plqdg4",
@@ -103,7 +112,8 @@ const MARTINA_HISTORICA: CitaMartina[] = [
     "calendar_id": "fede",
     "paciente": "Raquel Sáenz Elipe",
     "motivo": "primera visita",
-    "fechaActividad": "2026-08-11T17:17:30.000Z"
+    "fechaActividad": "2026-08-11T17:17:30.000Z",
+    "fechaCita": "2026-08-12T11:15:00+02:00"
   },
   {
     "id": "fede:up7c0ff8c3vec4oec8bp9o3u30",
@@ -111,7 +121,8 @@ const MARTINA_HISTORICA: CitaMartina[] = [
     "calendar_id": "fede",
     "paciente": "Blas Punzano Gil",
     "motivo": "Primera visita",
-    "fechaActividad": "2026-09-02T08:16:48.000Z"
+    "fechaActividad": "2026-09-02T08:16:48.000Z",
+    "fechaCita": "2026-09-02T15:30:00+02:00"
   },
   {
     "id": "fede:0bnk53ui10l3lcqaqdr8oam0co",
@@ -119,7 +130,8 @@ const MARTINA_HISTORICA: CitaMartina[] = [
     "calendar_id": "fede",
     "paciente": "Chimo Rambla Barrachina",
     "motivo": "primera visita",
-    "fechaActividad": "2026-09-07T08:22:57.000Z"
+    "fechaActividad": "2026-09-07T08:22:57.000Z",
+    "fechaCita": "2026-09-08T18:15:00+02:00"
   },
   {
     "id": "fede:sbiln80vlah5r8mb2gbl4v5lt4",
@@ -127,7 +139,8 @@ const MARTINA_HISTORICA: CitaMartina[] = [
     "calendar_id": "fede",
     "paciente": "Paola Valero Darmaz",
     "motivo": "primera visita",
-    "fechaActividad": "2026-09-25T11:40:54.000Z"
+    "fechaActividad": "2026-09-25T11:40:54.000Z",
+    "fechaCita": "2026-09-30T15:00:00+02:00"
   },
   {
     "id": "fede:8a1912fdvjcnhc7q9cvdcdnh9k",
@@ -135,7 +148,8 @@ const MARTINA_HISTORICA: CitaMartina[] = [
     "calendar_id": "fede",
     "paciente": "Joel Borreguero Hernández",
     "motivo": "primera visita",
-    "fechaActividad": "2026-09-25T19:46:02.000Z"
+    "fechaActividad": "2026-09-25T19:46:02.000Z",
+    "fechaCita": "2026-09-30T15:45:00+02:00"
   },
   {
     "id": "fede:u9k990na0h8m4bppb6jbb284tk",
@@ -143,7 +157,8 @@ const MARTINA_HISTORICA: CitaMartina[] = [
     "calendar_id": "fede",
     "paciente": "Josefina Blanco Tomaselo",
     "motivo": "primera visita",
-    "fechaActividad": "2026-10-16T11:45:07.000Z"
+    "fechaActividad": "2026-10-16T11:45:07.000Z",
+    "fechaCita": "2026-10-19T13:45:00+02:00"
   },
   {
     "id": "fede:8g4mfn79m4nlj89hd4md718820",
@@ -151,7 +166,8 @@ const MARTINA_HISTORICA: CitaMartina[] = [
     "calendar_id": "fede",
     "paciente": "Roberto Sandoval Moraga",
     "motivo": "Revisión general",
-    "fechaActividad": "2026-10-22T09:15:57.000Z"
+    "fechaActividad": "2026-10-22T09:15:57.000Z",
+    "fechaCita": "2026-11-09T09:00:00+01:00"
   },
   {
     "id": "fede:gb8sp6qsga4bhrrhtdesjn63ms",
@@ -159,7 +175,8 @@ const MARTINA_HISTORICA: CitaMartina[] = [
     "calendar_id": "fede",
     "paciente": "Chimo Dols Tarragón",
     "motivo": "revisión general",
-    "fechaActividad": "2026-10-30T16:05:24.000Z"
+    "fechaActividad": "2026-10-30T16:05:24.000Z",
+    "fechaCita": "2026-11-02T15:30:00+01:00"
   },
   {
     "id": "fede:9ohvhrr0akvv1rdvi13q5f7s8c",
@@ -167,7 +184,8 @@ const MARTINA_HISTORICA: CitaMartina[] = [
     "calendar_id": "fede",
     "paciente": "Joel Borreguero Hernández",
     "motivo": "Revisión general",
-    "fechaActividad": "2026-11-07T21:04:33.000Z"
+    "fechaActividad": "2026-11-07T21:04:33.000Z",
+    "fechaCita": "2026-11-09T14:00:00+01:00"
   },
   {
     "id": "fede:0mdbt59oqbvt5ca8q28p4j5c3s",
@@ -175,7 +193,8 @@ const MARTINA_HISTORICA: CitaMartina[] = [
     "calendar_id": "fede",
     "paciente": "Lautaro Lavia",
     "motivo": "revisión general",
-    "fechaActividad": "2026-11-10T07:16:04.000Z"
+    "fechaActividad": "2026-11-10T07:16:04.000Z",
+    "fechaCita": "2026-11-12T15:00:00+01:00"
   },
   {
     "id": "fede:22qm4f8srjqbsuii359osig214",
@@ -183,7 +202,8 @@ const MARTINA_HISTORICA: CitaMartina[] = [
     "calendar_id": "fede",
     "paciente": "Enrique Soto Saravia",
     "motivo": "Primera visita",
-    "fechaActividad": "2026-11-18T17:25:35.000Z"
+    "fechaActividad": "2026-11-18T17:25:35.000Z",
+    "fechaCita": "2026-11-24T18:45:00+01:00"
   },
   {
     "id": "fede:fvakvvpteajgndl6a2fms8r6fg",
@@ -191,7 +211,8 @@ const MARTINA_HISTORICA: CitaMartina[] = [
     "calendar_id": "fede",
     "paciente": "Carlos López Ciprés",
     "motivo": "revisión general",
-    "fechaActividad": "2026-11-23T18:53:27.000Z"
+    "fechaActividad": "2026-11-23T18:53:27.000Z",
+    "fechaCita": "2026-11-25T16:00:00+01:00"
   }
 ];
 
@@ -210,7 +231,7 @@ type CambioDB = {
 };
 type CitaMartina = {
   id: string; event_id: string; calendar_id: string; paciente: string;
-  motivo: string; fechaActividad: string; estimada?: boolean;
+  motivo: string; fechaActividad: string; fechaCita: string | null; estimada?: boolean;
 };
 const fechaMadrid = new Intl.DateTimeFormat('en-CA', {
   timeZone: 'Europe/Madrid', year: 'numeric', month: '2-digit', day: '2-digit'
@@ -236,6 +257,18 @@ function estadoVigente(c: CitaDB) { return normalizar(c.estado)!=='cancelada'; }
 function etiquetaEstado(e: string|null) {
   const s=normalizar(e);
   return ({finalizada:'Finalizada',pendiente:'Pendiente',cancelada:'Cancelada',no_ha_venido:'No asistió'} as Record<string,string>)[s] || (e||'Sin estado');
+}
+function EstadoConPunto({estado}: {estado:string | null}) {
+  const base = 'inline-flex items-center gap-2 whitespace-nowrap rounded-full border px-2.5 py-1 text-[11px] font-medium';
+  const clave=normalizar(estado);
+  const estilos: Record<string,{caja:string,punto:string}> = {
+    pendiente:{caja:'border-amber-400/35 bg-amber-400/10 text-amber-100',punto:'bg-amber-400 shadow-[0_0_9px_rgba(251,191,36,.95)]'},
+    finalizada:{caja:'border-green-400/35 bg-green-400/10 text-green-100',punto:'bg-green-400 shadow-[0_0_9px_rgba(74,222,128,.95)]'},
+    no_ha_venido:{caja:'border-red-400/35 bg-red-400/10 text-red-100',punto:'bg-red-500 shadow-[0_0_9px_rgba(239,68,68,.95)]'},
+    cancelada:{caja:'border-slate-400/30 bg-slate-400/10 text-slate-200',punto:'bg-slate-400 shadow-[0_0_8px_rgba(148,163,184,.6)]'}
+  };
+  const estilo=estilos[clave] || estilos.cancelada;
+  return <span className={`${base} ${estilo.caja}`}><span className={`h-2 w-2 shrink-0 rounded-full ${estilo.punto}`}/>{etiquetaEstado(estado)}</span>;
 }
 async function leerTodas<T>(supa: NonNullable<ReturnType<typeof createClient>>, tabla: string, columnas:string):Promise<T[]> {
   const todos:T[]=[];
@@ -274,6 +307,7 @@ function compilarMartina(citas:CitaDB[], cambios:CambioDB[]) {
       id:key,event_id:c.event_id||c.id,calendar_id:normalizar(c.calendar_id),
       paciente:c.nombre_paciente||h?.paciente||'Paciente sin nombre',
       motivo:c.motivo||h?.motivo||'Sin motivo',fechaActividad,
+      fechaCita:c.fecha_inicio || h?.fechaCita || null,
       estimada:!h && esCreacion
     });
   }
@@ -382,9 +416,9 @@ useEffect(() => {
   const lunes=useMemo(()=>moverDia(fechaBase,desplazamiento*7),[fechaBase,desplazamiento]);
   const dias=useMemo(()=>Array.from({length:mostrarFinde?7:5},(_,i)=>moverDia(lunes,i)),[lunes,mostrarFinde]);
   const diasClave=useMemo(()=>new Set(dias.map(claveLocal)),[dias]);
-  const citasSemana=useMemo(()=>martina.filter(c=>diasClave.has(diaMadrid(c.fechaActividad))),[martina,diasClave]);
-  const barras=useMemo(()=>dias.map(d=>citasSemana.filter(c=>diaMadrid(c.fechaActividad)===claveLocal(d)).length),[dias,citasSemana]);
-  const mayorBarra=Math.max(1,...barras);
+  const citasSemana=useMemo(()=>martina.filter(c=>diasClave.has(diaMadrid(c.fechaCita))),[martina,diasClave]);
+  const barras=useMemo(()=>dias.map(d=>citasSemana.filter(c=>diaMadrid(c.fechaCita)===claveLocal(d)).length),[dias,citasSemana]);
+  const mayorBarra=Math.max(5,...barras);
   // Resumen clínico anual: Dr. Federico incluye histórico de Celia internamente.
   // Ningún total operativo incluye canceladas.
   const anioActual=String(new Date().getFullYear());
@@ -443,35 +477,35 @@ useEffect(() => {
   }).length,[citasUnicas,anioInspeccion,mesInspeccion,profInspeccion]);
 
   const contenido = <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
-    <section className="rounded-3xl border border-cyan-500/25 bg-[rgba(5,28,37,.9)] p-5 text-white shadow-[0_0_30px_rgba(34,211,238,.06)]">
+    <section className="rounded-3xl border border-cyan-500/25 bg-[rgba(5,28,37,.9)] p-4 text-white shadow-[0_0_30px_rgba(34,211,238,.06)]">
       <div className="flex items-start justify-between gap-3">
         <div><div className="flex items-center gap-2 text-cyan-200"><CalendarCheck2 className="h-5 w-5"/><h2 className="text-sm font-semibold tracking-[.14em]">CITAS CREADAS</h2></div><p className="mt-1 text-xs text-cyan-100/65">Actividad de Martina</p></div>
-        <div className="min-w-[110px] rounded-2xl border border-cyan-400/20 bg-cyan-400/10 px-4 py-3 text-center"><div className="text-[10px] tracking-[.12em] text-cyan-100/75">MARTINA · TOTAL</div><div className="mt-1 text-3xl font-semibold tabular-nums">{cargando?'…':martina.length}</div><div className="mt-1 text-[10px] text-cyan-100/60">Citas gestionadas</div></div>
+        <div className="min-w-[98px] rounded-xl border border-cyan-400/20 bg-cyan-400/10 px-3 py-2 text-center"><div className="text-[10px] tracking-[.12em] text-cyan-100/75">MARTINA · TOTAL</div><div className="mt-0.5 text-2xl font-semibold tabular-nums">{cargando?'…':martina.length}</div><div className="mt-1 text-[10px] text-cyan-100/60">Citas gestionadas</div></div>
       </div>
-      <div className="my-5 border-t border-cyan-500/20"/>
+      <div className="my-3 border-t border-cyan-500/20"/>
       <div className="flex items-center justify-center gap-3">
         <button type="button" aria-label="Semana anterior" onClick={()=>setDesplazamiento(n=>n-1)} className="rounded-xl border border-cyan-500/30 p-2 text-cyan-200 hover:bg-cyan-500/15"><ChevronLeft className="h-4 w-4"/></button>
         <div className="min-w-[167px] text-center text-sm font-semibold tabular-nums">{mesES.format(lunes)} – {mesES.format(dias[dias.length-1])}</div>
         <button type="button" aria-label="Semana siguiente" disabled={desplazamiento>=0} onClick={()=>setDesplazamiento(n=>Math.min(0,n+1))} className="rounded-xl border border-cyan-500/30 p-2 text-cyan-200 hover:bg-cyan-500/15 disabled:opacity-30"><ChevronRight className="h-4 w-4"/></button>
       </div>
       <button type="button" onClick={()=>setMostrarFinde(v=>!v)} className="mx-auto mt-2 block text-[11px] text-cyan-200/70 underline underline-offset-4 hover:text-cyan-100">{mostrarFinde?'Mostrar lunes a viernes':'Ver también sábado y domingo'}</button>
-      <div className="mt-4 rounded-2xl border border-cyan-500/15 bg-cyan-950/30 px-4 py-4">
-        <div className="mb-3 text-xs text-cyan-100/70">Citas gestionadas por Martina · por día de intervención</div>
-        <div className="flex h-[156px] items-end gap-3">
-          {dias.map((d,i)=><div key={claveLocal(d)} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-2"><span className="text-[11px] tabular-nums text-cyan-100/80">{barras[i]}</span><div className="flex h-[105px] w-full items-end justify-center"><div className="w-full max-w-9 rounded-t-md bg-cyan-400/75" style={{height:`${Math.max(2,barras[i]/mayorBarra*100)}%`}} /></div><span className="text-xs text-cyan-100/75">{['L','M','X','J','V','S','D'][i]}</span></div>)}
+      <div className="mt-3 rounded-2xl border border-cyan-500/15 bg-cyan-950/30 px-4 py-3">
+        <div className="mb-3 text-xs text-cyan-100/70">Citas de Martina · por día de cita</div>
+        <div className="flex h-[130px] items-end gap-3">
+          {dias.map((d,i)=><div key={claveLocal(d)} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-2"><span className="text-[11px] tabular-nums text-cyan-100/80">{barras[i]}</span><div className="flex h-[94px] w-full items-end justify-center"><div className="w-full max-w-9 rounded-t-md bg-cyan-400/75" style={{height:`${barras[i]===0 ? 0 : Math.max(3,barras[i]/mayorBarra*100)}%`}} /></div><span className="text-xs text-cyan-100/75">{['L','M','X','J','V','S','D'][i]}</span></div>)}
         </div>
       </div>
       <div className="mt-4 border-t border-cyan-500/20 pt-3">
-        <div className="mb-2 flex justify-between gap-2 text-[11px] font-medium tracking-[.09em] text-cyan-200/80"><span>TOTAL CITAS CLÍNICA</span><span className="tracking-normal">{anioActual} · sin canceladas</span></div>
+        <div className="mb-2 flex justify-between gap-2 text-[11px] font-medium tracking-[.09em] text-cyan-200/80"><span>TOTAL CITAS CLÍNICA</span><span className="tracking-normal">{anioActual}</span></div>
         <div className="grid grid-cols-2 gap-2">
           <div className="rounded-xl border border-cyan-500/20 px-3 py-2"><div className="text-xs text-white">Dr. Federico</div><div className="mt-1 text-lg font-semibold tabular-nums">{cargando?'…':errorDatos?'—':totalFede}</div></div>
           <div className="rounded-xl border border-cyan-500/20 px-3 py-2"><div className="text-xs text-white">Dra. Ana</div><div className="mt-1 text-lg font-semibold tabular-nums">{cargando?'…':errorDatos?'—':totalAna}</div></div>
         </div>
       </div>
       <div className="mt-4 flex items-center justify-between gap-2 border-b border-cyan-500/20 pb-2 text-xs"><strong>Citas de Martina</strong><span className="text-cyan-100/60">{citasSemana.length} en la semana</span></div>
-      <div className="mt-2 h-[135px] overflow-y-auto pr-1">
-        {citasSemana.length===0?<p className="flex h-full items-center justify-center text-center text-xs text-cyan-100/50">Sin intervenciones registradas en esta semana</p>:
-          citasSemana.map(c=><div key={c.id} className="grid grid-cols-[1.4fr_1fr_.65fr] gap-2 border-b border-cyan-500/10 py-2 text-xs"><span className="truncate" title={c.paciente}>{c.paciente}</span><span className="truncate text-cyan-100/70" title={c.motivo}>{c.motivo}{c.estimada?' · fecha provisional':''}</span><span className="truncate text-right text-cyan-100/60">{c.calendar_id==='ana'?'Ana':'Federico'}</span></div>)}
+      <div className="mt-2 h-[135px] overflow-y-auto pr-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-cyan-950/30 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-600/65 hover:[&::-webkit-scrollbar-thumb]:bg-cyan-400">
+        {citasSemana.length===0?<p className="flex h-full items-center justify-center text-center text-xs text-cyan-100/50">Sin citas de Martina para esta semana</p>:
+          citasSemana.map(c=><div key={c.id} className="grid grid-cols-[1.4fr_1fr_.65fr] gap-2 border-b border-cyan-500/10 py-2 text-xs"><span className="truncate" title={c.paciente}>{c.paciente}</span><span className="truncate text-cyan-100/70" title={c.motivo}>{c.motivo}</span><span className="truncate text-right text-cyan-100/60">{c.calendar_id==='ana'?'Ana':'Federico'}</span></div>)}
       </div>
       {errorDatos?<p className="mt-2 flex gap-1 text-xs text-amber-200"><AlertCircle className="h-4 w-4 shrink-0"/>{errorDatos}. El histórico verificado de Martina sigue disponible.</p>:null}
       <button type="button" onClick={()=>setInspeccionar(true)} className="mt-3 ml-auto flex items-center gap-2 rounded-xl border border-cyan-400/35 px-3 py-2 text-xs font-semibold text-cyan-100 hover:bg-cyan-400/10"><ChartNoAxesCombined className="h-4 w-4"/> Inspeccionar</button>
@@ -488,7 +522,7 @@ useEffect(() => {
         <label className="space-y-1 text-xs text-cyan-100/70">Año<select value={anioInspeccion} onChange={e=>setAnioInspeccion(e.target.value)} className="w-full rounded-lg bg-[#123F4A] p-2 text-white">{opcionesAnios.map(y=><option key={y} value={y}>{y}</option>)}</select></label>
         <label className="space-y-1 text-xs text-cyan-100/70">Mes<select value={mesInspeccion} onChange={e=>setMesInspeccion(e.target.value)} className="w-full rounded-lg bg-[#123F4A] p-2 text-white"><option value="todos">Todo el año</option>{Array.from({length:12},(_,i)=><option key={i} value={String(i+1)}>{new Intl.DateTimeFormat('es-ES',{month:'long'}).format(new Date(2026,i,1))}</option>)}</select></label>
         <label className="space-y-1 text-xs text-cyan-100/70">Profesional<select value={profInspeccion} onChange={e=>setProfInspeccion(e.target.value)} className="w-full rounded-lg bg-[#123F4A] p-2 text-white"><option value="todos">Todos</option><option value="fede">Dr. Federico</option><option value="ana">Dra. Ana</option></select></label>
-        <label className="space-y-1 text-xs text-cyan-100/70">Estado<select value={estadoInspeccion} onChange={e=>setEstadoInspeccion(e.target.value)} className="w-full rounded-lg bg-[#123F4A] p-2 text-white"><option value="vigentes">Vigentes (sin canceladas)</option><option value="finalizada">Finalizadas</option><option value="pendiente">Pendientes</option><option value="no_ha_venido">No asistió</option><option value="cancelada">Canceladas</option><option value="todos">Todos los estados</option></select></label>
+        <label className="space-y-1 text-xs text-cyan-100/70">Estado<select value={estadoInspeccion} onChange={e=>setEstadoInspeccion(e.target.value)} className="w-full rounded-lg bg-[#123F4A] p-2 text-white"><option value="vigentes">Vigentes</option><option value="finalizada">Finalizadas</option><option value="pendiente">Pendientes</option><option value="no_ha_venido">No asistió</option><option value="cancelada">Canceladas</option><option value="todos">Todos los estados</option></select></label>
         <label className="space-y-1 text-xs text-cyan-100/70">Tipo<select value={motivoInspeccion} onChange={e=>setMotivoInspeccion(e.target.value)} className="w-full rounded-lg bg-[#123F4A] p-2 text-white"><option value="todos">Todos</option><option value="primera">Primeras visitas</option><option value="otras">Otros tratamientos</option></select></label>
       </div>
       <div className="my-4 grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -496,9 +530,8 @@ useEffect(() => {
       </div>
       <div className="overflow-hidden rounded-2xl border border-cyan-500/20 bg-[#082C36]">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-cyan-500/20 p-4"><h3 className="text-sm font-semibold">Detalle verificable de citas</h3><label className="flex items-center gap-2 rounded-lg border border-cyan-500/30 px-3 py-2 text-xs"><Search className="h-4 w-4 text-cyan-200"/><input aria-label="Buscar paciente o tratamiento" value={buscarInspeccion} onChange={e=>setBuscarInspeccion(e.target.value)} placeholder="Buscar paciente o tratamiento" className="w-48 bg-transparent text-white outline-none placeholder:text-cyan-100/40"/></label></div>
-        <div className="max-h-[55vh] overflow-auto"><table className="w-full min-w-[680px] text-left text-xs"><thead className="sticky top-0 bg-[#0D3742] text-cyan-100/80"><tr><th className="p-3">Fecha</th><th className="p-3">Paciente</th><th className="p-3">Motivo</th><th className="p-3">Profesional</th><th className="p-3">Estado</th></tr></thead><tbody>{inspeccion.map(c=><tr key={c.id} className="border-t border-cyan-500/10"><td className="p-3">{c.fecha_inicio?fechaCorta.format(new Date(c.fecha_inicio)):'—'}</td><td className="p-3">{c.nombre_paciente||'—'}</td><td className="p-3">{c.motivo||'—'}</td><td className="p-3">{profesionalGrupo(c)==='ana'?'Dra. Ana':profesionalGrupo(c)==='fede'?'Dr. Federico':'Otro'}</td><td className="p-3">{etiquetaEstado(c.estado)}</td></tr>)}{inspeccion.length===0?<tr><td className="p-5 text-center text-cyan-100/50" colSpan={5}>{cargando?'Cargando…':'Sin citas para estos filtros'}</td></tr>:null}</tbody></table></div>
+        <div className="max-h-[55vh] overflow-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-cyan-950/30 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-600/65"><table className="w-full min-w-[680px] text-left text-xs"><thead className="sticky top-0 bg-[#0D3742] text-cyan-100/80"><tr><th className="p-3">Fecha</th><th className="p-3">Paciente</th><th className="p-3">Motivo</th><th className="p-3">Profesional</th><th className="p-3">Estado</th></tr></thead><tbody>{inspeccion.map(c=><tr key={c.id} className="border-t border-cyan-500/10"><td className="p-3">{c.fecha_inicio?fechaCorta.format(new Date(c.fecha_inicio)):'—'}</td><td className="p-3">{c.nombre_paciente||'—'}</td><td className="p-3">{c.motivo||'—'}</td><td className="p-3">{profesionalGrupo(c)==='ana'?'Dra. Ana':profesionalGrupo(c)==='fede'?'Dr. Federico':'Otro'}</td><td className="p-3"><EstadoConPunto estado={c.estado}/></td></tr>)}{inspeccion.length===0?<tr><td className="p-5 text-center text-cyan-100/50" colSpan={5}>{cargando?'Cargando…':'Sin citas para estos filtros'}</td></tr>:null}</tbody></table></div>
       </div>
-      <p className="mt-3 text-xs text-cyan-100/60">Las primeras visitas incluyen cualquier origen, también Martina, y todas las vigentes del periodo, aunque estén pendientes. La actividad se fecha por día de cita. Para verificar facturas selecciona Dra. Ana + Finalizadas; un estado incompleto en Supabase puede requerir revisión.</p>
     </div>
   </div>:null;
 
@@ -635,3 +668,4 @@ return (
 };
 
 export default DashboardClientProvisional;
+
