@@ -410,7 +410,7 @@ useEffect(() => {
   // clases responsive evitan desbordamientos en pantallas pequeñas.
   const contenido = (
     <div className="grid grid-cols-1 gap-5 xl:grid-cols-2 xl:gap-7">
-<section className="relative overflow-hidden rounded-[28px] border border-cyan-400/35 bg-[#031B24] p-4 text-white shadow-[0_12px_35px_rgba(0,0,0,.3),0_0_19px_rgba(34,211,238,.075),inset_0_1px_0_rgba(165,243,252,.045)] transition-all duration-300 hover:-translate-y-0.5 hover:border-cyan-200/90 hover:bg-[#0A3541] hover:shadow-[0_0_18px_rgba(34,211,238,.40),0_0_30px_rgba(34,211,238,.13)] sm:p-5">
+<section className="relative overflow-hidden rounded-[28px] border border-cyan-400/35 bg-[#031B24] p-4 text-white shadow-[0_12px_35px_rgba(0,0,0,.3),0_0_19px_rgba(34,211,238,.075),inset_0_1px_0_rgba(165,243,252,.045)] sm:p-5">
         {/* Título fino, halo del icono y caja oscura: sin gradiente luminoso superior. */}
         <div className="flex items-start justify-between gap-2 sm:gap-4">
           <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
@@ -422,7 +422,7 @@ useEffect(() => {
   CITAS CREADAS
 </h2>
           </div>
-          <div className="shrink-0 rounded-xl border border-cyan-400/30 bg-[#082B35] px-2.5 py-1.5 text-center shadow-[0_0_14px_rgba(34,211,238,.08)] sm:px-3 sm:py-2">
+<div className="group shrink-0 rounded-xl border border-cyan-300/45 bg-[#082B35] px-2.5 py-1.5 text-center shadow-[0_0_12px_rgba(34,211,238,.10)] transition-all duration-300 hover:-translate-y-0.5 hover:border-cyan-200/90 hover:bg-[#0A3541] hover:shadow-[0_0_18px_rgba(34,211,238,.40),0_0_30px_rgba(34,211,238,.13)] sm:px-3 sm:py-2">
             <div className="flex items-baseline justify-center gap-2 sm:gap-3">
               <span className="text-[9px] font-normal uppercase tracking-[.12em] text-cyan-100/70 sm:text-[10px]">TOTAL</span>
               <strong className="text-[26px] font-semibold leading-none tabular-nums text-white sm:text-[30px]">{cargando?'…':martina.length}</strong>
