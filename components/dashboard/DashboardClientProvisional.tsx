@@ -313,44 +313,41 @@ function clasificarSeguimiento(citas:CitaDB[],gestiones:GestionSeguimiento[],hoy
   }).sort((a,b)=>(b.primera.fecha_inicio||'').localeCompare(a.primera.fecha_inicio||''));
 }
 function DonutSeguimiento({valores}:{valores:number[]}) {
-  // Gráfico de sectores COMPLETOS, con una separación fina y halo de cada color.
-  // La suma de los ángulos es 360°; separamos solo los bordes, sin agujero central.
+  // Sectores de una sola circunferencia: nunca se desplaza el centro de cada
+  // porción, porque eso crea los huecos triangulares visibles en la versión anterior.
   const total = valores.reduce((a,b)=>a+b,0);
   const colores = [estilosSeg.pendiente.hex,estilosSeg.curso.hex,estilosSeg.finalizado.hex,estilosSeg.no_continua.hex];
   const activos = valores.filter(v=>v>0).length;
-  let angulo=-90;
-  const sectores=valores.flatMap((valor,i)=>{
-    if(valor<=0 || !total)return [];
-    const amplitud=360*valor/total;
-    const corte=activos>1?Math.min(1.3,amplitud/7):0;
-    const inicio=angulo+corte, fin=angulo+amplitud-corte;
-    angulo+=amplitud;
-    const medio=(inicio+fin)/2*Math.PI/180;
-    const desplazamiento=activos>1?2.2:0;
-    const cx=100+Math.cos(medio)*desplazamiento;
-    const cy=100+Math.sin(medio)*desplazamiento;
-    const radio=76;
-    const punto=(a:number)=>{
-      const rad=a*Math.PI/180;
-      return `${(cx+radio*Math.cos(rad)).toFixed(3)} ${(cy+radio*Math.sin(rad)).toFixed(3)}`;
+  const centro = 100;
+  const radio = 81;
+  let angulo = -90;
+  const sectores = valores.flatMap((valor,i)=>{
+    if(valor<=0 || total===0) return [];
+    const amplitud = 360*valor/total;
+    // Separación muy fina: los sectores comparten centro y radio.
+    const margen = activos>1 ? Math.min(0.85,amplitud/10) : 0;
+    const inicio = angulo+margen;
+    const fin = angulo+amplitud-margen;
+    angulo += amplitud;
+    const punto = (grados:number) => {
+      const rad=grados*Math.PI/180;
+      return `${(centro+radio*Math.cos(rad)).toFixed(3)} ${(centro+radio*Math.sin(rad)).toFixed(3)}`;
     };
-    const d=`M ${cx.toFixed(3)} ${cy.toFixed(3)} L ${punto(inicio)} A ${radio} ${radio} 0 ${fin-inicio>180?1:0} 1 ${punto(fin)} Z`;
+    const d = `M ${centro} ${centro} L ${punto(inicio)} A ${radio} ${radio} 0 ${fin-inicio>180?1:0} 1 ${punto(fin)} Z`;
     return [{id:i,d,color:colores[i]}];
   });
-  return <svg viewBox="0 0 200 200" className="h-[130px] w-[130px] shrink-0 overflow-visible sm:h-[174px] sm:w-[174px]" role="img" aria-label={`Distribución de ${total} primeras visitas: ${valores[0]} pendientes, ${valores[1]} en tratamiento, ${valores[2]} finalizadas y ${valores[3]} no continúan`}>
+  return <svg viewBox="0 0 200 200" className="h-[142px] w-[142px] shrink-0 sm:h-[184px] sm:w-[184px]" role="img" aria-label={`Distribución de ${total} primeras visitas: ${valores[0]} pendientes, ${valores[1]} en tratamiento, ${valores[2]} finalizadas y ${valores[3]} no continúan`}>
     <defs>
-      <filter id="martina-seguimiento-halo" x="-35%" y="-35%" width="170%" height="170%">
-        <feGaussianBlur stdDeviation="3.0"/>
-      </filter>
+      <filter id="martina-seguimiento-halo" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.4"/></filter>
     </defs>
     {activos===1 ? <>
-      <circle cx="100" cy="100" r="76" fill={colores[valores.findIndex(v=>v>0)]} opacity="0.52" filter="url(#martina-seguimiento-halo)"/>
-      <circle cx="100" cy="100" r="76" fill={colores[valores.findIndex(v=>v>0)]}/>
+      <circle cx={centro} cy={centro} r={radio} fill={colores[valores.findIndex(v=>v>0)]} opacity="0.35" filter="url(#martina-seguimiento-halo)"/>
+      <circle cx={centro} cy={centro} r={radio} fill={colores[valores.findIndex(v=>v>0)]}/>
     </> : sectores.map(p=><g key={p.id}>
-      <path d={p.d} fill={p.color} opacity="0.52" filter="url(#martina-seguimiento-halo)"/>
+      <path d={p.d} fill={p.color} opacity="0.35" filter="url(#martina-seguimiento-halo)"/>
       <path d={p.d} fill={p.color}/>
     </g>)}
-    {total===0&&<circle cx="100" cy="100" r="76" fill="#0A303B" stroke="#145063" strokeWidth="1"/>}
+    {total===0&&<circle cx={centro} cy={centro} r={radio} fill="#0A303B" stroke="#145063" strokeWidth="1"/>}
   </svg>;
 }
 
@@ -540,8 +537,8 @@ function CajaSeguimiento({citas,cargando,errorDatos}:{citas:CitaDB[];cargando:bo
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-cyan-400/[.055] shadow-[0_0_22px_rgba(34,211,238,.17)] sm:h-10 sm:w-10"><HeartPulse className="h-5 w-5 text-cyan-300"/></div>
             <h2 className="text-[11px] font-normal uppercase tracking-[.08em] text-cyan-200 sm:text-sm sm:tracking-[.10em]">SEGUIMIENTO</h2>
           </div>
-          {/* Copia literal del contador de CITAS CREADAS: cambia solo el contenido. */}
-          <div className="group w-[201px] shrink-0 rounded-xl border border-cyan-300/45 bg-[#082B35] px-2.5 py-1.5 text-center shadow-[0_0_12px_rgba(34,211,238,.10)] transition-all duration-300 hover:-translate-y-0.5 hover:border-cyan-200/90 hover:bg-[#0A3541] hover:shadow-[0_0_18px_rgba(34,211,238,.40),0_0_30px_rgba(34,211,238,.13)] sm:px-3 sm:py-2">
+          {/* Mismo ancho visual que CITAS CREADAS (202px): no depender de clases dinámicas de Tailwind. */}
+          <div style={{width:202,maxWidth:'50%'}} className="group shrink-0 rounded-xl border border-cyan-300/45 bg-[#082B35] px-2.5 py-1.5 text-center shadow-[0_0_12px_rgba(34,211,238,.10)] transition-all duration-300 hover:-translate-y-0.5 hover:border-cyan-200/90 hover:bg-[#0A3541] hover:shadow-[0_0_18px_rgba(34,211,238,.40),0_0_30px_rgba(34,211,238,.13)] sm:px-3 sm:py-2">
             <div className="flex items-baseline justify-center gap-2 sm:gap-3"><span className="text-[9px] font-normal uppercase tracking-[.12em] text-cyan-100/70 sm:text-[10px]">TOTAL</span><strong className="text-[26px] font-semibold leading-none tabular-nums text-white sm:text-[30px]">{cargandoTodo?'…':errorTodo?'—':registros.length}</strong></div>
             <div className="mt-1 text-[9px] leading-tight text-cyan-100/65 sm:text-[10px]">Primeras visitas</div>
           </div>
@@ -1048,6 +1045,7 @@ return (
 };
 
 export default DashboardClientProvisional;
+
 
 
 
