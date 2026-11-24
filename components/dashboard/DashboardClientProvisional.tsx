@@ -247,10 +247,10 @@ type FilaSeguimiento = {
 };
 const scrollSeguimiento = '[scrollbar-width:thin] [scrollbar-color:rgba(103,232,249,.22)_transparent] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-300/20 hover:[&::-webkit-scrollbar-thumb]:bg-cyan-300/35';
 const estilosSeg = {
-  pendiente:{dot:'bg-red-500',color:'text-red-300',hex:'#F35B6B',capsula:'border-red-500/40 bg-red-500/[.09] text-red-200'},
-  curso:{dot:'bg-amber-400',color:'text-amber-200',hex:'#F7A81B',capsula:'border-amber-400/40 bg-amber-400/[.09] text-amber-100'},
-  finalizado:{dot:'bg-green-400',color:'text-green-200',hex:'#44D17A',capsula:'border-green-400/40 bg-green-400/[.09] text-green-100'},
-  no_continua:{dot:'bg-violet-400',color:'text-violet-200',hex:'#A678FF',capsula:'border-violet-400/40 bg-violet-400/[.09] text-violet-100'}
+  pendiente:{dot:'bg-red-600',color:'text-red-300',hex:'#DC2626',capsula:'border-red-500/40 bg-red-500/[.09] text-red-200'},
+  curso:{dot:'bg-yellow-400',color:'text-yellow-200',hex:'#FACC15',capsula:'border-yellow-400/40 bg-yellow-400/[.09] text-yellow-100'},
+  finalizado:{dot:'bg-green-400',color:'text-green-200',hex:'#4ADE80',capsula:'border-green-400/40 bg-green-400/[.09] text-green-100'},
+  no_continua:{dot:'bg-violet-400',color:'text-violet-200',hex:'#A78BFA',capsula:'border-violet-400/40 bg-violet-400/[.09] text-violet-100'}
 };
 function fechaCitaSeg(fecha:string|null) {
   return fecha ? new Date(fecha).toLocaleDateString('es-ES',{day:'numeric',month:'short',year:'2-digit',timeZone:'Europe/Madrid'}) : 'Sin cita';
@@ -313,36 +313,44 @@ function clasificarSeguimiento(citas:CitaDB[],gestiones:GestionSeguimiento[],hoy
   }).sort((a,b)=>(b.primera.fecha_inicio||'').localeCompare(a.primera.fecha_inicio||''));
 }
 function DonutSeguimiento({valores}:{valores:number[]}) {
-  const total=valores.reduce((s,n)=>s+n,0);
-  const colores=[estilosSeg.pendiente.hex,estilosSeg.curso.hex,estilosSeg.finalizado.hex,estilosSeg.no_continua.hex];
+  // Gráfico de sectores COMPLETOS, con una separación fina y halo de cada color.
+  // La suma de los ángulos es 360°; separamos solo los bordes, sin agujero central.
+  const total = valores.reduce((a,b)=>a+b,0);
+  const colores = [estilosSeg.pendiente.hex,estilosSeg.curso.hex,estilosSeg.finalizado.hex,estilosSeg.no_continua.hex];
+  const activos = valores.filter(v=>v>0).length;
   let angulo=-90;
-  const activos=valores.filter(v=>v>0).length;
-  const sectores=valores.map((valor,i)=>{
-    if(valor<=0||total===0)return null;
-    const amplitud=valor/total*360;
-    const hueco=activos>1?Math.min(1.5,amplitud/8):0;
-    const inicio=angulo+hueco;
-    const fin=angulo+amplitud-hueco;
-    const medio=(inicio+fin)/2*Math.PI/180;
-    const cx=100+Math.cos(medio)*(activos>1?2.6:0);
-    const cy=100+Math.sin(medio)*(activos>1?2.6:0);
-    const punto=(grados:number)=>{
-      const rad=grados*Math.PI/180;
-      return `${cx+73*Math.cos(rad)} ${cy+73*Math.sin(rad)}`;
-    };
-    const d=`M ${cx} ${cy} L ${punto(inicio)} A 73 73 0 ${fin-inicio>180?1:0} 1 ${punto(fin)} Z`;
+  const sectores=valores.flatMap((valor,i)=>{
+    if(valor<=0 || !total)return [];
+    const amplitud=360*valor/total;
+    const corte=activos>1?Math.min(1.3,amplitud/7):0;
+    const inicio=angulo+corte, fin=angulo+amplitud-corte;
     angulo+=amplitud;
-    return {id:i,d,color:colores[i]};
-  }).filter((x):x is {id:number;d:string;color:string}=>Boolean(x));
-  return <svg viewBox="0 0 200 200" className="h-[132px] w-[132px] shrink-0 sm:h-[156px] sm:w-[156px]" role="img" aria-label={`Distribución de ${total} primeras visitas: ${valores[0]} pendientes, ${valores[1]} en tratamiento, ${valores[2]} finalizadas y ${valores[3]} no continúan`}>
+    const medio=(inicio+fin)/2*Math.PI/180;
+    const desplazamiento=activos>1?2.2:0;
+    const cx=100+Math.cos(medio)*desplazamiento;
+    const cy=100+Math.sin(medio)*desplazamiento;
+    const radio=76;
+    const punto=(a:number)=>{
+      const rad=a*Math.PI/180;
+      return `${(cx+radio*Math.cos(rad)).toFixed(3)} ${(cy+radio*Math.sin(rad)).toFixed(3)}`;
+    };
+    const d=`M ${cx.toFixed(3)} ${cy.toFixed(3)} L ${punto(inicio)} A ${radio} ${radio} 0 ${fin-inicio>180?1:0} 1 ${punto(fin)} Z`;
+    return [{id:i,d,color:colores[i]}];
+  });
+  return <svg viewBox="0 0 200 200" className="h-[130px] w-[130px] shrink-0 overflow-visible sm:h-[174px] sm:w-[174px]" role="img" aria-label={`Distribución de ${total} primeras visitas: ${valores[0]} pendientes, ${valores[1]} en tratamiento, ${valores[2]} finalizadas y ${valores[3]} no continúan`}>
     <defs>
-      <filter id="martina-pie-halo" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="4.2"/></filter>
+      <filter id="martina-seguimiento-halo" x="-35%" y="-35%" width="170%" height="170%">
+        <feGaussianBlur stdDeviation="3.0"/>
+      </filter>
     </defs>
-    {sectores.map(p=><g key={p.id}>
-      <path d={p.d} fill={p.color} opacity=".50" filter="url(#martina-pie-halo)"/>
-      <path d={p.d} fill={p.color} stroke={p.color} strokeWidth="1.2" strokeLinejoin="round"/>
+    {activos===1 ? <>
+      <circle cx="100" cy="100" r="76" fill={colores[valores.findIndex(v=>v>0)]} opacity="0.52" filter="url(#martina-seguimiento-halo)"/>
+      <circle cx="100" cy="100" r="76" fill={colores[valores.findIndex(v=>v>0)]}/>
+    </> : sectores.map(p=><g key={p.id}>
+      <path d={p.d} fill={p.color} opacity="0.52" filter="url(#martina-seguimiento-halo)"/>
+      <path d={p.d} fill={p.color}/>
     </g>)}
-    {total===0&&<circle cx="100" cy="100" r="73" fill="#0A303B" stroke="#145063" strokeWidth="1"/>}
+    {total===0&&<circle cx="100" cy="100" r="76" fill="#0A303B" stroke="#145063" strokeWidth="1"/>}
   </svg>;
 }
 
@@ -516,7 +524,7 @@ function CajaSeguimiento({citas,cargando,errorDatos}:{citas:CitaDB[];cargando:bo
       </span>
     </div>;
   };
-  const indicador=(titulo:string,n:number,i:number)=><div key={titulo} className="flex items-center gap-2 text-[11px] text-cyan-100/85"><span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{backgroundColor:[estilosSeg.pendiente.hex,estilosSeg.curso.hex,estilosSeg.finalizado.hex,estilosSeg.no_continua.hex][i]}}/><span className="min-w-0 flex-1">{titulo}</span><strong className="font-semibold tabular-nums text-white">{cargandoTodo||errorTodo?'—':n}</strong></div>;
+  const indicador=(titulo:string,n:number,i:number)=><div key={titulo} className="grid grid-cols-[10px_max-content_20px] items-center gap-x-1.5 whitespace-nowrap text-[10px] text-cyan-100/85 sm:text-[11px]"><span className="h-2.5 w-2.5 rounded-full" style={{backgroundColor:[estilosSeg.pendiente.hex,estilosSeg.curso.hex,estilosSeg.finalizado.hex,estilosSeg.no_continua.hex][i]}}/><span>{titulo}:</span><strong className="text-right font-semibold tabular-nums text-white">{cargandoTodo||errorTodo?'—':n}</strong></div>;
   const opciones=[
     {label:'Año',value:anio,set:setAnio,opts:[{value:'todos',label:'Todos los años'},...anos.map(a=>({value:a,label:a}))]},
     {label:'Mes',value:mes,set:setMes,opts:[{value:'todos',label:'Todo el año'},...Array.from({length:12},(_,i)=>({value:String(i+1),label:new Intl.DateTimeFormat('es-ES',{month:'long'}).format(new Date(2026,i,1))}))]},
@@ -534,15 +542,15 @@ function CajaSeguimiento({citas,cargando,errorDatos}:{citas:CitaDB[];cargando:bo
           </div>
           {/* Copia literal del contador de CITAS CREADAS: cambia solo el contenido. */}
           <div className="group w-[201px] shrink-0 rounded-xl border border-cyan-300/45 bg-[#082B35] px-2.5 py-1.5 text-center shadow-[0_0_12px_rgba(34,211,238,.10)] transition-all duration-300 hover:-translate-y-0.5 hover:border-cyan-200/90 hover:bg-[#0A3541] hover:shadow-[0_0_18px_rgba(34,211,238,.40),0_0_30px_rgba(34,211,238,.13)] sm:px-3 sm:py-2">
-            <div className="flex items-baseline justify-evenly gap-2 sm:gap-3"><span className="text-[9px] font-normal uppercase tracking-[.12em] text-cyan-100/70 sm:text-[10px]">TOTAL</span><strong className="text-[26px] font-semibold leading-none tabular-nums text-white sm:text-[30px]">{cargandoTodo?'…':errorTodo?'—':registros.length}</strong></div>
+            <div className="flex items-baseline justify-center gap-2 sm:gap-3"><span className="text-[9px] font-normal uppercase tracking-[.12em] text-cyan-100/70 sm:text-[10px]">TOTAL</span><strong className="text-[26px] font-semibold leading-none tabular-nums text-white sm:text-[30px]">{cargandoTodo?'…':errorTodo?'—':registros.length}</strong></div>
             <div className="mt-1 text-[9px] leading-tight text-cyan-100/65 sm:text-[10px]">Primeras visitas</div>
           </div>
         </div>
         <div aria-hidden="true" className="mt-3 h-px w-full shrink-0 bg-cyan-300/75 shadow-[0_0_10px_rgba(34,211,238,.75)]"/>
         {/* Gráfico relleno de sectores separados, acabado mate + halo propio. Sin caja. */}
-        <div className="mt-2 flex shrink-0 items-center justify-center gap-3 sm:gap-6">
-          <div className="flex shrink-0 justify-center"><DonutSeguimiento valores={cargandoTodo||errorTodo?[0,0,0,0]:historico}/></div>
-          <div className="grid min-w-0 flex-1 grid-cols-1 gap-2.5 sm:max-w-[285px]">
+        <div className="mt-2 flex min-w-0 shrink-0 items-center justify-center gap-2.5 sm:gap-5">
+           <div className="flex shrink-0 items-center justify-center"><DonutSeguimiento valores={cargandoTodo||errorTodo?[0,0,0,0]:historico}/></div>
+           <div className="flex min-w-0 shrink-0 flex-col gap-2 sm:gap-2.5">
             {indicador('Citas pendientes',historico[0],0)}
             {indicador('En tratamiento',historico[1],1)}
             {indicador('TTO finalizado',historico[2],2)}
@@ -1040,5 +1048,7 @@ return (
 };
 
 export default DashboardClientProvisional;
+
+
 
 
