@@ -603,13 +603,12 @@ return (
     <div className="hidden lg:block h-full overflow-y-auto p-8 pb-24 bg-[#02141B] text-white">
       <div className="mb-10 flex items-center justify-between gap-8">
         <div>
-          <<h1 className="flex items-center gap-3 text-2xl font-bold text-white mb-4">
-            ¡Hola {nombreUsuario || '...'}!
-
-            <span className="text-cyan-300 text-3xl drop-shadow-[0_0_12px_rgba(34,211,238,.8)]">
-              ✦
-            </span>
-          </h1>
+          <h1 className="flex items-center gap-2 text-[2rem] leading-none font-bold text-white whitespace-nowrap">
+      ¡Hola {nombreUsuario || '...'}!
+      <span className="text-cyan-300 text-[1.35rem] drop-shadow-[0_0_12px_rgba(34,211,238,.8)]">
+        ✦
+      </span>
+    </h1>
 
           <div className="inline-flex items-center gap-3 rounded-full border border-cyan-400/20 bg-cyan-500/10 px-5 py-2.5 text-cyan-100 text-sm font-medium shadow-[0_0_20px_rgba(34,211,238,.08)]">
             <span
