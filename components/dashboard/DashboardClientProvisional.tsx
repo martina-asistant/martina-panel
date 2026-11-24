@@ -560,7 +560,7 @@ useEffect(() => {
 
   // Inspeccionar mantiene los filtros y los cálculos originales. Solo cambia la presentación.
   const inspector = inspeccionar ? (
-    <div role="dialog" aria-modal="true" aria-label="Inspeccionar actividad clínica" className={`fixed inset-0 z-[100] overflow-y-auto bg-[#02141B]/95 px-3 py-4 text-white backdrop-blur-lg sm:px-6 sm:py-6 lg:px-10 lg:py-8 ${scrollCyan}`}>
+    <div role="dialog" aria-modal="true" aria-label="Inspeccionar actividad clínica" className={`fixed inset-0 z-[100] overflow-y-auto bg-[#02141B]/95 px-2 py-4 text-white backdrop-blur-lg sm:px-6 sm:py-6 lg:px-10 lg:py-8 ${scrollCyan}`}>
       <div className="mx-auto max-w-6xl space-y-5 pb-10 sm:space-y-7">
         {/* Cabecera idéntica en lenguaje visual a Citas creadas; título blanco. */}
         <div className="flex items-center justify-between gap-3 border-b border-cyan-300/35 pb-3 shadow-[0_1px_0_rgba(34,211,238,.06)] sm:pb-4">
@@ -576,7 +576,7 @@ useEffect(() => {
         {/* Filtros con menú Martina propio: colores cian en todas las opciones, también en Windows. */}
         <section className="relative z-30 rounded-[22px] border border-cyan-400/25 bg-cyan-400/[.035] px-3 py-3 shadow-[0_0_24px_rgba(34,211,238,.065),inset_0_1px_0_rgba(165,243,252,.035)] sm:px-5 sm:py-3.5">
           <h3 className="mb-2.5 text-[11px] font-normal uppercase tracking-[.12em] text-cyan-200 sm:mb-3 sm:text-xs">FILTROS DE ACTIVIDAD</h3>
-          <div className="grid grid-cols-2 gap-x-2.5 gap-y-2.5 sm:gap-x-4 sm:gap-y-3 lg:grid-cols-5">
+          <div className="grid grid-cols-3 gap-x-2 gap-y-2.5 sm:gap-x-4 sm:gap-y-3 lg:grid-cols-5">
             {([
               {label:'Año',value:anioInspeccion,change:setAnioInspeccion,options:opcionesAnios.map(y=>({value:y,label:y}))},
               {label:'Mes',value:mesInspeccion,change:setMesInspeccion,options:[{value:'todos',label:'Todo el año'},...Array.from({length:12},(_,i)=>{const mes=new Intl.DateTimeFormat('es-ES',{month:'long'}).format(new Date(2026,i,1));return {value:String(i+1),label:mes.charAt(0).toUpperCase()+mes.slice(1)};})]},
@@ -612,11 +612,11 @@ useEffect(() => {
         </section>
 
         {/* Indicadores más pequeños y separados: efecto flotante al pasar el ratón. */}
-        <div className="grid grid-cols-2 justify-items-center gap-x-4 gap-y-5 py-2 sm:flex sm:flex-wrap sm:items-center sm:justify-center sm:gap-9 sm:py-3 lg:gap-14">
+        <div className="grid grid-cols-4 items-center justify-items-center gap-x-1 gap-y-2 py-2 sm:flex sm:flex-wrap sm:items-center sm:justify-center sm:gap-9 sm:py-3 lg:gap-14">
           {([['TOTAL FILTRADO',inspeccion.length],['DR. FEDERICO',inspeccion.filter(c=>profesionalGrupo(c)==='fede').length],['DRA. ANA',inspeccion.filter(c=>profesionalGrupo(c)==='ana').length],['PRIMERAS VISITAS',primerasVisitasPeriodo]] as [string,number][]).map(([titulo,valor])=>(
-            <div key={titulo} className="group flex h-[106px] w-[106px] shrink-0 flex-col items-center justify-center gap-1 rounded-full border border-cyan-300/35 bg-[radial-gradient(circle_at_50%_35%,#0E3945_0%,#05232D_75%,#031820_100%)] px-2 text-center shadow-[0_0_14px_rgba(34,211,238,.08),inset_0_0_14px_rgba(34,211,238,.045)] transition-all duration-300 hover:-translate-y-1 hover:border-cyan-200/85 hover:shadow-[0_0_18px_rgba(34,211,238,.38),0_0_38px_rgba(34,211,238,.20),inset_0_0_20px_rgba(34,211,238,.10)] sm:h-[120px] sm:w-[120px]">
-              <strong className="text-[26px] font-semibold leading-none tabular-nums text-white drop-shadow-[0_0_12px_rgba(103,232,249,.15)] sm:text-[31px]">{valor}</strong>
-              <span className="max-w-[94px] text-[8px] font-medium uppercase leading-tight tracking-[.035em] text-cyan-200/80 group-hover:text-cyan-100 sm:max-w-[112px] sm:text-[9px]">{titulo}</span>
+            <div key={titulo} className="group flex h-[clamp(65px,20vw,88px)] w-[clamp(65px,20vw,88px)] min-w-0 shrink-0 flex-col items-center justify-center gap-0.5 rounded-full border border-cyan-300/35 bg-[radial-gradient(circle_at_50%_35%,#0E3945_0%,#05232D_75%,#031820_100%)] px-2 text-center shadow-[0_0_14px_rgba(34,211,238,.08),inset_0_0_14px_rgba(34,211,238,.045)] transition-all duration-300 hover:-translate-y-1 hover:border-cyan-200/85 hover:shadow-[0_0_18px_rgba(34,211,238,.38),0_0_38px_rgba(34,211,238,.20),inset_0_0_20px_rgba(34,211,238,.10)] sm:h-[120px] sm:w-[120px]">
+              <strong className="text-[clamp(19px,5.8vw,26px)] font-semibold leading-none tabular-nums text-white drop-shadow-[0_0_12px_rgba(103,232,249,.15)] sm:text-[31px]">{valor}</strong>
+              <span className="max-w-[94px] px-0.5 text-[clamp(6px,1.85vw,8px)] font-medium uppercase leading-tight tracking-[.015em] text-cyan-200/80 group-hover:text-cyan-100 sm:max-w-[112px] sm:text-[9px] sm:tracking-[.035em]">{titulo}</span>
             </div>
           ))}
         </div>
@@ -711,7 +711,7 @@ return (
       {contenido}
     </div>
     {/* MOBILE */}
-    <div className="lg:hidden h-[calc(100dvh-190px)] overflow-y-auto bg-[#02141B] text-white px-5 pt-6 pb-32 overflow-x-hidden">
+    <div className="lg:hidden h-[calc(100dvh-190px)] overflow-y-auto bg-[#02141B] text-white px-3 pt-6 pb-32 overflow-x-hidden">
   <div className="mb-7">    
 <h1 className="flex items-center gap-2 text-[2rem] leading-none font-bold text-white whitespace-nowrap">
       ¡Hola {nombreUsuario || '...'}!
@@ -774,5 +774,4 @@ return (
 };
 
 export default DashboardClientProvisional;
-
 
