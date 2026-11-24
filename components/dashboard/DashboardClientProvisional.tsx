@@ -534,7 +534,7 @@ function CajaSeguimiento({citas,cargando,errorDatos}:{citas:CitaDB[];cargando:bo
           </div>
           {/* Copia literal del contador de CITAS CREADAS: cambia solo el contenido. */}
           <div className="group w-[201px] shrink-0 rounded-xl border border-cyan-300/45 bg-[#082B35] px-2.5 py-1.5 text-center shadow-[0_0_12px_rgba(34,211,238,.10)] transition-all duration-300 hover:-translate-y-0.5 hover:border-cyan-200/90 hover:bg-[#0A3541] hover:shadow-[0_0_18px_rgba(34,211,238,.40),0_0_30px_rgba(34,211,238,.13)] sm:px-3 sm:py-2">
-            <div className="flex items-baseline justify-center gap-2 sm:gap-3"><span className="text-[9px] font-normal uppercase tracking-[.12em] text-cyan-100/70 sm:text-[10px]">TOTAL</span><strong className="text-[26px] font-semibold leading-none tabular-nums text-white sm:text-[30px]">{cargandoTodo?'…':errorTodo?'—':registros.length}</strong></div>
+            <div className="flex items-baseline justify-evenly gap-2 sm:gap-3"><span className="text-[9px] font-normal uppercase tracking-[.12em] text-cyan-100/70 sm:text-[10px]">TOTAL</span><strong className="text-[26px] font-semibold leading-none tabular-nums text-white sm:text-[30px]">{cargandoTodo?'…':errorTodo?'—':registros.length}</strong></div>
             <div className="mt-1 text-[9px] leading-tight text-cyan-100/65 sm:text-[10px]">Primeras visitas</div>
           </div>
         </div>
