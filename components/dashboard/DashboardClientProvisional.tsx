@@ -603,7 +603,7 @@ return (
     <div className="hidden lg:block h-full overflow-y-auto p-8 pb-24 bg-[#02141B] text-white">
       <div className="mb-10 flex items-center justify-between gap-8">
         <div>
-          <h1 className="flex items-center gap-2 text-[2rem] leading-none font-bold text-white whitespace-nowrap">
+          <h1 className="mb-4 flex items-center gap-2 text-[2rem] leading-none font-bold text-white whitespace-nowrap">
       ¡Hola {nombreUsuario || '...'}!
       <span className="text-cyan-300 text-[1.35rem] drop-shadow-[0_0_12px_rgba(34,211,238,.8)]">
         ✦
