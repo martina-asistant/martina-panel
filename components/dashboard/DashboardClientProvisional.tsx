@@ -315,11 +315,27 @@ function compilarMartina(citas:CitaDB[], cambios:CambioDB[]) {
 }
 
 function CajaPendiente({titulo, icono:Icon}:{titulo:string;icono:typeof Bot}) {
-  return <section className="flex min-h-[280px] flex-col rounded-3xl border border-cyan-500/20 bg-[rgba(5,28,37,.85)] p-5 shadow-[0_0_24px_rgba(34,211,238,.045)]">
-    <div className="flex items-center gap-2 text-cyan-200"><Icon className="h-5 w-5"/><h2 className="text-sm font-semibold tracking-[.14em]">{titulo}</h2></div>
-    <div className="flex flex-1 flex-col items-center justify-center gap-3 text-slate-400"><ClipboardList className="h-9 w-9 text-cyan-300/35"/><span className="text-sm">En desarrollo</span></div>
-  </section>;
+  return (
+    <section className="group relative flex min-h-[280px] flex-col overflow-hidden rounded-[28px] border border-cyan-400/30 bg-[radial-gradient(ellipse_at_85%_0%,rgba(15,111,128,.20),transparent_58%),linear-gradient(150deg,#062B35_0%,#031C25_55%,#02141B_100%)] p-5 text-white shadow-[0_12px_40px_rgba(0,0,0,.23),0_0_22px_rgba(34,211,238,.085),inset_0_1px_0_rgba(165,243,252,.07)] transition-shadow duration-300 hover:shadow-[0_14px_44px_rgba(0,0,0,.3),0_0_32px_rgba(34,211,238,.17)] sm:p-6">
+      <div aria-hidden="true" className="pointer-events-none absolute -right-20 -top-24 h-48 w-48 rounded-full bg-cyan-400/10 blur-[65px]" />
+      <div className="relative flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-300/25 bg-cyan-300/[.07] shadow-[0_0_22px_rgba(34,211,238,.12)]">
+          <Icon className="h-5 w-5 text-cyan-300 drop-shadow-[0_0_9px_rgba(103,232,249,.55)]" />
+        </div>
+        <h2 className="text-sm font-semibold uppercase tracking-[.18em] text-cyan-200 drop-shadow-[0_0_12px_rgba(34,211,238,.28)]">{titulo}</h2>
+      </div>
+      <div className="relative flex flex-1 flex-col items-center justify-center gap-3 text-cyan-100/55">
+        <div className="rounded-2xl border border-cyan-400/10 bg-cyan-400/[.035] p-4">
+          <ClipboardList className="h-7 w-7 text-cyan-300/45" />
+        </div>
+        <span className="text-xs tracking-wide">En desarrollo</span>
+      </div>
+    </section>
+  );
 }
+
+const tarjetaGlow = 'relative overflow-hidden rounded-[28px] border border-cyan-400/30 bg-[radial-gradient(ellipse_at_92%_0%,rgba(18,117,134,.19),transparent_56%),linear-gradient(150deg,#062B35_0%,#031C25_60%,#02141B_100%)] text-white shadow-[0_12px_40px_rgba(0,0,0,.25),0_0_25px_rgba(34,211,238,.09),inset_0_1px_0_rgba(165,243,252,.065)]';
+const scrollCyan = '[&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-cyan-950/40 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-500/55 hover:[&::-webkit-scrollbar-thumb]:bg-cyan-300/80';
 
 interface Props {
   initialConvs?: unknown[];
@@ -476,64 +492,100 @@ useEffect(() => {
       && (profInspeccion==='todos'||profesionalGrupo(c)===profInspeccion);
   }).length,[citasUnicas,anioInspeccion,mesInspeccion,profInspeccion]);
 
-  const contenido = <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
-    <section className="rounded-3xl border border-cyan-500/25 bg-[rgba(5,28,37,.9)] p-4 text-white shadow-[0_0_30px_rgba(34,211,238,.06)]">
-      <div className="flex items-start justify-between gap-3">
-        <div><div className="flex items-center gap-2 text-cyan-200"><CalendarCheck2 className="h-5 w-5"/><h2 className="text-sm font-semibold tracking-[.14em]">CITAS CREADAS</h2></div><p className="mt-1 text-xs text-cyan-100/65">Actividad de Martina</p></div>
-        <div className="min-w-[98px] rounded-xl border border-cyan-400/20 bg-cyan-400/10 px-3 py-2 text-center"><div className="text-[10px] tracking-[.12em] text-cyan-100/75">MARTINA · TOTAL</div><div className="mt-0.5 text-2xl font-semibold tabular-nums">{cargando?'…':martina.length}</div><div className="mt-1 text-[10px] text-cyan-100/60">Citas gestionadas</div></div>
-      </div>
-      <div className="my-3 border-t border-cyan-500/20"/>
-      <div className="flex items-center justify-center gap-3">
-        <button type="button" aria-label="Semana anterior" onClick={()=>setDesplazamiento(n=>n-1)} className="rounded-xl border border-cyan-500/30 p-2 text-cyan-200 hover:bg-cyan-500/15"><ChevronLeft className="h-4 w-4"/></button>
-        <div className="min-w-[167px] text-center text-sm font-semibold tabular-nums">{mesES.format(lunes)} – {mesES.format(dias[dias.length-1])}</div>
-        <button type="button" aria-label="Semana siguiente" disabled={desplazamiento>=0} onClick={()=>setDesplazamiento(n=>Math.min(0,n+1))} className="rounded-xl border border-cyan-500/30 p-2 text-cyan-200 hover:bg-cyan-500/15 disabled:opacity-30"><ChevronRight className="h-4 w-4"/></button>
-      </div>
-      <button type="button" onClick={()=>setMostrarFinde(v=>!v)} className="mx-auto mt-2 block text-[11px] text-cyan-200/70 underline underline-offset-4 hover:text-cyan-100">{mostrarFinde?'Mostrar lunes a viernes':'Ver también sábado y domingo'}</button>
-      <div className="mt-3 rounded-2xl border border-cyan-500/15 bg-cyan-950/30 px-4 py-3">
-        <div className="mb-3 text-xs text-cyan-100/70">Citas de Martina · por día de cita</div>
-        <div className="flex h-[130px] items-end gap-3">
-          {dias.map((d,i)=><div key={claveLocal(d)} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-2"><span className="text-[11px] tabular-nums text-cyan-100/80">{barras[i]}</span><div className="flex h-[94px] w-full items-end justify-center"><div className="w-full max-w-9 rounded-t-md bg-cyan-400/75" style={{height:`${barras[i]===0 ? 0 : Math.max(3,barras[i]/mayorBarra*100)}%`}} /></div><span className="text-xs text-cyan-100/75">{['L','M','X','J','V','S','D'][i]}</span></div>)}
+  const contenido = (
+    <div className="grid grid-cols-1 gap-6 xl:grid-cols-2 xl:gap-7">
+      <section className={`${tarjetaGlow} p-5 sm:p-6`}>
+        <div aria-hidden="true" className="pointer-events-none absolute -right-12 -top-24 h-52 w-52 rounded-full bg-cyan-400/[.08] blur-[65px]" />
+        {/* Cabecera compacta, con la cifra integrada en la composición */}
+        <div className="relative flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-cyan-300/30 bg-cyan-400/[.08] shadow-[0_0_22px_rgba(34,211,238,.15)]">
+              <CalendarCheck2 className="h-6 w-6 text-cyan-300 drop-shadow-[0_0_9px_rgba(103,232,249,.62)]" />
+            </div>
+            <div>
+              <h2 className="text-sm font-semibold uppercase tracking-[.19em] text-cyan-200 drop-shadow-[0_0_12px_rgba(34,211,238,.3)] sm:text-base">CITAS CREADAS</h2>
+              <p className="mt-1 text-xs text-cyan-100/55">Actividad de Martina</p>
+            </div>
+          </div>
+          <div className="flex items-baseline gap-2 rounded-xl border border-cyan-300/20 bg-cyan-300/[.065] px-3 py-2 shadow-[inset_0_1px_0_rgba(165,243,252,.08),0_0_16px_rgba(34,211,238,.06)]">
+            <div className="text-right"><div className="text-[10px] uppercase tracking-[.13em] text-cyan-100/65">Martina · total</div><div className="mt-0.5 text-[10px] text-cyan-100/45">Citas gestionadas</div></div>
+            <strong className="text-3xl font-bold leading-none tabular-nums text-white drop-shadow-[0_0_15px_rgba(103,232,249,.22)]">{cargando?'…':martina.length}</strong>
+          </div>
         </div>
-      </div>
-      <div className="mt-4 border-t border-cyan-500/20 pt-3">
-        <div className="mb-2 flex justify-between gap-2 text-[11px] font-medium tracking-[.09em] text-cyan-200/80"><span>TOTAL CITAS CLÍNICA</span><span className="tracking-normal">{anioActual}</span></div>
-        <div className="grid grid-cols-2 gap-2">
-          <div className="rounded-xl border border-cyan-500/20 px-3 py-2"><div className="text-xs text-white">Dr. Federico</div><div className="mt-1 text-lg font-semibold tabular-nums">{cargando?'…':errorDatos?'—':totalFede}</div></div>
-          <div className="rounded-xl border border-cyan-500/20 px-3 py-2"><div className="text-xs text-white">Dra. Ana</div><div className="mt-1 text-lg font-semibold tabular-nums">{cargando?'…':errorDatos?'—':totalAna}</div></div>
+        <div className="relative mt-5 flex items-center justify-center gap-3 rounded-2xl border border-cyan-400/15 bg-[#041F29]/80 px-3 py-3 shadow-[inset_0_1px_0_rgba(165,243,252,.04)]">
+          <button type="button" aria-label="Semana anterior" onClick={()=>setDesplazamiento(n=>n-1)} className="rounded-xl border border-cyan-400/35 bg-cyan-400/[.07] p-2 text-cyan-200 shadow-[0_0_12px_rgba(34,211,238,.07)] transition hover:border-cyan-300/70 hover:bg-cyan-400/20"><ChevronLeft className="h-4 w-4"/></button>
+          <div className="min-w-[152px] text-center text-sm font-semibold tabular-nums text-white sm:text-base">{mesES.format(lunes)} – {mesES.format(dias[dias.length-1])}</div>
+          <button type="button" aria-label="Semana siguiente" disabled={desplazamiento>=0} onClick={()=>setDesplazamiento(n=>Math.min(0,n+1))} className="rounded-xl border border-cyan-400/35 bg-cyan-400/[.07] p-2 text-cyan-200 transition hover:border-cyan-300/70 hover:bg-cyan-400/20 disabled:cursor-not-allowed disabled:opacity-30"><ChevronRight className="h-4 w-4"/></button>
         </div>
-      </div>
-      <div className="mt-4 flex items-center justify-between gap-2 border-b border-cyan-500/20 pb-2 text-xs"><strong>Citas de Martina</strong><span className="text-cyan-100/60">{citasSemana.length} en la semana</span></div>
-      <div className="mt-2 h-[135px] overflow-y-auto pr-1 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-cyan-950/30 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-600/65 hover:[&::-webkit-scrollbar-thumb]:bg-cyan-400">
-        {citasSemana.length===0?<p className="flex h-full items-center justify-center text-center text-xs text-cyan-100/50">Sin citas de Martina para esta semana</p>:
-          citasSemana.map(c=><div key={c.id} className="grid grid-cols-[1.4fr_1fr_.65fr] gap-2 border-b border-cyan-500/10 py-2 text-xs"><span className="truncate" title={c.paciente}>{c.paciente}</span><span className="truncate text-cyan-100/70" title={c.motivo}>{c.motivo}</span><span className="truncate text-right text-cyan-100/60">{c.calendar_id==='ana'?'Ana':'Federico'}</span></div>)}
-      </div>
-      {errorDatos?<p className="mt-2 flex gap-1 text-xs text-amber-200"><AlertCircle className="h-4 w-4 shrink-0"/>{errorDatos}. El histórico verificado de Martina sigue disponible.</p>:null}
-      <button type="button" onClick={()=>setInspeccionar(true)} className="mt-3 ml-auto flex items-center gap-2 rounded-xl border border-cyan-400/35 px-3 py-2 text-xs font-semibold text-cyan-100 hover:bg-cyan-400/10"><ChartNoAxesCombined className="h-4 w-4"/> Inspeccionar</button>
-    </section>
-    <CajaPendiente titulo="SEGUIMIENTO" icono={HeartPulse}/>
-    <CajaPendiente titulo="LABORATORIO" icono={FlaskConical}/>
-    <CajaPendiente titulo="GESTIÓN MARTINA" icono={Bot}/>
-  </div>;
+        <div className="mt-2 text-center"><button type="button" onClick={()=>setMostrarFinde(v=>!v)} className="text-[11px] text-cyan-200/65 underline decoration-cyan-500/35 underline-offset-4 transition hover:text-cyan-100">{mostrarFinde?'Mostrar lunes a viernes':'Ver también sábado y domingo'}</button></div>
+        <div className="mt-4 rounded-2xl border border-cyan-400/20 bg-[linear-gradient(180deg,rgba(10,58,71,.72),rgba(4,29,39,.65))] px-4 py-4 shadow-[inset_0_1px_0_rgba(165,243,252,.045)]">
+          <div className="mb-4 text-xs font-medium tracking-wide text-cyan-100/75">Citas de Martina <span className="font-normal text-cyan-100/45">· por fecha de cita</span></div>
+          <div className="flex h-[130px] items-end gap-3">
+            {dias.map((d,i)=><div key={claveLocal(d)} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-2"><span className="text-[11px] tabular-nums text-cyan-100/80">{barras[i]}</span><div className="flex h-[94px] w-full items-end justify-center border-b border-cyan-400/20"><div className="w-full max-w-9 rounded-t-md bg-[linear-gradient(180deg,#67E8F9,#0891B2)] shadow-[0_0_16px_rgba(34,211,238,.28)]" style={{height:`${barras[i]===0 ? 0 : Math.max(3,barras[i]/mayorBarra*100)}%`}} /></div><span className="text-xs font-medium text-cyan-100/75">{['L','M','X','J','V','S','D'][i]}</span></div>)}
+          </div>
+        </div>
+        <div className="mt-5">
+          <div className="mb-3 flex items-center justify-between gap-3"><h3 className="text-[11px] font-semibold uppercase tracking-[.13em] text-cyan-200/90">Total citas clínica</h3><span className="text-[11px] text-cyan-100/50">{anioActual}</span></div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-2xl border border-cyan-400/20 bg-cyan-300/[.05] px-3 py-3 shadow-[inset_0_1px_0_rgba(165,243,252,.06)]"><div className="text-xs text-cyan-100/75">Dr. Federico</div><div className="mt-1 text-2xl font-semibold tabular-nums text-white">{cargando?'…':errorDatos?'—':totalFede}</div></div>
+            <div className="rounded-2xl border border-cyan-400/20 bg-cyan-300/[.05] px-3 py-3 shadow-[inset_0_1px_0_rgba(165,243,252,.06)]"><div className="text-xs text-cyan-100/75">Dra. Ana</div><div className="mt-1 text-2xl font-semibold tabular-nums text-white">{cargando?'…':errorDatos?'—':totalAna}</div></div>
+          </div>
+        </div>
+        <div className="mt-5 flex items-center justify-between gap-2 border-b border-cyan-400/20 pb-3 text-xs"><strong className="text-cyan-50">Citas de Martina</strong><span className="text-cyan-100/55">{citasSemana.length} en la semana</span></div>
+        <div className={`mt-2 h-[135px] overflow-y-auto pr-1 ${scrollCyan}`}>
+          {citasSemana.length===0?<p className="flex h-full items-center justify-center text-center text-xs text-cyan-100/50">Sin citas de Martina para esta semana</p>:
+            citasSemana.map(c=><div key={c.id} className="grid grid-cols-[1.4fr_1fr_.65fr] gap-2 border-b border-cyan-500/10 py-2.5 text-xs"><span className="truncate text-white" title={c.paciente}>{c.paciente}</span><span className="truncate text-cyan-100/70" title={c.motivo}>{c.motivo}</span><span className="truncate text-right text-cyan-100/60">{c.calendar_id==='ana'?'Ana':'Federico'}</span></div>)}
+        </div>
+        {errorDatos?<p className="mt-2 flex gap-1 text-xs text-amber-200"><AlertCircle className="h-4 w-4 shrink-0"/>{errorDatos}. El histórico verificado de Martina sigue disponible.</p>:null}
+        <button type="button" onClick={()=>setInspeccionar(true)} className="mt-4 ml-auto flex items-center gap-2 rounded-full border border-cyan-300/45 bg-cyan-400/[.08] px-5 py-2.5 text-xs font-semibold uppercase tracking-[.1em] text-cyan-100 shadow-[0_0_16px_rgba(34,211,238,.12)] transition hover:border-cyan-200 hover:bg-cyan-400/20 hover:shadow-[0_0_24px_rgba(34,211,238,.26)]"><ChartNoAxesCombined className="h-4 w-4 text-cyan-300"/> Inspeccionar</button>
+      </section>
+      <CajaPendiente titulo="SEGUIMIENTO" icono={HeartPulse}/>
+      <CajaPendiente titulo="LABORATORIO" icono={FlaskConical}/>
+      <CajaPendiente titulo="GESTIÓN MARTINA" icono={Bot}/>
+    </div>
+  );
 
-  const inspector = inspeccionar ? <div role="dialog" aria-modal="true" aria-label="Inspeccionar actividad clínica" className="fixed inset-0 z-[100] overflow-y-auto bg-[#02141B]/95 p-4 text-white backdrop-blur-lg lg:p-10">
-    <div className="mx-auto max-w-6xl">
-      <div className="mb-6 flex items-center justify-between gap-4"><div><h2 className="flex items-center gap-2 text-2xl font-semibold"><ChartNoAxesCombined className="text-cyan-300"/> Inspeccionar</h2><p className="mt-1 text-xs text-cyan-200/70">Actividad clínica · auditoría de citas por profesional</p></div><button type="button" onClick={()=>setInspeccionar(false)} aria-label="Cerrar" className="rounded-xl border border-cyan-400/30 p-3 hover:bg-cyan-500/10"><X/></button></div>
-      <div className="grid grid-cols-2 gap-3 rounded-2xl border border-cyan-500/20 bg-[#082C36] p-4 md:grid-cols-5">
-        <label className="space-y-1 text-xs text-cyan-100/70">Año<select value={anioInspeccion} onChange={e=>setAnioInspeccion(e.target.value)} className="w-full rounded-lg bg-[#123F4A] p-2 text-white">{opcionesAnios.map(y=><option key={y} value={y}>{y}</option>)}</select></label>
-        <label className="space-y-1 text-xs text-cyan-100/70">Mes<select value={mesInspeccion} onChange={e=>setMesInspeccion(e.target.value)} className="w-full rounded-lg bg-[#123F4A] p-2 text-white"><option value="todos">Todo el año</option>{Array.from({length:12},(_,i)=><option key={i} value={String(i+1)}>{new Intl.DateTimeFormat('es-ES',{month:'long'}).format(new Date(2026,i,1))}</option>)}</select></label>
-        <label className="space-y-1 text-xs text-cyan-100/70">Profesional<select value={profInspeccion} onChange={e=>setProfInspeccion(e.target.value)} className="w-full rounded-lg bg-[#123F4A] p-2 text-white"><option value="todos">Todos</option><option value="fede">Dr. Federico</option><option value="ana">Dra. Ana</option></select></label>
-        <label className="space-y-1 text-xs text-cyan-100/70">Estado<select value={estadoInspeccion} onChange={e=>setEstadoInspeccion(e.target.value)} className="w-full rounded-lg bg-[#123F4A] p-2 text-white"><option value="vigentes">Vigentes</option><option value="finalizada">Finalizadas</option><option value="pendiente">Pendientes</option><option value="no_ha_venido">No asistió</option><option value="cancelada">Canceladas</option><option value="todos">Todos los estados</option></select></label>
-        <label className="space-y-1 text-xs text-cyan-100/70">Tipo<select value={motivoInspeccion} onChange={e=>setMotivoInspeccion(e.target.value)} className="w-full rounded-lg bg-[#123F4A] p-2 text-white"><option value="todos">Todos</option><option value="primera">Primeras visitas</option><option value="otras">Otros tratamientos</option></select></label>
-      </div>
-      <div className="my-4 grid grid-cols-2 gap-3 md:grid-cols-4">
-        {[['TOTAL FILTRADO',inspeccion.length],['DR. FEDERICO',inspeccion.filter(c=>profesionalGrupo(c)==='fede').length],['DRA. ANA',inspeccion.filter(c=>profesionalGrupo(c)==='ana').length],['PRIMERAS VISITAS',primerasVisitasPeriodo]].map(([titulo,valor])=><div key={String(titulo)} className="rounded-2xl border border-cyan-500/20 bg-[#082C36] p-4"><div className="text-[10px] tracking-wider text-cyan-200/75">{titulo}</div><div className="mt-2 text-3xl font-semibold tabular-nums">{valor}</div></div>)}
-      </div>
-      <div className="overflow-hidden rounded-2xl border border-cyan-500/20 bg-[#082C36]">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-cyan-500/20 p-4"><h3 className="text-sm font-semibold">Detalle verificable de citas</h3><label className="flex items-center gap-2 rounded-lg border border-cyan-500/30 px-3 py-2 text-xs"><Search className="h-4 w-4 text-cyan-200"/><input aria-label="Buscar paciente o tratamiento" value={buscarInspeccion} onChange={e=>setBuscarInspeccion(e.target.value)} placeholder="Buscar paciente o tratamiento" className="w-48 bg-transparent text-white outline-none placeholder:text-cyan-100/40"/></label></div>
-        <div className="max-h-[55vh] overflow-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-cyan-950/30 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-600/65"><table className="w-full min-w-[680px] text-left text-xs"><thead className="sticky top-0 bg-[#0D3742] text-cyan-100/80"><tr><th className="p-3">Fecha</th><th className="p-3">Paciente</th><th className="p-3">Motivo</th><th className="p-3">Profesional</th><th className="p-3">Estado</th></tr></thead><tbody>{inspeccion.map(c=><tr key={c.id} className="border-t border-cyan-500/10"><td className="p-3">{c.fecha_inicio?fechaCorta.format(new Date(c.fecha_inicio)):'—'}</td><td className="p-3">{c.nombre_paciente||'—'}</td><td className="p-3">{c.motivo||'—'}</td><td className="p-3">{profesionalGrupo(c)==='ana'?'Dra. Ana':profesionalGrupo(c)==='fede'?'Dr. Federico':'Otro'}</td><td className="p-3"><EstadoConPunto estado={c.estado}/></td></tr>)}{inspeccion.length===0?<tr><td className="p-5 text-center text-cyan-100/50" colSpan={5}>{cargando?'Cargando…':'Sin citas para estos filtros'}</td></tr>:null}</tbody></table></div>
+  const inspector = inspeccionar ? (
+    <div role="dialog" aria-modal="true" aria-label="Inspeccionar actividad clínica" className={`fixed inset-0 z-[100] overflow-y-auto bg-[#02141B]/95 p-4 text-white backdrop-blur-lg lg:p-10 ${scrollCyan}`}>
+      <div className="mx-auto max-w-6xl space-y-7 pb-10">
+        <div className="flex flex-wrap items-center justify-between gap-5 border-b border-cyan-400/15 pb-6">
+          <div>
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-cyan-300/35 bg-cyan-400/[.1] shadow-[0_0_23px_rgba(34,211,238,.16)]"><ChartNoAxesCombined className="h-6 w-6 text-cyan-300 drop-shadow-[0_0_10px_rgba(103,232,249,.55)]"/></div>
+              <h2 className="text-2xl font-semibold tracking-tight text-white drop-shadow-[0_0_18px_rgba(103,232,249,.22)] sm:text-3xl">Inspeccionar <span className="text-cyan-300">✦</span></h2>
+            </div>
+            <p className="mt-2 pl-1 text-sm text-cyan-100/60">Actividad clínica · análisis por profesional</p>
+          </div>
+          <button type="button" onClick={()=>setInspeccionar(false)} aria-label="Cerrar" className="rounded-full border border-cyan-400/45 bg-cyan-400/[.075] p-3 text-cyan-100 shadow-[0_0_15px_rgba(34,211,238,.13)] transition hover:bg-cyan-400/20 hover:shadow-[0_0_22px_rgba(34,211,238,.26)]"><X className="h-5 w-5"/></button>
+        </div>
+        <div className="relative overflow-hidden rounded-[26px] border border-cyan-400/30 bg-[radial-gradient(ellipse_at_100%_0%,rgba(15,125,142,.18),transparent_65%),#062A34] p-5 shadow-[0_0_27px_rgba(34,211,238,.085),inset_0_1px_0_rgba(165,243,252,.07)] sm:p-6">
+          <div className="mb-5 text-[11px] font-semibold uppercase tracking-[.19em] text-cyan-200 drop-shadow-[0_0_10px_rgba(34,211,238,.3)]">Filtros de actividad</div>
+          <div className="grid grid-cols-2 gap-x-4 gap-y-5 md:grid-cols-5">
+            <label className="block text-xs text-cyan-100/75">Año<select value={anioInspeccion} onChange={e=>setAnioInspeccion(e.target.value)} className="mt-2 w-full rounded-xl border border-cyan-400/20 bg-[#103C48] px-3 py-3 text-sm text-white outline-none transition focus:border-cyan-300/75 focus:ring-1 focus:ring-cyan-300/45">{opcionesAnios.map(y=><option key={y} value={y}>{y}</option>)}</select></label>
+            <label className="block text-xs text-cyan-100/75">Mes<select value={mesInspeccion} onChange={e=>setMesInspeccion(e.target.value)} className="mt-2 w-full rounded-xl border border-cyan-400/20 bg-[#103C48] px-3 py-3 text-sm text-white outline-none transition focus:border-cyan-300/75 focus:ring-1 focus:ring-cyan-300/45"><option value="todos">Todo el año</option>{Array.from({length:12},(_,i)=><option key={i} value={String(i+1)}>{new Intl.DateTimeFormat('es-ES',{month:'long'}).format(new Date(2026,i,1))}</option>)}</select></label>
+            <label className="block text-xs text-cyan-100/75">Profesional<select value={profInspeccion} onChange={e=>setProfInspeccion(e.target.value)} className="mt-2 w-full rounded-xl border border-cyan-400/20 bg-[#103C48] px-3 py-3 text-sm text-white outline-none transition focus:border-cyan-300/75 focus:ring-1 focus:ring-cyan-300/45"><option value="todos">Todos</option><option value="fede">Dr. Federico</option><option value="ana">Dra. Ana</option></select></label>
+            <label className="block text-xs text-cyan-100/75">Estado<select value={estadoInspeccion} onChange={e=>setEstadoInspeccion(e.target.value)} className="mt-2 w-full rounded-xl border border-cyan-400/20 bg-[#103C48] px-3 py-3 text-sm text-white outline-none transition focus:border-cyan-300/75 focus:ring-1 focus:ring-cyan-300/45"><option value="vigentes">Vigentes</option><option value="finalizada">Finalizadas</option><option value="pendiente">Pendientes</option><option value="no_ha_venido">No asistió</option><option value="cancelada">Canceladas</option><option value="todos">Todos los estados</option></select></label>
+            <label className="block text-xs text-cyan-100/75">Tipo<select value={motivoInspeccion} onChange={e=>setMotivoInspeccion(e.target.value)} className="mt-2 w-full rounded-xl border border-cyan-400/20 bg-[#103C48] px-3 py-3 text-sm text-white outline-none transition focus:border-cyan-300/75 focus:ring-1 focus:ring-cyan-300/45"><option value="todos">Todos</option><option value="primera">Primeras visitas</option><option value="otras">Otros tratamientos</option></select></label>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          {([['TOTAL FILTRADO',inspeccion.length],['DR. FEDERICO',inspeccion.filter(c=>profesionalGrupo(c)==='fede').length],['DRA. ANA',inspeccion.filter(c=>profesionalGrupo(c)==='ana').length],['PRIMERAS VISITAS',primerasVisitasPeriodo]] as [string,number][]).map(([titulo,valor])=><div key={titulo} className="relative overflow-hidden rounded-[24px] border border-cyan-400/30 bg-[radial-gradient(ellipse_at_90%_0%,rgba(15,117,135,.21),transparent_65%),#062A34] p-5 shadow-[0_0_23px_rgba(34,211,238,.09),inset_0_1px_0_rgba(165,243,252,.07)]"><div className="text-[11px] font-semibold tracking-[.12em] text-cyan-200/85">{titulo}</div><div className="mt-4 text-4xl font-semibold tabular-nums text-white drop-shadow-[0_0_12px_rgba(103,232,249,.18)]">{valor}</div></div>)}
+        </div>
+        <div className="overflow-hidden rounded-[26px] border border-cyan-400/30 bg-[#041D26] shadow-[0_0_30px_rgba(34,211,238,.085),inset_0_1px_0_rgba(165,243,252,.06)]">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-cyan-400/20 bg-[#082E39] px-5 py-5 sm:px-6">
+            <h3 className="text-sm font-semibold uppercase tracking-[.14em] text-cyan-200 drop-shadow-[0_0_10px_rgba(34,211,238,.24)]">Detalle de citas</h3>
+            <label className="flex items-center gap-2 rounded-full border border-cyan-400/30 bg-[#041D26] px-4 py-2.5 text-xs shadow-[inset_0_1px_0_rgba(165,243,252,.05)]"><Search className="h-4 w-4 text-cyan-300"/><input aria-label="Buscar paciente o tratamiento" value={buscarInspeccion} onChange={e=>setBuscarInspeccion(e.target.value)} placeholder="Buscar paciente o tratamiento" className="w-48 bg-transparent text-white outline-none placeholder:text-cyan-100/40"/></label>
+          </div>
+          <div className={`max-h-[55vh] overflow-auto ${scrollCyan}`}>
+            <table className="w-full min-w-[680px] text-left text-xs">
+              <thead className="sticky top-0 bg-[#0B3540] text-cyan-200"><tr>{['Fecha','Paciente','Motivo','Profesional','Estado'].map(t=><th key={t} className="px-4 py-4 font-semibold uppercase tracking-[.11em]">{t}</th>)}</tr></thead>
+              <tbody>{inspeccion.map(c=><tr key={c.id} className="border-t border-cyan-500/10 transition hover:bg-cyan-400/[.055]"><td className="px-4 py-3.5">{c.fecha_inicio?fechaCorta.format(new Date(c.fecha_inicio)):'—'}</td><td className="px-4 py-3.5 text-white">{c.nombre_paciente||'—'}</td><td className="px-4 py-3.5 text-cyan-100/75">{c.motivo||'—'}</td><td className="px-4 py-3.5">{profesionalGrupo(c)==='ana'?'Dra. Ana':profesionalGrupo(c)==='fede'?'Dr. Federico':'Otro'}</td><td className="px-4 py-3.5"><EstadoConPunto estado={c.estado}/></td></tr>)}{inspeccion.length===0?<tr><td className="p-8 text-center text-cyan-100/50" colSpan={5}>{cargando?'Cargando…':'Sin citas para estos filtros'}</td></tr>:null}</tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
-  </div>:null;
+  ) : null;
 
 
 return (
@@ -668,4 +720,5 @@ return (
 };
 
 export default DashboardClientProvisional;
+
 
