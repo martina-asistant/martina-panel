@@ -15,206 +15,12 @@ import { createClient } from '@/lib/supabase/client';
  * MARTINA PANEL — DashboardClientProvisional (vista independiente de prueba, 24/11/2026).
  * 1. Los encabezados del Dashboard original se han conservado literalmente.
  * 2. Ninguna escritura a Supabase/Google Calendar desde las estadísticas.
- * 3. Los 21 eventos históricos tienen fechas de cita y creación verificadas
- *    en el JSON de Google Calendar facilitado el 23/11/2026.
- * 4. Las modificaciones de Martina se leen de historial_citas_cambios si
- *    han quedado registradas. Las anteriores que no tengan trazabilidad
- *    no se inventan.
+ * 3. Las estadísticas se calculan exclusivamente a partir de Supabase.
+ * 4. Las modificaciones de Martina se leen de historial_citas_cambios
+ *    si están registradas, sin incrementar el número de citas.
  * 5. Inspeccionar es una vista local operativa, no requiere una ruta nueva.
  *    En el futuro puede trasladarse a /dashboard/inspeccionar.
  */
-
-const MARTINA_HISTORICA: CitaMartina[] = [
-  {
-    "id": "fede:dr0c4iu02712r2ksrsl3t17sg0",
-    "event_id": "dr0c4iu02712r2ksrsl3t17sg0",
-    "calendar_id": "fede",
-    "paciente": "Maricarmen Germán Mateo",
-    "motivo": "primera visita",
-    "fechaActividad": "2026-07-23T07:43:42.000Z",
-    "fechaCita": "2026-08-05T10:00:00+02:00"
-  },
-  {
-    "id": "fede:o0pp96kh55fmm7f29lkok0n8tc",
-    "event_id": "o0pp96kh55fmm7f29lkok0n8tc",
-    "calendar_id": "fede",
-    "paciente": "Victoria Balaguer Babiloni",
-    "motivo": "revisión general",
-    "fechaActividad": "2026-07-24T08:37:28.000Z",
-    "fechaCita": "2026-07-31T09:30:00+02:00"
-  },
-  {
-    "id": "fede:b7oh3lqg7ipt82asecsvooll9o",
-    "event_id": "b7oh3lqg7ipt82asecsvooll9o",
-    "calendar_id": "fede",
-    "paciente": "Nongo Nong",
-    "motivo": "primera visita",
-    "fechaActividad": "2026-07-25T09:07:18.000Z",
-    "fechaCita": "2026-07-27T13:30:00+02:00"
-  },
-  {
-    "id": "fede:dgk2mf57vo5lbfonlsmjrl2jhk",
-    "event_id": "dgk2mf57vo5lbfonlsmjrl2jhk",
-    "calendar_id": "fede",
-    "paciente": "Martín Sánchez Fernández",
-    "motivo": "revisión general",
-    "fechaActividad": "2026-07-27T09:19:56.000Z",
-    "fechaCita": "2026-07-29T11:00:00+02:00"
-  },
-  {
-    "id": "fede:0drvlu2sdlds1am7tdncu3bp0g",
-    "event_id": "0drvlu2sdlds1am7tdncu3bp0g",
-    "calendar_id": "fede",
-    "paciente": "Sara Toran Rosario",
-    "motivo": "primera visita",
-    "fechaActividad": "2026-07-27T16:24:14.000Z",
-    "fechaCita": "2026-07-31T10:00:00+02:00"
-  },
-  {
-    "id": "fede:mm9sv9qh2p5gf6hbs2q24rhde4",
-    "event_id": "mm9sv9qh2p5gf6hbs2q24rhde4",
-    "calendar_id": "fede",
-    "paciente": "Raúl Ibáñez Jiménez",
-    "motivo": "revision general",
-    "fechaActividad": "2026-07-31T08:59:10.000Z",
-    "fechaCita": "2026-08-03T12:30:00+02:00"
-  },
-  {
-    "id": "fede:9oh74iu7jnbqtdo4t7kh5d1214",
-    "event_id": "9oh74iu7jnbqtdo4t7kh5d1214",
-    "calendar_id": "fede",
-    "paciente": "Carlos López Ciprés",
-    "motivo": "revisión general",
-    "fechaActividad": "2026-08-10T07:14:11.000Z",
-    "fechaCita": "2026-08-11T10:30:00+02:00"
-  },
-  {
-    "id": "fede:8bc00id9bo1ll32ceqc8r20474",
-    "event_id": "8bc00id9bo1ll32ceqc8r20474",
-    "calendar_id": "fede",
-    "paciente": "Andrea Díaz Martínez",
-    "motivo": "primera visita",
-    "fechaActividad": "2026-08-10T10:25:10.000Z",
-    "fechaCita": "2026-08-11T12:15:00+02:00"
-  },
-  {
-    "id": "fede:k7sonu6m43ubldrpoh9kjla7ms",
-    "event_id": "k7sonu6m43ubldrpoh9kjla7ms",
-    "calendar_id": "fede",
-    "paciente": "Erick Mattei Gramada",
-    "motivo": "primera visita",
-    "fechaActividad": "2026-08-11T14:39:54.000Z",
-    "fechaCita": "2026-08-12T10:30:00+02:00"
-  },
-  {
-    "id": "fede:d883v7giii451pkksp79plqdg4",
-    "event_id": "d883v7giii451pkksp79plqdg4",
-    "calendar_id": "fede",
-    "paciente": "Raquel Sáenz Elipe",
-    "motivo": "primera visita",
-    "fechaActividad": "2026-08-11T17:17:30.000Z",
-    "fechaCita": "2026-08-12T11:15:00+02:00"
-  },
-  {
-    "id": "fede:up7c0ff8c3vec4oec8bp9o3u30",
-    "event_id": "up7c0ff8c3vec4oec8bp9o3u30",
-    "calendar_id": "fede",
-    "paciente": "Blas Punzano Gil",
-    "motivo": "Primera visita",
-    "fechaActividad": "2026-09-02T08:16:48.000Z",
-    "fechaCita": "2026-09-02T15:30:00+02:00"
-  },
-  {
-    "id": "fede:0bnk53ui10l3lcqaqdr8oam0co",
-    "event_id": "0bnk53ui10l3lcqaqdr8oam0co",
-    "calendar_id": "fede",
-    "paciente": "Chimo Rambla Barrachina",
-    "motivo": "primera visita",
-    "fechaActividad": "2026-09-07T08:22:57.000Z",
-    "fechaCita": "2026-09-08T18:15:00+02:00"
-  },
-  {
-    "id": "fede:sbiln80vlah5r8mb2gbl4v5lt4",
-    "event_id": "sbiln80vlah5r8mb2gbl4v5lt4",
-    "calendar_id": "fede",
-    "paciente": "Paola Valero Darmaz",
-    "motivo": "primera visita",
-    "fechaActividad": "2026-09-25T11:40:54.000Z",
-    "fechaCita": "2026-09-30T15:00:00+02:00"
-  },
-  {
-    "id": "fede:8a1912fdvjcnhc7q9cvdcdnh9k",
-    "event_id": "8a1912fdvjcnhc7q9cvdcdnh9k",
-    "calendar_id": "fede",
-    "paciente": "Joel Borreguero Hernández",
-    "motivo": "primera visita",
-    "fechaActividad": "2026-09-25T19:46:02.000Z",
-    "fechaCita": "2026-09-30T15:45:00+02:00"
-  },
-  {
-    "id": "fede:u9k990na0h8m4bppb6jbb284tk",
-    "event_id": "u9k990na0h8m4bppb6jbb284tk",
-    "calendar_id": "fede",
-    "paciente": "Josefina Blanco Tomaselo",
-    "motivo": "primera visita",
-    "fechaActividad": "2026-10-16T11:45:07.000Z",
-    "fechaCita": "2026-10-19T13:45:00+02:00"
-  },
-  {
-    "id": "fede:8g4mfn79m4nlj89hd4md718820",
-    "event_id": "8g4mfn79m4nlj89hd4md718820",
-    "calendar_id": "fede",
-    "paciente": "Roberto Sandoval Moraga",
-    "motivo": "Revisión general",
-    "fechaActividad": "2026-10-22T09:15:57.000Z",
-    "fechaCita": "2026-11-09T09:00:00+01:00"
-  },
-  {
-    "id": "fede:gb8sp6qsga4bhrrhtdesjn63ms",
-    "event_id": "gb8sp6qsga4bhrrhtdesjn63ms",
-    "calendar_id": "fede",
-    "paciente": "Chimo Dols Tarragón",
-    "motivo": "revisión general",
-    "fechaActividad": "2026-10-30T16:05:24.000Z",
-    "fechaCita": "2026-11-02T15:30:00+01:00"
-  },
-  {
-    "id": "fede:9ohvhrr0akvv1rdvi13q5f7s8c",
-    "event_id": "9ohvhrr0akvv1rdvi13q5f7s8c",
-    "calendar_id": "fede",
-    "paciente": "Joel Borreguero Hernández",
-    "motivo": "Revisión general",
-    "fechaActividad": "2026-11-07T21:04:33.000Z",
-    "fechaCita": "2026-11-09T14:00:00+01:00"
-  },
-  {
-    "id": "fede:0mdbt59oqbvt5ca8q28p4j5c3s",
-    "event_id": "0mdbt59oqbvt5ca8q28p4j5c3s",
-    "calendar_id": "fede",
-    "paciente": "Lautaro Lavia",
-    "motivo": "revisión general",
-    "fechaActividad": "2026-11-10T07:16:04.000Z",
-    "fechaCita": "2026-11-12T15:00:00+01:00"
-  },
-  {
-    "id": "fede:22qm4f8srjqbsuii359osig214",
-    "event_id": "22qm4f8srjqbsuii359osig214",
-    "calendar_id": "fede",
-    "paciente": "Enrique Soto Saravia",
-    "motivo": "Primera visita",
-    "fechaActividad": "2026-11-18T17:25:35.000Z",
-    "fechaCita": "2026-11-24T18:45:00+01:00"
-  },
-  {
-    "id": "fede:fvakvvpteajgndl6a2fms8r6fg",
-    "event_id": "fvakvvpteajgndl6a2fms8r6fg",
-    "calendar_id": "fede",
-    "paciente": "Carlos López Ciprés",
-    "motivo": "revisión general",
-    "fechaActividad": "2026-11-23T18:53:27.000Z",
-    "fechaCita": "2026-11-25T16:00:00+01:00"
-  }
-];
 
 type CitaDB = {
   id: string; event_id: string | null; calendar_id: string | null;
@@ -231,7 +37,7 @@ type CambioDB = {
 };
 type CitaMartina = {
   id: string; event_id: string; calendar_id: string; paciente: string;
-  motivo: string; fechaActividad: string; fechaCita: string | null; estimada?: boolean;
+  motivo: string; fechaActividad: string; fechaCita: string | null;
 };
 const fechaMadrid = new Intl.DateTimeFormat('en-CA', {
   timeZone: 'Europe/Madrid', year: 'numeric', month: '2-digit', day: '2-digit'
@@ -253,7 +59,7 @@ function lunesSemana(d: Date) { const x = new Date(d.getFullYear(),d.getMonth(),
 function claveLocal(d: Date) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 function esPrimeraVisita(m: string | null) { return /primera\s+visita|primera\s+consulta/.test(normalizar(m)); }
 function profesionalGrupo(c: CitaDB) { const agenda=normalizar(c.calendar_id||c.profesional); return agenda==='ana'?'ana':(agenda==='fede'||agenda==='celia'?'fede':'otro'); }
-function estadoVigente(c: CitaDB) { return normalizar(c.estado)!=='cancelada'; }
+function estadoVigente(c: CitaDB) { return !['cancelada', 'no_ha_venido', 'no asistio'].includes(normalizar(c.estado)); }
 function etiquetaEstado(e: string|null) {
   const s=normalizar(e);
   return ({finalizada:'Finalizada',pendiente:'Pendiente',cancelada:'Cancelada',no_ha_venido:'No asistió'} as Record<string,string>)[s] || (e||'Sin estado');
@@ -281,37 +87,50 @@ async function leerTodas<T>(supa: NonNullable<ReturnType<typeof createClient>>, 
   }
   return todos;
 }
-function compilarMartina(citas:CitaDB[], cambios:CambioDB[]) {
-  const registros=new Map<string,CitaMartina>();
-  const historico=new Map(MARTINA_HISTORICA.map(c=>[c.id,c]));
-  // Snapshot de origen Google Calendar: incluye el registro aún no enlazado a Supabase.
-  for(const c of MARTINA_HISTORICA) registros.set(c.id,c);
-  const primeraMod=new Map<string,string>();
-  for(const m of cambios) {
-    if(!esMartina(m.realizado_por)||!m.created_at) continue;
-    const previa=primeraMod.get(m.historial_cita_id);
-    if(!previa || new Date(m.created_at)<new Date(previa)) primeraMod.set(m.historial_cita_id,m.created_at);
+function compilarMartina(citas:CitaDB[], cambios:CambioDB[], historialCompleto:CitaDB[]) {
+  // Solo Supabase: origen de creación o una intervención registrada por Martina.
+  // Cada cita (agenda + event_id) se contabiliza una única vez.
+  const primeraMod = new Map<string, string>();
+  for (const m of cambios) {
+    if (!esMartina(m.realizado_por) || !m.created_at) continue;
+    const previa = primeraMod.get(m.historial_cita_id);
+    if (!previa || m.created_at < previa) primeraMod.set(m.historial_cita_id, m.created_at);
   }
-  for(const c of citas) {
-    const key=idDeCita(c);
-    const esCreacion=esMartina(c.origen);
-    const primera=primeraMod.get(c.id);
-    if(!esCreacion && !primera && !historico.has(key)) continue;
-    const h=historico.get(key);
-    // Si fue creada por Martina, su actividad es la creación (fecha GC verificada).
-    // En registros posteriores a la extracción, 'created_at' sirve provisionalmente;
-    // las importaciones previas no se atribuyen falsamente a noviembre.
-    const fechaActividad=h?.fechaActividad || (esCreacion ? c.created_at : primera);
-    if(!fechaActividad) continue;
-    registros.set(key,{
-      id:key,event_id:c.event_id||c.id,calendar_id:normalizar(c.calendar_id),
-      paciente:c.nombre_paciente||h?.paciente||'Paciente sin nombre',
-      motivo:c.motivo||h?.motivo||'Sin motivo',fechaActividad,
-      fechaCita:c.fecha_inicio || h?.fechaCita || null,
-      estimada:!h && esCreacion
+
+  // Si existen varias filas históricas de un mismo evento, una modificación
+  // registrada sobre cualquiera de ellas sigue identificando la misma cita.
+  const primeraModPorEvento = new Map<string, string>();
+  for (const c of historialCompleto) {
+    const fecha = primeraMod.get(c.id);
+    if (!fecha) continue;
+    const clave = idDeCita(c);
+    const previa = primeraModPorEvento.get(clave);
+    if (!previa || fecha < previa) primeraModPorEvento.set(clave, fecha);
+  }
+
+  const registros = new Map<string, CitaMartina>();
+  for (const c of citas) {
+    const esCreacion = esMartina(c.origen);
+    const primera = primeraModPorEvento.get(idDeCita(c));
+    if (!esCreacion && !primera) continue;
+
+    const clave = idDeCita(c);
+    const fechaActividad = (esCreacion ? c.created_at : primera) || c.updated_at || c.fecha_inicio;
+    if (!fechaActividad) continue;
+
+    registros.set(clave, {
+      id: clave,
+      event_id: c.event_id || c.id,
+      calendar_id: normalizar(c.calendar_id),
+      paciente: c.nombre_paciente || 'Paciente sin nombre',
+      motivo: c.motivo || 'Sin motivo',
+      fechaActividad,
+      fechaCita: c.fecha_inicio,
     });
   }
-  return Array.from(registros.values()).sort((a,b)=>new Date(b.fechaActividad).getTime()-new Date(a.fechaActividad).getTime());
+  return Array.from(registros.values()).sort((a, b) =>
+    new Date(b.fechaActividad).getTime() - new Date(a.fechaActividad).getTime()
+  );
 }
 
 function CajaPendiente({titulo, icono:Icon}:{titulo:string;icono:typeof Bot}) {
@@ -429,7 +248,7 @@ useEffect(() => {
     }
     return Array.from(porEvento.values());
   },[citas]);
-  const martina=useMemo(()=>compilarMartina(citasUnicas,cambios),[citasUnicas,cambios]);
+  const martina=useMemo(()=>compilarMartina(citasUnicas,cambios,citas),[citasUnicas,cambios,citas]);
   const lunes=useMemo(()=>moverDia(fechaBase,desplazamiento*7),[fechaBase,desplazamiento]);
   const dias=useMemo(()=>Array.from({length:mostrarFinde?7:5},(_,i)=>moverDia(lunes,i)),[lunes,mostrarFinde]);
   const diasClave=useMemo(()=>new Set(dias.map(claveLocal)),[dias]);
@@ -437,7 +256,7 @@ useEffect(() => {
   const barras=useMemo(()=>dias.map(d=>citasSemana.filter(c=>diaMadrid(c.fechaCita)===claveLocal(d)).length),[dias,citasSemana]);
   const mayorBarra=Math.max(5,...barras);
   // Resumen clínico anual: Dr. Federico incluye histórico de Celia internamente.
-  // Ningún total operativo incluye canceladas.
+  // Ningún total clínico incluye canceladas ni no asistidas.
   const anioActual=String(new Date().getFullYear());
   const clinicaAnual=useMemo(()=>citasUnicas.filter(c=>estadoVigente(c) && diaMadrid(c.fecha_inicio).slice(0,4)===anioActual),[citasUnicas,anioActual]);
   const totalFede=clinicaAnual.filter(c=>profesionalGrupo(c)==='fede').length;
@@ -549,7 +368,7 @@ useEffect(() => {
           {citasSemana.length===0?<p className="py-4 text-center text-xs text-cyan-100/50">Sin citas de Martina para esta semana</p>:
             citasSemana.map(c=><div key={c.id} className="grid grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,.7fr)] items-center gap-2 border-b border-cyan-500/10 py-2.5 text-[11px] sm:text-xs"><span className="truncate text-white" title={c.paciente}>{c.paciente}</span><span className="truncate text-cyan-100/70" title={c.motivo}>{c.motivo}</span><span className="truncate text-right text-cyan-100/60">{c.calendar_id==='ana'?'Ana':'Federico'}</span></div>)}
         </div>
-        {errorDatos?<p className="mt-2 flex gap-1 text-xs text-amber-200"><AlertCircle className="h-4 w-4 shrink-0"/>{errorDatos}. El histórico verificado de Martina sigue disponible.</p>:null}
+        {errorDatos?<p className="mt-2 flex gap-1 text-xs text-amber-200"><AlertCircle className="h-4 w-4 shrink-0"/>{errorDatos}. No se han podido actualizar las estadísticas desde Supabase.</p>:null}
         <div className="mt-2 flex justify-end"><button type="button" onClick={()=>setInspeccionar(true)} className="inline-flex items-center gap-1.5 rounded-full border border-cyan-300/45 bg-cyan-400/[.06] px-3.5 py-1.5 text-[10px] font-medium uppercase tracking-[.1em] text-cyan-100 shadow-[0_0_11px_rgba(34,211,238,.11)] transition hover:border-cyan-200 hover:bg-cyan-400/20 hover:shadow-[0_0_20px_rgba(34,211,238,.22)]"><ChartNoAxesCombined className="h-3.5 w-3.5 text-cyan-300"/> Inspeccionar</button></div>
       </section>
       <CajaPendiente titulo="SEGUIMIENTO" icono={HeartPulse}/>
@@ -774,4 +593,6 @@ return (
 };
 
 export default DashboardClientProvisional;
+
+
 
