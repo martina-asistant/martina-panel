@@ -640,14 +640,14 @@ return (
     {/* DESKTOP */}
     <div className="hidden lg:block rounded-3xl border border-cyan-500/20 bg-[rgba(5,18,24,.78)] backdrop-blur-xl overflow-hidden shadow-[0_0_35px_rgba(34,211,238,.10)]">
       <div className="w-full overflow-hidden">
-        <table className="w-full table-fixed text-sm">
+        <table className="w-full min-w-[1250px] table-fixed text-sm">
           <colgroup>
-            <col className="w-[17%]" />
-            <col className="w-[10%]" />
-            <col className="w-[10%]" />
-            <col className="w-[5%]" />
-            <col className="w-[30%]" />
-            <col className="w-[13%]" />
+            <col className="w-[19%]" />
+            <col className="w-[12%]" />
+            <col className="w-[12%]" />
+            <col className="w-[7%]" />
+            <col className="w-[19%]" />
+            <col className="w-[15%]" />
             <col className="w-[11%]" />
             <col className="w-[5%]" />
           </colgroup>
