@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { cn } from '@/lib/utils/cn';
 import {
-  MessageCircle, PhoneCall, CalendarCheck2, ChevronLeft, ChevronRight,
+  MessageCircle, PhoneCall, CalendarCheck2, ChevronLeft, ChevronRight, ChevronDown,
   ChartNoAxesCombined, ClipboardList, FlaskConical, Bot, HeartPulse,
   X, Search, AlertCircle
 } from 'lucide-react';
@@ -557,36 +557,63 @@ useEffect(() => {
     </div>
   );
 
+  // Inspeccionar mantiene los filtros y los cálculos originales. Solo cambia la presentación.
   const inspector = inspeccionar ? (
-    <div role="dialog" aria-modal="true" aria-label="Inspeccionar actividad clínica" className={`fixed inset-0 z-[100] overflow-y-auto bg-[#02141B]/95 p-4 text-white backdrop-blur-lg lg:p-10 ${scrollCyan}`}>
-      <div className="mx-auto max-w-6xl space-y-7 pb-10">
-        <div className="flex flex-wrap items-center justify-between gap-5 border-b border-cyan-400/15 pb-6">
-          <div>
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-cyan-300/35 bg-cyan-400/[.1] shadow-[0_0_23px_rgba(34,211,238,.16)]"><ChartNoAxesCombined className="h-6 w-6 text-cyan-300 drop-shadow-[0_0_10px_rgba(103,232,249,.55)]"/></div>
-              <h2 className="text-2xl font-semibold tracking-tight text-white drop-shadow-[0_0_18px_rgba(103,232,249,.22)] sm:text-3xl">Inspeccionar <span className="text-cyan-300">✦</span></h2>
+    <div role="dialog" aria-modal="true" aria-label="Inspeccionar actividad clínica" className={`fixed inset-0 z-[100] overflow-y-auto bg-[#02141B]/95 px-3 py-4 text-white backdrop-blur-lg sm:px-6 sm:py-6 lg:px-10 lg:py-8 ${scrollCyan}`}>
+      <div className="mx-auto max-w-6xl space-y-5 pb-10 sm:space-y-7">
+        {/* Cabecera idéntica en lenguaje visual a Citas creadas; título blanco. */}
+        <div className="flex items-center justify-between gap-3 border-b border-cyan-300/35 pb-3 shadow-[0_1px_0_rgba(34,211,238,.06)] sm:pb-4">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-cyan-400/[.055] shadow-[0_0_22px_rgba(34,211,238,.17)] sm:h-10 sm:w-10">
+              <ChartNoAxesCombined className="h-5 w-5 text-cyan-300 drop-shadow-[0_0_10px_rgba(103,232,249,.75)]" />
+            </span>
+            <h2 className="text-base font-normal uppercase tracking-[.08em] text-white drop-shadow-[0_0_10px_rgba(34,211,238,.20)] sm:text-lg sm:tracking-[.10em]">INSPECCIONAR</h2>
+          </div>
+          <button type="button" onClick={()=>setInspeccionar(false)} aria-label="Cerrar Inspeccionar" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-cyan-400/40 bg-cyan-400/[.05] text-cyan-100 shadow-[0_0_14px_rgba(34,211,238,.1)] transition hover:border-cyan-200 hover:bg-cyan-400/15 sm:h-10 sm:w-10"><X className="h-4 w-4 sm:h-5 sm:w-5"/></button>
+        </div>
+
+        {/* Filtros más ligeros, similares a las acciones del panel; 2 columnas compactas en móvil. */}
+        <section className="rounded-[24px] border border-cyan-400/25 bg-cyan-400/[.035] px-3 py-3 shadow-[0_0_24px_rgba(34,211,238,.065),inset_0_1px_0_rgba(165,243,252,.035)] sm:px-5 sm:py-5">
+          <h3 className="mb-3 text-[11px] font-normal uppercase tracking-[.12em] text-cyan-200 sm:mb-4 sm:text-xs">FILTROS DE ACTIVIDAD</h3>
+          <div className="grid grid-cols-2 gap-x-2.5 gap-y-2.5 sm:gap-4 lg:grid-cols-5">
+            {([
+              {label:'Año',value:anioInspeccion,change:setAnioInspeccion,options:opcionesAnios.map(y=>({value:y,label:y}))},
+              {label:'Mes',value:mesInspeccion,change:setMesInspeccion,options:[{value:'todos',label:'Todo el año'},...Array.from({length:12},(_,i)=>({value:String(i+1),label:new Intl.DateTimeFormat('es-ES',{month:'long'}).format(new Date(2026,i,1))}))]},
+              {label:'Profesional',value:profInspeccion,change:setProfInspeccion,options:[{value:'todos',label:'Todos'},{value:'fede',label:'Dr. Federico'},{value:'ana',label:'Dra. Ana'}]},
+              {label:'Estado',value:estadoInspeccion,change:setEstadoInspeccion,options:[{value:'vigentes',label:'Vigentes'},{value:'finalizada',label:'Finalizadas'},{value:'pendiente',label:'Pendientes'},{value:'no_ha_venido',label:'No asistió'},{value:'cancelada',label:'Canceladas'},{value:'todos',label:'Todos los estados'}]},
+              {label:'Tipo',value:motivoInspeccion,change:setMotivoInspeccion,options:[{value:'todos',label:'Todos'},{value:'primera',label:'Primeras visitas'},{value:'otras',label:'Otros tratamientos'}]},
+            ] as {label:string;value:string;change:(v:string)=>void;options:{value:string;label:string}[]}[]).map((f,i)=>(
+              <label key={f.label} className={`block min-w-0 text-[11px] text-cyan-100/70 sm:text-xs ${i===4?'col-span-2 lg:col-span-1':''}`}>
+                {f.label}
+                <span className="relative mt-1 block sm:mt-1.5">
+                  <select value={f.value} onChange={e=>f.change(e.target.value)} className="w-full appearance-none rounded-xl border border-cyan-400/25 bg-[#0A303B] py-2 pl-3 pr-9 text-xs text-white shadow-[inset_0_1px_0_rgba(165,243,252,.04)] outline-none transition hover:border-cyan-300/50 focus:border-cyan-300/75 focus:ring-1 focus:ring-cyan-300/35 sm:py-2.5 sm:text-sm">
+                    {f.options.map(o=><option key={o.value} value={o.value}>{o.label}</option>)}
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-cyan-200/85" aria-hidden="true" />
+                </span>
+              </label>
+            ))}
+          </div>
+        </section>
+
+        {/* Cuatro medallones compactos, centrados. Conservamos los indicadores originales. */}
+        <div className="grid grid-cols-2 justify-items-center gap-x-2 gap-y-4 py-1 sm:flex sm:flex-wrap sm:items-center sm:justify-center sm:gap-6 sm:py-2 lg:gap-10">
+          {([['TOTAL FILTRADO',inspeccion.length],['DR. FEDERICO',inspeccion.filter(c=>profesionalGrupo(c)==='fede').length],['DRA. ANA',inspeccion.filter(c=>profesionalGrupo(c)==='ana').length],['PRIMERAS VISITAS',primerasVisitasPeriodo]] as [string,number][]).map(([titulo,valor])=>(
+            <div key={titulo} className="flex h-[116px] w-[116px] flex-col items-center justify-center gap-1 rounded-full border border-cyan-300/35 bg-[radial-gradient(circle_at_50%_35%,#0E3945_0%,#05232D_75%,#031820_100%)] px-2 text-center shadow-[0_0_21px_rgba(34,211,238,.10),inset_0_0_14px_rgba(34,211,238,.045)] sm:h-[138px] sm:w-[138px]">
+              <strong className="text-[27px] font-semibold leading-none tabular-nums text-white drop-shadow-[0_0_12px_rgba(103,232,249,.15)] sm:text-[34px]">{valor}</strong>
+              <span className="max-w-[100px] text-[9px] font-medium uppercase leading-tight tracking-[.045em] text-cyan-200/80 sm:max-w-[120px] sm:text-[10px]">{titulo}</span>
             </div>
-            <p className="mt-2 pl-1 text-sm text-cyan-100/60">Actividad clínica · análisis por profesional</p>
-          </div>
-          <button type="button" onClick={()=>setInspeccionar(false)} aria-label="Cerrar" className="rounded-full border border-cyan-400/45 bg-cyan-400/[.075] p-3 text-cyan-100 shadow-[0_0_15px_rgba(34,211,238,.13)] transition hover:bg-cyan-400/20 hover:shadow-[0_0_22px_rgba(34,211,238,.26)]"><X className="h-5 w-5"/></button>
+          ))}
         </div>
-        <div className="relative overflow-hidden rounded-[26px] border border-cyan-400/30 bg-[radial-gradient(ellipse_at_100%_0%,rgba(15,125,142,.18),transparent_65%),#062A34] p-5 shadow-[0_0_27px_rgba(34,211,238,.085),inset_0_1px_0_rgba(165,243,252,.07)] sm:p-6">
-          <div className="mb-5 text-[11px] font-semibold uppercase tracking-[.19em] text-cyan-200 drop-shadow-[0_0_10px_rgba(34,211,238,.3)]">Filtros de actividad</div>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-5 md:grid-cols-5">
-            <label className="block text-xs text-cyan-100/75">Año<select value={anioInspeccion} onChange={e=>setAnioInspeccion(e.target.value)} className="mt-2 w-full rounded-xl border border-cyan-400/20 bg-[#103C48] px-3 py-3 text-sm text-white outline-none transition focus:border-cyan-300/75 focus:ring-1 focus:ring-cyan-300/45">{opcionesAnios.map(y=><option key={y} value={y}>{y}</option>)}</select></label>
-            <label className="block text-xs text-cyan-100/75">Mes<select value={mesInspeccion} onChange={e=>setMesInspeccion(e.target.value)} className="mt-2 w-full rounded-xl border border-cyan-400/20 bg-[#103C48] px-3 py-3 text-sm text-white outline-none transition focus:border-cyan-300/75 focus:ring-1 focus:ring-cyan-300/45"><option value="todos">Todo el año</option>{Array.from({length:12},(_,i)=><option key={i} value={String(i+1)}>{new Intl.DateTimeFormat('es-ES',{month:'long'}).format(new Date(2026,i,1))}</option>)}</select></label>
-            <label className="block text-xs text-cyan-100/75">Profesional<select value={profInspeccion} onChange={e=>setProfInspeccion(e.target.value)} className="mt-2 w-full rounded-xl border border-cyan-400/20 bg-[#103C48] px-3 py-3 text-sm text-white outline-none transition focus:border-cyan-300/75 focus:ring-1 focus:ring-cyan-300/45"><option value="todos">Todos</option><option value="fede">Dr. Federico</option><option value="ana">Dra. Ana</option></select></label>
-            <label className="block text-xs text-cyan-100/75">Estado<select value={estadoInspeccion} onChange={e=>setEstadoInspeccion(e.target.value)} className="mt-2 w-full rounded-xl border border-cyan-400/20 bg-[#103C48] px-3 py-3 text-sm text-white outline-none transition focus:border-cyan-300/75 focus:ring-1 focus:ring-cyan-300/45"><option value="vigentes">Vigentes</option><option value="finalizada">Finalizadas</option><option value="pendiente">Pendientes</option><option value="no_ha_venido">No asistió</option><option value="cancelada">Canceladas</option><option value="todos">Todos los estados</option></select></label>
-            <label className="block text-xs text-cyan-100/75">Tipo<select value={motivoInspeccion} onChange={e=>setMotivoInspeccion(e.target.value)} className="mt-2 w-full rounded-xl border border-cyan-400/20 bg-[#103C48] px-3 py-3 text-sm text-white outline-none transition focus:border-cyan-300/75 focus:ring-1 focus:ring-cyan-300/45"><option value="todos">Todos</option><option value="primera">Primeras visitas</option><option value="otras">Otros tratamientos</option></select></label>
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          {([['TOTAL FILTRADO',inspeccion.length],['DR. FEDERICO',inspeccion.filter(c=>profesionalGrupo(c)==='fede').length],['DRA. ANA',inspeccion.filter(c=>profesionalGrupo(c)==='ana').length],['PRIMERAS VISITAS',primerasVisitasPeriodo]] as [string,number][]).map(([titulo,valor])=><div key={titulo} className="relative overflow-hidden rounded-[24px] border border-cyan-400/30 bg-[radial-gradient(ellipse_at_90%_0%,rgba(15,117,135,.21),transparent_65%),#062A34] p-5 shadow-[0_0_23px_rgba(34,211,238,.09),inset_0_1px_0_rgba(165,243,252,.07)]"><div className="text-[11px] font-semibold tracking-[.12em] text-cyan-200/85">{titulo}</div><div className="mt-4 text-4xl font-semibold tabular-nums text-white drop-shadow-[0_0_12px_rgba(103,232,249,.18)]">{valor}</div></div>)}
-        </div>
-        <div className="overflow-hidden rounded-[26px] border border-cyan-400/30 bg-[#041D26] shadow-[0_0_30px_rgba(34,211,238,.085),inset_0_1px_0_rgba(165,243,252,.06)]">
-          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-cyan-400/20 bg-[#082E39] px-5 py-5 sm:px-6">
-            <h3 className="text-sm font-semibold uppercase tracking-[.14em] text-cyan-200 drop-shadow-[0_0_10px_rgba(34,211,238,.24)]">Detalle de citas</h3>
-            <label className="flex items-center gap-2 rounded-full border border-cyan-400/30 bg-[#041D26] px-4 py-2.5 text-xs shadow-[inset_0_1px_0_rgba(165,243,252,.05)]"><Search className="h-4 w-4 text-cyan-300"/><input aria-label="Buscar paciente o tratamiento" value={buscarInspeccion} onChange={e=>setBuscarInspeccion(e.target.value)} placeholder="Buscar paciente o tratamiento" className="w-48 bg-transparent text-white outline-none placeholder:text-cyan-100/40"/></label>
+
+        {/* Cabecera del detalle más oscura que el encabezado de la tabla, estilo barra de acciones. */}
+        <section className="overflow-hidden rounded-[26px] border border-cyan-400/30 bg-[#041D26] shadow-[0_0_26px_rgba(34,211,238,.075),inset_0_1px_0_rgba(165,243,252,.05)]">
+          <div className="flex flex-col gap-3 border-b border-cyan-400/20 bg-[#021820] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5">
+            <h3 className="text-xs font-normal uppercase tracking-[.11em] text-cyan-100 drop-shadow-[0_0_10px_rgba(34,211,238,.20)] sm:text-sm">DETALLE DE CITAS</h3>
+            <label className="flex w-full items-center gap-2 rounded-full border border-cyan-400/40 bg-cyan-400/[.045] px-3 py-2 text-xs shadow-[0_0_16px_rgba(34,211,238,.09)] transition focus-within:border-cyan-200 focus-within:shadow-[0_0_22px_rgba(34,211,238,.18)] sm:w-auto sm:px-4">
+              <Search className="h-4 w-4 shrink-0 text-cyan-300 drop-shadow-[0_0_8px_rgba(103,232,249,.65)]" />
+              <input aria-label="Buscar paciente o tratamiento" value={buscarInspeccion} onChange={e=>setBuscarInspeccion(e.target.value)} placeholder="Buscar paciente o tratamiento" className="min-w-0 w-full bg-transparent text-white outline-none placeholder:text-cyan-100/40 sm:w-52" />
+            </label>
           </div>
           <div className={`max-h-[55vh] overflow-auto ${scrollCyan}`}>
             <table className="w-full min-w-[680px] text-left text-xs">
@@ -594,7 +621,7 @@ useEffect(() => {
               <tbody>{inspeccion.map(c=><tr key={c.id} className="border-t border-cyan-500/10 transition hover:bg-cyan-400/[.055]"><td className="px-4 py-3.5">{c.fecha_inicio?fechaCorta.format(new Date(c.fecha_inicio)):'—'}</td><td className="px-4 py-3.5 text-white">{c.nombre_paciente||'—'}</td><td className="px-4 py-3.5 text-cyan-100/75">{c.motivo||'—'}</td><td className="px-4 py-3.5">{profesionalGrupo(c)==='ana'?'Dra. Ana':profesionalGrupo(c)==='fede'?'Dr. Federico':'Otro'}</td><td className="px-4 py-3.5"><EstadoConPunto estado={c.estado}/></td></tr>)}{inspeccion.length===0?<tr><td className="p-8 text-center text-cyan-100/50" colSpan={5}>{cargando?'Cargando…':'Sin citas para estos filtros'}</td></tr>:null}</tbody>
             </table>
           </div>
-        </div>
+        </section>
       </div>
     </div>
   ) : null;
