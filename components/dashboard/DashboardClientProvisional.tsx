@@ -402,6 +402,7 @@ useEffect(() => {
   const [estadoInspeccion,setEstadoInspeccion]=useState('vigentes');
   const [motivoInspeccion,setMotivoInspeccion]=useState('todos');
   const [buscarInspeccion,setBuscarInspeccion]=useState('');
+  const [filtroAbierto,setFiltroAbierto]=useState<string | null>(null);
   const [fechaBase]=useState(()=>lunesSemana(new Date()));
   useEffect(()=>{
     let vivo=true;
@@ -572,36 +573,50 @@ useEffect(() => {
           <button type="button" onClick={()=>setInspeccionar(false)} aria-label="Cerrar Inspeccionar" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-cyan-400/40 bg-cyan-400/[.05] text-cyan-100 shadow-[0_0_14px_rgba(34,211,238,.1)] transition hover:border-cyan-200 hover:bg-cyan-400/15 sm:h-10 sm:w-10"><X className="h-4 w-4 sm:h-5 sm:w-5"/></button>
         </div>
 
-        {/* Filtros más ligeros, similares a las acciones del panel; 2 columnas compactas en móvil. */}
-        <section className="rounded-[24px] border border-cyan-400/25 bg-cyan-400/[.035] px-3 py-3 shadow-[0_0_24px_rgba(34,211,238,.065),inset_0_1px_0_rgba(165,243,252,.035)] sm:px-5 sm:py-5">
-          <h3 className="mb-3 text-[11px] font-normal uppercase tracking-[.12em] text-cyan-200 sm:mb-4 sm:text-xs">FILTROS DE ACTIVIDAD</h3>
-          <div className="grid grid-cols-2 gap-x-2.5 gap-y-2.5 sm:gap-4 lg:grid-cols-5">
+        {/* Filtros con menú Martina propio: colores cian en todas las opciones, también en Windows. */}
+        <section className="relative z-30 rounded-[22px] border border-cyan-400/25 bg-cyan-400/[.035] px-3 py-3 shadow-[0_0_24px_rgba(34,211,238,.065),inset_0_1px_0_rgba(165,243,252,.035)] sm:px-5 sm:py-3.5">
+          <h3 className="mb-2.5 text-[11px] font-normal uppercase tracking-[.12em] text-cyan-200 sm:mb-3 sm:text-xs">FILTROS DE ACTIVIDAD</h3>
+          <div className="grid grid-cols-2 gap-x-2.5 gap-y-2.5 sm:gap-x-4 sm:gap-y-3 lg:grid-cols-5">
             {([
               {label:'Año',value:anioInspeccion,change:setAnioInspeccion,options:opcionesAnios.map(y=>({value:y,label:y}))},
-              {label:'Mes',value:mesInspeccion,change:setMesInspeccion,options:[{value:'todos',label:'Todo el año'},...Array.from({length:12},(_,i)=>({value:String(i+1),label:new Intl.DateTimeFormat('es-ES',{month:'long'}).format(new Date(2026,i,1))}))]},
+              {label:'Mes',value:mesInspeccion,change:setMesInspeccion,options:[{value:'todos',label:'Todo el año'},...Array.from({length:12},(_,i)=>{const mes=new Intl.DateTimeFormat('es-ES',{month:'long'}).format(new Date(2026,i,1));return {value:String(i+1),label:mes.charAt(0).toUpperCase()+mes.slice(1)};})]},
               {label:'Profesional',value:profInspeccion,change:setProfInspeccion,options:[{value:'todos',label:'Todos'},{value:'fede',label:'Dr. Federico'},{value:'ana',label:'Dra. Ana'}]},
               {label:'Estado',value:estadoInspeccion,change:setEstadoInspeccion,options:[{value:'vigentes',label:'Vigentes'},{value:'finalizada',label:'Finalizadas'},{value:'pendiente',label:'Pendientes'},{value:'no_ha_venido',label:'No asistió'},{value:'cancelada',label:'Canceladas'},{value:'todos',label:'Todos los estados'}]},
               {label:'Tipo',value:motivoInspeccion,change:setMotivoInspeccion,options:[{value:'todos',label:'Todos'},{value:'primera',label:'Primeras visitas'},{value:'otras',label:'Otros tratamientos'}]},
             ] as {label:string;value:string;change:(v:string)=>void;options:{value:string;label:string}[]}[]).map((f,i)=>(
-              <label key={f.label} className={`block min-w-0 text-[11px] text-cyan-100/70 sm:text-xs ${i===4?'col-span-2 lg:col-span-1':''}`}>
-                {f.label}
-                <span className="relative mt-1 block sm:mt-1.5">
-                  <select value={f.value} onChange={e=>f.change(e.target.value)} className="w-full appearance-none rounded-xl border border-cyan-400/25 bg-[#0A303B] py-2 pl-3 pr-9 text-xs text-white shadow-[inset_0_1px_0_rgba(165,243,252,.04)] outline-none transition hover:border-cyan-300/50 focus:border-cyan-300/75 focus:ring-1 focus:ring-cyan-300/35 sm:py-2.5 sm:text-sm">
-                    {f.options.map(o=><option key={o.value} value={o.value}>{o.label}</option>)}
-                  </select>
-                  <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-cyan-200/85" aria-hidden="true" />
-                </span>
-              </label>
+              <div key={f.label} className={`relative min-w-0 text-[11px] text-cyan-100/70 sm:text-xs ${i===4?'col-span-2 lg:col-span-1':''}`}>
+                <span className="block">{f.label}</span>
+                <button
+                  type="button"
+                  aria-label={`Filtrar por ${f.label.toLowerCase()}`}
+                  aria-expanded={filtroAbierto===f.label}
+                  aria-haspopup="listbox"
+                  onClick={()=>setFiltroAbierto(actual=>actual===f.label?null:f.label)}
+                  onKeyDown={e=>{if(e.key==='Escape')setFiltroAbierto(null);}}
+                  className="relative mt-1 flex h-9 w-full items-center justify-between gap-2 rounded-xl border border-cyan-400/30 bg-[#0A303B] pl-3 pr-3 text-left text-xs text-white shadow-[inset_0_1px_0_rgba(165,243,252,.04)] transition hover:border-cyan-300/65 hover:bg-[#0C3945] focus:border-cyan-300/75 focus:outline-none focus:ring-1 focus:ring-cyan-300/35 sm:mt-1.5 sm:h-10 sm:text-sm"
+                >
+                  <span className="min-w-0 truncate">{f.options.find(o=>o.value===f.value)?.label||'Seleccionar'}</span>
+                  <ChevronDown aria-hidden="true" className={`h-4 w-4 shrink-0 text-cyan-300 transition-transform ${filtroAbierto===f.label?'rotate-180':''}`}/>
+                </button>
+                {filtroAbierto===f.label && (
+                  <>
+                    <button type="button" aria-label="Cerrar menú de filtros" className="fixed inset-0 z-40 cursor-default" onClick={()=>setFiltroAbierto(null)} />
+                    <div role="listbox" aria-label={f.label} className={`absolute left-0 top-full z-50 mt-1.5 max-h-52 w-full min-w-[145px] overflow-y-auto rounded-xl border border-cyan-400/45 bg-[#082B36] p-1 shadow-[0_15px_35px_rgba(0,0,0,.60),0_0_20px_rgba(34,211,238,.18)] ${scrollCyan}`}>
+                      {f.options.map(o=><button type="button" role="option" aria-selected={o.value===f.value} key={o.value} onClick={()=>{f.change(o.value);setFiltroAbierto(null);}} className={`block w-full rounded-lg px-3 py-2 text-left text-xs transition sm:text-sm ${o.value===f.value?'bg-cyan-400/20 font-medium text-cyan-100 shadow-[inset_2px_0_0_rgba(103,232,249,.8)]':'text-cyan-50/85 hover:bg-cyan-400/15 hover:text-white'}`}>{o.label}</button>)}
+                    </div>
+                  </>
+                )}
+              </div>
             ))}
           </div>
         </section>
 
-        {/* Cuatro medallones compactos, centrados. Conservamos los indicadores originales. */}
-        <div className="grid grid-cols-2 justify-items-center gap-x-2 gap-y-4 py-1 sm:flex sm:flex-wrap sm:items-center sm:justify-center sm:gap-6 sm:py-2 lg:gap-10">
+        {/* Indicadores más pequeños y separados: efecto flotante al pasar el ratón. */}
+        <div className="grid grid-cols-2 justify-items-center gap-x-4 gap-y-5 py-2 sm:flex sm:flex-wrap sm:items-center sm:justify-center sm:gap-9 sm:py-3 lg:gap-14">
           {([['TOTAL FILTRADO',inspeccion.length],['DR. FEDERICO',inspeccion.filter(c=>profesionalGrupo(c)==='fede').length],['DRA. ANA',inspeccion.filter(c=>profesionalGrupo(c)==='ana').length],['PRIMERAS VISITAS',primerasVisitasPeriodo]] as [string,number][]).map(([titulo,valor])=>(
-            <div key={titulo} className="flex h-[116px] w-[116px] flex-col items-center justify-center gap-1 rounded-full border border-cyan-300/35 bg-[radial-gradient(circle_at_50%_35%,#0E3945_0%,#05232D_75%,#031820_100%)] px-2 text-center shadow-[0_0_21px_rgba(34,211,238,.10),inset_0_0_14px_rgba(34,211,238,.045)] sm:h-[138px] sm:w-[138px]">
-              <strong className="text-[27px] font-semibold leading-none tabular-nums text-white drop-shadow-[0_0_12px_rgba(103,232,249,.15)] sm:text-[34px]">{valor}</strong>
-              <span className="max-w-[100px] text-[9px] font-medium uppercase leading-tight tracking-[.045em] text-cyan-200/80 sm:max-w-[120px] sm:text-[10px]">{titulo}</span>
+            <div key={titulo} className="group flex h-[106px] w-[106px] shrink-0 flex-col items-center justify-center gap-1 rounded-full border border-cyan-300/35 bg-[radial-gradient(circle_at_50%_35%,#0E3945_0%,#05232D_75%,#031820_100%)] px-2 text-center shadow-[0_0_14px_rgba(34,211,238,.08),inset_0_0_14px_rgba(34,211,238,.045)] transition-all duration-300 hover:-translate-y-1 hover:border-cyan-200/85 hover:shadow-[0_0_18px_rgba(34,211,238,.38),0_0_38px_rgba(34,211,238,.20),inset_0_0_20px_rgba(34,211,238,.10)] sm:h-[120px] sm:w-[120px]">
+              <strong className="text-[26px] font-semibold leading-none tabular-nums text-white drop-shadow-[0_0_12px_rgba(103,232,249,.15)] sm:text-[31px]">{valor}</strong>
+              <span className="max-w-[94px] text-[8px] font-medium uppercase leading-tight tracking-[.035em] text-cyan-200/80 group-hover:text-cyan-100 sm:max-w-[112px] sm:text-[9px]">{titulo}</span>
             </div>
           ))}
         </div>
@@ -609,7 +624,7 @@ useEffect(() => {
         {/* Cabecera del detalle más oscura que el encabezado de la tabla, estilo barra de acciones. */}
         <section className="overflow-hidden rounded-[26px] border border-cyan-400/30 bg-[#041D26] shadow-[0_0_26px_rgba(34,211,238,.075),inset_0_1px_0_rgba(165,243,252,.05)]">
           <div className="flex flex-col gap-3 border-b border-cyan-400/20 bg-[#021820] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5">
-            <h3 className="text-xs font-normal uppercase tracking-[.11em] text-cyan-100 drop-shadow-[0_0_10px_rgba(34,211,238,.20)] sm:text-sm">DETALLE DE CITAS</h3>
+            <h3 className="text-xs font-medium uppercase tracking-[.11em] text-cyan-300 drop-shadow-[0_0_12px_rgba(34,211,238,.55)] sm:text-sm">DETALLE DE CITAS</h3>
             <label className="flex w-full items-center gap-2 rounded-full border border-cyan-400/40 bg-cyan-400/[.045] px-3 py-2 text-xs shadow-[0_0_16px_rgba(34,211,238,.09)] transition focus-within:border-cyan-200 focus-within:shadow-[0_0_22px_rgba(34,211,238,.18)] sm:w-auto sm:px-4">
               <Search className="h-4 w-4 shrink-0 text-cyan-300 drop-shadow-[0_0_8px_rgba(103,232,249,.65)]" />
               <input aria-label="Buscar paciente o tratamiento" value={buscarInspeccion} onChange={e=>setBuscarInspeccion(e.target.value)} placeholder="Buscar paciente o tratamiento" className="min-w-0 w-full bg-transparent text-white outline-none placeholder:text-cyan-100/40 sm:w-52" />
