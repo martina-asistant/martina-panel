@@ -96,7 +96,7 @@ function CajaLaboratorio() {
         <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,114px)_76px] gap-2 bg-cyan-500/10 px-3 py-3 text-[10px] uppercase tracking-[.04em] text-cyan-300/90 lg:hidden">
           <span>Paciente</span><span>Estado</span><span>Fecha cita</span>
         </div>
-        <div className="hidden grid-cols-[minmax(0,2fr)_minmax(0,.75fr)_minmax(0,1fr)_minmax(0,1.3fr)_minmax(0,95px)] gap-2 bg-cyan-500/10 px-3 py-3 text-[10px] uppercase tracking-[.035em] text-cyan-300/90 lg:grid">
+        <div className="hidden grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.1fr)_minmax(0,1.3fr)_minmax(0,95px)] gap-2 bg-cyan-500/10 px-3 py-3 text-[10px] uppercase tracking-[.035em] text-cyan-300/90 lg:grid">
           <span>Paciente</span><span>Laboratorio</span><span>Trabajo</span><span>Estado</span><span>Fecha cita</span>
         </div>
         <div className="max-h-[420px] overflow-y-auto [scrollbar-width:thin] [scrollbar-color:rgba(103,232,249,.22)_transparent] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-300/20 hover:[&::-webkit-scrollbar-thumb]:bg-cyan-300/35">
@@ -111,7 +111,7 @@ function CajaLaboratorio() {
               <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,114px)_76px] items-center gap-2 px-3 py-3.5 text-xs lg:hidden">
                 <span className="min-w-0 truncate font-medium text-white" title={t.nombre_paciente||''}>{t.nombre_paciente||'—'}</span><span className="min-w-0">{chip}</span><span className="whitespace-nowrap text-[11px] text-cyan-100/75">{formatoFecha(t.fecha_cita)}</span>
               </div>
-              <div className="hidden grid-cols-[minmax(0,2fr)_minmax(0,.75fr)_minmax(0,1fr)_minmax(0,1.3fr)_minmax(0,95px)] items-center gap-2 px-3 py-3.5 text-xs lg:grid">
+              <div className="hidden grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1.1fr)_minmax(0,1.3fr)_minmax(0,95px)] items-center gap-2 px-3 py-3.5 text-xs lg:grid">
                 <span className="min-w-0 truncate font-medium text-white" title={t.nombre_paciente||''}>{t.nombre_paciente||'—'}</span><span className="min-w-0 truncate text-cyan-100/70" title={t.laboratorio||''}>{t.laboratorio||'—'}</span><span className="min-w-0 truncate text-cyan-100/80" title={t.trabajo||''}>{t.trabajo||'—'}</span><span className="min-w-0">{chip}</span><span className="whitespace-nowrap text-cyan-100/75">{formatoFecha(t.fecha_cita)}</span>
               </div>
             </div>;
@@ -410,7 +410,7 @@ useEffect(() => {
   // clases responsive evitan desbordamientos en pantallas pequeñas.
   const contenido = (
     <div className="grid grid-cols-1 gap-5 xl:grid-cols-2 xl:gap-7">
-      <section className="relative overflow-hidden rounded-[28px] border border-cyan-400/35 bg-[#031B24] p-4 text-white shadow-[0_12px_35px_rgba(0,0,0,.3),0_0_19px_rgba(34,211,238,.075),inset_0_1px_0_rgba(165,243,252,.045)] sm:p-5">
+<section className="relative overflow-hidden rounded-[28px] border border-cyan-400/35 bg-[#031B24] p-4 text-white shadow-[0_12px_35px_rgba(0,0,0,.3),0_0_19px_rgba(34,211,238,.075),inset_0_1px_0_rgba(165,243,252,.045)] transition-all duration-300 hover:-translate-y-0.5 hover:border-cyan-200/90 hover:bg-[#0A3541] hover:shadow-[0_0_18px_rgba(34,211,238,.40),0_0_30px_rgba(34,211,238,.13)] sm:p-5">
         {/* Título fino, halo del icono y caja oscura: sin gradiente luminoso superior. */}
         <div className="flex items-start justify-between gap-2 sm:gap-4">
           <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
