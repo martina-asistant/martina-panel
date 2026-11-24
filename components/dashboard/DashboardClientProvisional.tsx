@@ -10,6 +10,7 @@ import {
 import type { CanalMartina } from '@/lib/types/db.types';
 import { getConfiguracionMartina, updateCanalMartina } from '@/lib/repos/configuracion.repo';
 import { createClient } from '@/lib/supabase/client';
+import Link from 'next/link';
 
 /**
  * MARTINA PANEL — DashboardClientProvisional (vista independiente de prueba, 24/11/2026).
@@ -29,6 +30,100 @@ type CitaDB = {
   fecha_inicio: string | null; fecha_fin: string | null;
   created_at: string | null; updated_at: string | null;
 };
+type TrabajoLabResumen = {
+  id: string;
+  nombre_paciente: string | null;
+  laboratorio: string | null;
+  trabajo: string | null;
+  estado: string | null;
+  fecha_cita: string | null;
+};
+const estadosLab: Record<string,{etiqueta:string,color:string}> = {
+  pte_gestionar:{etiqueta:'Pte gestionar',color:'bg-red-600'},
+  disenado:{etiqueta:'Diseñado',color:'bg-violet-300'},
+  impreso:{etiqueta:'Impreso',color:'bg-pink-400'},
+  fresado:{etiqueta:'Fresado',color:'bg-cyan-300'},
+  horneado:{etiqueta:'Horneado',color:'bg-orange-400'},
+  en_clinica:{etiqueta:'En clínica',color:'bg-green-400'},
+};
+function CajaLaboratorio() {
+  const [trabajos,setTrabajos]=useState<TrabajoLabResumen[]>([]);
+  const [cargandoLab,setCargandoLab]=useState(true);
+  const [errorLab,setErrorLab]=useState('');
+  useEffect(()=>{
+    let activo=true;
+    async function cargarSoloLectura(){
+      const supa=createClient();
+      if(!supa){if(activo){setErrorLab('Sin conexión');setCargandoLab(false);}return;}
+      try{
+        const datos=await leerTodas<TrabajoLabResumen>(supa,'laboratorio_trabajos','id,nombre_paciente,laboratorio,trabajo,estado,fecha_cita');
+        if(activo){setTrabajos(datos);setErrorLab('');}
+      }catch(err){if(activo)setErrorLab(err instanceof Error?err.message:'Error al leer Laboratorio');}
+      finally{if(activo)setCargandoLab(false);}
+    }
+    void cargarSoloLectura();
+    return ()=>{activo=false;};
+  },[]);
+  // La caja no ejecuta las rutinas de vinculación ni escrituras del módulo Laboratorio.
+  const hoy=Date.now();
+  const abiertos=trabajos.filter(t=>t.estado!=='finalizado');
+  const proximos=abiertos.filter(t=>t.fecha_cita && !Number.isNaN(new Date(t.fecha_cita).getTime()) && new Date(t.fecha_cita).getTime()>=hoy)
+    .sort((a,b)=>new Date(a.fecha_cita!).getTime()-new Date(b.fecha_cita!).getTime());
+  const sinCita=abiertos.filter(t=>!t.fecha_cita);
+  const visibles=[...proximos,...sinCita];
+  const formatoFecha=(fecha:string|null)=>fecha?new Date(fecha).toLocaleDateString('es-ES',{day:'numeric',month:'short',year:'2-digit',timeZone:'Europe/Madrid'}):'Sin cita';
+  return (
+    <section className="min-w-0 overflow-hidden rounded-[28px] border border-cyan-400/35 bg-[#031B24] p-4 text-white shadow-[0_12px_35px_rgba(0,0,0,.3),0_0_19px_rgba(34,211,238,.075)] sm:p-5">
+      <div className="flex items-start justify-between gap-2 sm:gap-4">
+        <div className="flex min-w-0 items-center gap-2">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-cyan-400/[.055] shadow-[0_0_22px_rgba(34,211,238,.17)] sm:h-10 sm:w-10">
+            <FlaskConical className="h-5 w-5 text-cyan-300"/>
+          </div>
+          <h2 className="text-[11px] font-normal uppercase tracking-[.08em] text-cyan-200 sm:text-sm sm:tracking-[.10em]">LABORATORIO</h2>
+        </div>
+        <div className="shrink-0 rounded-xl border border-cyan-400/30 bg-[#082B35] px-2.5 py-1.5 text-center sm:px-3 sm:py-2">
+          <div className="text-[9px] uppercase tracking-[.08em] text-cyan-100/70 sm:text-[10px]">Citas próximas sin finalizar</div>
+          <strong className="mt-1 block text-[26px] font-semibold leading-none tabular-nums text-white sm:text-[30px]">{cargandoLab?'…':errorLab?'—':proximos.length}</strong>
+          <div className="mt-1 text-[10px] text-cyan-100/65">{cargandoLab?'Cargando…':errorLab?'No disponible':`${sinCita.length} pendiente${sinCita.length===1?'':'s'} de cita`}</div>
+        </div>
+      </div>
+      <div aria-hidden="true" className="mt-3 h-px w-full bg-cyan-300/65 shadow-[0_0_9px_rgba(34,211,238,.72)]" />
+      <div className="mt-3 overflow-hidden rounded-2xl border border-cyan-500/20 bg-[rgba(5,18,24,.78)]">
+        {/* Móvil: solo paciente, estado y fecha, tal como se acordó. */}
+        <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,110px)_70px] gap-2 bg-cyan-500/10 px-3 py-3 text-[10px] uppercase tracking-[.06em] text-cyan-300/80 lg:hidden">
+          <span>Paciente</span><span>Estado</span><span>Fecha cita</span>
+        </div>
+        {/* Escritorio: copia simplificada de las columnas de Laboratorio. */}
+        <div className="hidden grid-cols-[minmax(0,1.6fr)_minmax(0,.8fr)_minmax(0,.9fr)_minmax(0,1.15fr)_100px] gap-2 bg-cyan-500/10 px-4 py-3 text-[10px] uppercase tracking-[.07em] text-cyan-300/80 lg:grid">
+          <span>Paciente</span><span>Laboratorio</span><span>Trabajo</span><span>Estado</span><span>Fecha cita</span>
+        </div>
+        <div className={`max-h-[260px] overflow-y-auto ${scrollCyan}`}>
+          {!cargandoLab && !errorLab && visibles.length===0 && <div className="px-4 py-8 text-center text-xs text-cyan-100/55">Sin trabajos con citas próximas o pendientes de cita</div>}
+          {cargandoLab && <div className="px-4 py-8 text-center text-xs text-cyan-100/55">Cargando trabajos…</div>}
+          {errorLab && <div className="px-4 py-6 text-center text-xs text-amber-200">No se pudo cargar Laboratorio: {errorLab}</div>}
+          {visibles.map(t=>{
+            const estado=estadosLab[t.estado||'']||{etiqueta:t.estado||'Sin estado',color:'bg-slate-300'};
+            const chip=<span className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-cyan-500/20 bg-cyan-500/5 px-2 py-1.5 text-[10px] text-cyan-100"><span className={`h-2 w-2 shrink-0 rounded-full shadow-[0_0_10px_currentColor] ${estado.color}`}/><span className="min-w-0 truncate">{estado.etiqueta}</span></span>;
+            return <div key={t.id} className="border-t border-cyan-500/10">
+              <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,110px)_70px] items-center gap-2 px-3 py-3 text-xs lg:hidden">
+                <span className="min-w-0 truncate font-medium text-white" title={t.nombre_paciente||''}>{t.nombre_paciente||'—'}</span><span className="min-w-0">{chip}</span><span className="whitespace-nowrap text-[11px] text-cyan-100/70">{formatoFecha(t.fecha_cita)}</span>
+              </div>
+              <div className="hidden grid-cols-[minmax(0,1.6fr)_minmax(0,.8fr)_minmax(0,.9fr)_minmax(0,1.15fr)_100px] items-center gap-2 px-4 py-3 text-xs lg:grid">
+                <span className="min-w-0 truncate font-medium text-white" title={t.nombre_paciente||''}>{t.nombre_paciente||'—'}</span><span className="min-w-0 truncate text-cyan-100/70">{t.laboratorio||'—'}</span><span className="min-w-0 truncate text-cyan-100/80">{t.trabajo||'—'}</span><span className="min-w-0">{chip}</span><span className="whitespace-nowrap text-cyan-100/70">{formatoFecha(t.fecha_cita)}</span>
+              </div>
+            </div>;
+          })}
+        </div>
+      </div>
+      <div className="mt-3 flex justify-end">
+        <Link href="/laboratorio" className="inline-flex items-center gap-1.5 rounded-full border border-cyan-300/45 bg-cyan-400/[.06] px-3.5 py-1.5 text-[10px] font-medium uppercase tracking-[.1em] text-cyan-100 shadow-[0_0_11px_rgba(34,211,238,.11)] transition hover:border-cyan-200 hover:bg-cyan-400/20">
+          <FlaskConical className="h-3.5 w-3.5 text-cyan-300"/> Acceder
+        </Link>
+      </div>
+    </section>
+  );
+}
+
 type CambioDB = {
   historial_cita_id: string;
   realizado_por: string | null;
@@ -372,7 +467,7 @@ useEffect(() => {
         <div className="mt-2 flex justify-end"><button type="button" onClick={()=>setInspeccionar(true)} className="inline-flex items-center gap-1.5 rounded-full border border-cyan-300/45 bg-cyan-400/[.06] px-3.5 py-1.5 text-[10px] font-medium uppercase tracking-[.1em] text-cyan-100 shadow-[0_0_11px_rgba(34,211,238,.11)] transition hover:border-cyan-200 hover:bg-cyan-400/20 hover:shadow-[0_0_20px_rgba(34,211,238,.22)]"><ChartNoAxesCombined className="h-3.5 w-3.5 text-cyan-300"/> Inspeccionar</button></div>
       </section>
       <CajaPendiente titulo="SEGUIMIENTO" icono={HeartPulse}/>
-      <CajaPendiente titulo="LABORATORIO" icono={FlaskConical}/>
+      <CajaLaboratorio/>
       <CajaPendiente titulo="GESTIÓN MARTINA" icono={Bot}/>
     </div>
   );
@@ -593,6 +688,4 @@ return (
 };
 
 export default DashboardClientProvisional;
-
-
 
