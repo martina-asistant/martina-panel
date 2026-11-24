@@ -245,18 +245,12 @@ type FilaSeguimiento = {
   finActivo:GestionSeguimiento|null; fechaContacto:string|null;
   estadoTexto:string; alerta:boolean;
 };
-const scrollSeguimiento = '[&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-300/20 hover:[&::-webkit-scrollbar-thumb]:bg-cyan-300/35';
+const scrollSeguimiento = '[scrollbar-width:thin] [scrollbar-color:rgba(103,232,249,.22)_transparent] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-300/20 hover:[&::-webkit-scrollbar-thumb]:bg-cyan-300/35';
 const estilosSeg = {
-  pendiente:{dot:'bg-red-400',badge:'border-red-500/35 bg-red-500/[.10] text-red-100',hex:'#F35B6B'},
-  curso:{dot:'bg-amber-400',badge:'border-amber-400/35 bg-amber-400/[.11] text-amber-100',hex:'#F7A81B'},
-  finalizado:{dot:'bg-green-400',badge:'border-green-400/35 bg-green-400/[.11] text-green-100',hex:'#44D17A'},
-  no_continua:{dot:'bg-violet-400',badge:'border-violet-400/35 bg-violet-400/[.12] text-violet-100',hex:'#A678FF'}
-};
-const etiquetaSeg: Record<EstadoSeguimiento,string> = {
-  pendiente:'Pendiente',
-  curso:'En tratamiento',
-  finalizado:'TTO finalizado',
-  no_continua:'No continúan'
+  pendiente:{dot:'bg-red-500',color:'text-red-300',hex:'#F35B6B',capsula:'border-red-500/40 bg-red-500/[.09] text-red-200'},
+  curso:{dot:'bg-amber-400',color:'text-amber-200',hex:'#F7A81B',capsula:'border-amber-400/40 bg-amber-400/[.09] text-amber-100'},
+  finalizado:{dot:'bg-green-400',color:'text-green-200',hex:'#44D17A',capsula:'border-green-400/40 bg-green-400/[.09] text-green-100'},
+  no_continua:{dot:'bg-violet-400',color:'text-violet-200',hex:'#A678FF',capsula:'border-violet-400/40 bg-violet-400/[.09] text-violet-100'}
 };
 function fechaCitaSeg(fecha:string|null) {
   return fecha ? new Date(fecha).toLocaleDateString('es-ES',{day:'numeric',month:'short',year:'2-digit',timeZone:'Europe/Madrid'}) : 'Sin cita';
@@ -319,36 +313,39 @@ function clasificarSeguimiento(citas:CitaDB[],gestiones:GestionSeguimiento[],hoy
   }).sort((a,b)=>(b.primera.fecha_inicio||'').localeCompare(a.primera.fecha_inicio||''));
 }
 function DonutSeguimiento({valores}:{valores:number[]}) {
-  const total = valores.reduce((s,n)=>s+n,0);
-  const circ = 2*Math.PI*54;
-  const gradIds = ['seg-pendiente','seg-curso','seg-finalizado','seg-no-continua'];
-  let offset = 0;
-  const arcos = valores.map((v,i)=>{
-    const longitud = total ? (circ * v) / total : 0;
-    const dato = { gradId: gradIds[i], longitud, offset };
-    offset += longitud;
-    return dato;
-  });
-  return <svg viewBox="0 0 220 220" role="img" aria-label={`Resumen visual de seguimiento. Total ${total} primeras visitas`} className="h-auto w-full max-w-[215px] drop-shadow-[0_0_18px_rgba(34,211,238,.16)]">
+  const total=valores.reduce((s,n)=>s+n,0);
+  const colores=[estilosSeg.pendiente.hex,estilosSeg.curso.hex,estilosSeg.finalizado.hex,estilosSeg.no_continua.hex];
+  let angulo=-90;
+  const activos=valores.filter(v=>v>0).length;
+  const sectores=valores.map((valor,i)=>{
+    if(valor<=0||total===0)return null;
+    const amplitud=valor/total*360;
+    const hueco=activos>1?Math.min(1.5,amplitud/8):0;
+    const inicio=angulo+hueco;
+    const fin=angulo+amplitud-hueco;
+    const medio=(inicio+fin)/2*Math.PI/180;
+    const cx=100+Math.cos(medio)*(activos>1?2.6:0);
+    const cy=100+Math.sin(medio)*(activos>1?2.6:0);
+    const punto=(grados:number)=>{
+      const rad=grados*Math.PI/180;
+      return `${cx+73*Math.cos(rad)} ${cy+73*Math.sin(rad)}`;
+    };
+    const d=`M ${cx} ${cy} L ${punto(inicio)} A 73 73 0 ${fin-inicio>180?1:0} 1 ${punto(fin)} Z`;
+    angulo+=amplitud;
+    return {id:i,d,color:colores[i]};
+  }).filter((x):x is {id:number;d:string;color:string}=>Boolean(x));
+  return <svg viewBox="0 0 200 200" className="h-[132px] w-[132px] shrink-0 sm:h-[156px] sm:w-[156px]" role="img" aria-label={`Distribución de ${total} primeras visitas: ${valores[0]} pendientes, ${valores[1]} en tratamiento, ${valores[2]} finalizadas y ${valores[3]} no continúan`}>
     <defs>
-      <linearGradient id="seg-pendiente" x1="0" y1="0" x2="220" y2="220"><stop offset="0%" stopColor="#FF7B8A"/><stop offset="100%" stopColor="#D92E47"/></linearGradient>
-      <linearGradient id="seg-curso" x1="0" y1="0" x2="220" y2="220"><stop offset="0%" stopColor="#FFD66E"/><stop offset="100%" stopColor="#F59E0B"/></linearGradient>
-      <linearGradient id="seg-finalizado" x1="0" y1="0" x2="220" y2="220"><stop offset="0%" stopColor="#8CF4B5"/><stop offset="100%" stopColor="#22C55E"/></linearGradient>
-      <linearGradient id="seg-no-continua" x1="0" y1="0" x2="220" y2="220"><stop offset="0%" stopColor="#CCAEFF"/><stop offset="100%" stopColor="#8B5CF6"/></linearGradient>
-      <radialGradient id="seg-centro" cx="50%" cy="45%" r="68%"><stop offset="0%" stopColor="#0E3B47" stopOpacity="0.95"/><stop offset="100%" stopColor="#041922" stopOpacity="1"/></radialGradient>
-      <filter id="seg-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3.2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      <filter id="martina-pie-halo" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="4.2"/></filter>
     </defs>
-    <circle cx="110" cy="110" r="78" fill="none" stroke="#10333D" strokeWidth="26" opacity="0.9"/>
-    <circle cx="110" cy="110" r="94" fill="none" stroke="#0F2A33" strokeWidth="1.5" opacity="0.7"/>
-    {arcos.map((arco,i)=>arco.longitud>0?<circle key={i} cx="110" cy="110" r="78" fill="none" stroke={`url(#${arco.gradId})`} strokeWidth="26" strokeDasharray={`${arco.longitud} ${circ}`} strokeDashoffset={-arco.offset} strokeLinecap="round" filter="url(#seg-glow)" transform="rotate(-90 110 110)"/>:null)}
-    <circle cx="110" cy="110" r="56" fill="url(#seg-centro)" stroke="#0F3A44" strokeWidth="1.5"/>
-    <circle cx="110" cy="110" r="43" fill="none" stroke="rgba(103,232,249,.10)" strokeWidth="1.2"/>
+    {sectores.map(p=><g key={p.id}>
+      <path d={p.d} fill={p.color} opacity=".50" filter="url(#martina-pie-halo)"/>
+      <path d={p.d} fill={p.color} stroke={p.color} strokeWidth="1.2" strokeLinejoin="round"/>
+    </g>)}
+    {total===0&&<circle cx="100" cy="100" r="73" fill="#0A303B" stroke="#145063" strokeWidth="1"/>}
   </svg>;
 }
-function EstadoSeguimientoChip({estado}:{estado:EstadoSeguimiento}) {
-  const estilo = estilosSeg[estado];
-  return <span className={`inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-[10px] font-medium leading-none ${estilo.badge}`}><span className={`h-2.5 w-2.5 shrink-0 rounded-full shadow-[0_0_10px_currentColor] ${estilo.dot}`}/>{etiquetaSeg[estado]}</span>;
-}
+
 function CajaSeguimiento({citas,cargando,errorDatos}:{citas:CitaDB[];cargando:boolean;errorDatos:string}) {
   const [gestiones,setGestiones]=useState<GestionSeguimiento[]>([]);
   const [cargandoGestiones,setCargandoGestiones]=useState(true);
@@ -451,38 +448,15 @@ function CajaSeguimiento({citas,cargando,errorDatos}:{citas:CitaDB[];cargando:bo
   };
   const fila=(r:FilaSeguimiento,esInspector:boolean)=>{
     const abierta=expandida===r.primera.id;
-    const descripcion = r.estado==='pendiente'
-      ? (r.alerta ? 'Nuevo contacto sin realizar' : r.fechaContacto ? `Volver a contactar ${fechaGestionSeg(r.fechaContacto)}` : r.gestiones.length ? r.estadoTexto : 'Sin gestionar')
-      : r.estado==='curso'
-        ? 'Tratamiento en curso'
-        : r.estado==='finalizado'
-          ? 'Seguimiento cerrado'
-          : 'Paciente archivado en histórico';
-    if(!esInspector){
-      return <div key={r.primera.id} className="border-t border-cyan-500/10 py-3 transition-colors hover:bg-cyan-500/[.025]">
-        <div className="grid grid-cols-[minmax(0,1.65fr)_84px_78px_minmax(0,1.12fr)] items-start gap-2 px-0 text-[11px] sm:grid-cols-[minmax(0,1.8fr)_98px_92px_minmax(0,1.1fr)] sm:text-xs">
-          <div className="min-w-0 pr-1">
-            <p className="truncate font-medium text-white" title={r.primera.nombre_paciente||''}>{r.primera.nombre_paciente||'—'}</p>
-            {r.ultimo?.gestionado_por&&<p className="mt-1 flex items-center gap-1 text-[10px] text-cyan-100/52"><UserRound className="h-3 w-3 shrink-0 text-cyan-300/70"/> Gestionado por {r.ultimo.gestionado_por}</p>}
-          </div>
-          <span className="whitespace-nowrap text-[11px] text-cyan-100/80">{fechaCitaSeg(r.primera.fecha_inicio)}</span>
-          <span className="whitespace-nowrap text-[11px] text-cyan-100/80">{fechaCitaSeg(r.proxima?.fecha_inicio||null)}</span>
-          <div className="min-w-0">
-            <EstadoSeguimientoChip estado={r.estado}/>
-            <p className="mt-1 text-[10px] leading-snug text-cyan-100/55">{descripcion}</p>
-          </div>
-        </div>
-      </div>;
-    }
+    const tonoEstado=r.alerta?'border-red-500/40 bg-red-500/[.09] text-red-300':r.estado==='pendiente'?'border-amber-400/30 bg-amber-400/[.08] text-amber-200':r.estado==='curso'?'border-cyan-400/30 bg-cyan-400/[.07] text-cyan-200':r.estado==='finalizado'?'border-green-400/30 bg-green-400/[.08] text-green-200':'border-red-400/30 bg-red-400/[.07] text-red-200';
     return <div key={r.primera.id} className="border-t border-cyan-500/10 transition-colors hover:bg-cyan-500/[.035]">
-      <div className="grid grid-cols-[minmax(0,1.35fr)_75px_minmax(0,1fr)_84px_28px] items-center gap-1.5 px-2 py-3 text-[11px] sm:gap-2 sm:px-3 sm:text-xs">
+      <div className={`grid items-center gap-1.5 px-2 py-3 text-[11px] sm:gap-2 sm:px-3 sm:text-xs ${esInspector?'grid-cols-[minmax(0,1.35fr)_75px_minmax(0,1fr)_84px_28px]':'grid-cols-[minmax(0,1.4fr)_70px_minmax(0,1.05fr)_28px]'}`}>
         <span className="min-w-0 truncate font-medium text-white" title={r.primera.nombre_paciente||''}>{r.primera.nombre_paciente||'—'}</span>
-        <span className="whitespace-nowrap text-[10px] text-cyan-100/75">{fechaCitaSeg(r.proxima?.fecha_inicio||null)}</span>
-        <div className="min-w-0">
-          <EstadoSeguimientoChip estado={r.estado}/>
-          <p className="mt-1 text-[10px] leading-snug text-cyan-100/55">{descripcion}</p>
-        </div>
-        <label className="flex justify-center" title="FIN TRATAMIENTO"><input type="checkbox" checked={Boolean(r.finActivo)} disabled={Boolean(guardando)||r.estado==='no_continua'} onChange={()=>void finTratamiento(r)} aria-label={`FIN TRATAMIENTO ${r.primera.nombre_paciente||''}`} className="h-4 w-4 cursor-pointer accent-cyan-400 disabled:cursor-not-allowed"/></label>
+        <span className={`whitespace-nowrap text-[10px] ${r.proxima?'text-cyan-100/75':'text-red-300'}`}>{fechaCitaSeg(r.proxima?.fecha_inicio||null)}</span>
+        <span className={`inline-flex min-w-0 items-center gap-1 rounded-full border px-1.5 py-1 text-[10px] leading-tight ${tonoEstado}`} title={r.estadoTexto}>
+          {r.alerta&&<AlertCircle className="h-3 w-3 shrink-0"/>}<span className="min-w-0 break-words">{r.estadoTexto}</span>
+        </span>
+        {esInspector&&<label className="flex justify-center" title="FIN TRATAMIENTO"><input type="checkbox" checked={Boolean(r.finActivo)} disabled={Boolean(guardando)||r.estado==='no_continua'} onChange={()=>void finTratamiento(r)} aria-label={`FIN TRATAMIENTO ${r.primera.nombre_paciente||''}`} className="h-4 w-4 cursor-pointer accent-cyan-400 disabled:cursor-not-allowed"/></label>}
         <button type="button" onClick={()=>desplegar(r)} aria-label={`Historial de ${r.primera.nombre_paciente||'paciente'}`} aria-expanded={abierta} className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-cyan-400/40 bg-cyan-400/[.06] text-cyan-200 transition hover:border-cyan-200 hover:bg-cyan-400/20">
           <ChevronDown className={`h-4 w-4 transition-transform ${abierta?'rotate-180':''}`}/>
         </button>
@@ -514,49 +488,79 @@ function CajaSeguimiento({citas,cargando,errorDatos}:{citas:CitaDB[];cargando:bo
             <label className="flex items-center gap-2 text-[11px] text-cyan-100/80"><input type="checkbox" checked={financiacion} onChange={e=>setFinanciacion(e.target.checked)} className="accent-cyan-400"/> Financiación ofrecida</label>
             <label className="flex items-center gap-2 text-[11px] text-cyan-100/80"><input type="checkbox" checked={valoracion} onChange={e=>setValoracion(e.target.checked)} className="accent-cyan-400"/> Nueva visita de valoración propuesta</label>
             <label className="flex items-center gap-2 text-[11px] text-cyan-100/80"><input type="checkbox" checked={acepta} onChange={e=>setAcepta(e.target.checked)} className="accent-cyan-400"/> Acepta nuevo contacto</label>
-            {['no_contesta','volver_contactar'].includes(resultado)&&<label className="block space-y-1 text-[10px] text-cyan-100/75">Próximo contacto<input type="date" value={fechaContacto} onChange={e=>setFechaContacto(e.target.value)} className="block w-full rounded-lg border border-cyan-400/30 bg-[#0A303B] p-2 text-white"/></label>}
+            <label className="block space-y-1 text-[10px] text-cyan-100/75">Próximo contacto {['volver_contactar','no_contesta'].includes(resultado)?'(obligatorio)':'(opcional)'}<input type="date" value={fechaContacto} onChange={e=>setFechaContacto(e.target.value)} className="block w-full rounded-lg border border-cyan-400/30 bg-[#0A303B] p-2 text-white"/></label>
           </>}
-          <label className="block space-y-1 text-[10px] text-cyan-100/75">Observaciones<textarea value={observaciones} onChange={e=>setObservaciones(e.target.value)} rows={3} className="block w-full rounded-lg border border-cyan-400/30 bg-[#0A303B] p-2 text-white"/></label>
-          <button type="button" disabled={Boolean(guardando)} onClick={()=>void registrar(r)} className="rounded-full border border-cyan-300/45 bg-cyan-400/[.06] px-3 py-2 text-[11px] text-cyan-100 shadow-[0_0_11px_rgba(34,211,238,.11)] transition hover:border-cyan-200 hover:bg-cyan-400/20 disabled:cursor-not-allowed disabled:opacity-50">{guardando===r.primera.id?'Guardando…':'Guardar gestión'}</button>
+          <label className="block space-y-1 text-[10px] text-cyan-100/75">Observaciones<textarea value={observaciones} onChange={e=>setObservaciones(e.target.value)} rows={3} className="block w-full resize-y rounded-lg border border-cyan-400/30 bg-[#0A303B] p-2 text-white"/></label>
+          <button type="button" disabled={Boolean(guardando)} onClick={()=>void registrar(r)} className="rounded-full border border-cyan-300/45 bg-cyan-400/[.06] px-4 py-2 text-[11px] font-medium text-cyan-100 hover:bg-cyan-400/20 disabled:opacity-40">{guardando===r.primera.id?'Guardando…':'Guardar gestión'}</button>
         </div>}
+        {errorGuardar&&<p role="alert" className="text-[11px] text-amber-200">{errorGuardar}</p>}
       </div>}
     </div>;
   };
-  const indicador=(titulo:string,n:number,i:number)=><div key={titulo} className="flex items-center gap-2 rounded-full border border-cyan-400/14 bg-cyan-400/[.025] px-3 py-2 text-[11px] text-cyan-50/90 shadow-[inset_0_1px_0_rgba(165,243,252,.02)]"><span className="h-2.5 w-2.5 shrink-0 rounded-full shadow-[0_0_10px_currentColor]" style={{backgroundColor:[estilosSeg.pendiente.hex,estilosSeg.curso.hex,estilosSeg.finalizado.hex,estilosSeg.no_continua.hex][i]}}/><span className="min-w-0 flex-1 truncate">{titulo}</span><strong className="font-semibold tabular-nums text-white">{cargandoTodo||errorTodo?'—':n}</strong></div>;
+  // En el Dashboard no hay desplegables ni ediciones. La ficha de gestión queda en INSPECCIONAR.
+  const filaPrincipal=(r:FilaSeguimiento)=>{
+    const estilo=estilosSeg[r.estado];
+    const aviso=r.estado==='pendiente'
+      ? r.alerta?'Nuevo contacto sin realizar':r.fechaContacto?`Volver a contactar ${fechaGestionSeg(r.fechaContacto)}`:r.estadoTexto
+      : '';
+    return <div key={r.primera.id} className="grid grid-cols-[minmax(0,1fr)_62px_62px_88px] items-center gap-1.5 border-t border-cyan-500/10 px-2 py-3.5 text-[10px] transition-colors hover:bg-cyan-500/[.035] sm:grid-cols-[minmax(0,1.8fr)_94px_91px_133px] sm:gap-2 sm:px-3 sm:text-xs">
+      <span className="min-w-0 truncate font-medium text-white" title={r.primera.nombre_paciente||''}>{r.primera.nombre_paciente||'—'}</span>
+      <span className="min-w-0 whitespace-nowrap text-[10px] text-cyan-100/75 sm:text-[11px]">{fechaCitaSeg(r.primera.fecha_inicio)}</span>
+      <span className="min-w-0 whitespace-nowrap text-[10px] text-cyan-100/75 sm:text-[11px]">{fechaCitaSeg(r.proxima?.fecha_inicio||null)}</span>
+      <span className="min-w-0">
+        <span className={`inline-flex max-w-full items-center gap-1.5 rounded-full border px-2 py-1.5 text-[10px] leading-tight ${estilo.capsula}`}>
+          <span className={`h-2 w-2 shrink-0 rounded-full shadow-[0_0_10px_currentColor] ${estilo.dot}`}/>
+          <span className="min-w-0 truncate" title={r.estado==='curso'?'En tratamiento':r.estado==='finalizado'?'TTO finalizado':r.estado==='no_continua'?'No continúan':'Pendiente'}>{r.estado==='curso'?'En tratamiento':r.estado==='finalizado'?'TTO finalizado':r.estado==='no_continua'?'No continúan':'Pendiente'}</span>
+        </span>
+        {aviso&&<span className="mt-1 block text-[9px] leading-snug text-cyan-100/55 sm:text-[10px]">{aviso}</span>}
+      </span>
+    </div>;
+  };
+  const indicador=(titulo:string,n:number,i:number)=><div key={titulo} className="flex items-center gap-2 text-[11px] text-cyan-100/85"><span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{backgroundColor:[estilosSeg.pendiente.hex,estilosSeg.curso.hex,estilosSeg.finalizado.hex,estilosSeg.no_continua.hex][i]}}/><span className="min-w-0 flex-1">{titulo}</span><strong className="font-semibold tabular-nums text-white">{cargandoTodo||errorTodo?'—':n}</strong></div>;
   const opciones=[
     {label:'Año',value:anio,set:setAnio,opts:[{value:'todos',label:'Todos los años'},...anos.map(a=>({value:a,label:a}))]},
     {label:'Mes',value:mes,set:setMes,opts:[{value:'todos',label:'Todo el año'},...Array.from({length:12},(_,i)=>({value:String(i+1),label:new Intl.DateTimeFormat('es-ES',{month:'long'}).format(new Date(2026,i,1))}))]},
     {label:'Situación',value:situacion,set:setSituacion,opts:[{value:'todas',label:'Todas'},{value:'pendiente',label:'Pendientes'},{value:'curso',label:'En tratamiento'},{value:'finalizado',label:'Finalizadas'},{value:'no_continua',label:'No continúan'}]}
   ];
   return <>
-    <section className="min-w-0 overflow-hidden rounded-[28px] border border-cyan-300/50 bg-[#031B24] p-4 text-white shadow-[0_12px_35px_rgba(0,0,0,.3),0_0_22px_rgba(34,211,238,.11)] sm:p-5">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-2"><div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-cyan-400/[.055] shadow-[0_0_22px_rgba(34,211,238,.17)] sm:h-10 sm:w-10"><HeartPulse className="h-5 w-5 text-cyan-300"/></div><h2 className="text-[11px] font-normal uppercase tracking-[.08em] text-cyan-200 sm:text-sm sm:tracking-[.10em]">SEGUIMIENTO</h2></div>
-        <div className="group shrink-0 rounded-xl border border-cyan-300/45 bg-[#082B35] px-3 py-2 text-center shadow-[0_0_12px_rgba(34,211,238,.10)] transition-all duration-300 hover:-translate-y-0.5 hover:border-cyan-200/90 hover:bg-[#0A3541] hover:shadow-[0_0_18px_rgba(34,211,238,.40),0_0_30px_rgba(34,211,238,.13)]">
-          <div className="flex items-baseline justify-center gap-2"><span className="text-[9px] font-normal uppercase tracking-[.12em] text-cyan-100/70">TOTAL</span><strong className="text-[26px] font-semibold leading-none tabular-nums text-white sm:text-[30px]">{cargandoTodo||errorTodo?'…':historico.reduce((s,n)=>s+n,0)}</strong></div>
-          <div className="mt-1 text-[9px] leading-tight text-cyan-100/65 sm:text-[10px]">Primeras visitas</div>
+    {/* En escritorio la altura de CITAS CREADAS determina la fila del grid.
+        El contenido de SEGUIMIENTO no añade altura: solo su tabla desplaza por dentro. */}
+    <div className="min-w-0 xl:relative xl:min-h-0">
+      <section className="flex min-w-0 flex-col overflow-hidden rounded-[28px] border border-cyan-300/50 bg-[#031B24] p-4 text-white shadow-[0_12px_35px_rgba(0,0,0,.3),0_0_22px_rgba(34,211,238,.11)] sm:p-5 xl:absolute xl:inset-0">
+        <div className="flex shrink-0 items-start justify-between gap-2 sm:gap-4">
+          <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-cyan-400/[.055] shadow-[0_0_22px_rgba(34,211,238,.17)] sm:h-10 sm:w-10"><HeartPulse className="h-5 w-5 text-cyan-300"/></div>
+            <h2 className="text-[11px] font-normal uppercase tracking-[.08em] text-cyan-200 sm:text-sm sm:tracking-[.10em]">SEGUIMIENTO</h2>
+          </div>
+          {/* Copia literal del contador de CITAS CREADAS: cambia solo el contenido. */}
+          <div className="group shrink-0 rounded-xl border border-cyan-300/45 bg-[#082B35] px-2.5 py-1.5 text-center shadow-[0_0_12px_rgba(34,211,238,.10)] transition-all duration-300 hover:-translate-y-0.5 hover:border-cyan-200/90 hover:bg-[#0A3541] hover:shadow-[0_0_18px_rgba(34,211,238,.40),0_0_30px_rgba(34,211,238,.13)] sm:px-3 sm:py-2">
+            <div className="flex items-baseline justify-center gap-2 sm:gap-3"><span className="text-[9px] font-normal uppercase tracking-[.12em] text-cyan-100/70 sm:text-[10px]">TOTAL</span><strong className="text-[26px] font-semibold leading-none tabular-nums text-white sm:text-[30px]">{cargandoTodo?'…':errorTodo?'—':registros.length}</strong></div>
+            <div className="mt-1 text-[9px] leading-tight text-cyan-100/65 sm:text-[10px]">Primeras visitas</div>
+          </div>
         </div>
-      </div>
-      <div aria-hidden="true" className="mt-3 h-px w-full bg-cyan-300/75 shadow-[0_0_10px_rgba(34,211,238,.75)]"/>
-      <div className="mt-4 grid gap-4 lg:grid-cols-[230px_minmax(0,1fr)] lg:items-center">
-        <div className="flex justify-center lg:justify-start"><DonutSeguimiento valores={cargandoTodo||errorTodo?[0,0,0,0]:historico}/></div>
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-          {indicador('Citas pendientes',historico[0],0)}
-          {indicador('En tratamiento',historico[1],1)}
-          {indicador('TTO finalizado',historico[2],2)}
-          {indicador('No continúan',historico[3],3)}
+        <div aria-hidden="true" className="mt-3 h-px w-full shrink-0 bg-cyan-300/75 shadow-[0_0_10px_rgba(34,211,238,.75)]"/>
+        {/* Gráfico relleno de sectores separados, acabado mate + halo propio. Sin caja. */}
+        <div className="mt-2 flex shrink-0 items-center justify-center gap-3 sm:gap-6">
+          <div className="flex shrink-0 justify-center"><DonutSeguimiento valores={cargandoTodo||errorTodo?[0,0,0,0]:historico}/></div>
+          <div className="grid min-w-0 flex-1 grid-cols-1 gap-2.5 sm:max-w-[285px]">
+            {indicador('Citas pendientes',historico[0],0)}
+            {indicador('En tratamiento',historico[1],1)}
+            {indicador('TTO finalizado',historico[2],2)}
+            {indicador('No continúan',historico[3],3)}
+          </div>
         </div>
-      </div>
-      <div className="mt-5">
-        <div className="grid grid-cols-[minmax(0,1.65fr)_84px_78px_minmax(0,1.12fr)] items-center gap-2 border-b border-cyan-400/15 pb-3 text-[9px] uppercase tracking-[.055em] text-cyan-300/85 sm:grid-cols-[minmax(0,1.8fr)_98px_92px_minmax(0,1.1fr)] sm:text-[10px]">
-          <span>Paciente</span><span>Primera visita</span><span>Próx. cita</span><span>Estado</span>
+        {/* Caja de tabla igual que LABORATORIO: encabezado fijo y filas alineadas. */}
+        <div className="mt-3 flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-cyan-400/30 bg-[rgba(5,18,24,.78)]">
+          <div className="grid shrink-0 grid-cols-[minmax(0,1fr)_62px_62px_88px] items-center gap-1.5 bg-cyan-500/10 px-2 py-3 text-[9px] uppercase tracking-[.035em] text-cyan-300/90 sm:grid-cols-[minmax(0,1.8fr)_94px_91px_133px] sm:gap-2 sm:px-3">
+            <span>Paciente</span><span>Primera visita</span><span>Próx. cita</span><span>Estado</span>
+          </div>
+          <div className={`min-h-0 max-h-[360px] flex-1 overflow-y-auto xl:max-h-none ${scrollSeguimiento}`}>
+            {cargandoTodo?<p className="px-3 py-5 text-center text-xs text-cyan-100/55">Cargando seguimiento…</p>:errorTodo?<p className="px-3 py-5 text-center text-xs text-amber-200">No se pudo cargar el seguimiento: {errorTodo}</p>:datosMes.length?datosMes.map(filaPrincipal):<p className="px-3 py-5 text-center text-xs text-cyan-100/55">Sin primeras visitas que requieran revisión.</p>}
+          </div>
         </div>
-        <div className={`max-h-[430px] overflow-y-auto ${scrollSeguimiento}`}>
-          {cargandoTodo?<p className="py-8 text-center text-xs text-cyan-100/55">Cargando seguimiento…</p>:errorTodo?<p className="py-8 text-center text-xs text-amber-200">No se pudo cargar el seguimiento: {errorTodo}</p>:datosMes.length?datosMes.map(r=>fila(r,false)):<p className="py-8 text-center text-xs text-cyan-100/55">Sin primeras visitas que requieran revisión.</p>}
-        </div>
-      </div>
-      <div className="mt-4 flex justify-end"><button type="button" onClick={()=>setInspectorAbierto(true)} className="inline-flex items-center gap-1.5 rounded-full border border-cyan-300/45 bg-cyan-400/[.06] px-3.5 py-1.5 text-[10px] font-medium uppercase tracking-[.1em] text-cyan-100 shadow-[0_0_11px_rgba(34,211,238,.11)] transition hover:border-cyan-200 hover:bg-cyan-400/20 hover:shadow-[0_0_20px_rgba(34,211,238,.22)]"><ChartNoAxesCombined className="h-3.5 w-3.5 text-cyan-300"/> Inspeccionar</button></div>
-    </section>
+        <div className="mt-3 flex shrink-0 justify-end"><button type="button" onClick={()=>setInspectorAbierto(true)} className="inline-flex items-center gap-1.5 rounded-full border border-cyan-300/45 bg-cyan-400/[.06] px-3.5 py-1.5 text-[10px] font-medium uppercase tracking-[.1em] text-cyan-100 shadow-[0_0_11px_rgba(34,211,238,.11)] transition hover:border-cyan-200 hover:bg-cyan-400/20 hover:shadow-[0_0_20px_rgba(34,211,238,.22)]"><ChartNoAxesCombined className="h-3.5 w-3.5 text-cyan-300"/> Inspeccionar</button></div>
+      </section>
+    </div>
     {inspectorAbierto&&<div role="dialog" aria-modal="true" aria-label="Inspeccionar seguimiento" className={`fixed inset-0 z-[100] overflow-y-auto bg-[#02141B]/95 px-2 py-4 text-white backdrop-blur-lg sm:px-6 sm:py-6 lg:px-10 lg:py-8 ${scrollSeguimiento}`}>
       <div className="mx-auto max-w-6xl space-y-5 pb-10 sm:space-y-7">
         <div className="flex items-center justify-between gap-3 border-b border-cyan-300/35 pb-3 shadow-[0_1px_0_rgba(34,211,238,.06)] sm:pb-4"><div className="flex min-w-0 items-center gap-2 sm:gap-3"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-cyan-400/[.055] shadow-[0_0_22px_rgba(34,211,238,.17)] sm:h-10 sm:w-10"><ChartNoAxesCombined className="h-5 w-5 text-cyan-300 drop-shadow-[0_0_10px_rgba(103,232,249,.75)]"/></span><h2 className="text-base font-normal uppercase tracking-[.08em] text-white sm:text-lg sm:tracking-[.10em]">INSPECCIONAR SEGUIMIENTO</h2></div><button type="button" onClick={()=>setInspectorAbierto(false)} aria-label="Cerrar Inspeccionar" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-cyan-400/40 bg-cyan-400/[.05] text-cyan-100 shadow-[0_0_14px_rgba(34,211,238,.1)] transition hover:border-cyan-200 hover:bg-cyan-400/15 sm:h-10 sm:w-10"><X className="h-4 w-4 sm:h-5 sm:w-5"/></button></div>
@@ -597,7 +601,7 @@ function CajaPendiente({titulo, icono:Icon}:{titulo:string;icono:typeof Bot}) {
 }
 
 const tarjetaGlow = 'relative overflow-hidden rounded-[28px] border border-cyan-400/30 bg-[radial-gradient(ellipse_at_92%_0%,rgba(18,117,134,.19),transparent_56%),linear-gradient(150deg,#062B35_0%,#031C25_60%,#02141B_100%)] text-white shadow-[0_12px_40px_rgba(0,0,0,.25),0_0_25px_rgba(34,211,238,.09),inset_0_1px_0_rgba(165,243,252,.065)]';
-const scrollCyan = '[&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-cyan-950/40 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-500/55 hover:[&::-webkit-scrollbar-thumb]:bg-cyan-300/80';
+const scrollCyan = '[scrollbar-width:thin] [scrollbar-color:rgba(103,232,249,.22)_transparent] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-300/20 hover:[&::-webkit-scrollbar-thumb]:bg-cyan-300/35';
 
 interface Props {
   initialConvs?: unknown[];
@@ -1036,3 +1040,5 @@ return (
 };
 
 export default DashboardClientProvisional;
+
+
