@@ -492,52 +492,58 @@ useEffect(() => {
       && (profInspeccion==='todos'||profesionalGrupo(c)===profInspeccion);
   }).length,[citasUnicas,anioInspeccion,mesInspeccion,profInspeccion]);
 
+  // La vista de escritorio y móvil comparten componentes y datos, pero las
+  // clases responsive evitan desbordamientos en pantallas pequeñas.
   const contenido = (
-    <div className="grid grid-cols-1 gap-6 xl:grid-cols-2 xl:gap-7">
-      <section className={`${tarjetaGlow} p-5 sm:p-6`}>
-        <div aria-hidden="true" className="pointer-events-none absolute -right-12 -top-24 h-52 w-52 rounded-full bg-cyan-400/[.08] blur-[65px]" />
-        {/* Cabecera compacta, con la cifra integrada en la composición */}
-        <div className="relative flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-cyan-300/30 bg-cyan-400/[.08] shadow-[0_0_22px_rgba(34,211,238,.15)]">
-              <CalendarCheck2 className="h-6 w-6 text-cyan-300 drop-shadow-[0_0_9px_rgba(103,232,249,.62)]" />
+    <div className="grid grid-cols-1 gap-5 xl:grid-cols-2 xl:gap-7">
+      <section className="relative overflow-hidden rounded-[28px] border border-cyan-400/35 bg-[#031B24] p-4 text-white shadow-[0_12px_35px_rgba(0,0,0,.3),0_0_19px_rgba(34,211,238,.075),inset_0_1px_0_rgba(165,243,252,.045)] sm:p-5">
+        {/* Título fino, halo del icono y caja oscura: sin gradiente luminoso superior. */}
+        <div className="flex items-start justify-between gap-2 sm:gap-4">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-cyan-400/[.055] shadow-[0_0_22px_rgba(34,211,238,.17)] sm:h-10 sm:w-10">
+              <CalendarCheck2 className="h-5 w-5 text-cyan-300 drop-shadow-[0_0_10px_rgba(103,232,249,.75)]" />
             </div>
-            <div>
-              <h2 className="text-sm font-semibold uppercase tracking-[.19em] text-cyan-200 drop-shadow-[0_0_12px_rgba(34,211,238,.3)] sm:text-base">CITAS CREADAS</h2>
-              <p className="mt-1 text-xs text-cyan-100/55">Actividad de Martina</p>
-            </div>
+            <h2 className="text-[11px] font-normal uppercase tracking-[.17em] text-cyan-200 drop-shadow-[0_0_9px_rgba(34,211,238,.48)] sm:text-sm sm:tracking-[.23em]">CITAS CREADAS</h2>
           </div>
-          <div className="flex items-baseline gap-2 rounded-xl border border-cyan-300/20 bg-cyan-300/[.065] px-3 py-2 shadow-[inset_0_1px_0_rgba(165,243,252,.08),0_0_16px_rgba(34,211,238,.06)]">
-            <div className="text-right"><div className="text-[10px] uppercase tracking-[.13em] text-cyan-100/65">Martina · total</div><div className="mt-0.5 text-[10px] text-cyan-100/45">Citas gestionadas</div></div>
-            <strong className="text-3xl font-bold leading-none tabular-nums text-white drop-shadow-[0_0_15px_rgba(103,232,249,.22)]">{cargando?'…':martina.length}</strong>
+          <div className="shrink-0 rounded-xl border border-cyan-400/25 bg-[#082B35] px-2.5 py-2 text-center shadow-[0_0_12px_rgba(34,211,238,.05)] sm:min-w-[136px] sm:px-4">
+            <div className="text-[9px] uppercase tracking-[.12em] text-cyan-100/65">TOTAL</div>
+            <div className="mt-0.5 text-2xl font-semibold leading-none tabular-nums text-white sm:text-3xl">{cargando?'…':martina.length}</div>
+            <div className="mt-1.5 text-[9px] leading-tight text-cyan-100/60 sm:text-[10px]">Citas gestionadas Martina</div>
           </div>
         </div>
-        <div className="relative mt-5 flex items-center justify-center gap-3 rounded-2xl border border-cyan-400/15 bg-[#041F29]/80 px-3 py-3 shadow-[inset_0_1px_0_rgba(165,243,252,.04)]">
-          <button type="button" aria-label="Semana anterior" onClick={()=>setDesplazamiento(n=>n-1)} className="rounded-xl border border-cyan-400/35 bg-cyan-400/[.07] p-2 text-cyan-200 shadow-[0_0_12px_rgba(34,211,238,.07)] transition hover:border-cyan-300/70 hover:bg-cyan-400/20"><ChevronLeft className="h-4 w-4"/></button>
-          <div className="min-w-[152px] text-center text-sm font-semibold tabular-nums text-white sm:text-base">{mesES.format(lunes)} – {mesES.format(dias[dias.length-1])}</div>
-          <button type="button" aria-label="Semana siguiente" disabled={desplazamiento>=0} onClick={()=>setDesplazamiento(n=>Math.min(0,n+1))} className="rounded-xl border border-cyan-400/35 bg-cyan-400/[.07] p-2 text-cyan-200 transition hover:border-cyan-300/70 hover:bg-cyan-400/20 disabled:cursor-not-allowed disabled:opacity-30"><ChevronRight className="h-4 w-4"/></button>
+
+        {/* Selector circular como el resto de las agendas. */}
+        <div className="mt-3 flex items-center justify-center gap-3 sm:mt-4 sm:gap-5">
+          <button type="button" aria-label="Semana anterior" onClick={()=>setDesplazamiento(n=>n-1)} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-cyan-400/45 bg-cyan-400/[.06] text-cyan-100 shadow-[0_0_12px_rgba(34,211,238,.08)] transition hover:border-cyan-200 hover:bg-cyan-400/15"><ChevronLeft className="h-4 w-4"/></button>
+          <div className="min-w-[116px] text-center text-sm font-normal tabular-nums text-white sm:min-w-[144px] sm:text-base">{mesES.format(lunes)} – {mesES.format(dias[dias.length-1])}</div>
+          <button type="button" aria-label="Semana siguiente" disabled={desplazamiento>=0} onClick={()=>setDesplazamiento(n=>Math.min(0,n+1))} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-cyan-400/45 bg-cyan-400/[.06] text-cyan-100 transition hover:border-cyan-200 hover:bg-cyan-400/15 disabled:cursor-not-allowed disabled:opacity-30"><ChevronRight className="h-4 w-4"/></button>
         </div>
-        <div className="mt-2 text-center"><button type="button" onClick={()=>setMostrarFinde(v=>!v)} className="text-[11px] text-cyan-200/65 underline decoration-cyan-500/35 underline-offset-4 transition hover:text-cyan-100">{mostrarFinde?'Mostrar lunes a viernes':'Ver también sábado y domingo'}</button></div>
-        <div className="mt-4 rounded-2xl border border-cyan-400/20 bg-[linear-gradient(180deg,rgba(10,58,71,.72),rgba(4,29,39,.65))] px-4 py-4 shadow-[inset_0_1px_0_rgba(165,243,252,.045)]">
-          <div className="mb-4 text-xs font-medium tracking-wide text-cyan-100/75">Citas de Martina <span className="font-normal text-cyan-100/45">· por fecha de cita</span></div>
-          <div className="flex h-[130px] items-end gap-3">
-            {dias.map((d,i)=><div key={claveLocal(d)} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-2"><span className="text-[11px] tabular-nums text-cyan-100/80">{barras[i]}</span><div className="flex h-[94px] w-full items-end justify-center border-b border-cyan-400/20"><div className="w-full max-w-9 rounded-t-md bg-[linear-gradient(180deg,#67E8F9,#0891B2)] shadow-[0_0_16px_rgba(34,211,238,.28)]" style={{height:`${barras[i]===0 ? 0 : Math.max(3,barras[i]/mayorBarra*100)}%`}} /></div><span className="text-xs font-medium text-cyan-100/75">{['L','M','X','J','V','S','D'][i]}</span></div>)}
+        <div className="mt-1.5 text-center"><button type="button" onClick={()=>setMostrarFinde(v=>!v)} className="text-[10px] text-cyan-200/60 underline decoration-cyan-500/35 underline-offset-4 transition hover:text-cyan-100">{mostrarFinde?'Mostrar lunes a viernes':'Ver también sábado y domingo'}</button></div>
+
+        <div className="mt-3 rounded-2xl border border-cyan-400/25 bg-[#062631] px-3 py-3 shadow-[inset_0_1px_0_rgba(165,243,252,.035)] sm:px-4">
+          <div className="mb-2 text-xs font-medium text-cyan-100/80">Citas de Martina</div>
+          <div className="flex h-[118px] items-end gap-2 sm:gap-3">
+            {dias.map((d,i)=><div key={claveLocal(d)} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-1.5"><span className="text-[11px] tabular-nums text-cyan-100/80">{barras[i]}</span><div className="flex h-[84px] w-full items-end justify-center border-b border-cyan-400/20"><div className="w-full max-w-9 rounded-t-md bg-[linear-gradient(180deg,#67E8F9,#0891B2)] shadow-[0_0_14px_rgba(34,211,238,.24)]" style={{height:`${barras[i]===0 ? 0 : Math.max(3,barras[i]/mayorBarra*100)}%`}} /></div><span className="text-[11px] text-cyan-100/75">{['L','M','X','J','V','S','D'][i]}</span></div>)}
           </div>
         </div>
-        <div className="mt-5">
-          <div className="mb-3 flex items-center justify-between gap-3"><h3 className="text-[11px] font-semibold uppercase tracking-[.13em] text-cyan-200/90">Total citas clínica</h3><span className="text-[11px] text-cyan-100/50">{anioActual}</span></div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-2xl border border-cyan-400/20 bg-cyan-300/[.05] px-3 py-3 shadow-[inset_0_1px_0_rgba(165,243,252,.06)]"><div className="text-xs text-cyan-100/75">Dr. Federico</div><div className="mt-1 text-2xl font-semibold tabular-nums text-white">{cargando?'…':errorDatos?'—':totalFede}</div></div>
-            <div className="rounded-2xl border border-cyan-400/20 bg-cyan-300/[.05] px-3 py-3 shadow-[inset_0_1px_0_rgba(165,243,252,.06)]"><div className="text-xs text-cyan-100/75">Dra. Ana</div><div className="mt-1 text-2xl font-semibold tabular-nums text-white">{cargando?'…':errorDatos?'—':totalAna}</div></div>
+
+        {/* Tres contadores anuales; el histórico de Celia se agrupa internamente. */}
+        <div className="mt-4">
+          <h3 className="mb-2 text-[11px] font-medium uppercase tracking-[.1em] text-cyan-200/85">Total citas clínica <span className="ml-1 font-normal tracking-normal text-cyan-100/55">{anioActual}</span></h3>
+          <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+            <div className="min-w-0 rounded-xl border border-cyan-400/25 bg-[#082B35] px-2 py-2.5 text-center sm:px-3"><div className="truncate text-[10px] text-cyan-100/70 sm:text-xs">Total</div><div className="mt-1 text-xl font-semibold tabular-nums text-white sm:text-2xl">{cargando?'…':errorDatos?'—':totalFede+totalAna}</div></div>
+            <div className="min-w-0 rounded-xl border border-cyan-400/25 bg-[#082B35] px-2 py-2.5 text-center sm:px-3"><div className="truncate text-[10px] text-cyan-100/70 sm:text-xs">Dr. Federico</div><div className="mt-1 text-xl font-semibold tabular-nums text-white sm:text-2xl">{cargando?'…':errorDatos?'—':totalFede}</div></div>
+            <div className="min-w-0 rounded-xl border border-cyan-400/25 bg-[#082B35] px-2 py-2.5 text-center sm:px-3"><div className="truncate text-[10px] text-cyan-100/70 sm:text-xs">Dra. Ana</div><div className="mt-1 text-xl font-semibold tabular-nums text-white sm:text-2xl">{cargando?'…':errorDatos?'—':totalAna}</div></div>
           </div>
         </div>
-        <div className="mt-5 flex items-center justify-between gap-2 border-b border-cyan-400/20 pb-3 text-xs"><strong className="text-cyan-50">Citas de Martina</strong><span className="text-cyan-100/55">{citasSemana.length} en la semana</span></div>
-        <div className={`mt-2 h-[135px] overflow-y-auto pr-1 ${scrollCyan}`}>
-          {citasSemana.length===0?<p className="flex h-full items-center justify-center text-center text-xs text-cyan-100/50">Sin citas de Martina para esta semana</p>:
-            citasSemana.map(c=><div key={c.id} className="grid grid-cols-[1.4fr_1fr_.65fr] gap-2 border-b border-cyan-500/10 py-2.5 text-xs"><span className="truncate text-white" title={c.paciente}>{c.paciente}</span><span className="truncate text-cyan-100/70" title={c.motivo}>{c.motivo}</span><span className="truncate text-right text-cyan-100/60">{c.calendar_id==='ana'?'Ana':'Federico'}</span></div>)}
+
+        <div className="mt-4 flex items-center justify-between gap-2 border-b border-cyan-400/20 pb-2 text-xs"><strong className="font-medium text-cyan-50">Citas de Martina</strong><span className="text-cyan-100/55">{citasSemana.length} en la semana</span></div>
+        <div className={`mt-1 max-h-[140px] min-h-[35px] overflow-y-auto pr-1 ${scrollCyan}`}>
+          {citasSemana.length===0?<p className="py-4 text-center text-xs text-cyan-100/50">Sin citas de Martina para esta semana</p>:
+            citasSemana.map(c=><div key={c.id} className="grid grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,.7fr)] items-center gap-2 border-b border-cyan-500/10 py-2.5 text-[11px] sm:text-xs"><span className="truncate text-white" title={c.paciente}>{c.paciente}</span><span className="truncate text-cyan-100/70" title={c.motivo}>{c.motivo}</span><span className="truncate text-right text-cyan-100/60">{c.calendar_id==='ana'?'Ana':'Federico'}</span></div>)}
         </div>
         {errorDatos?<p className="mt-2 flex gap-1 text-xs text-amber-200"><AlertCircle className="h-4 w-4 shrink-0"/>{errorDatos}. El histórico verificado de Martina sigue disponible.</p>:null}
-        <button type="button" onClick={()=>setInspeccionar(true)} className="mt-4 ml-auto flex items-center gap-2 rounded-full border border-cyan-300/45 bg-cyan-400/[.08] px-5 py-2.5 text-xs font-semibold uppercase tracking-[.1em] text-cyan-100 shadow-[0_0_16px_rgba(34,211,238,.12)] transition hover:border-cyan-200 hover:bg-cyan-400/20 hover:shadow-[0_0_24px_rgba(34,211,238,.26)]"><ChartNoAxesCombined className="h-4 w-4 text-cyan-300"/> Inspeccionar</button>
+        <div className="mt-2 flex justify-end"><button type="button" onClick={()=>setInspeccionar(true)} className="inline-flex items-center gap-1.5 rounded-full border border-cyan-300/45 bg-cyan-400/[.06] px-3.5 py-1.5 text-[10px] font-medium uppercase tracking-[.1em] text-cyan-100 shadow-[0_0_11px_rgba(34,211,238,.11)] transition hover:border-cyan-200 hover:bg-cyan-400/20 hover:shadow-[0_0_20px_rgba(34,211,238,.22)]"><ChartNoAxesCombined className="h-3.5 w-3.5 text-cyan-300"/> Inspeccionar</button></div>
       </section>
       <CajaPendiente titulo="SEGUIMIENTO" icono={HeartPulse}/>
       <CajaPendiente titulo="LABORATORIO" icono={FlaskConical}/>
