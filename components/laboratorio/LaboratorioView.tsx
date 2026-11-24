@@ -644,11 +644,11 @@ return (
           <colgroup>
             <col className="w-[18%]" />
             <col className="w-[12%]" />
-            <col className="w-[12%]" />
-            <col className="w-[6%]" />
+            <col className="w-[11%]" />
+            <col className="w-[5%]" />
             <col className="w-[21%]" />
             <col className="w-[15%]" />
-            <col className="w-[11%]" />
+            <col className="w-[12%]" />
             <col className="w-[5%]" />
           </colgroup>
 
