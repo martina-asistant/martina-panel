@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils/cn';
 import {
   MessageCircle, PhoneCall, CalendarCheck2, ChevronLeft, ChevronRight, ChevronDown,
   ChartNoAxesCombined, ClipboardList, FlaskConical, Bot, HeartPulse,
-  X, Search, AlertCircle
+  X, Search, AlertCircle, UserRound
 } from 'lucide-react';
 import type { CanalMartina } from '@/lib/types/db.types';
 import { getConfiguracionMartina, updateCanalMartina } from '@/lib/repos/configuracion.repo';
@@ -24,7 +24,7 @@ import Link from 'next/link';
  */
 
 type CitaDB = {
-  id: string; event_id: string | null; calendar_id: string | null;
+  id: string; patient_id: string | null; event_id: string | null; calendar_id: string | null;
   profesional: string | null; nombre_paciente: string | null;
   motivo: string | null; estado: string | null; origen: string | null;
   fecha_inicio: string | null; fecha_fin: string | null;
@@ -227,6 +227,302 @@ function compilarMartina(citas:CitaDB[], cambios:CambioDB[], historialCompleto:C
   );
 }
 
+// SEGUIMIENTO: solo las citas se leen de historial_citas; las acciones se registran
+// en historial_seguimiento. No se escribe en Google Calendar ni en historial_citas.
+type GestionSeguimiento = {
+  id:string; historial_cita_id:string; patient_id:string; tipo_registro:string;
+  fecha_gestion:string; canal_contacto:string|null; resultado:string|null;
+  observaciones:string|null; financiacion_ofrecida:boolean;
+  nueva_valoracion_propuesta:boolean; acepta_nuevo_contacto:boolean|null;
+  fecha_proximo_contacto:string|null; motivo_no_continua:string|null;
+  fin_tratamiento:boolean; gestionado_por:string; fecha_registro:string;
+  registro_origen_id:string|null;
+};
+type EstadoSeguimiento = 'pendiente'|'curso'|'finalizado'|'no_continua';
+type FilaSeguimiento = {
+  primera:CitaDB; proxima:CitaDB|null; estado:EstadoSeguimiento;
+  gestiones:GestionSeguimiento[]; ultimo:GestionSeguimiento|null;
+  finActivo:GestionSeguimiento|null; fechaContacto:string|null;
+  estadoTexto:string; alerta:boolean;
+};
+const scrollSeguimiento = '[&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-300/20 hover:[&::-webkit-scrollbar-thumb]:bg-cyan-300/35';
+const estilosSeg = {
+  pendiente:{dot:'bg-amber-400',color:'text-amber-200',hex:'#F59E0B'},
+  curso:{dot:'bg-cyan-400',color:'text-cyan-200',hex:'#22D3EE'},
+  finalizado:{dot:'bg-green-400',color:'text-green-200',hex:'#4ADE80'},
+  no_continua:{dot:'bg-red-400',color:'text-red-200',hex:'#F87171'}
+};
+function fechaCitaSeg(fecha:string|null) {
+  return fecha ? new Date(fecha).toLocaleDateString('es-ES',{day:'numeric',month:'short',year:'2-digit',timeZone:'Europe/Madrid'}) : 'Sin cita';
+}
+function fechaGestionSeg(fecha:string|null) {
+  if(!fecha)return '—';
+  const [a,m,d]=fecha.split('-');
+  return a&&m&&d ? `${d}/${m}/${a}` : fecha;
+}
+function siguienteLaborable(fechaISO:string) {
+  const d=new Date(`${fechaISO}T12:00:00Z`);
+  if(Number.isNaN(d.getTime()))return '';
+  do {d.setUTCDate(d.getUTCDate()+1);} while ([0,6].includes(d.getUTCDay()));
+  return d.toISOString().slice(0,10);
+}
+function clasificarSeguimiento(citas:CitaDB[],gestiones:GestionSeguimiento[],hoy:string):FilaSeguimiento[] {
+  const porPaciente=new Map<string,CitaDB[]>();
+  for(const c of citas){
+    if(!c.patient_id)continue;
+    const arr=porPaciente.get(c.patient_id)||[];
+    arr.push(c);porPaciente.set(c.patient_id,arr);
+  }
+  const porVisita=new Map<string,GestionSeguimiento[]>();
+  for(const g of gestiones){
+    const arr=porVisita.get(g.historial_cita_id)||[];
+    arr.push(g);porVisita.set(g.historial_cita_id,arr);
+  }
+  return citas.filter(c=>Boolean(c.patient_id&&c.fecha_inicio)&&esPrimeraVisita(c.motivo)&&normalizar(c.estado)==='finalizada').map(primera=>{
+    const historial=[...(porVisita.get(primera.id)||[])].sort((a,b)=>a.fecha_registro.localeCompare(b.fecha_registro)||a.id.localeCompare(b.id));
+    const ult=historial[historial.length-1]||null;
+    // La última decisión explícita de cierre o reapertura determina el cierre actual.
+    let finActivo:GestionSeguimiento|null=null;
+    let cerrado=false;
+    for(const g of historial){
+      if(g.tipo_registro==='fin_tratamiento')finActivo=g;
+      if(g.tipo_registro==='rectificar_fin_tratamiento')finActivo=null;
+      if(g.tipo_registro==='no_continua')cerrado=true;
+      if(g.tipo_registro==='reabrir_seguimiento')cerrado=false;
+    }
+    const fechaPrimera=primera.fecha_inicio||'';
+    const proxima=(porPaciente.get(primera.patient_id!)||[])
+      .filter(c=>c.id!==primera.id && c.fecha_inicio && c.fecha_inicio>fechaPrimera
+        && diaMadrid(c.fecha_inicio)>=hoy && estadoVigente(c))
+      .sort((a,b)=>(a.fecha_inicio||'').localeCompare(b.fecha_inicio||''))[0]||null;
+    const estado:EstadoSeguimiento=finActivo?'finalizado':cerrado?'no_continua':proxima?'curso':'pendiente';
+    const ultimaGestion=[...historial].reverse().find(g=>g.tipo_registro==='gestion')||null;
+    const fechaContacto=ultimaGestion?.fecha_proximo_contacto||null;
+    const contactoVencido=estado==='pendiente'&&Boolean(fechaContacto&&fechaContacto<=hoy);
+    const sinGestionVencida=estado==='pendiente'&&!ultimaGestion&&Boolean(
+      primera.fecha_inicio && hoy>=siguienteLaborable(diaMadrid(primera.fecha_inicio))
+    );
+    let estadoTexto='Sin gestionar';
+    if(estado==='finalizado')estadoTexto='Finalizado';
+    else if(estado==='no_continua')estadoTexto='No continúa';
+    else if(estado==='curso')estadoTexto='En tratamiento';
+    else if(contactoVencido)estadoTexto='Nuevo contacto sin realizar';
+    else if(fechaContacto)estadoTexto=`Volver a contactar ${fechaGestionSeg(fechaContacto)}`;
+    else if(ultimaGestion)estadoTexto=ultimaGestion.resultado==='sin_respuesta'?'Sin respuesta':ultimaGestion.resultado==='no_contesta'?'No contesta':'En seguimiento';
+    return {primera,proxima,estado,gestiones:historial,ultimo:ult,finActivo,fechaContacto,estadoTexto,alerta:contactoVencido||sinGestionVencida};
+  }).sort((a,b)=>(b.primera.fecha_inicio||'').localeCompare(a.primera.fecha_inicio||''));
+}
+function DonutSeguimiento({valores}:{valores:number[]}) {
+  const total=valores.reduce((s,n)=>s+n,0), circ=2*Math.PI*51;
+  const colores=[estilosSeg.pendiente.hex,estilosSeg.curso.hex,estilosSeg.finalizado.hex,estilosSeg.no_continua.hex];
+  let antes=0;
+  const arcos=valores.map((v,i)=>{const segmento=total?circ*v/total:0;const dato={color:colores[i],segmento,offset:antes};antes+=segmento;return dato;});
+  return <svg viewBox="0 0 160 160" role="img" aria-label={`Total de primeras visitas ${total}`} className="mx-auto h-auto w-full max-w-[180px]">
+    <circle cx="80" cy="80" r="51" fill="none" stroke="#123944" strokeWidth="19"/>
+    {arcos.map((a,i)=>a.segmento>0?<circle key={i} cx="80" cy="80" r="51" fill="none" stroke={a.color} strokeWidth="19" strokeDasharray={`${a.segmento} ${circ}`} strokeDashoffset={-a.offset} transform="rotate(-90 80 80)"/>:null)}
+    <text x="80" y="79" textAnchor="middle" fontSize="27" fontWeight="600" fill="white">{total}</text>
+    <text x="80" y="96" textAnchor="middle" fontSize="9" fill="#A5F3FC">Primeras visitas</text>
+  </svg>;
+}
+function CajaSeguimiento({citas,cargando,errorDatos}:{citas:CitaDB[];cargando:boolean;errorDatos:string}) {
+  const [gestiones,setGestiones]=useState<GestionSeguimiento[]>([]);
+  const [cargandoGestiones,setCargandoGestiones]=useState(true);
+  const [errorSeg,setErrorSeg]=useState('');
+  const [guardando,setGuardando]=useState<string|null>(null);
+  const [expandida,setExpandida]=useState<string|null>(null);
+  const [inspectorAbierto,setInspectorAbierto]=useState(false);
+  const [anio,setAnio]=useState(String(new Date().getFullYear()));
+  const [mes,setMes]=useState('todos');
+  const [situacion,setSituacion]=useState('todas');
+  const [buscar,setBuscar]=useState('');
+  const [menuFiltro,setMenuFiltro]=useState<string|null>(null);
+  const [fechaGestion,setFechaGestion]=useState(()=>diaMadrid(new Date().toISOString()));
+  const [canal,setCanal]=useState('llamada');
+  const [resultado,setResultado]=useState('volver_contactar');
+  const [observaciones,setObservaciones]=useState('');
+  const [financiacion,setFinanciacion]=useState(false);
+  const [valoracion,setValoracion]=useState(false);
+  const [acepta,setAcepta]=useState(false);
+  const [fechaContacto,setFechaContacto]=useState('');
+  const [motivoCierre,setMotivoCierre]=useState('');
+  const [errorGuardar,setErrorGuardar]=useState('');
+  const hoy=diaMadrid(new Date().toISOString());
+  const mesActual=hoy.slice(0,7);
+  const cargandoTodo=cargando||cargandoGestiones;
+  const errorTodo=errorDatos||errorSeg;
+  useEffect(()=>{
+    let activo=true;
+    (async()=>{
+      const supa=createClient();
+      if(!supa){if(activo){setErrorSeg('Sin conexión con Supabase');setCargandoGestiones(false);}return;}
+      try {
+        const datos=await leerTodas<GestionSeguimiento>(supa,'historial_seguimiento','id,historial_cita_id,patient_id,tipo_registro,fecha_gestion,canal_contacto,resultado,observaciones,financiacion_ofrecida,nueva_valoracion_propuesta,acepta_nuevo_contacto,fecha_proximo_contacto,motivo_no_continua,fin_tratamiento,gestionado_por,fecha_registro,registro_origen_id');
+        if(activo){setGestiones(datos);setErrorSeg('');}
+      }catch(e){if(activo)setErrorSeg(e instanceof Error?e.message:'No se pudo leer el historial de seguimiento');}
+      finally{if(activo)setCargandoGestiones(false);}
+    })();
+    return ()=>{activo=false;};
+  },[]);
+  const registros=useMemo(()=>clasificarSeguimiento(citas,gestiones,hoy),[citas,gestiones,hoy]);
+  const datosMes=registros.filter(r=>{
+    if(r.estado==='no_continua')return false;
+    const actual=diaMadrid(r.primera.fecha_inicio).slice(0,7)===mesActual;
+    return actual||(r.estado==='pendiente');
+  });
+  const historico=[
+    registros.filter(r=>r.estado==='pendiente').length,
+    registros.filter(r=>r.estado==='curso').length,
+    registros.filter(r=>r.estado==='finalizado').length,
+    registros.filter(r=>r.estado==='no_continua').length
+  ];
+  const anos=[...new Set([hoy.slice(0,4),...registros.map(r=>diaMadrid(r.primera.fecha_inicio).slice(0,4)).filter(Boolean)])].sort().reverse();
+  const filtrados=registros.filter(r=>{
+    const fecha=diaMadrid(r.primera.fecha_inicio);
+    return (anio==='todos'||fecha.slice(0,4)===anio)
+      &&(mes==='todos'||Number(fecha.slice(5,7))===Number(mes))
+      &&(situacion==='todas'||r.estado===situacion)
+      &&(!buscar||normalizar(r.primera.nombre_paciente).includes(normalizar(buscar)));
+  });
+  const circulos=[
+    ['TOTAL',filtrados.length],['PENDIENTES',filtrados.filter(r=>r.estado==='pendiente').length],
+    ['EN TRATAMIENTO',filtrados.filter(r=>r.estado==='curso').length],
+    ['FINALIZADAS',filtrados.filter(r=>r.estado==='finalizado').length],
+    ['NO CONTINÚAN',filtrados.filter(r=>r.estado==='no_continua').length]
+  ] as [string,number][];
+  const actualizar=async(registro:Record<string,unknown>,id:string)=>{
+    if(guardando)return false;
+    setGuardando(id);setErrorGuardar('');
+    try{
+      const supa=createClient();
+      if(!supa)throw new Error('Sin conexión con Supabase');
+      const {data,error}=await supa.from('historial_seguimiento').insert(registro).select('id,historial_cita_id,patient_id,tipo_registro,fecha_gestion,canal_contacto,resultado,observaciones,financiacion_ofrecida,nueva_valoracion_propuesta,acepta_nuevo_contacto,fecha_proximo_contacto,motivo_no_continua,fin_tratamiento,gestionado_por,fecha_registro,registro_origen_id').single();
+      if(error)throw error;
+      if(!data)throw new Error('No se ha confirmado el guardado');
+      setGestiones(v=>[...v,data as GestionSeguimiento]);
+      return true;
+    }catch(e){setErrorGuardar(e instanceof Error?e.message:'No se ha podido guardar');return false;}
+    finally{setGuardando(null);}
+  };
+  const finTratamiento=async(r:FilaSeguimiento)=>{
+    if(r.estado==='no_continua')return;
+    if(r.finActivo){
+      await actualizar({historial_cita_id:r.primera.id,tipo_registro:'rectificar_fin_tratamiento',registro_origen_id:r.finActivo.id},r.primera.id);
+    }else{
+      await actualizar({historial_cita_id:r.primera.id,tipo_registro:'fin_tratamiento',fin_tratamiento:true},r.primera.id);
+    }
+  };
+  const desplegar=(r:FilaSeguimiento)=>{
+    setExpandida(v=>v===r.primera.id?null:r.primera.id);
+    setErrorGuardar('');setFechaGestion(hoy);setCanal('llamada');setResultado('volver_contactar');
+    setObservaciones('');setFinanciacion(false);setValoracion(false);setAcepta(false);setFechaContacto('');setMotivoCierre('');
+  };
+  const registrar=async(r:FilaSeguimiento)=>{
+    if(resultado==='no_continua'&&!motivoCierre.trim()){setErrorGuardar('Indica el motivo por el que no continúa');return;}
+    if(['no_contesta','volver_contactar'].includes(resultado)&&!fechaContacto){setErrorGuardar('Selecciona la fecha del próximo contacto');return;}
+    const tipo_registro=resultado==='no_continua'?'no_continua':'gestion';
+    const ok=await actualizar({historial_cita_id:r.primera.id,tipo_registro,fecha_gestion:fechaGestion,
+      ...(tipo_registro==='gestion'?{canal_contacto:canal,resultado,observaciones,financiacion_ofrecida:financiacion,nueva_valoracion_propuesta:valoracion,acepta_nuevo_contacto:acepta,fecha_proximo_contacto:fechaContacto||null}:{motivo_no_continua:motivoCierre,observaciones})},r.primera.id);
+    if(ok){setObservaciones('');setFechaContacto('');setResultado('volver_contactar');setMotivoCierre('');setFinanciacion(false);setValoracion(false);}
+  };
+  const fila=(r:FilaSeguimiento,esInspector:boolean)=>{
+    const abierta=expandida===r.primera.id;
+    const tonoEstado=r.alerta?'border-red-500/40 bg-red-500/[.09] text-red-300':r.estado==='pendiente'?'border-amber-400/30 bg-amber-400/[.08] text-amber-200':r.estado==='curso'?'border-cyan-400/30 bg-cyan-400/[.07] text-cyan-200':r.estado==='finalizado'?'border-green-400/30 bg-green-400/[.08] text-green-200':'border-red-400/30 bg-red-400/[.07] text-red-200';
+    return <div key={r.primera.id} className="border-t border-cyan-500/10 transition-colors hover:bg-cyan-500/[.035]">
+      <div className={`grid items-center gap-1.5 px-2 py-3 text-[11px] sm:gap-2 sm:px-3 sm:text-xs ${esInspector?'grid-cols-[minmax(0,1.35fr)_75px_minmax(0,1fr)_84px_28px]':'grid-cols-[minmax(0,1.4fr)_70px_minmax(0,1.05fr)_28px]'}`}>
+        <span className="min-w-0 truncate font-medium text-white" title={r.primera.nombre_paciente||''}>{r.primera.nombre_paciente||'—'}</span>
+        <span className={`whitespace-nowrap text-[10px] ${r.proxima?'text-cyan-100/75':'text-red-300'}`}>{fechaCitaSeg(r.proxima?.fecha_inicio||null)}</span>
+        <span className={`inline-flex min-w-0 items-center gap-1 rounded-full border px-1.5 py-1 text-[10px] leading-tight ${tonoEstado}`} title={r.estadoTexto}>
+          {r.alerta&&<AlertCircle className="h-3 w-3 shrink-0"/>}<span className="min-w-0 break-words">{r.estadoTexto}</span>
+        </span>
+        {esInspector&&<label className="flex justify-center" title="FIN TRATAMIENTO"><input type="checkbox" checked={Boolean(r.finActivo)} disabled={Boolean(guardando)||r.estado==='no_continua'} onChange={()=>void finTratamiento(r)} aria-label={`FIN TRATAMIENTO ${r.primera.nombre_paciente||''}`} className="h-4 w-4 cursor-pointer accent-cyan-400 disabled:cursor-not-allowed"/></label>}
+        <button type="button" onClick={()=>desplegar(r)} aria-label={`Historial de ${r.primera.nombre_paciente||'paciente'}`} aria-expanded={abierta} className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-cyan-400/40 bg-cyan-400/[.06] text-cyan-200 transition hover:border-cyan-200 hover:bg-cyan-400/20">
+          <ChevronDown className={`h-4 w-4 transition-transform ${abierta?'rotate-180':''}`}/>
+        </button>
+      </div>
+      {abierta&&<div className="space-y-3 border-t border-cyan-500/10 bg-[#021820] px-3 py-3 sm:px-4">
+        <div className="rounded-xl border border-cyan-400/20 bg-[#082B35] p-3 text-[11px] text-cyan-100/75">
+          <p className="font-medium text-cyan-200">Primera visita: {fechaCitaSeg(r.primera.fecha_inicio)}</p>
+          <p className="mt-1">Próxima cita: {fechaCitaSeg(r.proxima?.fecha_inicio||null)}</p>
+          {r.gestiones.length===0?<p className="mt-2 text-cyan-100/55">Sin gestiones registradas.</p>:r.gestiones.slice().reverse().map(g=><div key={g.id} className="mt-2 rounded-lg border border-cyan-400/15 bg-[#031B24] p-3">
+            <p className="font-medium text-cyan-200">{fechaGestionSeg(g.fecha_gestion)} · {g.tipo_registro==='gestion'?(g.resultado||'Gestión').replace(/_/g,' '):g.tipo_registro.replace(/_/g,' ')}</p>
+            <p className="mt-1 flex items-center gap-1"><UserRound className="h-3.5 w-3.5 text-cyan-300"/> Gestionado por {g.gestionado_por}</p>
+            {g.canal_contacto&&<p className="mt-1">Canal: {g.canal_contacto}</p>}
+            {g.observaciones&&<p className="mt-1 whitespace-pre-wrap">{g.observaciones}</p>}
+            {g.financiacion_ofrecida&&<p className="mt-1">✓ Financiación ofrecida</p>}
+            {g.nueva_valoracion_propuesta&&<p className="mt-1">✓ Nueva valoración propuesta</p>}
+            {g.fecha_proximo_contacto&&<p className="mt-1">Próximo contacto: {fechaGestionSeg(g.fecha_proximo_contacto)}</p>}
+            {g.motivo_no_continua&&<p className="mt-1">Motivo: {g.motivo_no_continua}</p>}
+            <p className="mt-1 text-[10px] text-cyan-100/45">Registrado: {new Date(g.fecha_registro).toLocaleString('es-ES',{timeZone:'Europe/Madrid'})}</p>
+          </div>)}
+        </div>
+        {r.estado==='no_continua'?<button type="button" disabled={Boolean(guardando)} onClick={()=>void actualizar({historial_cita_id:r.primera.id,tipo_registro:'reabrir_seguimiento'},r.primera.id)} className="rounded-full border border-cyan-300/45 bg-cyan-400/[.06] px-3 py-2 text-[11px] text-cyan-100 disabled:opacity-40">Reabrir seguimiento</button>:r.estado==='finalizado'?<p className="text-[11px] text-cyan-100/65">Tratamiento finalizado. Para rectificarlo, desmarca FIN TRATAMIENTO en Inspeccionar.</p>:<div className="space-y-3 rounded-xl border border-cyan-400/20 bg-[#062631] p-3">
+          <h4 className="text-[11px] font-medium uppercase tracking-wide text-cyan-200">Nueva gestión</h4>
+          <div className="grid grid-cols-2 gap-2">
+            <label className="space-y-1 text-[10px] text-cyan-100/75">Fecha gestión<input type="date" value={fechaGestion} onChange={e=>setFechaGestion(e.target.value)} className="block w-full min-w-0 rounded-lg border border-cyan-400/30 bg-[#0A303B] p-2 text-white"/></label>
+            <label className="space-y-1 text-[10px] text-cyan-100/75">Canal<select value={canal} onChange={e=>setCanal(e.target.value)} className="block w-full min-w-0 rounded-lg border border-cyan-400/30 bg-[#0A303B] p-2 text-white"><option value="llamada">Llamada</option><option value="whatsapp">WhatsApp</option><option value="presencial">Presencial</option><option value="otro">Otro</option></select></label>
+          </div>
+          <label className="block space-y-1 text-[10px] text-cyan-100/75">Resultado<select value={resultado} onChange={e=>setResultado(e.target.value)} className="block w-full rounded-lg border border-cyan-400/30 bg-[#0A303B] p-2 text-white"><option value="volver_contactar">Volver a contactar</option><option value="no_contesta">No contesta</option><option value="pendiente_respuesta">Pendiente de respuesta</option><option value="sin_respuesta">Sin respuesta</option><option value="no_continua">No continúa</option></select></label>
+          {resultado==='no_continua'?<label className="block space-y-1 text-[10px] text-cyan-100/75">Motivo de no continuar<select value={motivoCierre} onChange={e=>setMotivoCierre(e.target.value)} className="block w-full rounded-lg border border-cyan-400/30 bg-[#0A303B] p-2 text-white"><option value="">Seleccionar motivo</option><option value="Motivos económicos">Motivos económicos</option><option value="Otra clínica">Otra clínica</option><option value="No desea tratamiento">No desea tratamiento</option><option value="Otro motivo">Otro motivo</option></select></label>:<>
+            <label className="flex items-center gap-2 text-[11px] text-cyan-100/80"><input type="checkbox" checked={financiacion} onChange={e=>setFinanciacion(e.target.checked)} className="accent-cyan-400"/> Financiación ofrecida</label>
+            <label className="flex items-center gap-2 text-[11px] text-cyan-100/80"><input type="checkbox" checked={valoracion} onChange={e=>setValoracion(e.target.checked)} className="accent-cyan-400"/> Nueva visita de valoración propuesta</label>
+            <label className="flex items-center gap-2 text-[11px] text-cyan-100/80"><input type="checkbox" checked={acepta} onChange={e=>setAcepta(e.target.checked)} className="accent-cyan-400"/> Acepta nuevo contacto</label>
+            <label className="block space-y-1 text-[10px] text-cyan-100/75">Próximo contacto {['volver_contactar','no_contesta'].includes(resultado)?'(obligatorio)':'(opcional)'}<input type="date" value={fechaContacto} onChange={e=>setFechaContacto(e.target.value)} className="block w-full rounded-lg border border-cyan-400/30 bg-[#0A303B] p-2 text-white"/></label>
+          </>}
+          <label className="block space-y-1 text-[10px] text-cyan-100/75">Observaciones<textarea value={observaciones} onChange={e=>setObservaciones(e.target.value)} rows={3} className="block w-full resize-y rounded-lg border border-cyan-400/30 bg-[#0A303B] p-2 text-white"/></label>
+          <button type="button" disabled={Boolean(guardando)} onClick={()=>void registrar(r)} className="rounded-full border border-cyan-300/45 bg-cyan-400/[.06] px-4 py-2 text-[11px] font-medium text-cyan-100 hover:bg-cyan-400/20 disabled:opacity-40">{guardando===r.primera.id?'Guardando…':'Guardar gestión'}</button>
+        </div>}
+        {errorGuardar&&<p role="alert" className="text-[11px] text-amber-200">{errorGuardar}</p>}
+      </div>}
+    </div>;
+  };
+  const indicador=(titulo:string,n:number,i:number)=><div key={titulo} className="flex items-center gap-2 text-[11px] text-cyan-100/85"><span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{backgroundColor:[estilosSeg.pendiente.hex,estilosSeg.curso.hex,estilosSeg.finalizado.hex,estilosSeg.no_continua.hex][i]}}/><span className="min-w-0 flex-1">{titulo}</span><strong className="font-semibold tabular-nums text-white">{cargandoTodo||errorTodo?'—':n}</strong></div>;
+  const opciones=[
+    {label:'Año',value:anio,set:setAnio,opts:[{value:'todos',label:'Todos los años'},...anos.map(a=>({value:a,label:a}))]},
+    {label:'Mes',value:mes,set:setMes,opts:[{value:'todos',label:'Todo el año'},...Array.from({length:12},(_,i)=>({value:String(i+1),label:new Intl.DateTimeFormat('es-ES',{month:'long'}).format(new Date(2026,i,1))}))]},
+    {label:'Situación',value:situacion,set:setSituacion,opts:[{value:'todas',label:'Todas'},{value:'pendiente',label:'Pendientes'},{value:'curso',label:'En tratamiento'},{value:'finalizado',label:'Finalizadas'},{value:'no_continua',label:'No continúan'}]}
+  ];
+  return <>
+    <section className="min-w-0 overflow-hidden rounded-[28px] border border-cyan-300/50 bg-[#031B24] p-4 text-white shadow-[0_12px_35px_rgba(0,0,0,.3),0_0_22px_rgba(34,211,238,.11)] sm:p-5">
+      <div className="flex items-center gap-2"><div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-cyan-400/[.055] shadow-[0_0_22px_rgba(34,211,238,.17)] sm:h-10 sm:w-10"><HeartPulse className="h-5 w-5 text-cyan-300"/></div><h2 className="text-[11px] font-normal uppercase tracking-[.08em] text-cyan-200 sm:text-sm sm:tracking-[.10em]">SEGUIMIENTO</h2></div>
+      <div aria-hidden="true" className="mt-3 h-px w-full bg-cyan-300/75 shadow-[0_0_10px_rgba(34,211,238,.75)]"/>
+      <div className="mt-3 grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1.65fr)_minmax(145px,1fr)]">
+        <div className="min-w-0 overflow-hidden rounded-2xl border border-cyan-400/30 bg-[rgba(5,18,24,.78)]">
+          <div className="grid grid-cols-[minmax(0,1.4fr)_70px_minmax(0,1.05fr)_28px] items-center gap-1.5 bg-cyan-500/10 px-2 py-3 text-[9px] uppercase tracking-[.035em] text-cyan-300/90 sm:gap-2 sm:px-3"><span>Paciente</span><span>Próx. cita</span><span>Estado</span><span/></div>
+          <div className={`max-h-[420px] overflow-y-auto ${scrollSeguimiento}`}>
+            {cargandoTodo?<p className="p-5 text-center text-xs text-cyan-100/55">Cargando seguimiento…</p>:errorTodo?<p className="p-5 text-center text-xs text-amber-200">No se pudo cargar el seguimiento: {errorTodo}</p>:datosMes.length?datosMes.map(r=>fila(r,false)):<p className="p-5 text-center text-xs text-cyan-100/55">Sin primeras visitas que requieran revisión.</p>}
+          </div>
+        </div>
+        <div className="flex min-w-0 flex-col items-center gap-3 rounded-2xl border border-cyan-400/25 bg-[#062631] p-3">
+          <DonutSeguimiento valores={cargandoTodo||errorTodo?[0,0,0,0]:historico}/>
+          <div className="w-full space-y-2">
+            {indicador('Citas pendientes',historico[0],0)}
+            {indicador('En tratamiento',historico[1],1)}
+            {indicador('Finalizadas',historico[2],2)}
+            {indicador('No continúan',historico[3],3)}
+          </div>
+          <button type="button" onClick={()=>setInspectorAbierto(true)} className="mt-auto inline-flex items-center gap-1.5 rounded-full border border-cyan-300/45 bg-cyan-400/[.06] px-3.5 py-1.5 text-[10px] font-medium uppercase tracking-[.1em] text-cyan-100 shadow-[0_0_11px_rgba(34,211,238,.11)] transition hover:border-cyan-200 hover:bg-cyan-400/20 hover:shadow-[0_0_20px_rgba(34,211,238,.22)]"><ChartNoAxesCombined className="h-3.5 w-3.5 text-cyan-300"/> Inspeccionar</button>
+        </div>
+      </div>
+    </section>
+    {inspectorAbierto&&<div role="dialog" aria-modal="true" aria-label="Inspeccionar seguimiento" className={`fixed inset-0 z-[100] overflow-y-auto bg-[#02141B]/95 px-2 py-4 text-white backdrop-blur-lg sm:px-6 sm:py-6 lg:px-10 lg:py-8 ${scrollSeguimiento}`}>
+      <div className="mx-auto max-w-6xl space-y-5 pb-10 sm:space-y-7">
+        <div className="flex items-center justify-between gap-3 border-b border-cyan-300/35 pb-3 shadow-[0_1px_0_rgba(34,211,238,.06)] sm:pb-4"><div className="flex min-w-0 items-center gap-2 sm:gap-3"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-cyan-400/[.055] shadow-[0_0_22px_rgba(34,211,238,.17)] sm:h-10 sm:w-10"><ChartNoAxesCombined className="h-5 w-5 text-cyan-300 drop-shadow-[0_0_10px_rgba(103,232,249,.75)]"/></span><h2 className="text-base font-normal uppercase tracking-[.08em] text-white sm:text-lg sm:tracking-[.10em]">INSPECCIONAR SEGUIMIENTO</h2></div><button type="button" onClick={()=>setInspectorAbierto(false)} aria-label="Cerrar Inspeccionar" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-cyan-400/40 bg-cyan-400/[.05] text-cyan-100 shadow-[0_0_14px_rgba(34,211,238,.1)] transition hover:border-cyan-200 hover:bg-cyan-400/15 sm:h-10 sm:w-10"><X className="h-4 w-4 sm:h-5 sm:w-5"/></button></div>
+        <section className="relative z-30 rounded-[22px] border border-cyan-400/25 bg-cyan-400/[.035] px-3 py-3 shadow-[0_0_24px_rgba(34,211,238,.065)] sm:px-5 sm:py-3.5"><h3 className="mb-3 text-[11px] font-normal uppercase tracking-[.12em] text-cyan-200 sm:text-xs">FILTROS DE ACTIVIDAD</h3><div className="grid grid-cols-3 gap-2 sm:gap-4">
+          {opciones.map(f=><div key={f.label} className="relative min-w-0 text-[11px] text-cyan-100/70 sm:text-xs"><span className="block">{f.label}</span><button type="button" aria-expanded={menuFiltro===f.label} onClick={()=>setMenuFiltro(v=>v===f.label?null:f.label)} className="relative mt-1 flex h-9 w-full items-center justify-between gap-2 rounded-xl border border-cyan-400/30 bg-[#0A303B] px-3 text-left text-xs text-white transition hover:border-cyan-300/65 hover:bg-[#0C3945] sm:mt-1.5 sm:h-10 sm:text-sm"><span className="min-w-0 truncate">{f.opts.find(o=>o.value===f.value)?.label}</span><ChevronDown className="h-4 w-4 shrink-0 text-cyan-300"/></button>{menuFiltro===f.label&&<><button type="button" onClick={()=>setMenuFiltro(null)} aria-label="Cerrar filtros" className="fixed inset-0 z-40 cursor-default"/><div className={`absolute left-0 top-full z-50 mt-1.5 max-h-52 w-full min-w-[140px] overflow-y-auto rounded-xl border border-cyan-400/45 bg-[#082B36] p-1 shadow-[0_15px_35px_rgba(0,0,0,.60),0_0_20px_rgba(34,211,238,.18)] ${scrollSeguimiento}`}>{f.opts.map(o=><button key={o.value} type="button" onClick={()=>{f.set(o.value);setMenuFiltro(null);}} className="block w-full rounded-lg px-3 py-2 text-left text-xs text-cyan-50/85 hover:bg-cyan-400/15">{o.label}</button>)}</div></>}</div>)}
+        </div></section>
+        <div className="flex flex-wrap items-center justify-center gap-3 py-2 sm:gap-9 sm:py-3 lg:gap-14">
+          {circulos.map(([titulo,numero])=><div key={titulo} className="group flex h-[clamp(65px,20vw,88px)] w-[clamp(65px,20vw,88px)] shrink-0 flex-col items-center justify-center gap-0.5 rounded-full border border-cyan-300/35 bg-[radial-gradient(circle_at_50%_35%,#0E3945_0%,#05232D_75%,#031820_100%)] px-2 text-center shadow-[0_0_14px_rgba(34,211,238,.08),inset_0_0_14px_rgba(34,211,238,.045)] transition-all duration-300 hover:-translate-y-1 hover:border-cyan-200/85 hover:shadow-[0_0_18px_rgba(34,211,238,.38),0_0_38px_rgba(34,211,238,.20),inset_0_0_20px_rgba(34,211,238,.10)] sm:h-[120px] sm:w-[120px]"><strong className="text-[clamp(19px,5.8vw,26px)] font-semibold leading-none tabular-nums text-white sm:text-[31px]">{cargandoTodo||errorTodo?'—':numero}</strong><span className="text-[clamp(6px,1.85vw,8px)] font-medium uppercase leading-tight tracking-[.015em] text-cyan-200/80 sm:text-[9px]">{titulo}</span></div>)}
+        </div>
+        <section className="overflow-hidden rounded-[26px] border border-cyan-400/30 bg-[#041D26] shadow-[0_0_26px_rgba(34,211,238,.075)]"><div className="flex flex-col gap-3 border-b border-cyan-400/20 bg-[#021820] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5"><h3 className="text-xs font-medium uppercase tracking-[.11em] text-cyan-300 sm:text-sm">DETALLE DE SEGUIMIENTO</h3><label className="flex w-full items-center gap-2 rounded-full border border-cyan-400/40 bg-cyan-400/[.045] px-3 py-2 text-xs shadow-[0_0_16px_rgba(34,211,238,.09)] sm:w-auto sm:px-4"><Search className="h-4 w-4 shrink-0 text-cyan-300"/><input aria-label="Buscar paciente" value={buscar} onChange={e=>setBuscar(e.target.value)} placeholder="Buscar paciente" className="min-w-0 w-full bg-transparent text-white outline-none placeholder:text-cyan-100/40 sm:w-52"/></label></div>
+          <div className="grid grid-cols-[minmax(0,1.35fr)_75px_minmax(0,1fr)_84px_28px] items-center gap-1.5 bg-[#0B3540] px-2 py-4 text-[9px] font-semibold uppercase tracking-[.035em] text-cyan-200 sm:gap-2 sm:px-3"><span>Paciente</span><span>Próx. cita</span><span>Estado</span><span>FIN TRATAMIENTO</span><span/></div>
+          <div className={`max-h-[55vh] overflow-y-auto ${scrollSeguimiento}`}>{cargandoTodo?<p className="p-6 text-center text-xs text-cyan-100/60">Cargando…</p>:errorTodo?<p className="p-6 text-center text-xs text-amber-200">{errorTodo}</p>:filtrados.length?filtrados.map(r=>fila(r,true)):<p className="p-6 text-center text-xs text-cyan-100/60">Sin resultados para estos filtros</p>}</div>
+        </section>
+        {errorGuardar&&<p role="alert" className="text-xs text-amber-200">No se pudo guardar: {errorGuardar}</p>}
+      </div>
+    </div>}
+  </>;
+}
+
 function CajaPendiente({titulo, icono:Icon}:{titulo:string;icono:typeof Bot}) {
   return (
     <section className="group relative flex min-h-[280px] flex-col overflow-hidden rounded-[28px] border border-cyan-400/30 bg-[radial-gradient(ellipse_at_85%_0%,rgba(15,111,128,.20),transparent_58%),linear-gradient(150deg,#062B35_0%,#031C25_55%,#02141B_100%)] p-5 text-white shadow-[0_12px_40px_rgba(0,0,0,.23),0_0_22px_rgba(34,211,238,.085),inset_0_1px_0_rgba(165,243,252,.07)] transition-shadow duration-300 hover:shadow-[0_14px_44px_rgba(0,0,0,.3),0_0_32px_rgba(34,211,238,.17)] sm:p-6">
@@ -324,7 +620,7 @@ useEffect(() => {
       if(!supa){if(vivo){setErrorDatos('No se ha establecido conexión con Supabase.');setCargando(false);}return;}
       try {
         const [cs,ms]=await Promise.all([
-          leerTodas<CitaDB>(supa,'historial_citas','id,event_id,calendar_id,profesional,nombre_paciente,motivo,estado,origen,fecha_inicio,fecha_fin,created_at,updated_at'),
+          leerTodas<CitaDB>(supa,'historial_citas','id,patient_id,event_id,calendar_id,profesional,nombre_paciente,motivo,estado,origen,fecha_inicio,fecha_fin,created_at,updated_at'),
           leerTodas<CambioDB>(supa,'historial_citas_cambios','historial_cita_id,realizado_por,created_at,tipo_movimiento')
         ]);
         if(vivo){setCitas(cs);setCambios(ms);setErrorDatos('');}
@@ -465,7 +761,7 @@ useEffect(() => {
         {errorDatos?<p className="mt-2 flex gap-1 text-xs text-amber-200"><AlertCircle className="h-4 w-4 shrink-0"/>{errorDatos}. No se han podido actualizar las estadísticas desde Supabase.</p>:null}
         <div className="mt-2 flex justify-end"><button type="button" onClick={()=>setInspeccionar(true)} className="inline-flex items-center gap-1.5 rounded-full border border-cyan-300/45 bg-cyan-400/[.06] px-3.5 py-1.5 text-[10px] font-medium uppercase tracking-[.1em] text-cyan-100 shadow-[0_0_11px_rgba(34,211,238,.11)] transition hover:border-cyan-200 hover:bg-cyan-400/20 hover:shadow-[0_0_20px_rgba(34,211,238,.22)]"><ChartNoAxesCombined className="h-3.5 w-3.5 text-cyan-300"/> Inspeccionar</button></div>
       </section>
-      <CajaPendiente titulo="SEGUIMIENTO" icono={HeartPulse}/>
+      <CajaSeguimiento citas={citasUnicas} cargando={cargando} errorDatos={errorDatos}/>
       <CajaLaboratorio/>
       <CajaPendiente titulo="GESTIÓN MARTINA" icono={Bot}/>
     </div>
@@ -687,5 +983,6 @@ return (
 };
 
 export default DashboardClientProvisional;
+
 
 
