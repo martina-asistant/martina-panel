@@ -64,7 +64,7 @@ function CajaLaboratorio() {
     void cargarSoloLectura();
     return ()=>{activo=false;};
   },[]);
-  // La caja no ejecuta las rutinas de vinculación ni escrituras del módulo Laboratorio.
+  // Solo lectura: los trabajos se mantienen visibles hasta que pasan a Finalizado.
   const hoy=Date.now();
   const abiertos=trabajos.filter(t=>t.estado!=='finalizado');
   const proximos=abiertos.filter(t=>t.fecha_cita && !Number.isNaN(new Date(t.fecha_cita).getTime()) && new Date(t.fecha_cita).getTime()>=hoy)
@@ -72,54 +72,53 @@ function CajaLaboratorio() {
   const sinCita=abiertos.filter(t=>!t.fecha_cita);
   const visibles=[...proximos,...sinCita];
   const formatoFecha=(fecha:string|null)=>fecha?new Date(fecha).toLocaleDateString('es-ES',{day:'numeric',month:'short',year:'2-digit',timeZone:'Europe/Madrid'}):'Sin cita';
+  const contador=(numero:number,descripcion:string)=>(
+    <div className="group min-w-0 flex-1 rounded-xl border border-cyan-300/45 bg-[#082B35] px-2 py-2 text-center shadow-[0_0_12px_rgba(34,211,238,.10)] transition-all duration-300 hover:-translate-y-0.5 hover:border-cyan-200/90 hover:bg-[#0A3541] hover:shadow-[0_0_18px_rgba(34,211,238,.40),0_0_30px_rgba(34,211,238,.13)] sm:px-3">
+      <div className="flex items-baseline justify-center gap-2"><span className="text-[9px] uppercase tracking-[.08em] text-cyan-100/65">Total</span><strong className="text-[25px] font-semibold leading-none tabular-nums text-white sm:text-[29px]">{cargandoLab?'…':errorLab?'—':numero}</strong></div>
+      <div className="mt-1 text-[10px] leading-tight text-cyan-100/75">{descripcion}</div>
+    </div>
+  );
   return (
-    <section className="min-w-0 overflow-hidden rounded-[28px] border border-cyan-400/35 bg-[#031B24] p-4 text-white shadow-[0_12px_35px_rgba(0,0,0,.3),0_0_19px_rgba(34,211,238,.075)] sm:p-5">
-      <div className="flex items-start justify-between gap-2 sm:gap-4">
+    <section className="min-w-0 overflow-hidden rounded-[28px] border border-cyan-300/50 bg-[#031B24] p-4 text-white shadow-[0_12px_35px_rgba(0,0,0,.3),0_0_22px_rgba(34,211,238,.11)] sm:p-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-2">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-cyan-400/[.055] shadow-[0_0_22px_rgba(34,211,238,.17)] sm:h-10 sm:w-10">
-            <FlaskConical className="h-5 w-5 text-cyan-300"/>
-          </div>
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-cyan-400/[.055] shadow-[0_0_22px_rgba(34,211,238,.17)] sm:h-10 sm:w-10"><FlaskConical className="h-5 w-5 text-cyan-300"/></div>
           <h2 className="text-[11px] font-normal uppercase tracking-[.08em] text-cyan-200 sm:text-sm sm:tracking-[.10em]">LABORATORIO</h2>
         </div>
-        <div className="shrink-0 rounded-xl border border-cyan-400/30 bg-[#082B35] px-2.5 py-1.5 text-center sm:px-3 sm:py-2">
-          <div className="text-[9px] uppercase tracking-[.08em] text-cyan-100/70 sm:text-[10px]">Citas próximas sin finalizar</div>
-          <strong className="mt-1 block text-[26px] font-semibold leading-none tabular-nums text-white sm:text-[30px]">{cargandoLab?'…':errorLab?'—':proximos.length}</strong>
-          <div className="mt-1 text-[10px] text-cyan-100/65">{cargandoLab?'Cargando…':errorLab?'No disponible':`${sinCita.length} pendiente${sinCita.length===1?'':'s'} de cita`}</div>
+        <div className="flex w-full gap-2 sm:w-auto sm:min-w-[280px]">
+          {contador(proximos.length,'Citas próximas')}
+          {contador(sinCita.length,'Pendientes de cita')}
         </div>
       </div>
-      <div aria-hidden="true" className="mt-3 h-px w-full bg-cyan-300/65 shadow-[0_0_9px_rgba(34,211,238,.72)]" />
-      <div className="mt-3 overflow-hidden rounded-2xl border border-cyan-500/20 bg-[rgba(5,18,24,.78)]">
-        {/* Móvil: solo paciente, estado y fecha, tal como se acordó. */}
-        <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,110px)_70px] gap-2 bg-cyan-500/10 px-3 py-3 text-[10px] uppercase tracking-[.06em] text-cyan-300/80 lg:hidden">
+      <div aria-hidden="true" className="mt-3 h-px w-full bg-cyan-300/75 shadow-[0_0_10px_rgba(34,211,238,.75)]" />
+      <div className="mt-3 overflow-hidden rounded-2xl border border-cyan-400/30 bg-[rgba(5,18,24,.78)]">
+        {/* Móvil: paciente, estado y fecha; escritorio: las cinco columnas acordadas. */}
+        <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,114px)_76px] gap-2 bg-cyan-500/10 px-3 py-3 text-[10px] uppercase tracking-[.04em] text-cyan-300/90 lg:hidden">
           <span>Paciente</span><span>Estado</span><span>Fecha cita</span>
         </div>
-        {/* Escritorio: copia simplificada de las columnas de Laboratorio. */}
-        <div className="hidden grid-cols-[minmax(0,1.6fr)_minmax(0,.8fr)_minmax(0,.9fr)_minmax(0,1.15fr)_100px] gap-2 bg-cyan-500/10 px-4 py-3 text-[10px] uppercase tracking-[.07em] text-cyan-300/80 lg:grid">
+        <div className="hidden grid-cols-[minmax(0,2fr)_minmax(0,.75fr)_minmax(0,1fr)_minmax(0,1.3fr)_minmax(0,95px)] gap-2 bg-cyan-500/10 px-3 py-3 text-[10px] uppercase tracking-[.035em] text-cyan-300/90 lg:grid">
           <span>Paciente</span><span>Laboratorio</span><span>Trabajo</span><span>Estado</span><span>Fecha cita</span>
         </div>
-        <div className={`max-h-[260px] overflow-y-auto ${scrollCyan}`}>
+        <div className="max-h-[420px] overflow-y-auto [scrollbar-width:thin] [scrollbar-color:rgba(103,232,249,.22)_transparent] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-300/20 hover:[&::-webkit-scrollbar-thumb]:bg-cyan-300/35">
           {!cargandoLab && !errorLab && visibles.length===0 && <div className="px-4 py-8 text-center text-xs text-cyan-100/55">Sin trabajos con citas próximas o pendientes de cita</div>}
           {cargandoLab && <div className="px-4 py-8 text-center text-xs text-cyan-100/55">Cargando trabajos…</div>}
           {errorLab && <div className="px-4 py-6 text-center text-xs text-amber-200">No se pudo cargar Laboratorio: {errorLab}</div>}
           {visibles.map(t=>{
             const estado=estadosLab[t.estado||'']||{etiqueta:t.estado||'Sin estado',color:'bg-slate-300'};
-            const chip=<span className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-cyan-500/20 bg-cyan-500/5 px-2 py-1.5 text-[10px] text-cyan-100"><span className={`h-2 w-2 shrink-0 rounded-full shadow-[0_0_10px_currentColor] ${estado.color}`}/><span className="min-w-0 truncate">{estado.etiqueta}</span></span>;
-            return <div key={t.id} className="border-t border-cyan-500/10">
-              <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,110px)_70px] items-center gap-2 px-3 py-3 text-xs lg:hidden">
-                <span className="min-w-0 truncate font-medium text-white" title={t.nombre_paciente||''}>{t.nombre_paciente||'—'}</span><span className="min-w-0">{chip}</span><span className="whitespace-nowrap text-[11px] text-cyan-100/70">{formatoFecha(t.fecha_cita)}</span>
+            const pendiente=t.estado==='pte_gestionar';
+            const chip=<span className={`inline-flex max-w-full items-center gap-1.5 rounded-full border px-2 py-1.5 text-[10px] ${pendiente?'border-red-500/40 bg-red-500/[.09] text-red-300':'border-cyan-500/25 bg-cyan-500/5 text-cyan-100'}`}><span className={`h-2 w-2 shrink-0 rounded-full shadow-[0_0_10px_currentColor] ${estado.color}`}/><span className="min-w-0 truncate">{pendiente?'Pendiente':estado.etiqueta}</span></span>;
+            return <div key={t.id} className="border-t border-cyan-500/10 transition-colors hover:bg-cyan-500/[.035]">
+              <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,114px)_76px] items-center gap-2 px-3 py-3.5 text-xs lg:hidden">
+                <span className="min-w-0 truncate font-medium text-white" title={t.nombre_paciente||''}>{t.nombre_paciente||'—'}</span><span className="min-w-0">{chip}</span><span className="whitespace-nowrap text-[11px] text-cyan-100/75">{formatoFecha(t.fecha_cita)}</span>
               </div>
-              <div className="hidden grid-cols-[minmax(0,1.6fr)_minmax(0,.8fr)_minmax(0,.9fr)_minmax(0,1.15fr)_100px] items-center gap-2 px-4 py-3 text-xs lg:grid">
-                <span className="min-w-0 truncate font-medium text-white" title={t.nombre_paciente||''}>{t.nombre_paciente||'—'}</span><span className="min-w-0 truncate text-cyan-100/70">{t.laboratorio||'—'}</span><span className="min-w-0 truncate text-cyan-100/80">{t.trabajo||'—'}</span><span className="min-w-0">{chip}</span><span className="whitespace-nowrap text-cyan-100/70">{formatoFecha(t.fecha_cita)}</span>
+              <div className="hidden grid-cols-[minmax(0,2fr)_minmax(0,.75fr)_minmax(0,1fr)_minmax(0,1.3fr)_minmax(0,95px)] items-center gap-2 px-3 py-3.5 text-xs lg:grid">
+                <span className="min-w-0 truncate font-medium text-white" title={t.nombre_paciente||''}>{t.nombre_paciente||'—'}</span><span className="min-w-0 truncate text-cyan-100/70" title={t.laboratorio||''}>{t.laboratorio||'—'}</span><span className="min-w-0 truncate text-cyan-100/80" title={t.trabajo||''}>{t.trabajo||'—'}</span><span className="min-w-0">{chip}</span><span className="whitespace-nowrap text-cyan-100/75">{formatoFecha(t.fecha_cita)}</span>
               </div>
             </div>;
           })}
         </div>
       </div>
-      <div className="mt-3 flex justify-end">
-        <Link href="/laboratorio" className="inline-flex items-center gap-1.5 rounded-full border border-cyan-300/45 bg-cyan-400/[.06] px-3.5 py-1.5 text-[10px] font-medium uppercase tracking-[.1em] text-cyan-100 shadow-[0_0_11px_rgba(34,211,238,.11)] transition hover:border-cyan-200 hover:bg-cyan-400/20">
-          <FlaskConical className="h-3.5 w-3.5 text-cyan-300"/> Acceder
-        </Link>
-      </div>
+      <div className="mt-3 flex justify-end"><Link href="/laboratorio" className="inline-flex items-center gap-1.5 rounded-full border border-cyan-300/45 bg-cyan-400/[.06] px-3.5 py-1.5 text-[10px] font-medium uppercase tracking-[.1em] text-cyan-100 shadow-[0_0_11px_rgba(34,211,238,.11)] transition hover:border-cyan-200 hover:bg-cyan-400/20"><FlaskConical className="h-3.5 w-3.5 text-cyan-300"/> Acceder</Link></div>
     </section>
   );
 }
@@ -688,4 +687,5 @@ return (
 };
 
 export default DashboardClientProvisional;
+
 
