@@ -642,11 +642,11 @@ return (
       <div className="w-full overflow-hidden">
        <table className="w-full table-fixed text-sm">
           <colgroup>
-            <col className="w-[19%]" />
+            <col className="w-[18%]" />
             <col className="w-[12%]" />
             <col className="w-[12%]" />
-            <col className="w-[7%]" />
-            <col className="w-[19%]" />
+            <col className="w-[6%]" />
+            <col className="w-[21%]" />
             <col className="w-[15%]" />
             <col className="w-[11%]" />
             <col className="w-[5%]" />
