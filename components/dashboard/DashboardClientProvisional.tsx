@@ -499,11 +499,14 @@ useEffect(() => {
       <section className="relative overflow-hidden rounded-[28px] border border-cyan-400/35 bg-[#031B24] p-4 text-white shadow-[0_12px_35px_rgba(0,0,0,.3),0_0_19px_rgba(34,211,238,.075),inset_0_1px_0_rgba(165,243,252,.045)] sm:p-5">
         {/* Título fino, halo del icono y caja oscura: sin gradiente luminoso superior. */}
         <div className="flex items-start justify-between gap-2 sm:gap-4">
-          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+          <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-cyan-400/[.055] shadow-[0_0_22px_rgba(34,211,238,.17)] sm:h-10 sm:w-10">
               <CalendarCheck2 className="h-5 w-5 text-cyan-300 drop-shadow-[0_0_10px_rgba(103,232,249,.75)]" />
             </div>
-            <h2 className="text-[11px] font-normal uppercase tracking-[.17em] text-cyan-200 drop-shadow-[0_0_9px_rgba(34,211,238,.48)] sm:text-sm sm:tracking-[.23em]">CITAS CREADAS</h2>
+            
+<h2 className="text-[11px] font-normal uppercase tracking-[.08em] text-cyan-200 drop-shadow-[0_0_9px_rgba(34,211,238,.48)] sm:text-sm sm:tracking-[.10em]">
+  CITAS CREADAS
+</h2>
           </div>
           <div className="shrink-0 rounded-xl border border-cyan-400/30 bg-[#082B35] px-2.5 py-1.5 text-center shadow-[0_0_14px_rgba(34,211,238,.08)] sm:px-3 sm:py-2">
             <div className="flex items-baseline justify-center gap-2 sm:gap-3">
