@@ -505,22 +505,25 @@ useEffect(() => {
             </div>
             <h2 className="text-[11px] font-normal uppercase tracking-[.17em] text-cyan-200 drop-shadow-[0_0_9px_rgba(34,211,238,.48)] sm:text-sm sm:tracking-[.23em]">CITAS CREADAS</h2>
           </div>
-          <div className="shrink-0 rounded-xl border border-cyan-400/25 bg-[#082B35] px-2.5 py-2 text-center shadow-[0_0_12px_rgba(34,211,238,.05)] sm:min-w-[136px] sm:px-4">
-            <div className="text-[9px] uppercase tracking-[.12em] text-cyan-100/65">TOTAL</div>
-            <div className="mt-0.5 text-2xl font-semibold leading-none tabular-nums text-white sm:text-3xl">{cargando?'…':martina.length}</div>
-            <div className="mt-1.5 text-[9px] leading-tight text-cyan-100/60 sm:text-[10px]">Citas gestionadas Martina</div>
+          <div className="shrink-0 rounded-xl border border-cyan-400/30 bg-[#082B35] px-2.5 py-1.5 text-center shadow-[0_0_14px_rgba(34,211,238,.08)] sm:px-3 sm:py-2">
+            <div className="flex items-baseline justify-center gap-2 sm:gap-3">
+              <span className="text-[9px] font-normal uppercase tracking-[.12em] text-cyan-100/70 sm:text-[10px]">TOTAL</span>
+              <strong className="text-[26px] font-semibold leading-none tabular-nums text-white sm:text-[30px]">{cargando?'…':martina.length}</strong>
+            </div>
+            <div className="mt-1 text-[9px] leading-tight text-cyan-100/65 sm:text-[10px]">Gestionadas por Martina</div>
           </div>
         </div>
 
-        {/* Selector circular como el resto de las agendas. */}
-        <div className="mt-3 flex items-center justify-center gap-3 sm:mt-4 sm:gap-5">
+        {/* Separador cyan glow fino y selector semanal compacto. */}
+        <div aria-hidden="true" className="mt-3 h-px w-full bg-cyan-300/65 shadow-[0_0_9px_rgba(34,211,238,.72)] sm:mt-3" />
+        <div className="mt-2.5 flex items-center justify-center gap-3 sm:mt-3 sm:gap-5">
           <button type="button" aria-label="Semana anterior" onClick={()=>setDesplazamiento(n=>n-1)} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-cyan-400/45 bg-cyan-400/[.06] text-cyan-100 shadow-[0_0_12px_rgba(34,211,238,.08)] transition hover:border-cyan-200 hover:bg-cyan-400/15"><ChevronLeft className="h-4 w-4"/></button>
           <div className="min-w-[116px] text-center text-sm font-normal tabular-nums text-white sm:min-w-[144px] sm:text-base">{mesES.format(lunes)} – {mesES.format(dias[dias.length-1])}</div>
           <button type="button" aria-label="Semana siguiente" disabled={desplazamiento>=0} onClick={()=>setDesplazamiento(n=>Math.min(0,n+1))} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-cyan-400/45 bg-cyan-400/[.06] text-cyan-100 transition hover:border-cyan-200 hover:bg-cyan-400/15 disabled:cursor-not-allowed disabled:opacity-30"><ChevronRight className="h-4 w-4"/></button>
         </div>
         <div className="mt-1.5 text-center"><button type="button" onClick={()=>setMostrarFinde(v=>!v)} className="text-[10px] text-cyan-200/60 underline decoration-cyan-500/35 underline-offset-4 transition hover:text-cyan-100">{mostrarFinde?'Mostrar lunes a viernes':'Ver también sábado y domingo'}</button></div>
 
-        <div className="mt-3 rounded-2xl border border-cyan-400/25 bg-[#062631] px-3 py-3 shadow-[inset_0_1px_0_rgba(165,243,252,.035)] sm:px-4">
+        <div className="mt-2.5 rounded-2xl border border-cyan-400/25 bg-[#062631] px-3 py-3 shadow-[inset_0_1px_0_rgba(165,243,252,.035)] sm:px-4">
           <div className="mb-2 text-xs font-medium text-cyan-100/80">Citas de Martina</div>
           <div className="flex h-[118px] items-end gap-2 sm:gap-3">
             {dias.map((d,i)=><div key={claveLocal(d)} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-1.5"><span className="text-[11px] tabular-nums text-cyan-100/80">{barras[i]}</span><div className="flex h-[84px] w-full items-end justify-center border-b border-cyan-400/20"><div className="w-full max-w-9 rounded-t-md bg-[linear-gradient(180deg,#67E8F9,#0891B2)] shadow-[0_0_14px_rgba(34,211,238,.24)]" style={{height:`${barras[i]===0 ? 0 : Math.max(3,barras[i]/mayorBarra*100)}%`}} /></div><span className="text-[11px] text-cyan-100/75">{['L','M','X','J','V','S','D'][i]}</span></div>)}
