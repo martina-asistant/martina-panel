@@ -807,7 +807,7 @@ useEffect(() => {
   // Resumen clínico anual: Dr. Federico incluye histórico de Celia internamente.
   // Ningún total clínico incluye canceladas ni no asistidas.
   const anioActual=String(new Date().getFullYear());
-  const clinicaAnual=useMemo(()=>citasUnicas.filter(c=>estadoVigente(c) && diaMadrid(c.fecha_inicio).slice(0,4)===anioActual),[citasUnicas,anioActual]);
+  const clinicaAnual=useMemo(()=>citasUnicas.filter(c=>normalizar(c.estado)==='finalizada' && diaMadrid(c.fecha_inicio).slice(0,4)===anioActual),[citasUnicas,anioActual]);
   const totalFede=clinicaAnual.filter(c=>profesionalGrupo(c)==='fede').length;
   const totalAna=clinicaAnual.filter(c=>profesionalGrupo(c)==='ana').length;
   const opcionesAnios=Array.from(new Set(['2026',anioActual,...citasUnicas.map(c=>diaMadrid(c.fecha_inicio).slice(0,4)).filter(Boolean)])).sort().reverse();
