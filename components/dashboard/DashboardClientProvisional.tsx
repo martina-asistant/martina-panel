@@ -1017,11 +1017,11 @@ return (
       <div className="mb-10 flex items-center justify-between gap-8">
         <div>
           <h1 className="text-[20px] leading-tight font-normal tracking-tight text-white lg:text-[22px]">
-      ¡Bienvenida, {nombreUsuario || '...'}!
+      ¡{['fede', 'federico'].includes(normalizar(nombreUsuario)) ? 'Bienvenido' : 'Bienvenida'}, {nombreUsuario || '...'}!
     </h1>
     <div className="mt-1 flex items-center gap-1.5 text-xs font-light text-cyan-100/65 mb-4">
       <UserRound className="h-3.5 w-3.5 shrink-0"/>
-      <span>Administración</span>
+      <span>{['fede', 'federico'].includes(normalizar(nombreUsuario)) ? 'Gerencia' : normalizar(nombreUsuario) === 'ana' ? 'Doctora' : 'Administración'}</span>
     </div>
 
           <div className="inline-flex items-center gap-3 rounded-full border border-cyan-400/20 bg-cyan-500/10 px-5 py-2.5 text-cyan-100 text-sm font-medium shadow-[0_0_20px_rgba(34,211,238,.08)]">
@@ -1083,11 +1083,11 @@ return (
     <div className={`h-[calc(100dvh-190px)] overflow-y-auto overflow-x-hidden bg-[#02141B] px-3 pt-6 pb-32 text-white lg:hidden ${scrollCyan}`}>
   <div className="mb-7">    
 <h1 className="text-[20px] leading-tight font-normal tracking-tight text-white lg:text-[22px]">
-      ¡Bienvenida, {nombreUsuario || '...'}!
+      ¡{['fede', 'federico'].includes(normalizar(nombreUsuario)) ? 'Bienvenido' : 'Bienvenida'}, {nombreUsuario || '...'}!
     </h1>
     <div className="mt-1 flex items-center gap-1.5 text-xs font-light text-cyan-100/65">
       <UserRound className="h-3.5 w-3.5 shrink-0"/>
-      <span>Administración</span>
+      <span>{['fede', 'federico'].includes(normalizar(nombreUsuario)) ? 'Gerencia' : normalizar(nombreUsuario) === 'ana' ? 'Doctora' : 'Administración'}</span>
     </div>
 
 
