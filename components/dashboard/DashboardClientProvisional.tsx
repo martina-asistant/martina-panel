@@ -391,11 +391,18 @@ function CajaSeguimiento({citas,cargando,errorDatos}:{citas:CitaDB[];cargando:bo
     return ()=>{activo=false;};
   },[]);
   const registros=useMemo(()=>clasificarSeguimiento(citas,gestiones,hoy),[citas,gestiones,hoy]);
+  // Excepción de la carga inicial: los cierres previos a este ajuste quedan solo en el histórico.
+  const corteCierresIniciales=Date.parse('2026-11-25T15:59:53+01:00');
+  const prioridadSeguimiento:Record<EstadoSeguimiento,number>={pendiente:0,curso:1,finalizado:2,no_continua:3};
   const datosMes=registros.filter(r=>{
     if(r.estado==='no_continua')return false;
-    const actual=diaMadrid(r.primera.fecha_inicio).slice(0,7)===mesActual;
-    return actual||(r.estado==='pendiente');
-  });
+    if(r.estado==='pendiente')return true;
+    if(r.estado==='finalizado'){
+      const cierre=r.finActivo?.fecha_registro;
+      return Boolean(cierre && Date.parse(cierre)>=corteCierresIniciales && diaMadrid(cierre).slice(0,7)===mesActual);
+    }
+    return diaMadrid(r.primera.fecha_inicio).slice(0,7)===mesActual;
+  }).sort((a,b)=>prioridadSeguimiento[a.estado]-prioridadSeguimiento[b.estado] || (b.primera.fecha_inicio||'').localeCompare(a.primera.fecha_inicio||''));
   const historico=[
     registros.filter(r=>r.estado==='pendiente').length,
     registros.filter(r=>r.estado==='curso').length,
@@ -521,7 +528,7 @@ function CajaSeguimiento({citas,cargando,errorDatos}:{citas:CitaDB[];cargando:bo
       </span>
     </div>;
   };
-  const indicador=(titulo:string,n:number,i:number)=><div key={titulo} className="grid grid-cols-[10px_max-content_20px] items-center gap-x-1.5 whitespace-nowrap text-[10px] text-cyan-100/85 sm:text-[11px]"><span className="h-2.5 w-2.5 rounded-full" style={{backgroundColor:[estilosSeg.pendiente.hex,estilosSeg.curso.hex,estilosSeg.finalizado.hex,estilosSeg.no_continua.hex][i]}}/><span>{titulo}:</span><strong className="text-right font-semibold tabular-nums text-white">{cargandoTodo||errorTodo?'—':n}</strong></div>;
+  const indicador=(titulo:string,n:number,i:number)=><div key={titulo} className="contents"><span className="h-2.5 w-2.5 rounded-full" style={{backgroundColor:[estilosSeg.pendiente.hex,estilosSeg.curso.hex,estilosSeg.finalizado.hex,estilosSeg.no_continua.hex][i]}}/><span>{titulo}:</span><strong className="text-left font-semibold tabular-nums text-white">{cargandoTodo||errorTodo?'—':n}</strong></div>;
   const opciones=[
     {label:'Año',value:anio,set:setAnio,opts:[{value:'todos',label:'Todos los años'},...anos.map(a=>({value:a,label:a}))]},
     {label:'Mes',value:mes,set:setMes,opts:[{value:'todos',label:'Todo el año'},...Array.from({length:12},(_,i)=>({value:String(i+1),label:new Intl.DateTimeFormat('es-ES',{month:'long'}).format(new Date(2026,i,1))}))]},
@@ -537,8 +544,8 @@ function CajaSeguimiento({citas,cargando,errorDatos}:{citas:CitaDB[];cargando:bo
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-cyan-400/[.055] shadow-[0_0_22px_rgba(34,211,238,.17)] sm:h-10 sm:w-10"><HeartPulse className="h-5 w-5 text-cyan-300"/></div>
             <h2 className="text-[11px] font-normal uppercase tracking-[.08em] text-cyan-200 sm:text-sm sm:tracking-[.10em]">SEGUIMIENTO</h2>
           </div>
-          {/* Mismo ancho visual que CITAS CREADAS (202px): no depender de clases dinámicas de Tailwind. */}
-         <div className="group w-[170px] shrink-0 rounded-xl border border-cyan-300/45 bg-[#082B35] px-2.5 py-1.5 text-center shadow-[0_0_12px_rgba(34,211,238,.10)] transition-all duration-300 hover:-translate-y-0.5 hover:border-cyan-200/90 hover:bg-[#0A3541] hover:shadow-[0_0_18px_rgba(34,211,238,.40),0_0_30px_rgba(34,211,238,.13)] sm:px-3 sm:py-2">
+          {/* Ancho común con CITAS CREADAS: 136px CSS, sin depender del texto. */}
+         <div className="group w-[136px] shrink-0 rounded-xl border border-cyan-300/45 bg-[#082B35] px-2.5 py-1.5 text-center shadow-[0_0_12px_rgba(34,211,238,.10)] transition-all duration-300 hover:-translate-y-0.5 hover:border-cyan-200/90 hover:bg-[#0A3541] hover:shadow-[0_0_18px_rgba(34,211,238,.40),0_0_30px_rgba(34,211,238,.13)] sm:px-3 sm:py-2">
             <div className="flex items-baseline justify-center gap-2 sm:gap-3"><span className="text-[9px] font-normal uppercase tracking-[.12em] text-cyan-100/70 sm:text-[10px]">TOTAL</span><strong className="text-[26px] font-semibold leading-none tabular-nums text-white sm:text-[30px]">{cargandoTodo?'…':errorTodo?'—':registros.length}</strong></div>
             <div className="mt-1 text-[9px] leading-tight text-cyan-100/65 sm:text-[10px]">Primeras visitas</div>
           </div>
@@ -547,7 +554,7 @@ function CajaSeguimiento({citas,cargando,errorDatos}:{citas:CitaDB[];cargando:bo
         {/* Gráfico relleno de sectores separados, acabado mate + halo propio. Sin caja. */}
         <div className="mt-2 flex min-w-0 shrink-0 items-center justify-center gap-2.5 sm:gap-5">
            <div className="flex shrink-0 items-center justify-center"><DonutSeguimiento valores={cargandoTodo||errorTodo?[0,0,0,0]:historico}/></div>
-           <div className="flex min-w-0 shrink-0 flex-col gap-2 sm:gap-2.5">
+           <div className="grid min-w-0 shrink-0 grid-cols-[10px_max-content_max-content] items-center gap-x-1.5 gap-y-2 whitespace-nowrap text-[10px] text-cyan-100/85 sm:gap-y-2.5 sm:text-[11px]">
             {indicador('Citas pendientes',historico[0],0)}
             {indicador('En tratamiento',historico[1],1)}
             {indicador('TTO finalizado',historico[2],2)}
@@ -780,7 +787,7 @@ useEffect(() => {
   CITAS CREADAS
 </h2>
           </div>
-<div className="group shrink-0 rounded-xl border border-cyan-300/45 bg-[#082B35] px-2.5 py-1.5 text-center shadow-[0_0_12px_rgba(34,211,238,.10)] transition-all duration-300 hover:-translate-y-0.5 hover:border-cyan-200/90 hover:bg-[#0A3541] hover:shadow-[0_0_18px_rgba(34,211,238,.40),0_0_30px_rgba(34,211,238,.13)] sm:px-3 sm:py-2">
+<div className="group w-[136px] shrink-0 rounded-xl border border-cyan-300/45 bg-[#082B35] px-2.5 py-1.5 text-center shadow-[0_0_12px_rgba(34,211,238,.10)] transition-all duration-300 hover:-translate-y-0.5 hover:border-cyan-200/90 hover:bg-[#0A3541] hover:shadow-[0_0_18px_rgba(34,211,238,.40),0_0_30px_rgba(34,211,238,.13)] sm:px-3 sm:py-2">
             <div className="flex items-baseline justify-center gap-2 sm:gap-3">
               <span className="text-[9px] font-normal uppercase tracking-[.12em] text-cyan-100/70 sm:text-[10px]">TOTAL</span>
               <strong className="text-[26px] font-semibold leading-none tabular-nums text-white sm:text-[30px]">{cargando?'…':martina.length}</strong>
@@ -1045,8 +1052,3 @@ return (
 };
 
 export default DashboardClientProvisional;
-
-
-
-
-
