@@ -1016,11 +1016,11 @@ return (
     <div className={`hidden h-full overflow-y-auto overflow-x-hidden bg-[#02141B] p-8 pb-24 text-white lg:block lg:px-5 xl:px-8 2xl:px-10 ${scrollCyan}`}>
       <div className="mb-10 flex items-center justify-between gap-8">
         <div>
-          <h1 className="text-[1.65rem] leading-tight font-semibold text-white sm:text-[2rem]">
+          <h1 className="text-[20px] leading-tight font-normal tracking-tight text-white lg:text-[22px]">
       ¡Bienvenida, {nombreUsuario || '...'}!
     </h1>
-    <div className="mt-1 flex items-center gap-1.5 text-sm text-cyan-100/65 mb-4">
-      <UserRound className="h-4 w-4 shrink-0"/>
+    <div className="mt-1 flex items-center gap-1.5 text-xs font-light text-cyan-100/65 mb-4">
+      <UserRound className="h-3.5 w-3.5 shrink-0"/>
       <span>Administración</span>
     </div>
 
@@ -1082,11 +1082,11 @@ return (
     {/* MOBILE */}
     <div className={`h-[calc(100dvh-190px)] overflow-y-auto overflow-x-hidden bg-[#02141B] px-3 pt-6 pb-32 text-white lg:hidden ${scrollCyan}`}>
   <div className="mb-7">    
-<h1 className="text-[1.65rem] leading-tight font-semibold text-white sm:text-[2rem]">
+<h1 className="text-[20px] leading-tight font-normal tracking-tight text-white lg:text-[22px]">
       ¡Bienvenida, {nombreUsuario || '...'}!
     </h1>
-    <div className="mt-1 flex items-center gap-1.5 text-sm text-cyan-100/65">
-      <UserRound className="h-4 w-4 shrink-0"/>
+    <div className="mt-1 flex items-center gap-1.5 text-xs font-light text-cyan-100/65">
+      <UserRound className="h-3.5 w-3.5 shrink-0"/>
       <span>Administración</span>
     </div>
 
