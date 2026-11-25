@@ -1765,6 +1765,41 @@ const aplicarCambioEstadoVisita = async (
   }));
 };
 
+// Seguimiento de primeras visitas: registro independiente del estado de Agenda.
+const registrarPresupuesto = async (evento: EventoAgenda, entregado: boolean) => {
+  try {
+    const supa = createClient();
+    if (!supa) throw new Error('Sin conexión con Supabase');
+
+    const calendarId = ({
+      'ramblavilardental2@gmail.com': 'fede',
+      'ramblavilardental@gmail.com': 'celia',
+      'ramblavilardental3@gmail.com': 'ana',
+    } as Record<string, string>)[evento.calendar_id] || evento.calendar_id;
+
+    const { data: cita, error: errorCita } = await supa
+      .from('historial_citas')
+      .select('id')
+      .eq('event_id', evento.event_id)
+      .eq('calendar_id', calendarId)
+      .single();
+
+    if (errorCita || !cita) throw errorCita || new Error('Cita no localizada');
+
+    const { error } = await supa.from('historial_seguimiento').insert({
+      historial_cita_id: cita.id,
+      presupuesto_entregado: entregado,
+      tipo_registro: entregado ? 'gestion' : 'fin_tratamiento',
+      resultado: entregado ? 'presupuesto_entregado' : null,
+      fin_tratamiento: !entregado,
+    });
+
+    if (error) throw error;
+  } catch (error) {
+    console.error('Error registrando presupuesto:', error);
+  }
+};
+
 const cambiarEstadoVisita = async (
   evento: EventoAgenda,
   estado: EstadoVisita
@@ -5261,29 +5296,46 @@ return (
   </div>
 )}
 
-      {confirmarEstadoVisita && (
+      {confirmarEstadoVisita && (() => {
+  const preguntarPresupuesto =
+    datosUsuarioPanel?.rol === 'admin' &&
+    confirmarEstadoVisita.estado === 'finalizada' &&
+    normalizarTexto(confirmarEstadoVisita.evento.motivo || '') === 'primera visita';
+
+  return (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 backdrop-blur-sm">
     <div className="w-full max-w-[330px] rounded-3xl border border-cyan-300/45 bg-[#03111A]/95 px-6 py-5 shadow-[0_0_46px_rgba(34,211,238,.28)]">
 
       <div className="text-center text-cyan-300 text-[12px] uppercase tracking-[0.28em] font-medium mb-4">
-        {confirmarEstadoVisita.titulo}
+        {preguntarPresupuesto ? 'SE HA FINALIZADO UNA PRIMERA VISITA' : confirmarEstadoVisita.titulo}
       </div>
 
+      {!preguntarPresupuesto && (
       <div className="text-center text-cyan-100 text-sm font-medium mb-5">
         {confirmarEstadoVisita.evento.titulo || confirmarEstadoVisita.evento.nombre_paciente || 'Cita'}
       </div>
+      )}
 
       <div className="text-center text-white/95 text-sm mb-5">
-        {confirmarEstadoVisita.texto}
+        {preguntarPresupuesto ? '¿Se le ha entregado presupuesto?' : confirmarEstadoVisita.texto}
       </div>
 
       <div className="flex justify-center gap-3">
         <button
           type="button"
-          onClick={() => setConfirmarEstadoVisita(null)}
+          disabled={preguntarPresupuesto && loading}
+          onClick={async () => {
+            const pendiente = confirmarEstadoVisita;
+            setConfirmarEstadoVisita(null);
+
+            if (preguntarPresupuesto) {
+              await aplicarCambioEstadoVisita(pendiente.evento, pendiente.estado);
+              await registrarPresupuesto(pendiente.evento, false);
+            }
+          }}
           className="rounded-full border border-cyan-400/50 bg-cyan-500/10 px-5 py-1.5 text-sm text-cyan-100 hover:bg-cyan-500/20 hover:border-cyan-300/70 transition-all"
         >
-          No
+          {preguntarPresupuesto ? 'NO' : 'No'}
         </button>
 
         <button
@@ -5298,6 +5350,10 @@ return (
               pendiente.evento,
               pendiente.estado
             );
+
+            if (preguntarPresupuesto) {
+              await registrarPresupuesto(pendiente.evento, true);
+            }
           }}
           disabled={loading}
           style={{
@@ -5308,13 +5364,24 @@ return (
           }}
           className="rounded-full border border-white/25 px-5 py-1.5 text-sm text-white hover:brightness-110 disabled:opacity-50 transition-all"
         >
-          {confirmarEstadoVisita.textoBoton}
+          {preguntarPresupuesto ? 'SÍ' : confirmarEstadoVisita.textoBoton}
         </button>
       </div>
 
+      {preguntarPresupuesto && (
+        <button
+          type="button"
+          onClick={() => setConfirmarEstadoVisita(null)}
+          className="mt-4 w-full text-center text-xs text-cyan-100/60 hover:text-cyan-100 transition-all"
+        >
+          Cancelar
+        </button>
+      )}
+
     </div>
   </div>
-)}
+  );
+})()}
       
     </div>
   );
