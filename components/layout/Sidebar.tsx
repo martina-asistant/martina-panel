@@ -12,6 +12,7 @@ import {
   LogOut,
   CalendarDays,
   FlaskConical,
+  UsersRound,
   Lock
 } from 'lucide-react';
 
@@ -23,10 +24,11 @@ import type { UsuarioPanel } from '@/lib/types/db.types';
 const nav = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/agendas', label: 'Agendas', icon: CalendarDays },
+  { href: '/pacientes', label: 'Pacientes', icon: UsersRound },
+  { href: '/laboratorio', label: 'Laboratorio', icon: FlaskConical },
   { href: '/conversaciones', label: 'Conversaciones', icon: MessageSquare },
   { href: '/recordatorios', label: 'Recordatorios', icon: BellRing },
   { href: '/recalls', label: 'Recalls', icon: PhoneCall },
-  { href: '/laboratorio', label: 'Laboratorio', icon: FlaskConical },
 ];
 
 const Sidebar = () => {
@@ -78,7 +80,7 @@ const Sidebar = () => {
 
   return (
     <header className="w-full bg-[#03111A] border-b border-cyan-500/10 px-4 py-4 lg:px-8">
-      <div className="max-w-[1600px] mx-auto">
+      <div className="w-full mx-auto">
         {/* DESKTOP */}
         <div className="hidden lg:flex items-center justify-between gap-6">
           <div className="rounded-3xl border border-cyan-400/25 bg-cyan-500/10 px-8 py-3 flex items-center gap-7 shadow-[0_0_30px_rgba(34,211,238,.10)] min-w-[390px]">
