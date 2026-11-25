@@ -705,7 +705,7 @@ export default function PacientesView() {
                       notas_internas: e.target.value,
                     }))
                   }
-                  className="w-full min-w-0 resize-y rounded-2xl border border-cyan-500/15 bg-black/15 px-4 py-3 text-sm outline-none"
+                  className="w-full min-w-0 resize-y rounded-2xl border border-cyan-500/15 bg-black/15 px-4 py-3 text-sm outline-none [scrollbar-width:thin] [scrollbar-color:#155365_#031B24] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-track]:bg-[#031B24] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#155365] hover:[&::-webkit-scrollbar-thumb]:bg-[#216D80]"
                 />
               </label>
 
@@ -781,7 +781,7 @@ export default function PacientesView() {
                   </div>
                 )}
 
-                <div className="rounded-2xl border border-cyan-400/10 bg-black/10 p-4 md:max-h-[150px] md:shrink-0 md:overflow-y-auto">
+                <div className="rounded-2xl border border-cyan-400/10 bg-black/10 p-4 md:max-h-[150px] md:shrink-0 md:overflow-y-auto [scrollbar-width:thin] [scrollbar-color:#155365_#031B24] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-track]:bg-[#031B24] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#155365] hover:[&::-webkit-scrollbar-thumb]:bg-[#216D80]">
                   <div className="text-xs uppercase tracking-[0.12em] text-cyan-200/55">
                     Notas internas
                   </div>
@@ -820,7 +820,7 @@ export default function PacientesView() {
                       No hay citas registradas en el historial
                     </div>
                   ) : (
-                    <div className="mt-4 max-h-[390px] space-y-2 overflow-y-auto overflow-x-hidden pr-2 [scrollbar-width:thin] [scrollbar-color:#176477_#03111A] [&::-webkit-scrollbar]:w-[6px] [&::-webkit-scrollbar-track]:bg-[#03111A] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#176477] md:max-h-none md:min-h-0 md:flex-1">
+                    <div className="mt-4 max-h-[390px] space-y-2 overflow-y-auto overflow-x-hidden pr-2 [scrollbar-width:thin] [scrollbar-color:#155365_#031B24] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-track]:bg-[#031B24] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#155365] hover:[&::-webkit-scrollbar-thumb]:bg-[#216D80] md:max-h-none md:min-h-0 md:flex-1">
                       {historial.map((cita) => {
                         const estado = estiloEstadoHistorial[cita.estado] ?? {
                           nombre: textoHistorial(cita.estado),
@@ -888,8 +888,8 @@ export default function PacientesView() {
   // ================================================================
 
   return (
-    <section className="h-full w-full max-w-full overflow-x-hidden overflow-y-auto bg-[#020F14] px-3 py-5 text-white sm:px-4 lg:px-8 lg:py-7">
-      <div className="mx-auto w-full min-w-0 max-w-[1600px]">
+    <section className="h-full w-full max-w-full overflow-x-hidden overflow-y-auto bg-[#020F14] px-3 py-5 text-white lg:px-5 xl:px-8 2xl:px-10 lg:py-7 [scrollbar-width:thin] [scrollbar-color:#155365_#031B24] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-track]:bg-[#031B24] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#155365] hover:[&::-webkit-scrollbar-thumb]:bg-[#216D80]">
+      <div className="mx-auto w-full min-w-0 max-w-full">
         <div className="mb-5 flex min-w-0 items-center justify-between gap-2 sm:gap-4">
           <div className="min-w-0">
             
@@ -928,7 +928,7 @@ export default function PacientesView() {
             <div className="min-w-0 overflow-hidden rounded-3xl border border-cyan-400/15 bg-[#03111A]/90 md:flex md:min-h-0 md:flex-col">
               {buscador}
 
-              <div className="max-h-[640px] overflow-y-auto overflow-x-hidden p-2 md:max-h-none md:min-h-0 md:flex-1 [scrollbar-width:thin] [scrollbar-color:#176477_#03111A] [&::-webkit-scrollbar]:w-[6px] [&::-webkit-scrollbar-track]:bg-[#03111A] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#176477]">
+              <div className="max-h-[640px] overflow-y-auto overflow-x-hidden p-2 md:max-h-none md:min-h-0 md:flex-1 [scrollbar-width:thin] [scrollbar-color:#155365_#031B24] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-track]:bg-[#031B24] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#155365] hover:[&::-webkit-scrollbar-thumb]:bg-[#216D80]">
                 {cargando ? (
                   <p className="py-10 text-center text-sm text-white/35">
                     Cargando pacientes...
@@ -943,7 +943,7 @@ export default function PacientesView() {
                       key={p.id}
                       type="button"
                       onClick={() => elegir(p)}
-                      className={`mb-1 w-full min-w-0 overflow-x-auto rounded-2xl border px-4 py-3 text-left [scrollbar-width:thin] [scrollbar-color:#176477_#03111A] ${
+                      className={`mb-1 w-full min-w-0 overflow-x-auto rounded-2xl border px-4 py-3 text-left [scrollbar-width:thin] [scrollbar-color:#155365_#031B24] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-track]:bg-[#031B24] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#155365] hover:[&::-webkit-scrollbar-thumb]:bg-[#216D80] ${
                         seleccionado?.id === p.id
                           ? 'border-cyan-400/30 bg-cyan-500/10'
                           : 'border-transparent hover:bg-white/[0.035]'
@@ -1008,7 +1008,7 @@ export default function PacientesView() {
 
               {/* LISTADO MÓVIL */}
 
-              <div className="max-h-[640px] overflow-y-auto overflow-x-hidden p-2">
+              <div className="max-h-[640px] overflow-y-auto overflow-x-hidden p-2 [scrollbar-width:thin] [scrollbar-color:#155365_#031B24] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-track]:bg-[#031B24] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#155365] hover:[&::-webkit-scrollbar-thumb]:bg-[#216D80]">
                 {cargando ? (
                   <p className="py-10 text-center text-sm text-white/35">
                     Cargando pacientes...
