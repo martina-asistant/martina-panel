@@ -892,11 +892,8 @@ export default function PacientesView() {
       <div className="mx-auto w-full min-w-0 max-w-[1600px]">
         <div className="mb-5 flex min-w-0 items-center justify-between gap-2 sm:gap-4">
           <div className="min-w-0">
-            <div className="text-[11px] font-semibold tracking-[0.32em] text-cyan-300">
-              MARTINA
-            </div>
-
-            <h1 className="mt-1 text-2xl font-semibold">
+            
+            <h1 className="mt-1 w-fit bg-gradient-to-r from-white to-cyan-300 bg-clip-text text-2xl font-normal text-transparent">
               Pacientes
             </h1>
 
