@@ -580,18 +580,18 @@ function CajaSeguimiento({citas,cargando,errorDatos}:{citas:CitaDB[];cargando:bo
     const aviso=r.estado==='pendiente'
       ? r.alerta?'Nuevo contacto sin realizar':r.fechaContacto?`Volver a contactar ${fechaGestionSeg(r.fechaContacto)}`:r.estadoTexto
       : '';
-    return <div key={r.primera.id} className="grid grid-cols-[minmax(0,1.4fr)_28px_51px_minmax(76px,1fr)] items-center gap-1.5 border-t border-cyan-500/10 px-2 py-3.5 text-[10px] transition-colors hover:bg-cyan-500/[.035] sm:grid-cols-[minmax(0,1.8fr)_80px_100px_75px_minmax(0,1.3fr)] lg:grid-cols-[minmax(0,1.5fr)_minmax(68px,.65fr)_minmax(95px,.8fr)_minmax(65px,.65fr)_minmax(0,1.45fr)] sm:gap-2 sm:px-3 sm:text-xs">
+    return <div key={r.primera.id} className="grid grid-cols-[minmax(0,1fr)_39px_25px_43px_72px] items-center gap-0.5 border-t border-cyan-500/10 px-2 py-3.5 text-[10px] transition-colors hover:bg-cyan-500/[.035] sm:grid-cols-[minmax(0,1.8fr)_80px_100px_75px_minmax(0,1.3fr)] lg:grid-cols-[minmax(0,1.5fr)_minmax(68px,.65fr)_minmax(95px,.8fr)_minmax(65px,.65fr)_minmax(0,1.45fr)] sm:gap-2 sm:px-3 sm:text-xs">
       <span className="min-w-0 truncate font-medium text-white" title={r.primera.nombre_paciente||''}>{r.primera.nombre_paciente||'—'}</span>
-      <span className="hidden min-w-0 whitespace-nowrap text-[11px] text-cyan-100/75 sm:block text-center">{fechaCitaSeg(r.primera.fecha_inicio)}</span>
+      <span className="min-w-0 whitespace-nowrap text-center text-[10px] text-cyan-100/75 sm:text-[11px]" title={fechaCitaSeg(r.primera.fecha_inicio)}><span className="sm:hidden">{r.primera.fecha_inicio?new Date(r.primera.fecha_inicio).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',timeZone:'Europe/Madrid'}):'—'}</span><span className="hidden sm:inline">{fechaCitaSeg(r.primera.fecha_inicio)}</span></span>
       <span className="flex min-w-0 items-center justify-center text-center" title={valorPresupuesto===true?'Entregado':valorPresupuesto===false?'No entregado':'Pendiente de registrar'}>
         <span className="flex items-center justify-center sm:hidden">
           {valorPresupuesto===true?<CircleCheck className="h-4 w-4 shrink-0 text-green-400"/>:valorPresupuesto===false?<CircleX className="h-4 w-4 shrink-0 text-violet-400"/>:<span className="text-[10px] text-white">Pte</span>}
         </span>
         <span className="hidden min-w-0 justify-center sm:flex">{indicadorPresupuesto(valorPresupuesto)}</span>
       </span>
-      <span className={`min-w-0 whitespace-nowrap text-[10px] sm:text-[11px] lg:text-center ${r.proxima?'text-cyan-100/75':r.estado==='finalizado'?'text-green-300':r.estado==='no_continua'?'text-violet-300':'text-red-300'}`}>{fechaCitaSeg(r.proxima?.fecha_inicio||null)}</span>
-      <span className="min-w-0">
-        <span className={`inline-flex max-w-full items-center gap-1 rounded-full border px-1.5 py-1 text-[9px] leading-tight sm:hidden ${estilo.capsula}`} title={aviso||r.estadoTexto}>
+      <span className={`min-w-0 whitespace-nowrap text-[10px] max-sm:text-center sm:text-[11px] lg:text-center ${r.proxima?'text-cyan-100/75':r.estado==='finalizado'?'text-green-300':r.estado==='no_continua'?'text-violet-300':'text-red-300'}`} title={fechaCitaSeg(r.proxima?.fecha_inicio||null)}><span className="sm:hidden">{r.proxima?.fecha_inicio?new Date(r.proxima.fecha_inicio).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',timeZone:'Europe/Madrid'}):'Sin cita'}</span><span className="hidden sm:inline">{fechaCitaSeg(r.proxima?.fecha_inicio||null)}</span></span>
+      <span className="min-w-0 max-sm:justify-self-end">
+        <span className={`inline-flex max-w-full items-center gap-0.5 rounded-full border px-1 py-1 text-[9px] leading-tight sm:hidden ${estilo.capsula}`} title={aviso||r.estadoTexto}>
           <span className={`h-2 w-2 shrink-0 rounded-full ${estilo.dot}`}/>
           <span>{r.estado==='pendiente'?'Pte gestión':r.estado==='curso'?'En TTO':r.estado==='finalizado'?'Finalizado':'No continúan'}</span>
         </span>
@@ -637,8 +637,8 @@ function CajaSeguimiento({citas,cargando,errorDatos}:{citas:CitaDB[];cargando:bo
         </div>
         {/* Caja de tabla igual que LABORATORIO: encabezado fijo y filas alineadas. */}
         <div className="mt-3 flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-cyan-400/30 bg-[rgba(5,18,24,.78)]">
-          <div className="grid shrink-0 grid-cols-[minmax(0,1.4fr)_28px_51px_minmax(76px,1fr)] items-center gap-1.5 bg-cyan-500/10 px-2 py-3 text-[9px] uppercase tracking-[.035em] text-cyan-300/90 sm:grid-cols-[minmax(0,1.8fr)_80px_100px_75px_minmax(0,1.3fr)] lg:grid-cols-[minmax(0,1.5fr)_minmax(68px,.65fr)_minmax(95px,.8fr)_minmax(65px,.65fr)_minmax(0,1.45fr)] sm:gap-2 sm:px-3">
-            <span>Paciente</span><span className="hidden text-center sm:block">Primera visita</span><span className="text-center"><span className="sm:hidden">PTO</span><span className="hidden sm:inline">Presupuesto</span></span><span className="lg:text-center">Próx. cita</span><span>Estado</span>
+          <div className="grid shrink-0 grid-cols-[minmax(0,1fr)_39px_25px_43px_72px] items-center gap-0.5 bg-cyan-500/10 px-2 py-3 text-[9px] uppercase tracking-[.035em] text-cyan-300/90 sm:grid-cols-[minmax(0,1.8fr)_80px_100px_75px_minmax(0,1.3fr)] lg:grid-cols-[minmax(0,1.5fr)_minmax(68px,.65fr)_minmax(95px,.8fr)_minmax(65px,.65fr)_minmax(0,1.45fr)] sm:gap-2 sm:px-3">
+            <span>Paciente</span><span className="text-center"><span className="sm:hidden whitespace-nowrap text-[8px]">1ª visita</span><span className="hidden sm:inline">Primera visita</span></span><span className="text-center"><span className="sm:hidden">PTO</span><span className="hidden sm:inline">Presupuesto</span></span><span className="max-sm:text-center max-sm:tracking-normal max-sm:text-[8px] lg:text-center">Próx. cita</span><span className="max-sm:text-right max-sm:pr-1">Estado</span>
           </div>
           <div className={`min-h-0 max-h-[360px] flex-1 overflow-y-auto xl:max-h-none ${scrollSeguimiento}`}>
             {cargandoTodo?<p className="px-3 py-5 text-center text-xs text-cyan-100/55">Cargando seguimiento…</p>:errorTodo?<p className="px-3 py-5 text-center text-xs text-amber-200">No se pudo cargar el seguimiento: {errorTodo}</p>:datosTablaSeguimiento.length?datosTablaSeguimiento.map(filaPrincipal):<p className="px-3 py-5 text-center text-xs text-cyan-100/55">Sin primeras visitas que requieran revisión.</p>}
