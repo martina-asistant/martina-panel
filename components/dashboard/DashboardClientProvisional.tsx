@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils/cn';
 import {
   MessageCircle, PhoneCall, CalendarCheck2, ChevronLeft, ChevronRight, ChevronDown,
   ChartNoAxesCombined, ClipboardList, FlaskConical, Bot, HeartPulse,
-  X, Search, AlertCircle, UserRound
+  X, Search, AlertCircle, UserRound, CalendarDays, Check, Plus, ClipboardCheck
 } from 'lucide-react';
 import type { CanalMartina } from '@/lib/types/db.types';
 import { getConfiguracionMartina, updateCanalMartina } from '@/lib/repos/configuracion.repo';
@@ -237,6 +237,7 @@ type GestionSeguimiento = {
   fecha_proximo_contacto:string|null; motivo_no_continua:string|null;
   fin_tratamiento:boolean; gestionado_por:string; fecha_registro:string;
   registro_origen_id:string|null;
+  presupuesto_entregado:boolean|null; financiacion_inicial_ofrecida:boolean|null; motivo_no_coge_cita:string|null; contactara_paciente:boolean|null;
 };
 type EstadoSeguimiento = 'pendiente'|'curso'|'finalizado'|'no_continua';
 type FilaSeguimiento = {
@@ -293,10 +294,10 @@ function clasificarSeguimiento(citas:CitaDB[],gestiones:GestionSeguimiento[],hoy
     const fechaPrimera=primera.fecha_inicio||'';
     const proxima=(porPaciente.get(primera.patient_id!)||[])
       .filter(c=>c.id!==primera.id && c.fecha_inicio && c.fecha_inicio>fechaPrimera
-        && diaMadrid(c.fecha_inicio)>=hoy && estadoVigente(c))
+        && c.fecha_fin && new Date(c.fecha_fin).getTime()>Date.now() && normalizar(c.estado)!=='finalizada' && estadoVigente(c))
       .sort((a,b)=>(a.fecha_inicio||'').localeCompare(b.fecha_inicio||''))[0]||null;
     const estado:EstadoSeguimiento=finActivo?'finalizado':cerrado?'no_continua':proxima?'curso':'pendiente';
-    const ultimaGestion=[...historial].reverse().find(g=>g.tipo_registro==='gestion')||null;
+    const ultimaGestion=historial.filter(g=>g.tipo_registro==='gestion' && !['presupuesto_entregado','datos_iniciales'].includes(g.resultado||'')).sort((a,b)=>b.fecha_gestion.localeCompare(a.fecha_gestion)||b.fecha_registro.localeCompare(a.fecha_registro))[0]||null;
     const fechaContacto=ultimaGestion?.fecha_proximo_contacto||null;
     const contactoVencido=estado==='pendiente'&&Boolean(fechaContacto&&fechaContacto<=hoy);
     const sinGestionVencida=estado==='pendiente'&&!ultimaGestion&&Boolean(
@@ -308,6 +309,8 @@ function clasificarSeguimiento(citas:CitaDB[],gestiones:GestionSeguimiento[],hoy
     else if(estado==='curso')estadoTexto='En tratamiento';
     else if(contactoVencido)estadoTexto='Nuevo contacto sin realizar';
     else if(fechaContacto)estadoTexto=`Volver a contactar ${fechaGestionSeg(fechaContacto)}`;
+    else if(ultimaGestion?.contactara_paciente)estadoTexto='Contactará el paciente';
+    else if(ultimaGestion?.acepta_nuevo_contacto===false)estadoTexto='No acepta próximo contacto';
     else if(ultimaGestion)estadoTexto=ultimaGestion.resultado==='sin_respuesta'?'Sin respuesta':ultimaGestion.resultado==='no_contesta'?'No contesta':'En seguimiento';
     return {primera,proxima,estado,gestiones:historial,ultimo:ult,finActivo,fechaContacto,estadoTexto,alerta:contactoVencido||sinGestionVencida};
   }).sort((a,b)=>(b.primera.fecha_inicio||'').localeCompare(a.primera.fecha_inicio||''));
@@ -351,6 +354,20 @@ function DonutSeguimiento({valores}:{valores:number[]}) {
   </svg>;
 }
 
+const campoSeg='flex min-h-8 w-full items-center gap-2 rounded-xl border border-cyan-400/35 bg-[#0A303B] px-3 py-1.5 text-left text-xs text-white transition hover:border-cyan-300/75 hover:shadow-[0_0_12px_rgba(34,211,238,.18)]';
+const botonSeg='inline-flex items-center justify-center gap-1.5 rounded-full border border-cyan-300/45 bg-cyan-400/[.07] px-3 py-1.5 text-xs text-cyan-100 transition hover:bg-cyan-400/20 hover:shadow-[0_0_15px_rgba(34,211,238,.22)] disabled:opacity-40';
+const motivosSeg=['Motivos económicos','Necesita consultarlo','Está comparando clínicas','Otro motivo'];
+const resultadosSeg:Record<string,{label:string,dot:string}>={no_contesta:{label:'No contesta',dot:'bg-red-500'},pendiente_respuesta:{label:'Pendiente de respuesta',dot:'bg-yellow-400'},valorando_presupuesto:{label:'Valorando presupuesto',dot:'bg-yellow-400'},ha_cogido_cita:{label:'Ha cogido cita',dot:'bg-green-400'},no_continua:{label:'No continúa',dot:'bg-violet-400'}};
+function SelectorSeg({valor,opciones,cambiar,placeholder}:{valor:string;opciones:{value:string;label:string;dot?:string}[];cambiar:(v:string)=>void;placeholder:string}){
+  const [abierto,setAbierto]=useState(false);const actual=opciones.find(o=>o.value===valor);
+  return <div className="relative"><button type="button" aria-expanded={abierto} onClick={()=>setAbierto(v=>!v)} className={campoSeg}>{actual?.dot&&<span className={`h-2 w-2 rounded-full ${actual.dot}`}/>}<span className="flex-1">{actual?.label||placeholder}</span><ChevronDown className="h-4 w-4 text-cyan-300"/></button>{abierto&&<><button type="button" className="fixed inset-0 z-40 cursor-default" aria-label="Cerrar opciones" onClick={()=>setAbierto(false)}/><div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-xl border border-cyan-400/45 bg-[#082B36] p-1 shadow-[0_8px_30px_rgba(0,0,0,.6),0_0_16px_rgba(34,211,238,.16)]">{opciones.map(o=><button key={o.value} type="button" onClick={()=>{cambiar(o.value);setAbierto(false)}} className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs hover:bg-cyan-400/15 ${valor===o.value?'bg-cyan-400/10':''}`}>{o.dot&&<span className={`h-2 w-2 rounded-full ${o.dot}`}/>}<span className="flex-1">{o.label}</span>{valor===o.value&&<Check className="h-3.5 w-3.5 text-cyan-300"/>}</button>)}</div></>}</div>;
+}
+function CalendarioSeg({valor,cambiar,min,max}:{valor:string;cambiar:(v:string)=>void;min?:string;max?:string}){
+  const [abierto,setAbierto]=useState(false);const [mes,setMes]=useState(()=>new Date());
+  const y=mes.getFullYear(),m=mes.getMonth(),inicio=(new Date(y,m,1).getDay()+6)%7,dias=new Date(y,m+1,0).getDate(),hoy=diaMadrid(new Date().toISOString());
+  return <div className="relative"><button type="button" aria-expanded={abierto} className={campoSeg} onClick={()=>{if(!abierto)setMes(new Date(`${valor||hoy}T12:00:00`));setAbierto(v=>!v)}}><CalendarDays className="h-4 w-4 text-cyan-300"/><span className="flex-1">{valor?fechaGestionSeg(valor):'Seleccionar fecha'}</span><ChevronDown className="h-4 w-4 text-cyan-300"/></button>{abierto&&<><button type="button" className="fixed inset-0 z-40 cursor-default" aria-label="Cerrar calendario" onClick={()=>setAbierto(false)}/><div className="absolute left-1/2 top-full z-50 mt-1 w-[230px] -translate-x-1/2 rounded-xl border border-cyan-400/45 bg-[#062631] p-3 shadow-[0_8px_30px_rgba(0,0,0,.6),0_0_15px_rgba(34,211,238,.18)]"><div className="mb-2 flex items-center justify-between border-b border-cyan-400/25 pb-2 text-xs uppercase text-cyan-200"><button type="button" aria-label="Mes anterior" onClick={()=>setMes(new Date(y,m-1,1))}><ChevronLeft className="h-4 w-4"/></button>{mes.toLocaleDateString('es-ES',{month:'long',year:'numeric'})}<button type="button" aria-label="Mes siguiente" onClick={()=>setMes(new Date(y,m+1,1))}><ChevronRight className="h-4 w-4"/></button></div><div className="grid grid-cols-7 text-center text-[11px]">{['L','M','X','J','V','S','D'].map(d=><span key={d} className="pb-1 text-cyan-300/70">{d}</span>)}{Array.from({length:inicio},(_,i)=><span key={`e${i}`}/>)}{Array.from({length:dias},(_,i)=>{const f=claveLocal(new Date(y,m,i+1));return <button key={f} type="button" disabled={Boolean((min&&f<min)||(max&&f>max))} onClick={()=>{cambiar(f);setAbierto(false)}} className={`h-7 rounded-full hover:bg-cyan-400/20 disabled:opacity-25 ${f===valor?'bg-cyan-500/40 text-white':f===hoy?'border border-cyan-300 text-white':(inicio+i)%7>=5?'text-slate-400':'text-white'}`}>{i+1}</button>})}</div></div></>}</div>;
+}
+
 function CajaSeguimiento({citas,cargando,errorDatos}:{citas:CitaDB[];cargando:boolean;errorDatos:string}) {
   const [gestiones,setGestiones]=useState<GestionSeguimiento[]>([]);
   const [cargandoGestiones,setCargandoGestiones]=useState(true);
@@ -363,15 +380,21 @@ function CajaSeguimiento({citas,cargando,errorDatos}:{citas:CitaDB[];cargando:bo
   const [situacion,setSituacion]=useState('todas');
   const [buscar,setBuscar]=useState('');
   const [menuFiltro,setMenuFiltro]=useState<string|null>(null);
+  const [formulario,setFormulario]=useState(false);
   const [fechaGestion,setFechaGestion]=useState(()=>diaMadrid(new Date().toISOString()));
   const [canal,setCanal]=useState('llamada');
-  const [resultado,setResultado]=useState('volver_contactar');
+  const [resultado,setResultado]=useState('');
   const [observaciones,setObservaciones]=useState('');
   const [financiacion,setFinanciacion]=useState(false);
   const [valoracion,setValoracion]=useState(false);
-  const [acepta,setAcepta]=useState(false);
+  const [contacto,setContacto]=useState('');
   const [fechaContacto,setFechaContacto]=useState('');
   const [motivoCierre,setMotivoCierre]=useState('');
+  const [otroCierre,setOtroCierre]=useState('');
+  const [editarInicial,setEditarInicial]=useState(false);
+  const [finInicial,setFinInicial]=useState<boolean|null>(null);
+  const [motivoInicial,setMotivoInicial]=useState('');
+  const [otroInicial,setOtroInicial]=useState('');
   const [errorGuardar,setErrorGuardar]=useState('');
   const hoy=diaMadrid(new Date().toISOString());
   const mesActual=hoy.slice(0,7);
@@ -383,7 +406,7 @@ function CajaSeguimiento({citas,cargando,errorDatos}:{citas:CitaDB[];cargando:bo
       const supa=createClient();
       if(!supa){if(activo){setErrorSeg('Sin conexión con Supabase');setCargandoGestiones(false);}return;}
       try {
-        const datos=await leerTodas<GestionSeguimiento>(supa,'historial_seguimiento','id,historial_cita_id,patient_id,tipo_registro,fecha_gestion,canal_contacto,resultado,observaciones,financiacion_ofrecida,nueva_valoracion_propuesta,acepta_nuevo_contacto,fecha_proximo_contacto,motivo_no_continua,fin_tratamiento,gestionado_por,fecha_registro,registro_origen_id');
+        const datos=await leerTodas<GestionSeguimiento>(supa,'historial_seguimiento','id,historial_cita_id,patient_id,tipo_registro,fecha_gestion,canal_contacto,resultado,observaciones,financiacion_ofrecida,nueva_valoracion_propuesta,acepta_nuevo_contacto,fecha_proximo_contacto,motivo_no_continua,fin_tratamiento,gestionado_por,fecha_registro,registro_origen_id,presupuesto_entregado,financiacion_inicial_ofrecida,motivo_no_coge_cita,contactara_paciente');
         if(activo){setGestiones(datos);setErrorSeg('');}
       }catch(e){if(activo)setErrorSeg(e instanceof Error?e.message:'No se pudo leer el historial de seguimiento');}
       finally{if(activo)setCargandoGestiones(false);}
@@ -416,7 +439,7 @@ function CajaSeguimiento({citas,cargando,errorDatos}:{citas:CitaDB[];cargando:bo
       &&(mes==='todos'||Number(fecha.slice(5,7))===Number(mes))
       &&(situacion==='todas'||r.estado===situacion)
       &&(!buscar||normalizar(r.primera.nombre_paciente).includes(normalizar(buscar)));
-  });
+  }).sort((a,b)=>prioridadSeguimiento[a.estado]-prioridadSeguimiento[b.estado]||(b.primera.fecha_inicio||'').localeCompare(a.primera.fecha_inicio||''));
   const circulos=[
     ['TOTAL',filtrados.length],['PENDIENTES',filtrados.filter(r=>r.estado==='pendiente').length],
     ['EN TRATAMIENTO',filtrados.filter(r=>r.estado==='curso').length],
@@ -429,7 +452,7 @@ function CajaSeguimiento({citas,cargando,errorDatos}:{citas:CitaDB[];cargando:bo
     try{
       const supa=createClient();
       if(!supa)throw new Error('Sin conexión con Supabase');
-      const {data,error}=await supa.from('historial_seguimiento').insert(registro).select('id,historial_cita_id,patient_id,tipo_registro,fecha_gestion,canal_contacto,resultado,observaciones,financiacion_ofrecida,nueva_valoracion_propuesta,acepta_nuevo_contacto,fecha_proximo_contacto,motivo_no_continua,fin_tratamiento,gestionado_por,fecha_registro,registro_origen_id').single();
+      const {data,error}=await supa.from('historial_seguimiento').insert(registro).select('id,historial_cita_id,patient_id,tipo_registro,fecha_gestion,canal_contacto,resultado,observaciones,financiacion_ofrecida,nueva_valoracion_propuesta,acepta_nuevo_contacto,fecha_proximo_contacto,motivo_no_continua,fin_tratamiento,gestionado_por,fecha_registro,registro_origen_id,presupuesto_entregado,financiacion_inicial_ofrecida,motivo_no_coge_cita,contactara_paciente').single();
       if(error)throw error;
       if(!data)throw new Error('No se ha confirmado el guardado');
       setGestiones(v=>[...v,data as GestionSeguimiento]);
@@ -445,67 +468,64 @@ function CajaSeguimiento({citas,cargando,errorDatos}:{citas:CitaDB[];cargando:bo
       await actualizar({historial_cita_id:r.primera.id,tipo_registro:'fin_tratamiento',fin_tratamiento:true},r.primera.id);
     }
   };
-  const desplegar=(r:FilaSeguimiento)=>{
-    setExpandida(v=>v===r.primera.id?null:r.primera.id);
-    setErrorGuardar('');setFechaGestion(hoy);setCanal('llamada');setResultado('volver_contactar');
-    setObservaciones('');setFinanciacion(false);setValoracion(false);setAcepta(false);setFechaContacto('');setMotivoCierre('');
-  };
+  const resetFormulario=()=>{setFechaGestion(hoy);setCanal('llamada');setResultado('');setObservaciones('');setFinanciacion(false);setValoracion(false);setContacto('');setFechaContacto('');setMotivoCierre('');setOtroCierre('');setErrorGuardar('');};
+  const desplegar=(r:FilaSeguimiento)=>{setExpandida(v=>v===r.primera.id?null:r.primera.id);setFormulario(false);setEditarInicial(false);resetFormulario();};
+  const necesitaFecha=['no_contesta','pendiente_respuesta'].includes(resultado)||(resultado==='valorando_presupuesto'&&contacto==='si');
   const registrar=async(r:FilaSeguimiento)=>{
-    if(resultado==='no_continua'&&!motivoCierre.trim()){setErrorGuardar('Indica el motivo por el que no continúa');return;}
-    if(['no_contesta','volver_contactar'].includes(resultado)&&!fechaContacto){setErrorGuardar('Selecciona la fecha del próximo contacto');return;}
-    const tipo_registro=resultado==='no_continua'?'no_continua':'gestion';
-    const ok=await actualizar({historial_cita_id:r.primera.id,tipo_registro,fecha_gestion:fechaGestion,
-      ...(tipo_registro==='gestion'?{canal_contacto:canal,resultado,observaciones,financiacion_ofrecida:financiacion,nueva_valoracion_propuesta:valoracion,acepta_nuevo_contacto:acepta,fecha_proximo_contacto:fechaContacto||null}:{motivo_no_continua:motivoCierre,observaciones})},r.primera.id);
-    if(ok){setObservaciones('');setFechaContacto('');setResultado('volver_contactar');setMotivoCierre('');setFinanciacion(false);setValoracion(false);}
+    if(!resultado||!fechaGestion){setErrorGuardar('Selecciona fecha y resultado');return;}
+    if(resultado==='valorando_presupuesto'&&!contacto){setErrorGuardar('Indica si acepta próximo contacto');return;}
+    if(necesitaFecha&&(!fechaContacto||fechaContacto<fechaGestion)){setErrorGuardar('Selecciona una fecha válida para el próximo contacto');return;}
+    if(resultado==='ha_cogido_cita'&&!r.proxima){setErrorGuardar('Registra primero la cita en Agenda y vuelve a abrir el Dashboard');return;}
+    const motivo=motivoCierre==='Otro motivo'?otroCierre.trim():motivoCierre;
+    if(resultado==='no_continua'&&!motivo){setErrorGuardar('Indica el motivo de cierre');return;}
+    const ok=await actualizar({historial_cita_id:r.primera.id,tipo_registro:resultado==='no_continua'?'no_continua':'gestion',fecha_gestion:fechaGestion,canal_contacto:canal,resultado,observaciones:observaciones.trim()||null,financiacion_ofrecida:resultado==='valorando_presupuesto'&&financiacion,nueva_valoracion_propuesta:resultado==='valorando_presupuesto'&&valoracion,acepta_nuevo_contacto:resultado==='valorando_presupuesto'?contacto==='si':null,contactara_paciente:resultado==='valorando_presupuesto'?contacto==='paciente':null,fecha_proximo_contacto:necesitaFecha?fechaContacto:null,motivo_no_continua:resultado==='no_continua'?motivo:null},r.primera.id);
+    if(ok){setFormulario(false);resetFormulario();}
   };
   const fila=(r:FilaSeguimiento,esInspector:boolean)=>{
     const abierta=expandida===r.primera.id;
-    const tonoEstado=r.alerta?'border-red-500/40 bg-red-500/[.09] text-red-300':r.estado==='pendiente'?'border-amber-400/30 bg-amber-400/[.08] text-amber-200':r.estado==='curso'?'border-cyan-400/30 bg-cyan-400/[.07] text-cyan-200':r.estado==='finalizado'?'border-green-400/30 bg-green-400/[.08] text-green-200':'border-red-400/30 bg-red-400/[.07] text-red-200';
-    return <div key={r.primera.id} className="border-t border-cyan-500/10 transition-colors hover:bg-cyan-500/[.035]">
+    const presupuesto=[...r.gestiones].reverse().find(g=>g.presupuesto_entregado!==null&&g.presupuesto_entregado!==undefined);
+    const inicial=[...r.gestiones].reverse().find(g=>g.resultado==='datos_iniciales');
+    const puedeGestionar=r.estado==='pendiente'||r.estado==='curso';
+    const opcionesMotivo=motivosSeg.map(v=>({value:v,label:v}));
+    const inputSeg='w-full rounded-xl border border-cyan-400/35 bg-[#0A303B] px-3 py-1.5 text-xs text-white outline-none focus:border-cyan-300 placeholder:text-cyan-100/40';
+    const labelSeg='mb-1 block text-xs text-cyan-100/75';
+    const capsula=(texto:string,activo:boolean,accion:()=>void,dot?:string)=><button key={texto} type="button" onClick={accion} className={`${botonSeg} ${activo?'border-cyan-300 bg-cyan-400/20 shadow-[0_0_12px_rgba(34,211,238,.2)]':''}`}>{dot&&<span className={`h-2 w-2 rounded-full ${dot}`}/ >}{texto}</button>;
+        return <div key={r.primera.id} className="border-t border-cyan-500/10 transition-colors hover:bg-cyan-500/[.035]">
       <div className={`grid items-center gap-1.5 px-2 py-3 text-[11px] sm:gap-2 sm:px-3 sm:text-xs ${esInspector?'grid-cols-[minmax(0,1.35fr)_75px_minmax(0,1fr)_84px_28px]':'grid-cols-[minmax(0,1.4fr)_70px_minmax(0,1.05fr)_28px]'}`}>
         <span className="min-w-0 truncate font-medium text-white" title={r.primera.nombre_paciente||''}>{r.primera.nombre_paciente||'—'}</span>
         <span className={`whitespace-nowrap text-[10px] ${r.proxima?'text-cyan-100/75':'text-red-300'}`}>{fechaCitaSeg(r.proxima?.fecha_inicio||null)}</span>
-        <span className={`inline-flex min-w-0 items-center gap-1 rounded-full border px-1.5 py-1 text-[10px] leading-tight ${tonoEstado}`} title={r.estadoTexto}>
-          {r.alerta&&<AlertCircle className="h-3 w-3 shrink-0"/>}<span className="min-w-0 break-words">{r.estadoTexto}</span>
+        <span className={`inline-flex min-w-0 items-center gap-1 rounded-full border px-1.5 py-1 text-[10px] leading-tight ${estilosSeg[r.estado].capsula}`} title={r.estadoTexto}>
+          <span className={`h-2 w-2 shrink-0 rounded-full ${estilosSeg[r.estado].dot}`}/>{r.alerta&&<AlertCircle className="h-3 w-3 shrink-0"/>}<span className="min-w-0 break-words">{r.estadoTexto}</span>
         </span>
         {esInspector&&<label className="flex justify-center" title="FIN TRATAMIENTO"><input type="checkbox" checked={Boolean(r.finActivo)} disabled={Boolean(guardando)||r.estado==='no_continua'} onChange={()=>void finTratamiento(r)} aria-label={`FIN TRATAMIENTO ${r.primera.nombre_paciente||''}`} className="h-4 w-4 cursor-pointer accent-cyan-400 disabled:cursor-not-allowed"/></label>}
         <button type="button" onClick={()=>desplegar(r)} aria-label={`Historial de ${r.primera.nombre_paciente||'paciente'}`} aria-expanded={abierta} className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-cyan-400/40 bg-cyan-400/[.06] text-cyan-200 transition hover:border-cyan-200 hover:bg-cyan-400/20">
           <ChevronDown className={`h-4 w-4 transition-transform ${abierta?'rotate-180':''}`}/>
         </button>
       </div>
+
       {abierta&&<div className="space-y-3 border-t border-cyan-500/10 bg-[#021820] px-3 py-3 sm:px-4">
-        <div className="rounded-xl border border-cyan-400/20 bg-[#082B35] p-3 text-[11px] text-cyan-100/75">
-          <p className="font-medium text-cyan-200">Primera visita: {fechaCitaSeg(r.primera.fecha_inicio)}</p>
-          <p className="mt-1">Próxima cita: {fechaCitaSeg(r.proxima?.fecha_inicio||null)}</p>
-          {r.gestiones.length===0?<p className="mt-2 text-cyan-100/55">Sin gestiones registradas.</p>:r.gestiones.slice().reverse().map(g=><div key={g.id} className="mt-2 rounded-lg border border-cyan-400/15 bg-[#031B24] p-3">
-            <p className="font-medium text-cyan-200">{fechaGestionSeg(g.fecha_gestion)} · {g.tipo_registro==='gestion'?(g.resultado||'Gestión').replace(/_/g,' '):g.tipo_registro.replace(/_/g,' ')}</p>
-            <p className="mt-1 flex items-center gap-1"><UserRound className="h-3.5 w-3.5 text-cyan-300"/> Gestionado por {g.gestionado_por}</p>
-            {g.canal_contacto&&<p className="mt-1">Canal: {g.canal_contacto}</p>}
-            {g.observaciones&&<p className="mt-1 whitespace-pre-wrap">{g.observaciones}</p>}
-            {g.financiacion_ofrecida&&<p className="mt-1">✓ Financiación ofrecida</p>}
-            {g.nueva_valoracion_propuesta&&<p className="mt-1">✓ Nueva valoración propuesta</p>}
-            {g.fecha_proximo_contacto&&<p className="mt-1">Próximo contacto: {fechaGestionSeg(g.fecha_proximo_contacto)}</p>}
-            {g.motivo_no_continua&&<p className="mt-1">Motivo: {g.motivo_no_continua}</p>}
-            <p className="mt-1 text-[10px] text-cyan-100/45">Registrado: {new Date(g.fecha_registro).toLocaleString('es-ES',{timeZone:'Europe/Madrid'})}</p>
-          </div>)}
+        <div className="rounded-xl border border-cyan-400/30 bg-[#06232D] p-3 text-xs">
+          <div className="grid grid-cols-3 gap-2"><div><span className={labelSeg}>Primera visita</span>{fechaCitaSeg(r.primera.fecha_inicio)}</div><div><span className={labelSeg}>Presupuesto</span><span className={presupuesto?.presupuesto_entregado===true?'text-green-300':'text-cyan-100/70'}>{presupuesto?presupuesto.presupuesto_entregado?'Entregado':'No entregado':'Sin registrar'}</span></div><div><span className={labelSeg}>Próxima cita</span>{fechaCitaSeg(r.proxima?.fecha_inicio||null)}</div></div>
+          {(!presupuesto||presupuesto.presupuesto_entregado)&&<div className="mt-3 flex flex-wrap gap-2">{[true,false].map(v=><button key={String(v)} type="button" disabled={Boolean(guardando)||Boolean(presupuesto)} className={botonSeg} onClick={()=>void actualizar({historial_cita_id:r.primera.id,tipo_registro:v?'gestion':'fin_tratamiento',resultado:v?'presupuesto_entregado':null,presupuesto_entregado:v,fin_tratamiento:!v},r.primera.id)}>Presupuesto: {v?'Sí':'No'}</button>)} </div>}
+          {presupuesto?.presupuesto_entregado===true&&<div className="mt-3 space-y-2 border-t border-cyan-400/20 pt-3"><div className="flex items-center justify-between gap-2"><span className="text-cyan-200">EXPLICACIÓN INICIAL DEL PRESUPUESTO</span><button type="button" className={botonSeg} onClick={()=>{setFinInicial(inicial?.financiacion_inicial_ofrecida??null);const m=inicial?.motivo_no_coge_cita||'';setMotivoInicial(m&&!motivosSeg.includes(m)?'Otro motivo':m);setOtroInicial(m&&!motivosSeg.includes(m)?m:'');setEditarInicial(v=>!v)}}>{editarInicial?'Cancelar':'Editar'}</button></div>
+          {!editarInicial?<div className="text-cyan-100/80">Financiación: {inicial?.financiacion_inicial_ofrecida==null?'Sin registrar':inicial.financiacion_inicial_ofrecida?'Sí':'No'}{!r.proxima&&<p className="mt-1">Motivo: {inicial?.motivo_no_coge_cita||'Sin registrar'}</p>}</div>:<><div className="flex flex-wrap items-center gap-2"><span>¿Se ha ofrecido financiación?</span>{capsula('Sí',finInicial===true,()=>setFinInicial(true))}{capsula('No',finInicial===false,()=>setFinInicial(false))}</div>{!r.proxima&&<><span className={labelSeg}>Motivo por el que no ha cogido cita</span><SelectorSeg valor={motivoInicial} opciones={opcionesMotivo} cambiar={setMotivoInicial} placeholder="Seleccionar motivo"/>{motivoInicial==='Otro motivo'&&<input className={inputSeg} value={otroInicial} onChange={e=>setOtroInicial(e.target.value)} placeholder="Especificar motivo"/>}</>}<button type="button" disabled={Boolean(guardando)} className={botonSeg} onClick={async()=>{if(motivoInicial==='Otro motivo'&&!otroInicial.trim()){setErrorGuardar('Especifica el motivo');return;}if(await actualizar({historial_cita_id:r.primera.id,tipo_registro:'gestion',resultado:'datos_iniciales',financiacion_inicial_ofrecida:finInicial,motivo_no_coge_cita:motivoInicial==='Otro motivo'?otroInicial.trim():motivoInicial||null},r.primera.id))setEditarInicial(false)}}>Guardar información inicial</button></>}
+          </div>}
         </div>
-        {r.estado==='no_continua'?<button type="button" disabled={Boolean(guardando)} onClick={()=>void actualizar({historial_cita_id:r.primera.id,tipo_registro:'reabrir_seguimiento'},r.primera.id)} className="rounded-full border border-cyan-300/45 bg-cyan-400/[.06] px-3 py-2 text-[11px] text-cyan-100 disabled:opacity-40">Reabrir seguimiento</button>:r.estado==='finalizado'?<p className="text-[11px] text-cyan-100/65">Tratamiento finalizado. Para rectificarlo, desmarca FIN TRATAMIENTO en Inspeccionar.</p>:<div className="space-y-3 rounded-xl border border-cyan-400/20 bg-[#062631] p-3">
-          <h4 className="text-[11px] font-medium uppercase tracking-wide text-cyan-200">Nueva gestión</h4>
-          <div className="grid grid-cols-2 gap-2">
-            <label className="space-y-1 text-[10px] text-cyan-100/75">Fecha gestión<input type="date" value={fechaGestion} onChange={e=>setFechaGestion(e.target.value)} className="block w-full min-w-0 rounded-lg border border-cyan-400/30 bg-[#0A303B] p-2 text-white"/></label>
-            <label className="space-y-1 text-[10px] text-cyan-100/75">Canal<select value={canal} onChange={e=>setCanal(e.target.value)} className="block w-full min-w-0 rounded-lg border border-cyan-400/30 bg-[#0A303B] p-2 text-white"><option value="llamada">Llamada</option><option value="whatsapp">WhatsApp</option><option value="presencial">Presencial</option><option value="otro">Otro</option></select></label>
-          </div>
-          <label className="block space-y-1 text-[10px] text-cyan-100/75">Resultado<select value={resultado} onChange={e=>setResultado(e.target.value)} className="block w-full rounded-lg border border-cyan-400/30 bg-[#0A303B] p-2 text-white"><option value="volver_contactar">Volver a contactar</option><option value="no_contesta">No contesta</option><option value="pendiente_respuesta">Pendiente de respuesta</option><option value="sin_respuesta">Sin respuesta</option><option value="no_continua">No continúa</option></select></label>
-          {resultado==='no_continua'?<label className="block space-y-1 text-[10px] text-cyan-100/75">Motivo de no continuar<select value={motivoCierre} onChange={e=>setMotivoCierre(e.target.value)} className="block w-full rounded-lg border border-cyan-400/30 bg-[#0A303B] p-2 text-white"><option value="">Seleccionar motivo</option><option value="Motivos económicos">Motivos económicos</option><option value="Otra clínica">Otra clínica</option><option value="No desea tratamiento">No desea tratamiento</option><option value="Otro motivo">Otro motivo</option></select></label>:<>
-            <label className="flex items-center gap-2 text-[11px] text-cyan-100/80"><input type="checkbox" checked={financiacion} onChange={e=>setFinanciacion(e.target.checked)} className="accent-cyan-400"/> Financiación ofrecida</label>
-            <label className="flex items-center gap-2 text-[11px] text-cyan-100/80"><input type="checkbox" checked={valoracion} onChange={e=>setValoracion(e.target.checked)} className="accent-cyan-400"/> Nueva visita de valoración propuesta</label>
-            <label className="flex items-center gap-2 text-[11px] text-cyan-100/80"><input type="checkbox" checked={acepta} onChange={e=>setAcepta(e.target.checked)} className="accent-cyan-400"/> Acepta nuevo contacto</label>
-            <label className="block space-y-1 text-[10px] text-cyan-100/75">Próximo contacto {['volver_contactar','no_contesta'].includes(resultado)?'(obligatorio)':'(opcional)'}<input type="date" value={fechaContacto} onChange={e=>setFechaContacto(e.target.value)} className="block w-full rounded-lg border border-cyan-400/30 bg-[#0A303B] p-2 text-white"/></label>
-          </>}
-          <label className="block space-y-1 text-[10px] text-cyan-100/75">Observaciones<textarea value={observaciones} onChange={e=>setObservaciones(e.target.value)} rows={3} className="block w-full resize-y rounded-lg border border-cyan-400/30 bg-[#0A303B] p-2 text-white"/></label>
-          <button type="button" disabled={Boolean(guardando)} onClick={()=>void registrar(r)} className="rounded-full border border-cyan-300/45 bg-cyan-400/[.06] px-4 py-2 text-[11px] font-medium text-cyan-100 hover:bg-cyan-400/20 disabled:opacity-40">{guardando===r.primera.id?'Guardando…':'Guardar gestión'}</button>
-        </div>}
-        {errorGuardar&&<p role="alert" className="text-[11px] text-amber-200">{errorGuardar}</p>}
+        <div className="rounded-xl border border-cyan-400/30 bg-[#041E27] p-3 shadow-[0_0_18px_rgba(34,211,238,.08)]"><div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-cyan-400/25 pb-2"><h4 className="text-xs text-cyan-300">HISTORIAL DE SEGUIMIENTO</h4>{puedeGestionar&&<button type="button" className={botonSeg} onClick={()=>{resetFormulario();setFormulario(v=>!v)}}><Plus className="h-4 w-4"/> Añadir gestión</button>}</div>
+          {!r.gestiones.length&&<p className="text-xs text-cyan-100/55">Sin gestiones registradas.</p>}
+          {[...r.gestiones].sort((a,b)=>a.fecha_gestion.localeCompare(b.fecha_gestion)||a.fecha_registro.localeCompare(b.fecha_registro)).map((g,i,arr)=>{const Icon=g.presupuesto_entregado!=null?ClipboardCheck:g.canal_contacto==='llamada'?PhoneCall:g.canal_contacto==='whatsapp'?MessageCircle:ClipboardList;const titulo=g.presupuesto_entregado!=null?(g.presupuesto_entregado?'Presupuesto entregado':'Presupuesto no entregado'):g.resultado==='datos_iniciales'?'Información inicial del presupuesto':g.tipo_registro==='gestion'?`${g.canal_contacto==='llamada'?'Llamada · ':g.canal_contacto==='whatsapp'?'WhatsApp · ':''}${resultadosSeg[g.resultado||'']?.label||g.resultado?.replace(/_/g,' ')||'Gestión'}`:({fin_tratamiento:'TTO finalizado',rectificar_fin_tratamiento:'Fin de tratamiento rectificado',no_continua:'No continúa',reabrir_seguimiento:'Seguimiento reabierto'}[g.tipo_registro]||g.tipo_registro);
+          return <div key={g.id} className="relative flex gap-3 pb-4 last:pb-0">{i<arr.length-1&&<span className="absolute left-[15px] top-8 bottom-0 w-px bg-cyan-400/35"/>}<span className={`relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-cyan-400/20 bg-[#0A303B] ${g.canal_contacto==='whatsapp'||g.presupuesto_entregado===true?'text-green-300':'text-cyan-300'}`}><Icon className="h-4 w-4"/></span><div className="min-w-0 flex-1 pt-1 text-xs"><p className="font-medium text-white">{titulo}</p><p className="mt-1 text-cyan-100/65">{fechaGestionSeg(g.fecha_gestion)}{diaMadrid(g.fecha_registro)===g.fecha_gestion?` · ${new Date(g.fecha_registro).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Madrid'})}`:''}</p><p className="mt-1 flex items-center gap-1 text-slate-400"><UserRound className="h-3 w-3"/> Gestionado por {g.gestionado_por}</p>{diaMadrid(g.fecha_registro)!==g.fecha_gestion&&<p className="mt-1 text-[10px] text-slate-400">Registrado: {new Date(g.fecha_registro).toLocaleString('es-ES',{timeZone:'Europe/Madrid'})}</p>}
+          {(g.observaciones||g.financiacion_ofrecida||g.nueva_valoracion_propuesta||g.fecha_proximo_contacto||g.motivo_no_continua||g.contactara_paciente||g.acepta_nuevo_contacto===false||g.financiacion_inicial_ofrecida!=null||g.motivo_no_coge_cita)&&<div className="mt-2 space-y-1 rounded-lg bg-[#082B35] p-2 text-cyan-100/85">{g.financiacion_ofrecida&&<p>✓ Financiación ofrecida</p>}{g.nueva_valoracion_propuesta&&<p>✓ Nueva cita de valoración propuesta</p>}{g.financiacion_inicial_ofrecida!=null&&<p>Financiación inicial: {g.financiacion_inicial_ofrecida?'Sí':'No'}</p>}{g.motivo_no_coge_cita&&<p>Motivo inicial: {g.motivo_no_coge_cita}</p>}{g.fecha_proximo_contacto&&<p className="text-yellow-200">Volver a contactar el {fechaGestionSeg(g.fecha_proximo_contacto)}</p>}{g.contactara_paciente?<p>Contactará el paciente</p>:g.acepta_nuevo_contacto===false&&<p>No acepta próximo contacto</p>}{g.motivo_no_continua&&<p>Motivo: {g.motivo_no_continua}</p>}{g.observaciones&&<p className="whitespace-pre-wrap">{g.observaciones}</p>}</div>}</div></div>})}
+        </div>
+        {r.estado==='no_continua'&&<button type="button" disabled={Boolean(guardando)} className={botonSeg} onClick={()=>void actualizar({historial_cita_id:r.primera.id,tipo_registro:'reabrir_seguimiento'},r.primera.id)}>Reabrir seguimiento</button>}
+        {r.estado==='finalizado'&&<p className="text-xs text-cyan-100/65">Tratamiento finalizado. Para rectificarlo, desmarca FIN TRATAMIENTO.</p>}
+        {formulario&&puedeGestionar&&<div className="mx-auto max-w-3xl space-y-3 rounded-2xl border border-cyan-400/45 bg-[#062631] p-3 shadow-[0_0_20px_rgba(34,211,238,.12)] sm:p-4"><h4 className="flex items-center gap-2 border-b border-cyan-400/50 pb-2 text-xs text-cyan-200"><ClipboardList className="h-5 w-5 text-cyan-300"/> NUEVA GESTIÓN</h4><div className="grid gap-3 sm:grid-cols-2"><div><span className={labelSeg}>Fecha de gestión</span><CalendarioSeg valor={fechaGestion} cambiar={setFechaGestion} max={hoy}/></div><div><span className={labelSeg}>Canal de contacto</span><div className="flex gap-2">{(['llamada','whatsapp'] as const).map(v=>{const Icon=v==='llamada'?PhoneCall:MessageCircle;return <button key={v} type="button" onClick={()=>{setCanal(v);if(['no_contesta','pendiente_respuesta'].includes(resultado))setResultado(v==='llamada'?'no_contesta':'pendiente_respuesta')}} className={`${campoSeg} justify-center ${canal===v?(v==='llamada'?'border-cyan-300':'border-green-400'):''}`}><Icon className={`h-4 w-4 ${v==='llamada'?'text-cyan-300':'text-green-400'}`}/>{v==='llamada'?'Llamada':'WhatsApp'}</button>})}</div></div></div>
+          <div><span className={labelSeg}>Resultado de la gestión</span><SelectorSeg valor={resultado} cambiar={v=>{setResultado(v);setContacto('');setFechaContacto('');setFinanciacion(false);setValoracion(false);setMotivoCierre('');setOtroCierre('')}} placeholder="Seleccionar resultado" opciones={[canal==='llamada'?'no_contesta':'pendiente_respuesta','valorando_presupuesto','ha_cogido_cita','no_continua'].map(v=>({value:v,...resultadosSeg[v]}))}/></div>
+          {resultado==='valorando_presupuesto'&&<><div><span className={labelSeg}>Acciones realizadas</span><div className="flex flex-wrap gap-2">{[['Financiación ofrecida',financiacion,setFinanciacion],['Nueva cita de valoración propuesta',valoracion,setValoracion]].map(([t,a,f])=>{const activo=Boolean(a);const Icon=activo?Check:Plus;return <button key={String(t)} type="button" onClick={()=> (f as (v:boolean)=>void)(!activo)} className={`${botonSeg} !text-[10px] ${activo?'border-cyan-300 bg-cyan-400/20':''}`}><Icon className="h-3 w-3 text-cyan-300"/>{String(t)}</button>})}</div></div><div><span className={labelSeg}>¿Acepta próximo contacto?</span><div className="flex flex-wrap gap-2">{capsula('Sí',contacto==='si',()=>setContacto('si'),'bg-green-400')}{capsula('Contactará el paciente',contacto==='paciente',()=>setContacto('paciente'),'bg-yellow-400')}{capsula('No',contacto==='no',()=>setContacto('no'),'bg-red-500')}</div></div></>}
+          {necesitaFecha&&<div><span className={labelSeg}>Fecha del próximo contacto</span><CalendarioSeg valor={fechaContacto} cambiar={setFechaContacto} min={fechaGestion}/></div>}
+          {resultado==='no_continua'&&<div><span className={labelSeg}>Motivo de cierre</span><SelectorSeg valor={motivoCierre} cambiar={setMotivoCierre} placeholder="Seleccionar motivo" opciones={['Motivos económicos','Ha elegido otra clínica','Otro motivo'].map(v=>({value:v,label:v}))}/>{motivoCierre==='Otro motivo'&&<input className={`${inputSeg} mt-2`} value={otroCierre} onChange={e=>setOtroCierre(e.target.value)} placeholder="Especificar motivo"/>}</div>}
+          <div><span className={labelSeg}>Observaciones (opcional)</span><textarea rows={2} className={inputSeg} value={observaciones} onChange={e=>setObservaciones(e.target.value)} placeholder="Añadir observaciones…"/></div><div className="flex items-center justify-end gap-3 border-t border-cyan-400/25 pt-2"><button type="button" className="text-xs text-slate-400" onClick={()=>{setFormulario(false);resetFormulario()}}>Cancelar</button><button type="button" disabled={Boolean(guardando)} className={botonSeg} onClick={()=>void registrar(r)}><Check className="h-4 w-4"/>{guardando===r.primera.id?'Guardando…':'Guardar gestión'}</button></div></div>}
+        {errorGuardar&&<p role="alert" className="text-xs text-amber-200">{errorGuardar}</p>}
       </div>}
     </div>;
   };
