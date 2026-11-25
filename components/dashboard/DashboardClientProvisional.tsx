@@ -443,7 +443,7 @@ function CajaSeguimiento({citas,cargando,errorDatos}:{citas:CitaDB[];cargando:bo
       &&(!buscar||normalizar(r.primera.nombre_paciente).includes(normalizar(buscar)));
   }).sort((a,b)=>{
     // El orden por nombre es opcional y solo afecta a Inspeccionar.
-    if(ordenPaciente!=='original'){
+    if(ordenPaciente!=='original'||(a.estado===b.estado&&a.estado!=='curso')){
       const nombreA=(a.primera.nombre_paciente||'').trim();
       const nombreB=(b.primera.nombre_paciente||'').trim();
       if(!nombreA&&nombreB)return 1;
