@@ -427,7 +427,7 @@ function CajaSeguimiento({citas,cargando,errorDatos}:{citas:CitaDB[];cargando:bo
       return Boolean(cierre && Date.parse(cierre)>=corteCierresIniciales && diaMadrid(cierre).slice(0,7)===mesActual);
     }
     return diaMadrid(r.primera.fecha_inicio).slice(0,7)===mesActual;
-  }).sort((a,b)=>prioridadSeguimiento[a.estado]-prioridadSeguimiento[b.estado] || (b.primera.fecha_inicio||'').localeCompare(a.primera.fecha_inicio||''));
+  }).sort((a,b)=>prioridadSeguimiento[a.estado]-prioridadSeguimiento[b.estado] || (a.primera.fecha_inicio||'').localeCompare(b.primera.fecha_inicio||''));
   const historico=[
     registros.filter(r=>r.estado==='pendiente').length,
     registros.filter(r=>r.estado==='curso').length,
