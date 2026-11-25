@@ -1016,12 +1016,13 @@ return (
     <div className={`hidden h-full overflow-y-auto overflow-x-hidden bg-[#02141B] p-8 pb-24 text-white lg:block lg:px-5 xl:px-8 2xl:px-10 ${scrollCyan}`}>
       <div className="mb-10 flex items-center justify-between gap-8">
         <div>
-          <h1 className="mb-4 flex items-center gap-2 text-[2rem] leading-none font-bold text-white whitespace-nowrap">
-      ¡Hola {nombreUsuario || '...'}!
-      <span className="text-cyan-300 text-[1.35rem] drop-shadow-[0_0_12px_rgba(34,211,238,.8)]">
-        ✦
-      </span>
+          <h1 className="text-[1.65rem] leading-tight font-semibold text-white sm:text-[2rem]">
+      ¡Bienvenida, {nombreUsuario || '...'}!
     </h1>
+    <div className="mt-1 flex items-center gap-1.5 text-sm text-cyan-100/65 mb-4">
+      <UserRound className="h-4 w-4 shrink-0"/>
+      <span>Administración</span>
+    </div>
 
           <div className="inline-flex items-center gap-3 rounded-full border border-cyan-400/20 bg-cyan-500/10 px-5 py-2.5 text-cyan-100 text-sm font-medium shadow-[0_0_20px_rgba(34,211,238,.08)]">
             <span
@@ -1081,12 +1082,13 @@ return (
     {/* MOBILE */}
     <div className={`h-[calc(100dvh-190px)] overflow-y-auto overflow-x-hidden bg-[#02141B] px-3 pt-6 pb-32 text-white lg:hidden ${scrollCyan}`}>
   <div className="mb-7">    
-<h1 className="flex items-center gap-2 text-[2rem] leading-none font-bold text-white whitespace-nowrap">
-      ¡Hola {nombreUsuario || '...'}!
-      <span className="text-cyan-300 text-[1.35rem] drop-shadow-[0_0_12px_rgba(34,211,238,.8)]">
-        ✦
-      </span>
+<h1 className="text-[1.65rem] leading-tight font-semibold text-white sm:text-[2rem]">
+      ¡Bienvenida, {nombreUsuario || '...'}!
     </h1>
+    <div className="mt-1 flex items-center gap-1.5 text-sm text-cyan-100/65">
+      <UserRound className="h-4 w-4 shrink-0"/>
+      <span>Administración</span>
+    </div>
 
 
     <div className="mt-5 flex items-center justify-between gap-4">
