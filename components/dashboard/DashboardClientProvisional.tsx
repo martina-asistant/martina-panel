@@ -375,6 +375,7 @@ function CajaSeguimiento({citas,cargando,errorDatos}:{citas:CitaDB[];cargando:bo
   const [guardando,setGuardando]=useState<string|null>(null);
   const [expandida,setExpandida]=useState<string|null>(null);
   const [inspectorAbierto,setInspectorAbierto]=useState(false);
+  const [ordenPaciente,setOrdenPaciente]=useState<'original'|'asc'|'desc'>('original');
   const [anio,setAnio]=useState(String(new Date().getFullYear()));
   const [mes,setMes]=useState('todos');
   const [situacion,setSituacion]=useState('todas');
@@ -440,7 +441,27 @@ function CajaSeguimiento({citas,cargando,errorDatos}:{citas:CitaDB[];cargando:bo
       &&(mes==='todos'||Number(fecha.slice(5,7))===Number(mes))
       &&(situacion==='todas'||r.estado===situacion)
       &&(!buscar||normalizar(r.primera.nombre_paciente).includes(normalizar(buscar)));
-  }).sort((a,b)=>prioridadSeguimiento[a.estado]-prioridadSeguimiento[b.estado]||(b.primera.fecha_inicio||'').localeCompare(a.primera.fecha_inicio||''));
+  }).sort((a,b)=>{
+    // El orden por nombre es opcional y solo afecta a Inspeccionar.
+    if(ordenPaciente!=='original'){
+      const nombreA=(a.primera.nombre_paciente||'').trim();
+      const nombreB=(b.primera.nombre_paciente||'').trim();
+      if(!nombreA&&nombreB)return 1;
+      if(nombreA&&!nombreB)return -1;
+      const comparacion=nombreA.localeCompare(nombreB,'es',{sensitivity:'base'});
+      if(comparacion)return ordenPaciente==='asc'?comparacion:-comparacion;
+    }
+    const prioridad=prioridadSeguimiento[a.estado]-prioridadSeguimiento[b.estado];
+    if(prioridad)return prioridad;
+    if(a.estado==='curso'&&b.estado==='curso'){
+      const fechaA=a.proxima?.fecha_inicio?Date.parse(a.proxima.fecha_inicio):Infinity;
+      const fechaB=b.proxima?.fecha_inicio?Date.parse(b.proxima.fecha_inicio):Infinity;
+      const seguraA=Number.isFinite(fechaA)?fechaA:Infinity;
+      const seguraB=Number.isFinite(fechaB)?fechaB:Infinity;
+      if(seguraA!==seguraB)return seguraA<seguraB?-1:1;
+    }
+    return (b.primera.fecha_inicio||'').localeCompare(a.primera.fecha_inicio||'');
+  });
   const circulos=[
     ['TOTAL',filtrados.length],['PENDIENTES',filtrados.filter(r=>r.estado==='pendiente').length],
     ['EN TRATAMIENTO',filtrados.filter(r=>r.estado==='curso').length],
@@ -607,7 +628,7 @@ function CajaSeguimiento({citas,cargando,errorDatos}:{citas:CitaDB[];cargando:bo
             {cargandoTodo?<p className="px-3 py-5 text-center text-xs text-cyan-100/55">Cargando seguimiento…</p>:errorTodo?<p className="px-3 py-5 text-center text-xs text-amber-200">No se pudo cargar el seguimiento: {errorTodo}</p>:datosMes.length?datosMes.map(filaPrincipal):<p className="px-3 py-5 text-center text-xs text-cyan-100/55">Sin primeras visitas que requieran revisión.</p>}
           </div>
         </div>
-        <div className="mt-3 flex shrink-0 justify-end"><button type="button" onClick={()=>setInspectorAbierto(true)} className="inline-flex items-center gap-1.5 rounded-full border border-cyan-300/45 bg-cyan-400/[.06] px-3.5 py-1.5 text-[10px] font-medium uppercase tracking-[.1em] text-cyan-100 shadow-[0_0_11px_rgba(34,211,238,.11)] transition hover:border-cyan-200 hover:bg-cyan-400/20 hover:shadow-[0_0_20px_rgba(34,211,238,.22)]"><ChartNoAxesCombined className="h-3.5 w-3.5 text-cyan-300"/> Inspeccionar</button></div>
+        <div className="mt-3 flex shrink-0 justify-end"><button type="button" onClick={()=>{setOrdenPaciente('original');setInspectorAbierto(true)}} className="inline-flex items-center gap-1.5 rounded-full border border-cyan-300/45 bg-cyan-400/[.06] px-3.5 py-1.5 text-[10px] font-medium uppercase tracking-[.1em] text-cyan-100 shadow-[0_0_11px_rgba(34,211,238,.11)] transition hover:border-cyan-200 hover:bg-cyan-400/20 hover:shadow-[0_0_20px_rgba(34,211,238,.22)]"><ChartNoAxesCombined className="h-3.5 w-3.5 text-cyan-300"/> Inspeccionar</button></div>
       </section>
     </div>
     {inspectorAbierto&&<div role="dialog" aria-modal="true" aria-label="Inspeccionar seguimiento" className={`fixed inset-0 z-[100] overflow-y-auto bg-[#02141B]/95 px-2 py-4 text-white backdrop-blur-lg sm:px-6 sm:py-6 lg:px-10 lg:py-8 ${scrollSeguimiento}`}>
@@ -620,7 +641,7 @@ function CajaSeguimiento({citas,cargando,errorDatos}:{citas:CitaDB[];cargando:bo
           {circulos.map(([titulo,numero])=><div key={titulo} className="group flex h-[clamp(65px,20vw,88px)] w-[clamp(65px,20vw,88px)] shrink-0 flex-col items-center justify-center gap-0.5 rounded-full border border-cyan-300/35 bg-[radial-gradient(circle_at_50%_35%,#0E3945_0%,#05232D_75%,#031820_100%)] px-2 text-center shadow-[0_0_14px_rgba(34,211,238,.08),inset_0_0_14px_rgba(34,211,238,.045)] transition-all duration-300 hover:-translate-y-1 hover:border-cyan-200/85 hover:shadow-[0_0_18px_rgba(34,211,238,.38),0_0_38px_rgba(34,211,238,.20),inset_0_0_20px_rgba(34,211,238,.10)] sm:h-[120px] sm:w-[120px] xl:h-[130px] xl:w-[130px]"><strong className="text-[clamp(19px,5.8vw,26px)] font-semibold leading-none tabular-nums text-white sm:text-[31px] xl:text-[34px]">{cargandoTodo||errorTodo?'—':numero}</strong><span className="text-[clamp(6px,1.85vw,8px)] font-medium uppercase leading-tight tracking-[.015em] text-cyan-200/80 sm:text-[9px] xl:text-[11px]">{titulo}</span></div>)}
         </div>
         <section className="overflow-hidden rounded-[26px] border border-cyan-400/30 bg-[#041D26] shadow-[0_0_26px_rgba(34,211,238,.075)]"><div className="flex flex-col gap-3 border-b border-cyan-400/20 bg-[#021820] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5"><h3 className="text-xs lg:text-sm font-medium uppercase tracking-[.11em] text-cyan-300 sm:text-sm">DETALLE DE SEGUIMIENTO</h3><label className="flex w-full items-center gap-2 rounded-full border border-cyan-400/40 bg-cyan-400/[.045] px-3 py-2 text-xs lg:text-sm shadow-[0_0_16px_rgba(34,211,238,.09)] sm:w-auto sm:px-4"><Search className="h-4 w-4 shrink-0 text-cyan-300"/><input aria-label="Buscar paciente" value={buscar} onChange={e=>setBuscar(e.target.value)} placeholder="Buscar paciente" className="min-w-0 w-full bg-transparent text-white outline-none placeholder:text-cyan-100/40 sm:w-52"/></label></div>
-          <div className="grid grid-cols-[minmax(0,1.35fr)_75px_minmax(0,1fr)_84px_28px] lg:grid-cols-[minmax(0,1.5fr)_minmax(125px,.85fr)_minmax(100px,.8fr)_minmax(0,1.65fr)_minmax(125px,.65fr)_32px] 2xl:grid-cols-[minmax(0,1.5fr)_minmax(145px,.9fr)_minmax(120px,.9fr)_minmax(0,1.65fr)_minmax(150px,.65fr)_36px] items-center gap-1.5 bg-[#0B3540] px-2 py-4 text-[9px] font-semibold uppercase tracking-[.035em] text-cyan-200 sm:gap-2 sm:px-3 lg:bg-[#072630] lg:px-4 lg:py-3 lg:text-xs lg:tracking-[.11em] lg:text-[#48B3C4] lg:gap-4 lg:overflow-hidden lg:[scrollbar-gutter:stable] lg:[scrollbar-width:thin] lg:[&::-webkit-scrollbar]:w-1"><span>Paciente</span><span className="hidden text-center lg:block">Presupuesto</span><span className="lg:text-center">Próx. cita</span><span>Estado</span><span className="lg:text-center">FIN TRATAMIENTO</span><span/></div>
+          <div className="grid grid-cols-[minmax(0,1.35fr)_75px_minmax(0,1fr)_84px_28px] lg:grid-cols-[minmax(0,1.5fr)_minmax(125px,.85fr)_minmax(100px,.8fr)_minmax(0,1.65fr)_minmax(125px,.65fr)_32px] 2xl:grid-cols-[minmax(0,1.5fr)_minmax(145px,.9fr)_minmax(120px,.9fr)_minmax(0,1.65fr)_minmax(150px,.65fr)_36px] items-center gap-1.5 bg-[#0B3540] px-2 py-4 text-[9px] font-semibold uppercase tracking-[.035em] text-cyan-200 sm:gap-2 sm:px-3 lg:bg-[#072630] lg:px-4 lg:py-3 lg:text-xs lg:tracking-[.11em] lg:text-[#48B3C4] lg:gap-4 lg:overflow-hidden lg:[scrollbar-gutter:stable] lg:[scrollbar-width:thin] lg:[&::-webkit-scrollbar]:w-1"><span className="min-w-0"><span className="lg:hidden">Paciente</span><button type="button" onClick={()=>setOrdenPaciente(v=>v==='original'?'asc':v==='asc'?'desc':'original')} title={ordenPaciente==='original'?'Ordenar de A a Z':ordenPaciente==='asc'?'Ordenar de Z a A':'Recuperar orden por estado y fecha'} aria-label={ordenPaciente==='original'?'Ordenar pacientes de A a Z':ordenPaciente==='asc'?'Ordenar pacientes de Z a A':'Recuperar orden por estado y fecha'} className="hidden items-center gap-1 uppercase tracking-[inherit] hover:text-cyan-200 focus-visible:outline focus-visible:outline-1 focus-visible:outline-cyan-300 lg:inline-flex">Paciente<span aria-hidden="true" className="text-cyan-300">{ordenPaciente==='original'?'↕':ordenPaciente==='asc'?'↑':'↓'}</span></button></span><span className="hidden text-center lg:block">Presupuesto</span><span className="lg:text-center">Próx. cita</span><span>Estado</span><span className="lg:text-center">FIN TRATAMIENTO</span><span/></div>
           <div className={`max-h-[55vh] overflow-y-auto lg:[scrollbar-gutter:stable] ${scrollSeguimiento}`}>{cargandoTodo?<p className="p-6 text-center text-xs lg:text-sm text-cyan-100/60">Cargando…</p>:errorTodo?<p className="p-6 text-center text-xs lg:text-sm text-amber-200">{errorTodo}</p>:filtrados.length?filtrados.map(r=>fila(r,true)):<p className="p-6 text-center text-xs lg:text-sm text-cyan-100/60">Sin resultados para estos filtros</p>}</div>
         </section>
         {errorGuardar&&<p role="alert" className="text-xs lg:text-sm text-amber-200">No se pudo guardar: {errorGuardar}</p>}
