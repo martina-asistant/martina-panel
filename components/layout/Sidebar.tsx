@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -83,7 +84,7 @@ const Sidebar = () => {
       <div className="w-full mx-auto">
         {/* DESKTOP */}
         <div className="hidden lg:flex items-center justify-between gap-6">
-          <div className="rounded-3xl border border-cyan-400/25 bg-cyan-500/10 px-8 py-3 flex items-center gap-7 shadow-[0_0_30px_rgba(34,211,238,.10)] min-w-[390px]">
+          <div className="rounded-3xl border border-cyan-400/25 bg-cyan-500/10 px-8 py-3 flex items-center gap-7 shadow-[0_0_30px_rgba(34,211,238,.10)] min-w-[390px] shrink-0">
             <div
               key={avatarKey}
               className="
@@ -127,7 +128,7 @@ const Sidebar = () => {
               <span>Cerrar sesión</span>
             </button>
 
-            <nav className="flex items-center justify-end gap-2 mt-12 w-full">
+            <nav className="flex items-center gap-1 2xl:gap-2 mt-12 w-full overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {nav.map(({ href, label, icon: Icon }) => {
                 const active = pathname?.startsWith(href);
                 const permitido = puedeEntrar(href);
@@ -140,7 +141,7 @@ const Sidebar = () => {
                       if (!permitido) e.preventDefault();
                     }}
                     className={cn(
-                      'flex items-center gap-2 px-4 py-3 rounded-2xl text-sm transition-all duration-300 border whitespace-nowrap',
+                      'first:ml-auto shrink-0 flex items-center gap-2 px-2 2xl:px-4 py-3 rounded-2xl text-sm transition-all duration-300 border whitespace-nowrap',
                       active
                         ? 'bg-cyan-500/15 border-cyan-400/25 text-cyan-300 shadow-[0_0_25px_rgba(34,211,238,.10)]'
                         : 'border-transparent text-gray-400 hover:bg-white/5 hover:text-white',
@@ -236,3 +237,4 @@ const Sidebar = () => {
 };
 
 export default Sidebar;
+
