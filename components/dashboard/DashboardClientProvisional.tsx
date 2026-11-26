@@ -262,6 +262,10 @@ function fechaGestionSeg(fecha:string|null) {
   const [a,m,d]=fecha.split('-');
   return a&&m&&d ? `${d}/${m}/${a}` : fecha;
 }
+function fechaContactoCorta(fecha:string|null) {
+  const texto=fechaGestionSeg(fecha);
+  return /^\d{2}\/\d{2}\/\d{4}$/.test(texto)?texto.slice(0,6)+texto.slice(-2):texto;
+}
 function siguienteLaborable(fechaISO:string) {
   const d=new Date(`${fechaISO}T12:00:00Z`);
   if(Number.isNaN(d.getTime()))return '';
@@ -336,7 +340,7 @@ function clasificarSeguimiento(citas:CitaDB[],gestiones:GestionSeguimiento[],hoy
     else if(estado==='no_continua')estadoTexto='No continúa';
     else if(estado==='curso'&&proxima)estadoTexto='En tratamiento';
     else if(contactoVencido)estadoTexto='Contacto sin registrar';
-    else if(fechaContacto)estadoTexto=`Volver a contactar ${fechaGestionSeg(fechaContacto)}`;
+    else if(fechaContacto)estadoTexto=`Volver a contactar ${fechaContactoCorta(fechaContacto)}`;
     else if(estado==='curso')estadoTexto='En tratamiento';
     else if(ultimaGestion?.contactara_paciente)estadoTexto='Contactará el paciente';
     else if(ultimaGestion?.acepta_nuevo_contacto===false)estadoTexto='No acepta próximo contacto';
@@ -772,7 +776,7 @@ function CajaSeguimiento({citas,historialCitas,cargando,errorDatos}:{citas:CitaD
           const automatico=g.tipo_registro==='fin_tratamiento'&&g.presupuesto_entregado===false;
           const colorTitulo=g.presupuesto_entregado===true?'text-green-400':g.presupuesto_entregado===false?'text-white':g.tipo_registro==='fin_tratamiento'?'text-green-400':g.tipo_registro==='no_continua'?'text-violet-400':'text-white';
           return <div key={g.id} className="relative pb-4 last:pb-0"><div className="relative flex gap-3">{(i<arr.length-1||automatico)&&<span className="absolute left-[15px] top-8 -bottom-4 w-px bg-cyan-400/35"/>}<span className={`relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-cyan-400/20 bg-[#0A303B] ${g.presupuesto_entregado===false?'text-white':g.presupuesto_entregado===true||g.tipo_registro==='fin_tratamiento'?'text-green-400':g.tipo_registro==='no_continua'?'text-violet-400':g.canal_contacto==='whatsapp'?'text-green-300':'text-cyan-300'}`}><Icon className="h-4 w-4"/></span><div className="min-w-0 flex-1 pt-1 text-xs lg:text-sm"><p className={`font-medium ${colorTitulo}`}>{titulo}</p><p className="mt-1 text-cyan-100/65">{fechaGestionSeg(g.fecha_gestion)}{diaMadrid(g.fecha_registro)===g.fecha_gestion?` · ${new Date(g.fecha_registro).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Madrid'})}`:''}</p><p className="mt-1 flex items-center gap-1 text-slate-400"><UserRound className="h-3 w-3"/> Gestionado por {g.gestionado_por}</p>{diaMadrid(g.fecha_registro)!==g.fecha_gestion&&<p className="mt-1 text-[10px] text-slate-400">Registrado: {new Date(g.fecha_registro).toLocaleString('es-ES',{timeZone:'Europe/Madrid'})}</p>}
-          {(g.observaciones||g.financiacion_ofrecida||g.nueva_valoracion_propuesta||g.fecha_proximo_contacto||g.motivo_no_continua||g.contactara_paciente||g.acepta_nuevo_contacto===false||g.financiacion_inicial_ofrecida!=null||g.motivo_no_coge_cita)&&<div className="mt-2 space-y-1 rounded-lg bg-[#082B35] p-2 text-cyan-100/85">{g.financiacion_ofrecida&&<p>✓ Financiación ofrecida</p>}{g.nueva_valoracion_propuesta&&<p>✓ Nueva cita de valoración propuesta</p>}{g.financiacion_inicial_ofrecida!=null&&<p>Financiación inicial: {g.financiacion_inicial_ofrecida?'Sí':'No'}</p>}{g.motivo_no_coge_cita&&<p>Motivo inicial: {g.motivo_no_coge_cita}</p>}{g.fecha_proximo_contacto&&<><p className={r.contactosAnulados.includes(g.id)?"text-slate-400 line-through":"text-yellow-200"}>Volver a contactar el {fechaGestionSeg(g.fecha_proximo_contacto)}</p>{r.contactosAnulados.includes(g.id)&&<p className="text-xs text-cyan-300/80">Contacto anulado automáticamente por nueva cita.</p>}</>}{g.contactara_paciente?<p>Contactará el paciente</p>:g.acepta_nuevo_contacto===false&&<p>No acepta próximo contacto</p>}{g.motivo_no_continua&&<p>Motivo: {g.motivo_no_continua}</p>}{g.observaciones&&<p className="whitespace-pre-wrap">{g.observaciones}</p>}</div>}</div></div>{automatico&&<div className="relative mt-4 flex gap-3">{i<arr.length-1&&<span className="absolute left-[15px] top-8 -bottom-4 w-px bg-cyan-400/35"/>}<span className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-cyan-400/20 bg-[#0A303B] text-green-400"><ClipboardList className="h-4 w-4"/></span><div className="min-w-0 flex-1 pt-1 text-xs lg:text-sm"><p className="font-medium text-green-400">TTO finalizado automáticamente</p><p className="mt-1 text-cyan-100/65">{fechaGestionSeg(g.fecha_gestion)}{diaMadrid(g.fecha_registro)===g.fecha_gestion?` · ${new Date(g.fecha_registro).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Madrid'})}`:''}</p><div className="mt-2 rounded-lg bg-[#082B35] p-2 text-cyan-100/85">Finalización automática: tratamiento resuelto sin necesidad de presupuesto.</div></div></div>}</div>})}
+          {(g.observaciones||g.financiacion_ofrecida||g.nueva_valoracion_propuesta||g.fecha_proximo_contacto||g.motivo_no_continua||g.contactara_paciente||g.acepta_nuevo_contacto===false||g.financiacion_inicial_ofrecida!=null||g.motivo_no_coge_cita)&&<div className="mt-2 space-y-1 rounded-lg bg-[#082B35] p-2 text-cyan-100/85">{g.financiacion_ofrecida&&<p>✓ Financiación ofrecida</p>}{g.nueva_valoracion_propuesta&&<p>✓ Nueva cita de valoración propuesta</p>}{g.financiacion_inicial_ofrecida!=null&&<p>Financiación inicial: {g.financiacion_inicial_ofrecida?'Sí':'No'}</p>}{g.motivo_no_coge_cita&&<p>Motivo inicial: {g.motivo_no_coge_cita}</p>}{g.fecha_proximo_contacto&&<><p className={r.contactosAnulados.includes(g.id)?"text-slate-400 line-through":"text-yellow-200"}>Volver a contactar el {fechaContactoCorta(g.fecha_proximo_contacto)}</p>{r.contactosAnulados.includes(g.id)&&<p className="text-xs text-cyan-300/80">Contacto anulado automáticamente por nueva cita.</p>}</>}{g.contactara_paciente?<p>Contactará el paciente</p>:g.acepta_nuevo_contacto===false&&<p>No acepta próximo contacto</p>}{g.motivo_no_continua&&<p>Motivo: {g.motivo_no_continua}</p>}{g.observaciones&&<p className="whitespace-pre-wrap">{g.observaciones}</p>}</div>}</div></div>{automatico&&<div className="relative mt-4 flex gap-3">{i<arr.length-1&&<span className="absolute left-[15px] top-8 -bottom-4 w-px bg-cyan-400/35"/>}<span className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-cyan-400/20 bg-[#0A303B] text-green-400"><ClipboardList className="h-4 w-4"/></span><div className="min-w-0 flex-1 pt-1 text-xs lg:text-sm"><p className="font-medium text-green-400">TTO finalizado automáticamente</p><p className="mt-1 text-cyan-100/65">{fechaGestionSeg(g.fecha_gestion)}{diaMadrid(g.fecha_registro)===g.fecha_gestion?` · ${new Date(g.fecha_registro).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Madrid'})}`:''}</p><div className="mt-2 rounded-lg bg-[#082B35] p-2 text-cyan-100/85">Finalización automática: tratamiento resuelto sin necesidad de presupuesto.</div></div></div>}</div>})}
         </div>
         </div>
         {puedeGestionar&&ultimaGestionEditable&&!r.contactosAnulados.includes(ultimaGestionEditable.id)&&<button type="button" disabled={Boolean(guardando)} className={botonSeg} onClick={()=>abrirEdicionGestion(ultimaGestionEditable)}>Editar última gestión</button>}
@@ -793,9 +797,10 @@ function CajaSeguimiento({citas,historialCitas,cargando,errorDatos}:{citas:CitaD
     const estilo=estilosSeg[r.estado];
     const presupuesto=[...r.gestiones].reverse().find(g=>g.presupuesto_entregado!=null);
     const valorPresupuesto=presupuesto?.presupuesto_entregado;
-    const aviso=r.contactoVencido?'Contacto sin registrar':r.estado==='pendiente'
-      ? r.alerta?'Nuevo contacto sin realizar':r.estadoTexto
-      : r.estado==='curso'&&!r.proxima&&r.fechaContacto?r.estadoTexto:'';
+    const aviso=(r.estado==='pendiente'||r.estado==='curso')&&!r.proxima
+      ? r.contactoVencido?'Contacto sin registrar':r.fechaContacto?r.estadoTexto:''
+      : '';
+    const textoPrincipal=aviso||(r.estado==='pendiente'?'Pendiente':r.estado==='curso'?'En tratamiento':r.estado==='finalizado'?'TTO finalizado':'No continúan');
     return <div key={r.primera.id} className="grid grid-cols-[minmax(0,1fr)_39px_25px_43px_72px] items-center gap-0.5 border-t border-cyan-500/10 px-2 py-3.5 text-[10px] transition-colors hover:bg-cyan-500/[.035] sm:grid-cols-[minmax(0,1.8fr)_80px_100px_75px_minmax(0,1.3fr)] lg:grid-cols-[minmax(0,1.5fr)_minmax(68px,.65fr)_minmax(95px,.8fr)_minmax(65px,.65fr)_minmax(0,1.45fr)] sm:gap-2 sm:px-3 sm:text-xs">
       <span className="min-w-0 truncate font-medium text-white" title={r.primera.nombre_paciente||''}>{r.primera.nombre_paciente||'—'}</span>
       <span className="min-w-0 whitespace-nowrap text-center text-[10px] text-cyan-100/75 sm:text-[11px]" title={fechaCitaSeg(r.primera.fecha_inicio)}><span className="sm:hidden">{r.primera.fecha_inicio?new Date(r.primera.fecha_inicio).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',timeZone:'Europe/Madrid'}):'—'}</span><span className="hidden sm:inline">{fechaCitaSeg(r.primera.fecha_inicio)}</span></span>
@@ -809,11 +814,11 @@ function CajaSeguimiento({citas,historialCitas,cargando,errorDatos}:{citas:CitaD
       <span className="min-w-0 max-sm:justify-self-end">
         <span className={`inline-flex max-w-full items-center gap-0.5 rounded-full border px-1 py-1 text-[9px] leading-tight sm:hidden ${estilo.capsula}`} title={aviso||r.estadoTexto}>
           <span className={`h-2 w-2 shrink-0 rounded-full ${estilo.dot}`}/>
-          <span>{r.estado==='pendiente'?'Pte gestión':r.estado==='curso'?'En TTO':r.estado==='finalizado'?'Finalizado':'No continúan'}</span>{r.contactoVencido&&<TriangleAlert className="h-3 w-3 shrink-0 text-red-400" aria-label="Contacto sin registrar"/>}
+          <span>{aviso||(r.estado==='pendiente'?'Pendiente':r.estado==='curso'?'En TTO':r.estado==='finalizado'?'Finalizado':'No continúan')}</span>{r.contactoVencido&&<TriangleAlert className="h-3 w-3 shrink-0 text-red-400" aria-label="Contacto sin registrar"/>}
         </span>
         <span className={`hidden max-w-full items-center gap-1.5 rounded-full border px-2 py-1.5 text-[10px] leading-tight sm:inline-flex lg:flex lg:w-full lg:text-[11px] ${estilo.capsula}`}>
           <span className={`h-2 w-2 shrink-0 rounded-full shadow-[0_0_10px_currentColor] ${estilo.dot}`}/>
-          <span className="min-w-0 break-words" title={aviso||r.estadoTexto}>{r.estado==='curso'?(aviso||'En tratamiento'):r.estado==='finalizado'?'TTO finalizado':r.estado==='no_continua'?'No continúan':r.contactoVencido?aviso:`Pendiente${aviso?`: ${aviso.charAt(0).toLowerCase()}${aviso.slice(1)}`:''}`}</span>{r.contactoVencido&&<TriangleAlert className="h-3.5 w-3.5 shrink-0 text-red-400" aria-label="Contacto sin registrar"/>}
+          <span className="min-w-0 break-words" title={aviso||r.estadoTexto}>{textoPrincipal}</span>{r.contactoVencido&&<TriangleAlert className="h-3.5 w-3.5 shrink-0 text-red-400" aria-label="Contacto sin registrar"/>}
         </span>
       </span>
     </div>;
