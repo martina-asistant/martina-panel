@@ -369,6 +369,157 @@ function CalendarioSeg({valor,cambiar,min,max}:{valor:string;cambiar:(v:string)=
   return <div className="relative"><button type="button" aria-expanded={abierto} className={campoSeg} onClick={()=>{if(!abierto)setMes(new Date(`${valor||hoy}T12:00:00`));setAbierto(v=>!v)}}><CalendarDays className="h-4 w-4 text-cyan-300"/><span className="flex-1">{valor?fechaGestionSeg(valor):'Seleccionar fecha'}</span><ChevronDown className="h-4 w-4 text-cyan-300"/></button>{abierto&&<><button type="button" className="fixed inset-0 z-40 cursor-default" aria-label="Cerrar calendario" onClick={()=>setAbierto(false)}/><div className="absolute left-1/2 top-full z-50 mt-1 w-[230px] -translate-x-1/2 rounded-xl border border-cyan-400/45 bg-[#062631] p-3 shadow-[0_8px_30px_rgba(0,0,0,.6),0_0_15px_rgba(34,211,238,.18)]"><div className="mb-2 flex items-center justify-between border-b border-cyan-400/25 pb-2 text-xs lg:text-sm uppercase text-cyan-200"><button type="button" aria-label="Mes anterior" onClick={()=>setMes(new Date(y,m-1,1))}><ChevronLeft className="h-4 w-4"/></button>{mes.toLocaleDateString('es-ES',{month:'long',year:'numeric'})}<button type="button" aria-label="Mes siguiente" onClick={()=>setMes(new Date(y,m+1,1))}><ChevronRight className="h-4 w-4"/></button></div><div className="grid grid-cols-7 text-center text-[11px]">{['L','M','X','J','V','S','D'].map(d=><span key={d} className="pb-1 text-cyan-300/70">{d}</span>)}{Array.from({length:inicio},(_,i)=><span key={`e${i}`}/>)}{Array.from({length:dias},(_,i)=>{const f=claveLocal(new Date(y,m,i+1));return <button key={f} type="button" disabled={Boolean((min&&f<min)||(max&&f>max))} onClick={()=>{cambiar(f);setAbierto(false)}} className={`h-7 rounded-full hover:bg-cyan-400/20 disabled:opacity-25 ${f===valor?'bg-cyan-500/40 text-white':f===hoy?'border border-cyan-300 text-white':(inicio+i)%7>=5?'text-slate-400':'text-white'}`}>{i+1}</button>})}</div></div></>}</div>;
 }
 
+// Cronología de solo lectura: paleta de tratamientos de Agenda y estados de Pacientes.
+const colorTratamientoCronologia = (valor: string | null) => {
+  const motivo = (valor || '').trim().toLowerCase();
+
+  if (motivo === 'anotacion') {
+    return {
+      bg: 'rgba(14,116,144,.88)',
+      text: 'text-white',
+    };
+  }
+
+  if (motivo === 'primera visita') {
+    return { bg: 'rgba(250,204,21,.90)', text: 'text-white' };
+  }
+
+  if (motivo === 'férula' || motivo === 'ferula' || motivo === 'férula michigan' || motivo === 'ferula michigan') {
+  return { bg: 'rgba(202,138,4,.90)', text: 'text-white' };
+}
+
+  if (motivo === 'endodoncia') {
+    return { bg: 'rgba(244,114,182,.90)', text: 'text-white' };
+  }
+
+  if (motivo === 'rec+post') {
+    return { bg: 'rgba(236,72,153,.90)', text: 'text-white' };
+  }
+
+  if (motivo === 'profilaxis' || motivo === 'limpieza') {
+  return { bg: 'rgba(148,163,184,.90)', text: 'text-white' };
+}
+
+if (motivo === 'exodoncia') {
+  return {
+    bg: 'rgba(248,113,113,.90)',
+    text: 'text-white',
+  };
+}
+
+  if (motivo === 'obturación' || motivo === 'obturacion') {
+    return { bg: 'rgba(168,85,247,.90)', text: 'text-white' };
+  }
+
+  if (motivo === 'revisión' || motivo === 'revision') {
+    return { bg: 'rgba(108,156,224,.90)', text: 'text-white' };
+  }
+
+  if (motivo === 'revisión general' || motivo === 'revision general') {
+    return { bg: 'rgba(125,211,252,.90)', text: 'text-white' };
+  }
+
+  if (motivo === 'prótesis' || motivo === 'protesis') {
+    return { bg: 'rgba(255,142,43,.85)', text: 'text-white' };
+  }
+
+  if (motivo === 'impresiones') {
+    return { bg: 'rgba(255,169,77,.85)', text: 'text-white' };
+  }
+
+  if (motivo === 'prueba-colocar') {
+    return { bg: 'rgba(249,115,22,.90)', text: 'text-white' };
+  }
+
+  if (motivo === 'raspados') {
+    return { bg: 'rgba(153,27,27,.85)', text: 'text-white' };
+  }
+
+  if (motivo === 'tallados') {
+    return { bg: 'rgba(220,38,38,.85)', text: 'text-white' };
+  }
+
+  if (motivo === 'implante') {
+    return { bg: 'rgba(14,165,233,.90)', text: 'text-white' };
+  }
+
+  if (motivo === 'quitar puntos') {
+  return { bg: 'rgba(34,197,94,.90)', text: 'text-white' };
+}
+
+if (motivo === 'fotos') {
+  return { bg: 'rgba(161,98,7,.90)', text: 'text-white' };
+}
+
+  if (motivo === 'cirugía' || motivo === 'cirugia') {
+    return { bg: 'rgba(255,255,255,.95)', text: 'text-[#03111A]' };
+  }
+
+  // VER-VALORAR (lila claro elegante)
+if (motivo === 'ver-valorar' || motivo === 'ver valorar') {
+  return {
+    bg: 'rgba(184,163,209,.90)',
+    text: 'text-white',
+  };
+}
+
+// ORTODONCIA (morado intenso)
+if (motivo === 'ortodoncia') {
+  return {
+    bg: 'rgba(122,91,157,.90)',
+    text: 'text-white',
+  };
+}
+
+// BLANQUEAMIENTO (plata brillante)
+if (motivo === 'blanqueamiento') {
+  return {
+    bg: 'rgba(246,239,230,.90)',
+    text: 'text-slate-800',
+  };
+}
+
+  return { bg: 'rgba(59,130,246,.85)', text: 'text-white' };
+};
+
+const estadosCronologia: Record<string,{texto:string; punto:string}> = {
+  finalizada:{texto:'Finalizada',punto:'bg-green-400 shadow-[0_0_6px_rgba(74,222,128,.35)]'},
+  pendiente:{texto:'Pendiente',punto:'bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,.35)]'},
+  no_ha_venido:{texto:'No ha venido',punto:'bg-red-500 shadow-[0_0_6px_rgba(239,68,68,.35)]'},
+  cancelada:{texto:'Cancelada',punto:'bg-orange-400 shadow-[0_0_6px_rgba(251,146,60,.35)]'},
+};
+
+function CronologiaCitasSeguimiento({primera,citas}:{primera:CitaDB;citas:CitaDB[]}) {
+  // El Dashboard ya entrega citas únicas por agenda/evento; no se consulta ni escribe nada adicional.
+  const inicio=Date.parse(primera.fecha_inicio||'');
+  const visibles=citas.filter(c=>c.patient_id===primera.patient_id && c.fecha_inicio && Number.isFinite(Date.parse(c.fecha_inicio)) && Date.parse(c.fecha_inicio)>=inicio)
+    .sort((a,b)=>Date.parse(a.fecha_inicio!)-Date.parse(b.fecha_inicio!) || a.id.localeCompare(b.id));
+  return <div className="mt-3 min-w-0 border-t border-cyan-400/20 pt-3">
+    <div className="mb-2 flex items-center justify-between gap-2">
+      <h4 className="text-xs lg:text-sm text-cyan-300">CRONOLOGÍA DE CITAS</h4>
+      <span className="text-[10px] text-cyan-100/55">{visibles.length} {visibles.length===1?'cita':'citas'}</span>
+    </div>
+    <div className={`min-w-0 overflow-x-auto overscroll-x-contain pb-2 ${scrollSeguimiento}`}>
+      <ol className="flex w-max items-start py-1" aria-label="Cronología de citas">
+        {visibles.map((c,i)=>{
+          const clave=normalizar(c.estado);
+          const estado=estadosCronologia[clave==='no asistio'?'no_ha_venido':clave]||{texto:c.estado||'Sin estado',punto:'bg-slate-400'};
+          const motivo=c.motivo||'Sin motivo';
+          const fecha=fechaCitaSeg(c.fecha_inicio);
+          return <li key={c.id} className="relative flex w-[132px] shrink-0 flex-col items-center gap-1.5 px-2 text-center">
+            <span className="whitespace-nowrap text-[11px] leading-4 text-cyan-100/75">{fecha}</span>
+            <div className="relative flex h-3 w-full items-center justify-center">
+              {i<visibles.length-1&&<span aria-hidden="true" className="absolute left-1/2 top-1/2 h-px w-[132px] -translate-y-1/2 bg-cyan-400/25"/>}
+              <span role="img" title={estado.texto} aria-label={estado.texto} className={`relative z-[1] h-2 w-2 shrink-0 rounded-full ${estado.punto}`}/>
+            </div>
+            <span title={motivo} className="max-w-full truncate rounded-full border bg-transparent px-2.5 py-0.5 text-[11px] leading-4 text-white" style={{borderColor:colorTratamientoCronologia(c.motivo).bg}}>{motivo}</span>
+          </li>;
+        })}
+      </ol>
+    </div>
+  </div>;
+}
+
 function CajaSeguimiento({citas,cargando,errorDatos}:{citas:CitaDB[];cargando:boolean;errorDatos:string}) {
   const [gestiones,setGestiones]=useState<GestionSeguimiento[]>([]);
   const [cargandoGestiones,setCargandoGestiones]=useState(true);
@@ -575,6 +726,7 @@ function CajaSeguimiento({citas,cargando,errorDatos}:{citas:CitaDB[];cargando:bo
             </div>
             <div><span className={labelSeg}>Próxima cita</span><div className={`flex min-h-7 items-center ${r.proxima?'text-cyan-100/75':r.estado==='finalizado'?'text-green-300':r.estado==='no_continua'?'text-violet-300':'text-red-300'}`}>{fechaCitaSeg(r.proxima?.fecha_inicio||null)}</div></div>
           </div>
+          {esInspector&&<CronologiaCitasSeguimiento primera={r.primera} citas={citas}/>}
           {presupuesto?.presupuesto_entregado===true&&<div className="mt-3 space-y-2 border-t border-cyan-400/20 pt-3"><div className="flex items-center justify-between gap-2"><span className="text-cyan-200">EXPLICACIÓN INICIAL DEL PRESUPUESTO</span><button type="button" className={botonSeg} onClick={()=>{setFinInicial(inicial?.financiacion_inicial_ofrecida??null);const m=inicial?.motivo_no_coge_cita||'';setMotivoInicial(m&&!motivosSeg.includes(m)?'Otro motivo':m);setOtroInicial(m&&!motivosSeg.includes(m)?m:'');setEditarInicial(v=>!v)}}>{editarInicial?'Cancelar':'Editar'}</button></div>
           {!editarInicial?<div className="text-cyan-100/80">Financiación: {inicial?.financiacion_inicial_ofrecida==null?'Sin registrar':inicial.financiacion_inicial_ofrecida?'Sí':'No'}{!r.proxima&&<p className="mt-1">Motivo: {inicial?.motivo_no_coge_cita||'Sin registrar'}</p>}</div>:<><div className="flex flex-wrap items-center gap-2"><span>¿Se ha ofrecido financiación?</span>{capsula('Sí',finInicial===true,()=>setFinInicial(true))}{capsula('No',finInicial===false,()=>setFinInicial(false))}</div>{!r.proxima&&<><span className={labelSeg}>Motivo por el que no ha cogido cita</span><SelectorSeg valor={motivoInicial} opciones={opcionesMotivo} cambiar={setMotivoInicial} placeholder="Seleccionar motivo"/>{motivoInicial==='Otro motivo'&&<input className={inputSeg} value={otroInicial} onChange={e=>setOtroInicial(e.target.value)} placeholder="Especificar motivo"/>}</>}<button type="button" disabled={Boolean(guardando)} className={botonSeg} onClick={async()=>{if(motivoInicial==='Otro motivo'&&!otroInicial.trim()){setErrorGuardar('Especifica el motivo');return;}if(await actualizar({historial_cita_id:r.primera.id,tipo_registro:'gestion',resultado:'datos_iniciales',financiacion_inicial_ofrecida:finInicial,motivo_no_coge_cita:motivoInicial==='Otro motivo'?otroInicial.trim():motivoInicial||null},r.primera.id,inicial?.id))setEditarInicial(false)}}>Guardar información inicial</button></>}
           </div>}
