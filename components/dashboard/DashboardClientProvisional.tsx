@@ -566,10 +566,7 @@ function CajaSeguimiento({citas,cargando,errorDatos}:{citas:CitaDB[];cargando:bo
         </button>
       </div>
 
-      {abierta&&createPortal(<div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/70 p-3 sm:p-5" role="presentation">
-        <section role="dialog" aria-modal="true" aria-label={`Historial de ${r.primera.nombre_paciente||'paciente'}`} className="flex max-h-[85dvh] w-full max-w-[950px] flex-col overflow-hidden rounded-2xl border border-cyan-400/45 bg-[#021820] text-white shadow-[0_12px_60px_rgba(0,0,0,.65)]">
-          <header className="flex shrink-0 items-center justify-between gap-3 border-b border-cyan-400/30 px-4 py-3"><div className="min-w-0"><h3 className="break-words text-base font-medium">{r.primera.nombre_paciente||'Paciente'}</h3><p className="text-xs text-cyan-200">Historial de seguimiento</p></div><button type="button" disabled={Boolean(guardando)} onClick={()=>desplegar(r)} aria-label="Cerrar historial" className={botonSeg}><X className="h-5 w-5"/></button></header>
-          <div className={`min-h-0 space-y-3 overflow-y-auto overscroll-contain px-3 py-3 sm:px-4 ${scrollSeguimiento}`}>
+      {abierta&&<div className="space-y-3 border-t border-cyan-500/10 bg-[#021820] px-3 py-3 sm:px-4">
         <div className="rounded-xl border border-cyan-400/30 bg-[#06232D] p-3 text-xs lg:text-sm">
           <div className="grid grid-cols-3 items-start gap-2 lg:gap-4">
             <div><span className={labelSeg}>Primera visita</span><div className="flex min-h-7 items-center">{fechaCitaSeg(r.primera.fecha_inicio)}</div></div>
@@ -600,9 +597,7 @@ function CajaSeguimiento({citas,cargando,errorDatos}:{citas:CitaDB[];cargando:bo
           {resultado==='no_continua'&&<div><span className={labelSeg}>Motivo de cierre</span><SelectorSeg valor={motivoCierre} cambiar={setMotivoCierre} placeholder="Seleccionar motivo" opciones={['Motivos económicos','Ha elegido otra clínica','Otro motivo'].map(v=>({value:v,label:v}))}/>{motivoCierre==='Otro motivo'&&<input className={`${inputSeg} mt-2`} value={otroCierre} onChange={e=>setOtroCierre(e.target.value)} placeholder="Especificar motivo"/>}</div>}
           <div><span className={labelSeg}>Observaciones (opcional)</span><textarea rows={2} className={inputSeg} value={observaciones} onChange={e=>setObservaciones(e.target.value)} placeholder="Añadir observaciones…"/></div><div className="flex items-center justify-end gap-3 border-t border-cyan-400/25 pt-2"><button type="button" className="text-xs lg:text-sm text-slate-400" onClick={()=>{setFormulario(false);resetFormulario()}}>Cancelar</button><button type="button" disabled={Boolean(guardando)} className={botonSeg} onClick={()=>void registrar(r)}><Check className="h-4 w-4"/>{guardando===r.primera.id?'Guardando…':gestionEditada?'Guardar cambios':'Guardar gestión'}</button></div>{errorGuardar&&<p role="alert" className="text-xs lg:text-sm text-amber-200">{errorGuardar}</p>}</div></div>,document.body)}
         {!formulario&&errorGuardar&&<p role="alert" className="text-xs lg:text-sm text-amber-200">{errorGuardar}</p>}
-          </div>
-        </section>
-      </div>,document.body)}
+      </div>}
     </div>;
   };
   // En el Dashboard no hay desplegables ni ediciones. La ficha de gestión queda en INSPECCIONAR.
