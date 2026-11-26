@@ -566,7 +566,7 @@ function CajaSeguimiento({citas,cargando,errorDatos}:{citas:CitaDB[];cargando:bo
         </button>
       </div>
 
-      {abierta&&<div className="space-y-3 border-t border-cyan-500/10 bg-[#021820] px-3 py-3 sm:px-4">
+      {abierta&&<div className="mx-auto w-full max-w-[1100px] space-y-3 border-t border-cyan-500/10 bg-[#021820] px-3 py-3 sm:px-4">
         <div className="rounded-xl border border-cyan-400/30 bg-[#06232D] p-3 text-xs lg:text-sm">
           <div className="grid grid-cols-3 items-start gap-2 lg:gap-4">
             <div><span className={labelSeg}>Primera visita</span><div className="flex min-h-7 items-center">{fechaCitaSeg(r.primera.fecha_inicio)}</div></div>
