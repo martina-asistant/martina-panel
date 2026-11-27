@@ -129,7 +129,7 @@ const rangoHistorial = (inicio?: string | null, fin?: string | null) => {
 type CitaConOrigen = HistorialCita & { origen?: string | null };
 type MovimientoVisual = {
   id: string; tipo: string; responsable: string | null; canal: string | null;
-  fecha: string | null; nuevaFecha?: string; detalle?: string | null;
+  fecha: string | null; fechaAnterior?: string; detalle?: string | null;
 };
 const puntosMovimiento: Record<string, string> = {
   creacion: 'bg-sky-400', modificacion: 'bg-violet-400',
@@ -163,10 +163,10 @@ function prepararMovimientos(cita: CitaConOrigen, cambios: HistorialCitaCambio[]
   const movimientos: MovimientoVisual[] = propios.map(m => ({
     id: m.id, tipo: m.tipo_movimiento, responsable: m.realizado_por, canal: m.canal,
     fecha: m.created_at,
-    nuevaFecha: m.tipo_movimiento === 'modificacion' && m.fecha_nueva &&
+    fechaAnterior: m.tipo_movimiento === 'modificacion' && m.fecha_anterior && m.fecha_nueva &&
       (Date.parse(m.fecha_nueva) !== Date.parse(m.fecha_anterior || '') ||
        (m.fecha_fin_nueva || null) !== (m.fecha_fin_anterior || null))
-      ? rangoHistorial(m.fecha_nueva, m.fecha_fin_nueva) : undefined,
+      ? rangoHistorial(m.fecha_anterior, m.fecha_fin_anterior) : undefined,
     detalle: m.tipo_movimiento === 'cancelacion' ? m.motivo_cambio : null,
   }));
   const origen = (cita.origen || '').trim();
@@ -185,10 +185,7 @@ function prepararMovimientos(cita: CitaConOrigen, cambios: HistorialCitaCambio[]
     const tiempo = (m: MovimientoVisual) => m.fecha && Number.isFinite(Date.parse(m.fecha)) ? Date.parse(m.fecha) : m.tipo === 'creacion' ? -Infinity : Infinity;
     return tiempo(a) - tiempo(b) || (a.tipo === 'creacion' ? -1 : b.tipo === 'creacion' ? 1 : a.id.localeCompare(b.id));
   });
-  const primeraModificacion = propios.find(m => m.tipo_movimiento === 'modificacion');
-  const original = primeraModificacion?.fecha_anterior;
-  return { movimientos, inicio: original || cita.fecha_inicio,
-    fin: original ? primeraModificacion.fecha_fin_anterior : cita.fecha_fin };
+  return { movimientos, inicio: cita.fecha_inicio, fin: cita.fecha_fin };
 }
 
 function CronologiaMovimientos({ movimientos }: { movimientos: MovimientoVisual[] }) {
@@ -199,7 +196,7 @@ function CronologiaMovimientos({ movimientos }: { movimientos: MovimientoVisual[
       <span aria-hidden="true" className={`absolute left-0 top-[5px] h-[7px] w-[7px] rounded-full ${puntosMovimiento[m.tipo] || 'bg-slate-400'}`} />
       <div className="break-words text-xs text-white/85">{etiquetasMovimiento[m.tipo] || textoHistorial(m.tipo)}{m.responsable ? `${m.tipo === 'no_ha_venido' ? ' · Registrado por ' : ' por '}${textoHistorial(m.responsable)}` : ''}{m.canal && m.canal.toLowerCase() !== 'panel' ? ` · ${canalMovimiento(m.canal)}` : ''}</div>
       {m.fecha && <div className="mt-0.5 text-[11px] text-slate-400">{mostrarFechaMovimiento(m.fecha)}</div>}
-      {m.nuevaFecha && <div className="mt-0.5 break-words text-xs text-sky-400">Nueva fecha: {m.nuevaFecha}</div>}
+      {m.fechaAnterior && <div className="mt-0.5 break-words text-xs text-white">Fecha anterior: {m.fechaAnterior}</div>}
       {m.detalle && <div className="mt-0.5 break-words text-xs text-slate-400">Motivo: {m.detalle}</div>}
     </li>)}
   </ol>;
