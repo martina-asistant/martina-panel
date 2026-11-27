@@ -341,8 +341,8 @@ function clasificarSeguimiento(citas:CitaDB[],gestiones:GestionSeguimiento[],hoy
     else if(estado==='curso'&&proxima)estadoTexto='En tratamiento';
     else if(contactoVencido)estadoTexto='Contacto sin registrar';
     else if(fechaContacto)estadoTexto=`Volver a contactar ${fechaContactoCorta(fechaContacto)}`;
-    else if(estado==='curso')estadoTexto='En tratamiento';
     else if(ultimaGestion?.contactara_paciente)estadoTexto='Contactará el paciente';
+    else if(estado==='curso')estadoTexto='En tratamiento';
     else if(ultimaGestion?.acepta_nuevo_contacto===false)estadoTexto='No acepta próximo contacto';
     else if(ultimaGestion)estadoTexto=ultimaGestion.resultado==='sin_respuesta'?'Sin respuesta':ultimaGestion.resultado==='no_contesta'?'No contesta':'En seguimiento';
     return {primera,proxima,estado,gestiones:historial,ultimo:ult,finActivo,fechaContacto,estadoTexto,alerta:contactoVencido||sinGestionVencida,contactoVencido,contactosAnulados};
@@ -605,8 +605,12 @@ function CajaSeguimiento({citas,historialCitas,cargando,errorDatos}:{citas:CitaD
   // Excepción de la carga inicial: los cierres previos a este ajuste quedan solo en el histórico.
   const corteCierresIniciales=Date.parse('2026-11-25T15:59:53+01:00');
   const prioridadSeguimiento:Record<EstadoSeguimiento,number>={pendiente:0,curso:1,finalizado:2,no_continua:3};
+  const primeraDelMes=(r:FilaSeguimiento)=>diaMadrid(r.primera.fecha_inicio).slice(0,7)===mesActual;
   const datosMes=registros.filter(r=>{
     if(r.estado==='no_continua')return false;
+    const presupuesto=[...r.gestiones].reverse().find(g=>g.presupuesto_entregado!=null);
+    if(presupuesto?.presupuesto_entregado===false)return false;
+    if(!r.proxima&&r.estadoTexto==='Contactará el paciente')return primeraDelMes(r);
     if(r.estado==='pendiente'||(r.estado==='curso'&&!r.proxima))return true;
     if(r.estado==='finalizado'){
       const cierre=r.finActivo?.fecha_registro;
@@ -616,6 +620,7 @@ function CajaSeguimiento({citas,historialCitas,cargando,errorDatos}:{citas:CitaD
   }).sort((a,b)=>prioridadSeguimiento[a.estado]-prioridadSeguimiento[b.estado] || (a.primera.fecha_inicio||'').localeCompare(b.primera.fecha_inicio||''));
   const datosTablaSeguimiento=filtroTablaSeguimiento==='mes'
     ? datosMes.filter(r=>{
+        if((r.estado==='pendiente'||r.estado==='curso')&&primeraDelMes(r))return true;
         if((r.estado==='pendiente'||r.estado==='curso')&&!r.proxima){
           // Contactos previstos: visibles desde su mes, incluidos los vencidos.
           if(r.fechaContacto)return r.fechaContacto.slice(0,7)<=mesActual;
@@ -798,7 +803,7 @@ function CajaSeguimiento({citas,historialCitas,cargando,errorDatos}:{citas:CitaD
     const presupuesto=[...r.gestiones].reverse().find(g=>g.presupuesto_entregado!=null);
     const valorPresupuesto=presupuesto?.presupuesto_entregado;
     const aviso=(r.estado==='pendiente'||r.estado==='curso')&&!r.proxima
-      ? r.contactoVencido?'Contacto sin registrar':r.fechaContacto?r.estadoTexto:''
+      ? r.contactoVencido?'Contacto sin registrar':r.fechaContacto||r.estadoTexto==='Contactará el paciente'?r.estadoTexto:''
       : '';
     const textoPrincipal=aviso||(r.estado==='pendiente'?'Pendiente':r.estado==='curso'?'En tratamiento':r.estado==='finalizado'?'TTO finalizado':'No continúan');
     return <div key={r.primera.id} className="grid grid-cols-[minmax(0,1fr)_39px_25px_43px_72px] items-center gap-0.5 border-t border-cyan-500/10 px-2 py-3.5 text-[10px] transition-colors hover:bg-cyan-500/[.035] sm:grid-cols-[minmax(0,1.8fr)_80px_100px_75px_minmax(0,1.3fr)] lg:grid-cols-[minmax(0,1.5fr)_minmax(68px,.65fr)_minmax(95px,.8fr)_minmax(65px,.65fr)_minmax(0,1.45fr)] sm:gap-2 sm:px-3 sm:text-xs">
