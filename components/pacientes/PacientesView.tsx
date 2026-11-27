@@ -155,6 +155,12 @@ function prepararMovimientos(cita: CitaConOrigen, cambios: HistorialCitaCambio[]
     cita.estado === 'no_ha_venido' ? 'no_ha_venido' : null;
   const ultimoEstado = tipoEstado ? todos.filter(m => m.tipo_movimiento === tipoEstado).pop() : undefined;
   const propios = todos.filter(m => {
+    // Solo es una modificación de cita si cambia el día o la hora de inicio.
+    if (m.tipo_movimiento === 'modificacion') {
+      const anterior = Date.parse(m.fecha_anterior || '');
+      const nueva = Date.parse(m.fecha_nueva || '');
+      return Number.isFinite(anterior) && Number.isFinite(nueva) && anterior !== nueva;
+    }
     if (m.tipo_movimiento === 'finalizacion' || m.tipo_movimiento === 'no_ha_venido') {
       return m.id === ultimoEstado?.id;
     }
@@ -163,9 +169,7 @@ function prepararMovimientos(cita: CitaConOrigen, cambios: HistorialCitaCambio[]
   const movimientos: MovimientoVisual[] = propios.map(m => ({
     id: m.id, tipo: m.tipo_movimiento, responsable: m.realizado_por, canal: m.canal,
     fecha: m.created_at,
-    fechaAnterior: m.tipo_movimiento === 'modificacion' && m.fecha_anterior && m.fecha_nueva &&
-      (Date.parse(m.fecha_nueva) !== Date.parse(m.fecha_anterior || '') ||
-       (m.fecha_fin_nueva || null) !== (m.fecha_fin_anterior || null))
+    fechaAnterior: m.tipo_movimiento === 'modificacion'
       ? rangoHistorial(m.fecha_anterior, m.fecha_fin_anterior) : undefined,
     detalle: m.tipo_movimiento === 'cancelacion' ? m.motivo_cambio : null,
   }));
