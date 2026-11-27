@@ -14,7 +14,7 @@ import {
   X,
 } from 'lucide-react';
 
-import type { Patient, HistorialCita } from '@/lib/types/db.types';
+import type { Patient, HistorialCita, HistorialCitaCambio } from '@/lib/types/db.types';
 import { createClient } from '@/lib/supabase/client';
 
 import {
@@ -24,6 +24,7 @@ import {
 } from '@/lib/repos/pacientes.repo';
 import {
   listarHistorialPaciente,
+  listarCambiosHistorialPaciente,
   calcularResumenHistorial,
 } from '@/lib/repos/pacientes-historial.repo';
 
@@ -121,6 +122,93 @@ const rangoHistorial = (inicio?: string | null, fin?: string | null) => {
   if (!desde) return '—';
   if (!hasta) return `${desde.dia} - ${desde.hora}`;
   return `${desde.dia} - ${desde.hora} a ${hasta.hora}`;
+};
+
+// Presentación únicamente: el repositorio ya devuelve origen mediante select('*').
+// No se altera el tipo compartido ni la fecha vigente utilizada por el resumen.
+type CitaConOrigen = HistorialCita & { origen?: string | null };
+type MovimientoVisual = {
+  id: string; tipo: string; responsable: string | null; canal: string | null;
+  fecha: string | null; nuevaFecha?: string; detalle?: string | null;
+};
+const puntosMovimiento: Record<string, string> = {
+  creacion: 'bg-sky-400', modificacion: 'bg-violet-400',
+  cancelacion: 'bg-orange-400', finalizacion: 'bg-green-400',
+  no_ha_venido: 'bg-red-500',
+};
+const etiquetasMovimiento: Record<string, string> = {
+  creacion: 'Creada', modificacion: 'Modificada', cancelacion: 'Cancelada',
+  finalizacion: 'Finalizada', no_ha_venido: 'No ha venido',
+};
+const canalMovimiento = (canal: string | null) => {
+  const valor = (canal || '').trim();
+  const etiquetas: Record<string, string> = { voz: 'Voz', llamadas: 'Voz', whatsapp: 'WhatsApp', panel: 'Panel', chat: 'Chat', qr: 'QR' };
+  return etiquetas[valor.toLowerCase()] || valor;
+};
+const ordenarMovimientos = (a: HistorialCitaCambio, b: HistorialCitaCambio) =>
+  Date.parse(a.created_at) - Date.parse(b.created_at) || a.id.localeCompare(b.id);
+
+function prepararMovimientos(cita: CitaConOrigen, cambios: HistorialCitaCambio[]) {
+  const todos = cambios.filter(m => m.historial_cita_id === cita.id).sort(ordenarMovimientos);
+  // Los estados de recepción son corregibles: solo mostrar el movimiento vigente.
+  const tipoEstado = cita.estado === 'finalizada' ? 'finalizacion' :
+    cita.estado === 'no_ha_venido' ? 'no_ha_venido' : null;
+  const ultimoEstado = tipoEstado ? todos.filter(m => m.tipo_movimiento === tipoEstado).pop() : undefined;
+  const propios = todos.filter(m => {
+    if (m.tipo_movimiento === 'finalizacion' || m.tipo_movimiento === 'no_ha_venido') {
+      return m.id === ultimoEstado?.id;
+    }
+    return m.tipo_movimiento !== 'cancelacion' || cita.estado === 'cancelada';
+  });
+  const movimientos: MovimientoVisual[] = propios.map(m => ({
+    id: m.id, tipo: m.tipo_movimiento, responsable: m.realizado_por, canal: m.canal,
+    fecha: m.created_at,
+    nuevaFecha: m.tipo_movimiento === 'modificacion' && m.fecha_nueva &&
+      (Date.parse(m.fecha_nueva) !== Date.parse(m.fecha_anterior || '') ||
+       (m.fecha_fin_nueva || null) !== (m.fecha_fin_anterior || null))
+      ? rangoHistorial(m.fecha_nueva, m.fecha_fin_nueva) : undefined,
+    detalle: m.tipo_movimiento === 'cancelacion' ? m.motivo_cambio : null,
+  }));
+  const origen = (cita.origen || '').trim();
+  const responsable = cita.creada_por || (['blanca','fede','sheila','martina'].includes(origen.toLowerCase()) ? origen : null);
+  if (!propios.some(m => m.tipo_movimiento === 'creacion') && (responsable || cita.canal_creacion)) {
+    movimientos.unshift({ id: `${cita.id}-creacion`, tipo: 'creacion', responsable,
+      canal: cita.canal_creacion, fecha: cita.creada_por || cita.canal_creacion ? cita.created_at : null });
+  }
+  if (cita.estado === 'cancelada' && !propios.some(m => m.tipo_movimiento === 'cancelacion') &&
+      (cita.cancelada_por || cita.canal_cancelacion || cita.cancelada_at || cita.motivo_cancelacion)) {
+    movimientos.push({ id: `${cita.id}-cancelacion`, tipo: 'cancelacion', responsable: cita.cancelada_por,
+      canal: cita.canal_cancelacion, fecha: cita.cancelada_at, detalle: cita.motivo_cancelacion });
+  }
+  // La creación histórica sin fecha se muestra primero; otros movimientos sin fecha al final.
+  movimientos.sort((a,b) => {
+    const tiempo = (m: MovimientoVisual) => m.fecha && Number.isFinite(Date.parse(m.fecha)) ? Date.parse(m.fecha) : m.tipo === 'creacion' ? -Infinity : Infinity;
+    return tiempo(a) - tiempo(b) || (a.tipo === 'creacion' ? -1 : b.tipo === 'creacion' ? 1 : a.id.localeCompare(b.id));
+  });
+  const primeraModificacion = propios.find(m => m.tipo_movimiento === 'modificacion');
+  const original = primeraModificacion?.fecha_anterior;
+  return { movimientos, inicio: original || cita.fecha_inicio,
+    fin: original ? primeraModificacion.fecha_fin_anterior : cita.fecha_fin };
+}
+
+function CronologiaMovimientos({ movimientos }: { movimientos: MovimientoVisual[] }) {
+  if (!movimientos.length) return null;
+  return <ol className="mt-3 ml-1" aria-label="Movimientos de la cita">
+    {movimientos.map((m,i) => <li key={m.id} className="relative min-w-0 pb-2.5 pl-4 last:pb-0">
+      {i < movimientos.length - 1 && <span aria-hidden="true" className="absolute left-[3px] top-[7px] h-full w-px bg-cyan-400/20" />}
+      <span aria-hidden="true" className={`absolute left-0 top-[5px] h-[7px] w-[7px] rounded-full ${puntosMovimiento[m.tipo] || 'bg-slate-400'}`} />
+      <div className="break-words text-xs text-white/85">{etiquetasMovimiento[m.tipo] || textoHistorial(m.tipo)}{m.responsable ? `${m.tipo === 'no_ha_venido' ? ' · Registrado por ' : ' por '}${textoHistorial(m.responsable)}` : ''}{m.canal && m.canal.toLowerCase() !== 'panel' ? ` · ${canalMovimiento(m.canal)}` : ''}</div>
+      {m.fecha && <div className="mt-0.5 text-[11px] text-slate-400">{mostrarFechaMovimiento(m.fecha)}</div>}
+      {m.nuevaFecha && <div className="mt-0.5 break-words text-xs text-sky-400">Nueva fecha: {m.nuevaFecha}</div>}
+      {m.detalle && <div className="mt-0.5 break-words text-xs text-slate-400">Motivo: {m.detalle}</div>}
+    </li>)}
+  </ol>;
+}
+
+const mostrarFechaMovimiento = (valor: string) => {
+  const d = new Date(valor);
+  if (Number.isNaN(d.getTime())) return '—';
+  return new Intl.DateTimeFormat('es-ES', { timeZone: 'Europe/Madrid', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(d).replace(', ', ' - ');
 };
 
 const estiloEstadoHistorial: Record<string, { nombre: string; punto: string; fondo: string }> = {
@@ -232,6 +320,8 @@ export default function PacientesView() {
 
   const [error, setError] = useState('');
   const [historial, setHistorial] = useState<HistorialCita[]>([]);
+  const [cambiosHistorial, setCambiosHistorial] = useState<HistorialCitaCambio[]>([]);
+  const [errorMovimientos, setErrorMovimientos] = useState('');
   const [cargandoHistorial, setCargandoHistorial] = useState(false);
   const [errorHistorial, setErrorHistorial] = useState('');
 
@@ -292,6 +382,8 @@ export default function PacientesView() {
     const patientId = seleccionado?.id;
     if (!patientId) {
       setHistorial([]);
+      setCambiosHistorial([]);
+      setErrorMovimientos('');
       setErrorHistorial('');
       setCargandoHistorial(false);
       return;
@@ -301,6 +393,8 @@ export default function PacientesView() {
     setCargandoHistorial(true);
     setErrorHistorial('');
     setHistorial([]);
+    setCambiosHistorial([]);
+    setErrorMovimientos('');
 
     const cargarHistorial = async () => {
       try {
@@ -321,6 +415,14 @@ export default function PacientesView() {
             p.id === patientId ? { ...p, ...resumen } : p
           )
         );
+        // Un fallo de lectura de movimientos no oculta las citas ni su resumen.
+        try {
+          const cambios = await listarCambiosHistorialPaciente(citas);
+          if (activo) setCambiosHistorial(cambios);
+        } catch (e) {
+          console.error('Error cargando movimientos:', e);
+          if (activo) setErrorMovimientos('No se han podido consultar todos los movimientos de las citas.');
+        }
       } catch (e) {
         console.error('Error cargando historial de citas:', e);
         if (activo) setErrorHistorial('No se ha podido cargar el historial de citas.');
@@ -821,7 +923,9 @@ export default function PacientesView() {
                     </div>
                   ) : (
                     <div className="mt-4 max-h-[390px] space-y-2 overflow-y-auto overflow-x-hidden pr-2 [scrollbar-width:thin] [scrollbar-color:#155365_#031B24] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-track]:bg-[#031B24] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#155365] hover:[&::-webkit-scrollbar-thumb]:bg-[#216D80] md:max-h-none md:min-h-0 md:flex-1">
+                      {errorMovimientos && <p role="alert" className="text-xs text-amber-200/80">{errorMovimientos}</p>}
                       {historial.map((cita) => {
+                        const cronologia = prepararMovimientos(cita, cambiosHistorial);
                         const estado = estiloEstadoHistorial[cita.estado] ?? {
                           nombre: textoHistorial(cita.estado),
                           punto: 'bg-slate-400',
@@ -839,7 +943,7 @@ export default function PacientesView() {
                                   {textoHistorial(cita.motivo) || 'Cita sin motivo'}
                                 </div>
                                 <div className="mt-1 text-xs font-semibold text-white">
-                                  {rangoHistorial(cita.fecha_inicio, cita.fecha_fin)}
+                                  {rangoHistorial(cronologia.inicio, cronologia.fin)}
                                 </div>
                                 {cita.detalle_motivo && (
                                   <div className="mt-1 break-words text-xs font-normal text-white">
@@ -857,6 +961,7 @@ export default function PacientesView() {
                                 {estado.nombre}
                               </span>
                             </div>
+                            <CronologiaMovimientos movimientos={cronologia.movimientos} />
                           </div>
                         );
                       })}
